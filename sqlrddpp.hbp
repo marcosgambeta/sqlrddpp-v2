@@ -40,32 +40,30 @@ source/utilslang.prg
 #source/sql.y
 source/sqly.c
 
-source/compat.c
-source/firebird.c
-source/firebird3.c
-source/firebird4.c
-source/firebird5.c
-source/mysql.c
-source/pgs.c
-source/sqlact.c
-source/sqlex1.c
-source/sqlex2.c
-source/sqlex3.c
-source/sqllex.c
-source/sqlora.c
-source/sqlorax.c
-source/sqlrdd1.c
-source/sqlsrodbc.c
+source/compat.cpp
+source/firebird.cpp
+source/firebird3.cpp
+source/firebird4.cpp
+source/firebird5.cpp
+source/mysql.cpp
+source/pgs.cpp
+source/sqlact.cpp
+source/sqlex1.cpp
+source/sqlex2.cpp
+source/sqlex3.cpp
+source/sqllex.cpp
+source/sqlora.cpp
+source/sqlorax.cpp
+source/sqlrdd1.cpp
+source/sqlsrodbc.cpp
 
 -hbx=sqlrddpp.hbx
 sqlrddpp.hbx
 
-# if necessary, add manually:
-# hbmk2 sqlrddpp.hbp -cflag=-fpermissive
-# harbour, gcc and c++ mode
-# harbour++
-#{allgcc}-cflag=-fpermissive
+{allgcc}-cflag=-fpermissive
 
 {allmsvc}-cflag=/D_CRT_SECURE_NO_WARNINGS
 
 xhb.hbc
+
+-cpp=iso11
