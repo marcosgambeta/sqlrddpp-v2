@@ -43,7 +43,7 @@
  *
  */
 
-#if defined(__XCC__) || (defined(__BORLANDC__) && __BORLANDC__ > 0x580)
+#if (defined(__BORLANDC__) && __BORLANDC__ > 0x580)
 #define _INTPTR_T_DEFINED
 #endif
 
