@@ -10,14 +10,14 @@
  *          Regenerate using hbmk2 '-hbx=' option.
  */
 
-#ifndef __HBEXTERN_CH__SQLRDDPP__
-#define __HBEXTERN_CH__SQLRDDPP__
+#ifndef __HBEXTERN_CH__SQLRDDPP_V2__
+#define __HBEXTERN_CH__SQLRDDPP_V2__
 
-#if defined(__HBEXTREQ__) .OR. defined(__HBEXTERN__SQLRDDPP__ANNOUNCE)
-   ANNOUNCE __HBEXTERN__SQLRDDPP__
+#if defined(__HBEXTREQ__) .OR. defined(__HBEXTERN__SQLRDDPP_V2__ANNOUNCE)
+   ANNOUNCE __HBEXTERN__SQLRDDPP_V2__
 #endif
 
-#if defined(__HBEXTREQ__) .OR. defined(__HBEXTERN__SQLRDDPP__REQUEST)
+#if defined(__HBEXTREQ__) .OR. defined(__HBEXTERN__SQLRDDPP_V2__REQUEST)
    #command DYNAMIC <fncs,...> => EXTERNAL <fncs>
 #endif
 
@@ -480,7 +480,7 @@ DYNAMIC _SR_SCANEXECALL
 DYNAMIC _SR_UNREGISTER
 DYNAMIC __SR_STARTSQL
 
-#if defined(__HBEXTREQ__) .OR. defined(__HBEXTERN__SQLRDDPP__REQUEST)
+#if defined(__HBEXTREQ__) .OR. defined(__HBEXTERN__SQLRDDPP_V2__REQUEST)
    #uncommand DYNAMIC <fncs,...> => EXTERNAL <fncs>
 #endif
 
