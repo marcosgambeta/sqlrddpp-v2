@@ -1184,7 +1184,7 @@ HB_FUNC( SQLO2_ORACLESETLOBPREFETCH )
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
 
    if( session ) {
-      hb_retl(OCI_SetDefaultLobPrefetchSize(session->cn , (unsigned int) hb_parni(2)));
+      hb_retl(OCI_SetDefaultLobPrefetchSize(session->cn , static_cast<unsigned int>(hb_parni(2))));
    } else {
       hb_retl(0);
    }
@@ -1195,7 +1195,7 @@ HB_FUNC( SQLO2_SETSTATEMENTCACHESIZE)
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
 
    if( session ) {
-      hb_retl(OCI_SetStatementCacheSize(session->cn, (unsigned int) hb_parni(2)));
+      hb_retl(OCI_SetStatementCacheSize(session->cn, static_cast<unsigned int>(hb_parni(2))));
    } else {
       hb_retl(0);
    }
@@ -1206,7 +1206,7 @@ HB_FUNC( SQLO2_GETSTATEMENTCACHESIZE)
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
 
    if( session ) {
-      hb_retni((unsigned int) OCI_GetStatementCacheSize(session->cn));
+      hb_retni(static_cast<unsigned int>(OCI_GetStatementCacheSize(session->cn)));
    } else {
       hb_retni(0);
    }

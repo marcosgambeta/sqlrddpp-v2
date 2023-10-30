@@ -89,7 +89,7 @@ HB_FUNC( SR_SQLPARSE )     /* SqlParse(cCommand, @nError, @nErrorPos) */
             hb_itemPutNI((PHB_ITEM) hb_param(2, HB_IT_ANY), stmt->errMsg);
          }
          if( HB_ISBYREF(3) ) {
-            hb_itemPutNI((PHB_ITEM) hb_param(3, HB_IT_ANY), (int) (stmt->queryPtr - sqlIniPos));
+            hb_itemPutNI((PHB_ITEM) hb_param(3, HB_IT_ANY), static_cast<int>(stmt->queryPtr - sqlIniPos));
          }
       }
       hb_itemRelease(hb_itemReturnForward(stmt->pArray));
@@ -266,30 +266,30 @@ HB_FUNC( SR_STRTOHEX )
    }
 
    cStr = hb_parc(1);
-   len = (int) hb_parclen(1);
+   len = static_cast<int>(hb_parclen(1));
    outbuff = (char *) hb_xgrab((len * 2) + 1);
    c = outbuff;
 
    for( i = 0; i < len; i++ ) {
 
-      iNum = (int) cStr[i];
+      iNum = static_cast<int>(cStr[i]);
       c[0] = '0';
       c[1] = '0';
 
-      iCipher = (int) (iNum % 16);
+      iCipher = static_cast<int>(iNum % 16);
 
       if( iCipher < 10 ) {
-         c[1] = '0' + (char) iCipher;
+         c[1] = '0' + static_cast<char>(iCipher);
       } else {
-         c[1] = 'A' + (char) (iCipher - 10);
+         c[1] = 'A' + static_cast<char>(iCipher - 10);
       }
       iNum >>= 4;
 
       iCipher = iNum % 16;
       if( iCipher < 10 ) {
-         c[0] = '0' + (char) iCipher;
+         c[0] = '0' + static_cast<char>(iCipher);
       } else {
-         c[0] = 'A' + (char) (iCipher - 10);
+         c[0] = 'A' + static_cast<char>(iCipher - 10);
       }
 
       c += 2;
@@ -307,7 +307,7 @@ char * sr_Hex2Str(const char * cStr, int len, int * lenOut)
    int i, nalloc;
    int iCipher, iNum;
 
-   nalloc = (int) (len / 2);
+   nalloc = static_cast<int>(len / 2);
    outbuff = (char *) hb_xgrab(nalloc + 1);
 
    for( i = 0; i < nalloc; i++ ) {
@@ -345,7 +345,7 @@ char * sr_Hex2Str(const char * cStr, int len, int * lenOut)
 
       iNum += iCipher;
       cStr++;
-      outbuff[i] = (char) iNum;
+      outbuff[i] = static_cast<char>(iNum);
    }
 
    outbuff[nalloc] = '\0';
@@ -876,7 +876,7 @@ HB_FUNC( SR_DBQUALIFY )
       case SYSTEMID_ADABAS:
          szOut[0] = '"';
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i + 1] = (char) toupper((HB_BYTE) pszBuffer[i]);
+            szOut[i + 1] = static_cast<char>(toupper((HB_BYTE) pszBuffer[i]));
          }
          szOut[i + 1] = '"';
          break;
@@ -884,7 +884,7 @@ HB_FUNC( SR_DBQUALIFY )
       case SYSTEMID_POSTGR:
          szOut[0] = '"';
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i + 1] = (char) tolower((HB_BYTE) pszBuffer[i]);
+            szOut[i + 1] = static_cast<char>(tolower((HB_BYTE) pszBuffer[i]));
          }
          szOut[i + 1] = '"';
          break;
@@ -900,13 +900,13 @@ HB_FUNC( SR_DBQUALIFY )
       case SYSTEMID_MARIADB:
          szOut[0] = '`';
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i + 1] = (char) tolower((HB_BYTE) pszBuffer[i]);
+            szOut[i + 1] = static_cast<char>(tolower((HB_BYTE) pszBuffer[i]));
          }
          szOut[i + 1] = '`';
          break;
       case SYSTEMID_INFORM:
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i] = (char) tolower((HB_BYTE) pszBuffer[i]);
+            szOut[i] = static_cast<char>(tolower((HB_BYTE) pszBuffer[i]));
          }
          ulLen -=2;
          break;

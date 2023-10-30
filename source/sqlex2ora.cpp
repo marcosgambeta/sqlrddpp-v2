@@ -100,7 +100,7 @@ char * QualifyName2(char * szName, SQLEXORAAREAP thiswa)
          case SYSTEMID_FIREBR5:
          case SYSTEMID_IBMDB2:
          case SYSTEMID_ADABAS: {
-            szName[i] = (char) toupper((int) szName[i]);
+            szName[i] = static_cast<char>(toupper(static_cast<int>(szName[i])));
             break;
          }
          case SYSTEMID_INGRES:
@@ -108,7 +108,7 @@ char * QualifyName2(char * szName, SQLEXORAAREAP thiswa)
          case SYSTEMID_MYSQL:
          case SYSTEMID_OTERRO:
          case SYSTEMID_INFORM: {
-            szName[i] = (char) tolower((int) szName[i]);
+            szName[i] = static_cast<char>(tolower(static_cast<int>(szName[i])));
             break;
          }
       }
@@ -239,7 +239,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
       bMultiLang = hb_arrayGetL(pFieldStruct, FIELD_MULTILANG);
       bIsMemo = cType == 'M';
 
-      if( i != (int)(thiswa->sqlarea.ulhRecno) ) { // RECNO is never included in INSERT column list
+      if( i != static_cast<int>(thiswa->sqlarea.ulhRecno) ) { // RECNO is never included in INSERT column list
          temp = hb_strdup((const char *) sFields);
          temp1 = hb_strdup((const char *) sParams);
          sprintf(sFields, "%s,%c%s%c", temp, OPEN_QUALIFIER(thiswa), QualifyName2(colName, thiswa), CLOSE_QUALIFIER(thiswa));
@@ -255,12 +255,12 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
 
       hb_xfree(colName);
 
-      InsertRecord->iSQLType = (int) lType;
+      InsertRecord->iSQLType = static_cast<int>(lType);
       InsertRecord->isNullable = bNullable;
       InsertRecord->isBoundNULL = false;
       InsertRecord->lFieldPosDB = i;
       InsertRecord->lFieldPosWA = lFieldPosWA;
-      InsertRecord->ColumnSize = (unsigned int) hb_itemGetNI(pFieldLen);
+      InsertRecord->ColumnSize = static_cast<unsigned int>(hb_itemGetNI(pFieldLen));
       InsertRecord->DecimalDigits = (unsigned short) hb_itemGetNI(pFieldDec);
       InsertRecord->isArgumentNull = false;
       InsertRecord->isMemo = bIsMemo;
@@ -387,7 +387,7 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
    iBind = 0;
 
    for( iCol = 1; iCol <= iCols; iCol++ ) {
-      if( iCol != (int) (thiswa->sqlarea.ulhRecno) ) { // RECNO is never included in INSERT column list
+      if( iCol != static_cast<int>(thiswa->sqlarea.ulhRecno) ) { // RECNO is never included in INSERT column list
          iBind++;
          switch( InsertRecord->iCType ) {
             case SQL_C_CHAR: {
@@ -505,9 +505,9 @@ HB_ERRCODE FeedRecordColsOra(SQLEXORAAREAP thiswa, HB_BOOL bUpdate)
 
    for( i = 1; i <= iCols; i++ ) {
       if( (!bUpdate) || (bUpdate && (thiswa->editMask[i - 1] || thiswa->specialMask[i - 1]) ) ) {
-         if( i == (int)(thiswa->sqlarea.ulhDeleted) ) {
+         if( i == static_cast<int>(thiswa->sqlarea.ulhDeleted) ) {
             SetBindEmptylValue2(InsertRecord); // Writes a ' ' to deleted flag
-         } else if( i != (int)(thiswa->sqlarea.ulhRecno) ) { // RECNO is never included in INSERT column list
+         } else if( i != static_cast<int>(thiswa->sqlarea.ulhRecno) ) { // RECNO is never included in INSERT column list
             // Get item value from Workarea
             pFieldData = hb_arrayGetItemPtr(thiswa->sqlarea.aBuffer, i);
 
@@ -679,7 +679,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
       OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, 0, __LINE__, __FILE__);
    }
 
-   iCols = (int) hb_arrayLen(thiswa->aFields);
+   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
    CurrRecord = thiswa->CurrRecord;
    iBind = 0;
    thiswa->bIndexTouchedInUpdate = false;

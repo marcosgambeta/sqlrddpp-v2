@@ -345,7 +345,7 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
          switch( BindStructure->iCType ) {
             case SQL_C_CHAR: {
                int nTrim, i;
-               size = lenKey > (int)(BindStructure->ColumnSize) ? ((int) (BindStructure->ColumnSize)) : lenKey;
+               size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
                nTrim = size;
 
                // RTrim() the string value
@@ -405,7 +405,7 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
                char datemask[9] = "10000101";
                char * mask = datemask;
 
-               size = lenKey > (int) (BindStructure->ColumnSize) ? ((int) (BindStructure->ColumnSize)) : lenKey;
+               size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
 
                // Must fix partial date seek
                for( iPos = 0; iPos < size; iPos++ ) {
@@ -413,13 +413,13 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
                }
 
                hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asTimestamp.year = (unsigned int) lVal;
+               BindStructure->asTimestamp.year = static_cast<unsigned int>(lVal);
                mask += 4;
                hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asTimestamp.month = (unsigned int) lVal;
+               BindStructure->asTimestamp.month = static_cast<unsigned int>(lVal);
                mask += 2;
                hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asTimestamp.day = (unsigned int) lVal;
+               BindStructure->asTimestamp.day = static_cast<unsigned int>(lVal);
                BindStructure->asTimestamp.hour = 0;
                BindStructure->asTimestamp.minute = 0;
                BindStructure->asTimestamp.second = 0;
@@ -434,7 +434,7 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
                char datemask[9] = "10000101";
                char * mask = datemask;
 
-               size = lenKey > (int) (BindStructure->ColumnSize) ? ((int) (BindStructure->ColumnSize)) : lenKey;
+               size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
 
                // Must fix partial date seek
                for( iPos = 0; iPos < size; iPos++ ) {
@@ -442,13 +442,13 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
                }
 
                hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asDate.year = (unsigned int) lVal;
+               BindStructure->asDate.year = static_cast<unsigned int>(lVal);
                mask += 4;
                hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asDate.month = (unsigned int) lVal;
+               BindStructure->asDate.month = static_cast<unsigned int>(lVal);
                mask += 2;
                hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asDate.day = (unsigned int) lVal;
+               BindStructure->asDate.day = static_cast<unsigned int>(lVal);
 
                break;
             }
@@ -475,20 +475,20 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
          hb_dateDecode(hb_itemGetDL(pKey), &iYear, &iMonth, &iDay);
 
          if( BindStructure->iCType == SQL_C_TYPE_DATE ) {
-            BindStructure->asDate.year = (unsigned int) iYear;
-            BindStructure->asDate.month = (unsigned int) iMonth;
-            BindStructure->asDate.day = (unsigned int) iDay;
+            BindStructure->asDate.year = static_cast<unsigned int>(iYear);
+            BindStructure->asDate.month = static_cast<unsigned int>(iMonth);
+            BindStructure->asDate.day = static_cast<unsigned int>(iDay);
          } else if( BindStructure->iCType == SQL_C_TYPE_TIMESTAMP ) {
             long lJulian, lMilliSec;
             int seconds, millisec;
             hb_itemGetTDT(pKey, &lJulian, &lMilliSec);
             hb_timeDecode(lMilliSec, &iHour, &iMinute, &seconds, &millisec);
-            BindStructure->asTimestamp.year = (unsigned int) iYear;
-            BindStructure->asTimestamp.month = (unsigned int) iMonth;
-            BindStructure->asTimestamp.day = (unsigned int) iDay;
-            BindStructure->asTimestamp.hour = (unsigned int)iHour;
-            BindStructure->asTimestamp.minute = (unsigned int)iMinute;
-            BindStructure->asTimestamp.second = (unsigned int)seconds;
+            BindStructure->asTimestamp.year = static_cast<unsigned int>(iYear);
+            BindStructure->asTimestamp.month = static_cast<unsigned int>(iMonth);
+            BindStructure->asTimestamp.day = static_cast<unsigned int>(iDay);
+            BindStructure->asTimestamp.hour = static_cast<unsigned int>(iHour);
+            BindStructure->asTimestamp.minute = static_cast<unsigned int>(iMinute);
+            BindStructure->asTimestamp.second = static_cast<unsigned int>(seconds);
             BindStructure->asTimestamp.fraction = 0;
          } else {
             // To Do: Raise RT error

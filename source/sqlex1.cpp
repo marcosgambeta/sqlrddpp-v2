@@ -489,7 +489,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
 
    res = SQLFetch(thiswa->colStmt[lFieldPosDB - 1]);
    if( res != SQL_SUCCESS ) {
-      if( res == (unsigned int) SQL_ERROR ) {
+      if( res == static_cast<unsigned int>(SQL_ERROR) ) {
          odbcErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLFetch", sSql, (SQLRETURN) res, __LINE__, __FILE__);
          SQLFreeStmt(thiswa->colStmt[lFieldPosDB - 1], SQL_CLOSE);
          return HB_FAILURE;
@@ -515,7 +515,7 @@ HB_ERRCODE SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hS
    switch( BindStructure->iCType ) {
       case SQL_C_CHAR: {
          int nTrim, i;
-         int size = (int) hb_itemGetCLen(pFieldData);
+         int size = static_cast<int>(hb_itemGetCLen(pFieldData));
          const char * pszText = hb_itemGetCPtr(pFieldData);
 
          nTrim = size;
@@ -552,7 +552,7 @@ HB_ERRCODE SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hS
       }
       case SQL_C_BINARY: {
          int nTrim, i;
-         int size = (int) hb_itemGetCLen(pFieldData);
+         int size = static_cast<int>(hb_itemGetCLen(pFieldData));
          const char * pszText = hb_itemGetCPtr(pFieldData);
 
          nTrim = size;
@@ -734,7 +734,7 @@ void ReleaseInsertRecordStructure(SQLEXAREAP thiswa, int iCols)
    if( thiswa->InsertRecord ) {
       int n;
       if( iCols == 0 ) {
-         iCols = (int) hb_arrayLen(thiswa->aFields);
+         iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
       }
       InsertRecord = thiswa->InsertRecord;
 
@@ -760,7 +760,7 @@ void ReleaseCurrRecordStructure(SQLEXAREAP thiswa, int iCols)
    if( thiswa->CurrRecord ) {
       int n;
       if( iCols == 0 ) {
-         iCols = (int) hb_arrayLen(thiswa->aFields);
+         iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
       }
       CurrRecord = thiswa->CurrRecord;
 
@@ -784,7 +784,7 @@ void ReleaseColStatements(SQLEXAREAP thiswa, int iCols)
    int i;
    if( thiswa->colStmt ) {
       if( iCols == 0 ) {
-         iCols = (int) hb_arrayLen(thiswa->aFields);
+         iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
       }
 
       for( i = 0; i < iCols; i++ ) {
@@ -1213,7 +1213,7 @@ void SetCurrRecordStructure(SQLEXAREAP thiswa)
    // bool bNullable, bMultiLang, bIsMemo;
    bool bMultiLang;
 
-   iCols = (int) hb_arrayLen(thiswa->aFields);
+   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
    thiswa->CurrRecord = (COLUMNBINDP) hb_xgrab(iCols * sizeof(COLUMNBIND));
    memset(thiswa->CurrRecord, 0, iCols * sizeof(COLUMNBIND));
@@ -1231,7 +1231,7 @@ void SetCurrRecordStructure(SQLEXAREAP thiswa)
          cType = 'M';
       }
 
-      BindStructure->iSQLType = (int) lType;
+      BindStructure->iSQLType = static_cast<int>(lType);
       BindStructure->isNullable = hb_arrayGetL(pFieldStruct, FIELD_NULLABLE);
       BindStructure->isBoundNULL = false;
       BindStructure->isArgumentNull = false;
@@ -2973,14 +2973,14 @@ static HB_ERRCODE sqlExDeleteRec(SQLEXAREAP thiswa)
             thiswa->iTCCompat >= 2 ? '*' : 'T',
             thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ",
             thiswa->sRecnoName,
-            (int) GetCurrentRecordNum(thiswa));
+            static_cast<int>(GetCurrentRecordNum(thiswa)));
 
       } else {
          sprintf(thiswa->sSql,
             "DELETE FROM %s WHERE %s = %i",
             thiswa->sTable,
             thiswa->sRecnoName,
-            (int) GetCurrentRecordNum(thiswa));
+            static_cast<int>(GetCurrentRecordNum(thiswa)));
       }
 
       res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmt));
@@ -3356,7 +3356,7 @@ static HB_ERRCODE sqlExRecall(SQLEXAREAP thiswa)
          ' ',
          thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ",
          thiswa->sRecnoName,
-         (int) GetCurrentRecordNum(thiswa));
+         static_cast<int>(GetCurrentRecordNum(thiswa)));
 
       res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmt));
       if( CHECK_SQL_N_OK(res) ) {
@@ -3750,7 +3750,7 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
 static HB_ERRCODE sqlExOrderCreate(SQLEXAREAP thiswa, LPDBORDERCREATEINFO pOrderCreateInfo)
 {
    HB_ERRCODE err;
-   int iLen = (int) hb_arrayLen(thiswa->aFields);
+   int iLen = static_cast<int>(hb_arrayLen(thiswa->aFields));
    thiswa->lBofAt = 0;
    thiswa->lEofAt = 0;
    thiswa->indexLevel = -1;
@@ -3761,7 +3761,7 @@ static HB_ERRCODE sqlExOrderCreate(SQLEXAREAP thiswa, LPDBORDERCREATEINFO pOrder
    // (FOR clause or Synthetic Index) all allocated structures for binding
    // columns are now invalid and will GPF when unalloc
 
-   if( iLen != (int) hb_arrayLen(thiswa->aFields) ) {
+   if( iLen != static_cast<int>(hb_arrayLen(thiswa->aFields)) ) {
       // Release structures
       ReleaseColStatements(thiswa, iLen);
       ReleaseInsertRecordStructure(thiswa, iLen);
@@ -3815,7 +3815,7 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREAP thiswa, HB_USHORT uiIndex, LPDBORDER
                odbcErrorDiagRTE(thiswa->hStmt, "OrdKeyCount", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
                uiError = HB_FAILURE;
             } else {
-               pInfo->itmResult = hb_itemPutNI(pInfo->itmResult, (int) lValue);
+               pInfo->itmResult = hb_itemPutNI(pInfo->itmResult, static_cast<int>(lValue));
                uiError = HB_SUCCESS;
             }
             break;

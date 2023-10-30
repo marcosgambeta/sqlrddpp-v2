@@ -1208,7 +1208,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
    } else {
       /*
       if( HB_IS_NIL(itemTemp) ) {
-         TraceLog(nullptr, "Empty buffer found at position %i, fieldpos %i\n", (int) thiswa->uiBufferIndex[fieldNum - 1], (int) fieldNum);
+         TraceLog(nullptr, "Empty buffer found at position %i, fieldpos %i\n", static_cast<int>(thiswa->uiBufferIndex[fieldNum - 1]), static_cast<int>(fieldNum));
       }
       */
 #ifndef HB_CDP_SUPPORT_OFF
@@ -3110,7 +3110,7 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
       field.uiDec = (HB_USHORT) 0;
       field.uiLen = (HB_USHORT)hb_arrayGetNI(thisfield, (HB_USHORT) 3);
 
-      thiswa->uiBufferIndex[i - 1] = (int) hb_arrayGetNI(thisfield, (HB_USHORT) 5);
+      thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, (HB_USHORT) 5));
 
       fieldType = (unsigned char *) hb_arrayGetCPtr(thisfield, (HB_USHORT) 2);
 
@@ -3199,7 +3199,7 @@ static HB_BOOL SetFields(SQLAREAP thiswa)
          return false;
       }
 
-      thiswa->uiBufferIndex[i - 1] = (int) hb_arrayGetNI(thisfield, (HB_USHORT) 5);
+      thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, (HB_USHORT) 5));
       hb_itemRelease(thisfield);
    }
    return true;

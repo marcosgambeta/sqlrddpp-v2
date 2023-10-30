@@ -183,24 +183,24 @@ HB_FUNC( FBCONNECT ) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv)
    dpb[i++] = isc_dpb_version1;
    dpb[i++] = isc_dpb_user_name;
    len = strlen(user);
-   dpb[i++] = (char) len;
+   dpb[i++] = static_cast<char>(len);
    memcpy(&(dpb[i]), user, len);
    i += len;
 
    dpb[i++] = isc_dpb_password;
    len = strlen(passwd);
-   dpb[i++] = (char) len;
+   dpb[i++] = static_cast<char>(len);
    memcpy(&(dpb[i]), passwd, len);
    i += len;
 
    if( charset != nullptr ) {
       dpb[i++] = isc_dpb_lc_ctype;
       len = strlen(charset);
-      dpb[i++] = (char) len;
+      dpb[i++] = static_cast<char>(len);
       memcpy(&(dpb[i]), charset, len);
       i += len;
    }
-   if( isc_attach_database(session->status, 0, db_connect, &(session->db), (short) i, dpb) ) {
+   if( isc_attach_database(session->status, 0, db_connect, &(session->db), static_cast<short>(i), dpb) ) {
       fb_log_status(session, "FBCONNECT");
       if( session->msgerror )
          hb_xfree(session->msgerror);
@@ -677,7 +677,7 @@ HB_FUNC( FBGETDATA )    // FBGetData(hEnv, nField, @uData)
                   times.tm_hour,
                   times.tm_min,
                   times.tm_sec,
-                  (int) (((ISC_TIMESTAMP *) var->sqldata)->timestamp_time % 10000));
+                  static_cast<int>(((ISC_TIMESTAMP *) var->sqldata)->timestamp_time % 10000));
             {
                long lJulian, lMilliSec;
                hb_timeStampStrGetDT(date_s, &lJulian, &lMilliSec);
@@ -691,7 +691,7 @@ HB_FUNC( FBGETDATA )    // FBGetData(hEnv, nField, @uData)
                   times.tm_hour,
                   times.tm_min,
                   times.tm_sec,
-                  (int) ((*((ISC_TIME *) var->sqldata)) % 10000));
+                  static_cast<int>((*((ISC_TIME *) var->sqldata)) % 10000));
             //hb_storc(date_s, 3);
             lMilliSec = hb_timeUnformat(date_s, nullptr); // TOCHECK:
 //             hb_itemPutTDT(pItem, 0, lMilliSec);
@@ -776,7 +776,7 @@ HB_FUNC( FBGETDATA )    // FBGetData(hEnv, nField, @uData)
             }
             for( resp = res_buffer; * resp != isc_info_end; ) {
                item = *resp++;
-               length = (short) isc_vax_integer(resp, 2);
+               length = static_cast<short>(isc_vax_integer(resp, 2));
                resp += 2;
                switch( item ) {
                   case isc_info_blob_total_length:
@@ -1179,7 +1179,7 @@ HB_FUNC( FBLINEPROCESSED )
                         times.tm_hour,
                         times.tm_min,
                         times.tm_sec,
-                        (int) (((ISC_TIMESTAMP *) var->sqldata)->timestamp_time % 10000));
+                        static_cast<int>(((ISC_TIMESTAMP *) var->sqldata)->timestamp_time % 10000));
 
                   //sprintf(p, "%*s ", 24, date_s);
 
@@ -1193,7 +1193,7 @@ HB_FUNC( FBLINEPROCESSED )
                         times.tm_hour,
                         times.tm_min,
                         times.tm_sec,
-                        (int) ((*((ISC_TIME *) var->sqldata)) % 10000));
+                        static_cast<int>((*((ISC_TIME *) var->sqldata)) % 10000));
 
                   FBFieldGet(hb_arrayGetItemPtr(pFields, icol), temp, (char *) date_s, strlen(date_s), bQueryOnly, ulSystemID, bTranslate);
                   hb_arraySetForward(pRet, icol, temp);
@@ -1306,7 +1306,7 @@ HB_FUNC( FBLINEPROCESSED )
                   }
                   for( resp = res_buffer; * resp != isc_info_end;) {
                      item = *resp++;
-                     length = (short) isc_vax_integer(resp, 2);
+                     length = static_cast<short>(isc_vax_integer(resp, 2));
                      resp += 2;
                      switch( item ) {
                      case isc_info_blob_total_length:

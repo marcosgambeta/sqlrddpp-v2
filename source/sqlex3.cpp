@@ -424,7 +424,7 @@ HB_ERRCODE FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryLe
          switch( BindStructure->iCType ) {
             case SQL_C_CHAR: {
                int nTrim, index;
-               size = lenKey > (int) (BindStructure->ColumnSize) ? ((int) (BindStructure->ColumnSize)) : lenKey;
+               size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
                nTrim = size;
 
                // RTrim() the string value
@@ -478,7 +478,7 @@ HB_ERRCODE FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryLe
                char datemask[9] = "10000101";
                char * mask = datemask;
                // DebugBreak();
-               size = lenKey > (int) (BindStructure->ColumnSize) ? ((int) (BindStructure->ColumnSize)) : lenKey;
+               size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
 
                // Must fix partial date seek
                for( iPos = 0; iPos < size; iPos++ ) {
@@ -507,7 +507,7 @@ HB_ERRCODE FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryLe
                char datemask[9] = "10000101";
                char * mask = datemask;
 
-               size = lenKey > (int)(BindStructure->ColumnSize) ? ((int) (BindStructure->ColumnSize)) : lenKey;
+               size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
 
                // Must fix partial date seek
                for( iPos = 0; iPos < size; iPos++ ) {

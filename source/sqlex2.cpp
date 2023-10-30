@@ -101,7 +101,7 @@ char * QualifyName(char * szName, SQLEXAREAP thiswa)
       case SYSTEMID_FIREBR5:
       case SYSTEMID_IBMDB2:
       case SYSTEMID_ADABAS:
-         szName[i] = (char) toupper((HB_BYTE) szName[i]);
+         szName[i] = static_cast<char>(toupper((HB_BYTE) szName[i]));
          break;
       case SYSTEMID_INGRES:
       case SYSTEMID_POSTGR:
@@ -109,7 +109,7 @@ char * QualifyName(char * szName, SQLEXAREAP thiswa)
       case SYSTEMID_MARIADB:
       case SYSTEMID_OTERRO:
       case SYSTEMID_INFORM:
-         szName[i] = (char) tolower((HB_BYTE) szName[i]);
+         szName[i] = static_cast<char>(tolower((HB_BYTE) szName[i]));
          break;
       }
    }
@@ -250,7 +250,7 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
       }
       bIsMemo = cType == 'M' || bMultiLang;
 
-      if( i != (int)(thiswa->ulhRecno) ) { // RECNO is never included in INSERT column list
+      if( i != static_cast<int>(thiswa->ulhRecno) ) { // RECNO is never included in INSERT column list
          temp = hb_strdup((const char *) sFields);
          sprintf(sFields, "%s,%c%s%c", temp, OPEN_QUALIFIER(thiswa), QualifyName(colName, thiswa), CLOSE_QUALIFIER(thiswa));
          sParams[uiPos] = ',';
@@ -261,7 +261,7 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
 
       hb_xfree(colName);
 
-      InsertRecord->iSQLType = (int) lType;
+      InsertRecord->iSQLType = static_cast<int>(lType);
       InsertRecord->isNullable = bNullable;
       InsertRecord->isBoundNULL = false;
       InsertRecord->lFieldPosDB = i;
@@ -435,7 +435,7 @@ HB_ERRCODE BindInsertColumns(SQLEXAREAP thiswa)
    iBind = 0;
 
    for( iCol = 1; iCol <= iCols; iCol++ ) {
-      if( iCol != (int) (thiswa->ulhRecno) ) { // RECNO is never included in INSERT column list
+      if( iCol != static_cast<int>(thiswa->ulhRecno) ) { // RECNO is never included in INSERT column list
          iBind++;
          switch( InsertRecord->iCType ) {
             case SQL_C_CHAR: {
@@ -563,9 +563,9 @@ HB_ERRCODE FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate)
 
    for( i = 1; i <= iCols; i++ ) {
       if( (!bUpdate) || (bUpdate && (thiswa->editMask[i - 1] || thiswa->specialMask[i - 1]) ) ) {
-         if( i == (int)(thiswa->ulhDeleted) ) {
+         if( i == static_cast<int>(thiswa->ulhDeleted) ) {
             SetBindEmptylValue(InsertRecord); // Writes a ' ' to deleted flag
-         } else if( i != (int)(thiswa->ulhRecno) ) { // RECNO is never included in INSERT column list
+         } else if( i != static_cast<int>(thiswa->ulhRecno) ) { // RECNO is never included in INSERT column list
             // Get item value from Workarea
             pFieldData = hb_arrayGetItemPtr(thiswa->aBuffer, i);
 
@@ -748,7 +748,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
       odbcErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
    }
 
-   iCols = (int) hb_arrayLen(thiswa->aFields);
+   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
    CurrRecord = thiswa->CurrRecord;
    iBind = 0;
    thiswa->bIndexTouchedInUpdate = false;

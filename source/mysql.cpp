@@ -204,7 +204,7 @@ HB_FUNC( MYSFETCH )     /* MYSFetch(ConnHandle, ResultSet) => nStatus */
    } else {
       if( session->ifetch >= -1 ) {
          session->ifetch++;
-         rows = (int) (mysql_num_rows(session->stmt) - 1);
+         rows = static_cast<int>(mysql_num_rows(session->stmt) - 1);
 
          if( session->ifetch > rows ) {
             hb_retni(SQL_NO_DATA_FOUND);
@@ -602,7 +602,7 @@ HB_FUNC( MYSQUERYATTR )
       //case MYSQL_DATETIME_TYPE:
       
          hb_arraySetForward(atemp, FIELD_TYPE, hb_itemPutC(temp, "C"));
-         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, (int) field->length));
+         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, static_cast<int>(field->length)));
          hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
          hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_CHAR));
          break;
@@ -655,13 +655,13 @@ HB_FUNC( MYSQUERYATTR )
          break;
       case MYSQL_LONG_TYPE:
          hb_arraySetForward(atemp, FIELD_TYPE, hb_itemPutC(temp, "N"));
-         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(11, (int) field->length)));
+         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(11, static_cast<int>(field->length))));
          hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
          hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_NUMERIC));
          break;
       case MYSQL_INT24_TYPE:
          hb_arraySetForward(atemp, FIELD_TYPE, hb_itemPutC(temp, "N"));
-         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(8, (int) field->length)));
+         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(8, static_cast<int>(field->length))));
          hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
          hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_NUMERIC));
          break;
@@ -670,7 +670,7 @@ HB_FUNC( MYSQUERYATTR )
       case MYSQL_DOUBLE_TYPE:
       case MYSQL_NEWDECIMAL_TYPE:
          hb_arraySetForward(atemp, FIELD_TYPE, hb_itemPutC(temp, "N"));
-         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, (int) field->length));
+         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, static_cast<int>(field->length)));
          hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, field->decimals));
          hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_NUMERIC));
          break;
@@ -738,7 +738,7 @@ HB_FUNC( MYSTABLEATTR )
       //case MYSQL_DATETIME_TYPE:      
          hb_itemPutC(temp, "C");
          hb_arraySetForward(atemp, FIELD_TYPE, temp);
-         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, (int) field->length));
+         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, static_cast<int>(field->length)));
          hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
          hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_CHAR));
          break;
@@ -797,14 +797,14 @@ HB_FUNC( MYSTABLEATTR )
       case MYSQL_LONG_TYPE:
          hb_itemPutC(temp, "N");
          hb_arraySetForward(atemp, FIELD_TYPE, temp);
-         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(11, (int) field->length)));
+         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(11, static_cast<int>(field->length))));
          hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
          hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_NUMERIC));
          break;
       case MYSQL_INT24_TYPE:
          hb_itemPutC(temp, "N");
          hb_arraySetForward(atemp, FIELD_TYPE, temp);
-         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(8, (int) field->length)));
+         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(8, static_cast<int>(field->length))));
          hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
          hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_NUMERIC));
          break;
@@ -812,7 +812,7 @@ HB_FUNC( MYSTABLEATTR )
       case MYSQL_DECIMAL_TYPE:
       case MYSQL_DOUBLE_TYPE:
          hb_arraySetForward(atemp, FIELD_TYPE, hb_itemPutC(temp, "N"));
-         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, (int) field->length));
+         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, static_cast<int>(field->length)));
          hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, field->decimals));
          hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_NUMERIC));
          break;

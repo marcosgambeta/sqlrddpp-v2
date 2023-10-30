@@ -123,7 +123,7 @@ HB_FUNC( PGSSTATUS2 ) /* PGSStatus(ConnHandle) => nStatus */
 {
    PPSQL_SESSION session = (PPSQL_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
    assert(session->dbh != nullptr);
-   hb_retni((int) PQstatus(session->dbh));
+   hb_retni(static_cast<int>(PQstatus(session->dbh)));
 }
 
 HB_FUNC( PGSRESULTSTATUS ) /* PGSResultStatus(ResultSet) => nStatus */
@@ -131,7 +131,7 @@ HB_FUNC( PGSRESULTSTATUS ) /* PGSResultStatus(ResultSet) => nStatus */
    int ret;
    PGresult * res = (PGresult *) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
    assert(res != nullptr);
-   ret = (int) PQresultStatus(res);
+   ret = static_cast<int>(PQresultStatus(res));
 
    switch( ret ) {
    case PGRES_EMPTY_QUERY:
@@ -169,11 +169,11 @@ HB_FUNC( PGSEXEC )      /* PGSExec(ConnHandle, cCommand) => ResultSet */
    
    session->ifetch = -1;
    session->numcols = PQnfields(session->stmt);
-   ret = (int) PQresultStatus(session->stmt);
+   ret = static_cast<int>(PQresultStatus(session->stmt));
 
    switch( ret ) {
    case PGRES_COMMAND_OK:
-      session->iAffectedRows =(int) atoi(PQcmdTuples(session->stmt));
+      session->iAffectedRows = static_cast<int>(atoi(PQcmdTuples(session->stmt)));
    break;
    default :
    session->iAffectedRows =0;
@@ -199,7 +199,7 @@ HB_FUNC( PGSFETCH )     /* PGSFetch(ResultSet) => nStatus */
          if( session->ifetch > iTpl ) {
             hb_retni(SQL_NO_DATA_FOUND);
          } else {
-            session->iAffectedRows =(int) iTpl;
+            session->iAffectedRows = static_cast<int>(iTpl);
             hb_retni(SQL_SUCCESS);
          }
       } else {
@@ -307,7 +307,7 @@ HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr(ResultSet) => aStruct */
       hb_arraySetNL(atemp, FIELD_ENUM, row + 1);
 
       /* Data type, len, dec */
-      type = (int) PQftype(session->stmt, row);
+      type = static_cast<int>(PQftype(session->stmt, row));
       typmod = PQfmod(session->stmt, row);
 
 

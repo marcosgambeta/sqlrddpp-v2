@@ -846,10 +846,10 @@ HB_FUNC( ORACLEINBINDPARAM )
          PHB_ITEM pFieldData = hb_param(6,HB_IT_DATE);
          hb_dateDecode(hb_itemGetDL(pFieldData), &iYear, &iMonth, &iDay);
          //hb_dateStrPut(Stmt->pLink[iPos].sDate, iYear, iMonth, iDay);
-         Stmt->pLink[iPos].sDate[0] = (char) (iYear / 100) + 100; // century
-         Stmt->pLink[iPos].sDate[1] = (char) (iYear % 100) + 100; // year
-         Stmt->pLink[iPos].sDate[2] = (char) iMonth;
-         Stmt->pLink[iPos].sDate[3] = (char) iDay;
+         Stmt->pLink[iPos].sDate[0] = static_cast<char>(iYear / 100) + 100; // century
+         Stmt->pLink[iPos].sDate[1] = static_cast<char>(iYear % 100) + 100; // year
+         Stmt->pLink[iPos].sDate[2] = static_cast<char>(iMonth);
+         Stmt->pLink[iPos].sDate[3] = static_cast<char>(iDay);
          Stmt->pLink[iPos].sDate[4] = 1;
          Stmt->pLink[iPos].sDate[5] = 1;
          Stmt->pLink[iPos].sDate[6] = 1;
@@ -874,13 +874,13 @@ HB_FUNC( ORACLEINBINDPARAM )
          hb_dateDecode(plJulian, &iYear, &iMonth, &iDay);
          hb_timeDecode(plMilliSec, &iHour, &iMin, &iSeconds, &mSec);
          //hb_dateStrPut(Stmt->pLink[iPos].sDate, iYear, iMonth, iDay);
-         Stmt->pLink[iPos].sDate[0] = (char) (iYear / 100) + 100; // century
-         Stmt->pLink[iPos].sDate[1] = (char) (iYear % 100) + 100; // year
-         Stmt->pLink[iPos].sDate[2] = (char) iMonth;
-         Stmt->pLink[iPos].sDate[3] = (char) iDay;
-         Stmt->pLink[iPos].sDate[4] = (char) iHour + 1;
-         Stmt->pLink[iPos].sDate[5] = (char) iMin + 1;
-         Stmt->pLink[iPos].sDate[6] = (char) iSeconds + 1;
+         Stmt->pLink[iPos].sDate[0] = static_cast<char>(iYear / 100) + 100; // century
+         Stmt->pLink[iPos].sDate[1] = static_cast<char>(iYear % 100) + 100; // year
+         Stmt->pLink[iPos].sDate[2] = static_cast<char>(iMonth);
+         Stmt->pLink[iPos].sDate[3] = static_cast<char>(iDay);
+         Stmt->pLink[iPos].sDate[4] = static_cast<char>(iHour) + 1;
+         Stmt->pLink[iPos].sDate[5] = static_cast<char>(iMin) + 1;
+         Stmt->pLink[iPos].sDate[6] = static_cast<char>(iSeconds) + 1;
       }
 
       ret = sqlo_bind_by_pos(lStmt ? Stmt->stmt :Stmt->stmtParam, iParamNum, SQLOT_DAT, &Stmt->pLink[iPos].sDate,
