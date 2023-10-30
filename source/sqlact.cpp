@@ -636,7 +636,7 @@ HB_FUNC( SR_ESCAPENUM )
    char SciNot[5] = {'\0', '\0', '\0', '\0', '\0'};
    HB_SIZE iSize, iPos;
    int iDecPos;
-   HB_BOOL bInteger = true;
+   bool bInteger = true;
    HB_SIZE len, dec;
    double dMultpl;
 
@@ -750,7 +750,7 @@ PHB_ITEM sr_escapeNumber(char * FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM p
    char SciNot[5] = {'\0', '\0', '\0', '\0', '\0'};
    HB_SIZE iSize, iPos;
    int iDecPos;
-   HB_BOOL bInteger = true;
+   bool bInteger = true;
    double dMultpl;
 
    iSize = strlen(FromBuffer);
@@ -929,7 +929,7 @@ HB_FUNC( SR_DBQUALIFY )
 
 HB_BOOL hb_arraySetNL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_LONG lVal)
 {
-   HB_BOOL ret;
+   bool ret;
    PHB_ITEM pItem = hb_errNew();
    hb_itemPutNL(pItem, lVal);
    ret = hb_arraySetForward(pArray, ulIndex, pItem);
@@ -941,7 +941,7 @@ HB_BOOL hb_arraySetNL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_LONG lVal)
 
 HB_BOOL hb_arraySetL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_BOOL lVal)
 {
-   HB_BOOL ret;
+   bool ret;
    PHB_ITEM pItem = hb_errNew();
    hb_itemPutL(pItem, lVal);
    ret = hb_arraySetForward(pArray, ulIndex, pItem);

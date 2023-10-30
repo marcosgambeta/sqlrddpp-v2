@@ -101,7 +101,7 @@ HB_FUNC( MYSCONNECT )
    const char * szDb = hb_parc(4);
    HB_UINT uiPort = HB_ISNUM(5) ? hb_parnl(5) : MYSQL_PORT;
    HB_UINT uiTimeout = HB_ISNUM(7) ? hb_parnl(7) : 3600;
-   HB_BOOL lCompress = HB_ISLOG(8) ? hb_parl(8) : false;
+   bool lCompress = HB_ISLOG(8) ? hb_parl(8) : false;
    mysql_library_init(0, nullptr, nullptr);
 //    memset(session, 0, sizeof(MYSQL_SESSION));
 
@@ -403,9 +403,9 @@ HB_FUNC( MYSLINEPROCESSED )
    HB_LONG lIndex;
 
    PHB_ITEM pFields = hb_param(3, HB_IT_ARRAY);
-   HB_BOOL bQueryOnly = hb_parl(4);
+   bool bQueryOnly = hb_parl(4);
    HB_ULONG ulSystemID = hb_parnl(5);
-   HB_BOOL bTranslate = hb_parl(6);
+   bool bTranslate = hb_parl(6);
    PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
 
    assert(session != nullptr);

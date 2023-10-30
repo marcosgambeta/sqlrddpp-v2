@@ -101,11 +101,11 @@ static void createSeekQueryOra(SQLEXORAAREAP thiswa, HB_BOOL bUseOptimizerHints)
 
 static HB_ERRCODE getSeekWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType, int queryLevel, HB_BOOL * bUseOptimizerHints)
 {
-   HB_BOOL bWhere = false;
+   bool bWhere = false;
    int iCol;
    INDEXBINDORAP SeekBind;
    COLUMNBINDORAP BindStructure;
-   HB_BOOL bDirectionFWD;
+   bool bDirectionFWD;
    char * temp;
 
    thiswa->sWhere[0] = '\0';
@@ -231,7 +231,7 @@ HB_BOOL CreateSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
 {
    PHB_ITEM pColumns, pIndexRef;
    INDEXBINDORAP SeekBind;
-   HB_BOOL bUseOptimizerHints;
+   bool bUseOptimizerHints;
 
    bUseOptimizerHints = thiswa->nSystemID == SYSTEMID_ORACLE;
    thiswa->bConditionChanged1 = true; // SKIP statements are no longer valid

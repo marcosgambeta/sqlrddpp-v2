@@ -108,11 +108,11 @@ static void createSeekQuery(SQLEXAREAP thiswa, HB_BOOL bUseOptimizerHints)
 
 static HB_ERRCODE getSeekWhereExpression(SQLEXAREAP thiswa, int iListType, int queryLevel, HB_BOOL * bUseOptimizerHints)
 {
-   HB_BOOL bWhere = false;
+   bool bWhere = false;
    int iCol;
    INDEXBINDP SeekBind;
    COLUMNBINDP BindStructure;
-   HB_BOOL bDirectionFWD;
+   bool bDirectionFWD;
    char * temp;
 
    thiswa->sWhere[0] = '\0';
@@ -191,11 +191,11 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREAP thiswa, int iListType, int q
 {
    SqlExLog("getSeekWhereExpression()", 3);
 
-   HB_BOOL bWhere = false;
+   bool bWhere = false;
    int iCol;
    INDEXBINDP SeekBind;
    COLUMNBINDP BindStructure;
-   HB_BOOL bDirectionFWD;
+   bool bDirectionFWD;
    char * temp;
 
    thiswa->sWhere[0] = '\0';

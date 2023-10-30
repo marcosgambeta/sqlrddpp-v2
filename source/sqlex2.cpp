@@ -219,7 +219,7 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
    char tablename[100] = {0};
    char declare[200] = {0};
    char cType;
-   HB_BOOL bNullable, bMultiLang, bIsMemo;
+   bool bNullable, bMultiLang, bIsMemo;
    COLUMNBINDP InsertRecord;
    HB_USHORT uiPos;
 

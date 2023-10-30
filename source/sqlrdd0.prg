@@ -2197,20 +2197,20 @@ RETURN SYSTEMID_UNKNOW
 
 #include "compat.h"
 
-static HB_BOOL s_fMultiLang               = false;
-static HB_BOOL s_fShutDown                = false;
-static HB_BOOL s_fGoTopOnScope            = true;
-static HB_BOOL s_fSerializedAsString      = false;
-static HB_BOOL s_fHideRecno               = true;
-static HB_BOOL s_fHideHistoric            = false;
-static HB_BOOL s_fUseDeleteds             = true;
+static bool s_fMultiLang               = false;
+static bool s_fShutDown                = false;
+static bool s_fGoTopOnScope            = true;
+static bool s_fSerializedAsString      = false;
+static bool s_fHideRecno               = true;
+static bool s_fHideHistoric            = false;
+static bool s_fUseDeleteds             = true;
 /* Culik added new global to tell if we will serialize arrays as json or xml */
-static HB_BOOL s_fSerializeArrayAsJson    = false;
+static bool s_fSerializeArrayAsJson    = false;
 /* Culik added new global to tell if we are using sqlverser 2008 or newer */
-static HB_BOOL s_fSql2008newTypes         = false;
+static bool s_fSql2008newTypes         = false;
 
-static HB_BOOL s_iOldPgsBehavior          = false;
-static HB_BOOL s_fShortasNum              = false;
+static bool s_iOldPgsBehavior          = false;
+static bool s_fShortasNum              = false;
 
 HB_BOOL HB_EXPORT sr_isMultilang(void)
 {

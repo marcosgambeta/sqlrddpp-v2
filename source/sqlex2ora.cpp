@@ -211,7 +211,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
    char ident[200] = {0};
    char declare[200] = {0};
    char cType;
-   HB_BOOL bNullable, bMultiLang, bIsMemo;
+   bool bNullable, bMultiLang, bIsMemo;
    COLUMNBINDORAP InsertRecord;
    // HB_USHORT uiPos;
 

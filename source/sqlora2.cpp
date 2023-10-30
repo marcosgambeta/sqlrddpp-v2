@@ -325,7 +325,7 @@ HB_FUNC( SQLO2_EXECDIRECT )
 HB_FUNC( SQLO2_EXECUTE )
 {
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
+   bool lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
    if( session ) {
       char * stm = (char *) hb_parc(2);
       if( lStmt ) {
@@ -376,8 +376,8 @@ HB_FUNC( ORACLEINBINDPARAM2 )
    int iFieldSize = hb_parni(4);
    int iPos = iParamNum - 1;
    int ret = SQL_ERROR;
-   HB_BOOL lStmt = HB_ISLOG(7) ? hb_parl(7) : false;
-   HB_BOOL isNull = HB_ISLOG(8) ? hb_parl(8) : false;
+   bool lStmt = HB_ISLOG(7) ? hb_parl(7) : false;
+   bool isNull = HB_ISLOG(8) ? hb_parl(8) : false;
 
 
    if( Stmt ) {
@@ -579,7 +579,7 @@ HB_FUNC(ORACLEPREPARE2)
 {
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
    const char * szSql = hb_parc(2);
-   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
+   bool lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
    int ret = -1;
 
    if( session ) {
@@ -867,9 +867,9 @@ HB_FUNC( SQLO2_LINEPROCESSED )
    PHB_ITEM temp;
    HB_SIZE i, cols;
    PHB_ITEM pFields = hb_param(3, HB_IT_ARRAY);
-   HB_BOOL  bQueryOnly = hb_parl(4);
+   bool  bQueryOnly = hb_parl(4);
    HB_ULONG ulSystemID = hb_parnl(5);
-   HB_BOOL  bTranslate = hb_parl(6);
+   bool  bTranslate = hb_parl(6);
    PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
 //   SQLO2_stmt_handle_t stmtParamRes;
 

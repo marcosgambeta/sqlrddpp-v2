@@ -673,7 +673,7 @@ HB_FUNC( FBGETDATA3 ) // FBGetData(hEnv, nField, @uData)
    char res_buffer[20];
    HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
    short length;
-   HB_BOOL bEnd = false;
+   bool bEnd = false;
    XSQLVAR * var;
    VARY * vary;
 
@@ -1141,15 +1141,15 @@ HB_FUNC( FBLINEPROCESSED3 )
    char res_buffer[20];
    HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
    short length;
-   HB_BOOL bEnd = false;
+   bool bEnd = false;
    XSQLVAR * var;
    VARY * vary;
 
    PHB_ITEM temp;
    PHB_ITEM pFields = hb_param(3, HB_IT_ARRAY);
-   HB_BOOL bQueryOnly = hb_parl(4);
+   bool bQueryOnly = hb_parl(4);
    HB_ULONG ulSystemID = hb_parnl(5);
-   HB_BOOL bTranslate = hb_parl(6);
+   bool bTranslate = hb_parl(6);
    PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
    HB_LONG lIndex;
 

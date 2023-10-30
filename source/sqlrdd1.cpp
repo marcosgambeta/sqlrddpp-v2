@@ -740,7 +740,8 @@ static HB_ERRCODE sqlSkip(SQLAREAP thiswa, HB_LONG lToSkip)
 
 HB_ERRCODE sqlSkipFilter(SQLAREAP thiswa, HB_LONG lUpDown)
 {
-   HB_BOOL bOutOfRange, bDeleted;
+   bool bOutOfRange;
+   HB_BOOL bDeleted;
    PHB_ITEM pResult;
    HB_ERRCODE uiError;
 
@@ -821,7 +822,7 @@ static HB_ERRCODE ConcludeSkipraw(SQLAREAP thiswa, HB_LONG lToSkip)
 
 static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip)
 {
-   HB_BOOL bEof, bBof;
+   bool bEof, bBof;
    PHB_ITEM pToSkip;
 
    // TraceLog(nullptr, "sqlSkipRaw %i\n", lToSkip);
@@ -846,7 +847,7 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip)
 
    if( thiswa->isam ) {
       HB_LONG lPosCache, lFound, lPreviousCacheStatus;
-      HB_BOOL bCurrentDeleted;
+      bool bCurrentDeleted;
 
       lPosCache = hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE);
       bCurrentDeleted = lPosCache && HB_IS_NIL(hb_arrayGetItemPtr(thiswa->aCache, lPosCache));
@@ -1256,7 +1257,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
    double dNum;
    HB_USHORT len, dec, fieldindex;
    PHB_ITEM pFieldNum;
-   //HB_BOOL bOk = true;
+   //bool bOk = true;
    //PHB_DYNS s_pSym_SR_FROMXML = nullptr;
    //TraceLog(nullptr, "sqlPutValue, writing column %i\n", fieldNum);
 

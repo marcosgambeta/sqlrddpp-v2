@@ -362,7 +362,7 @@ void getOrderByExpressionOra(SQLEXORAAREAP thiswa, HB_BOOL bUseOptimizerHints)
          thiswa->sOrderBy[0] = '\0';
       }
    } else {
-      HB_BOOL bDirectionFWD = thiswa->recordListDirection == LIST_FORWARD;
+      bool bDirectionFWD = thiswa->recordListDirection == LIST_FORWARD;
 
       if( thiswa->bReverseIndex ) {
          bDirectionFWD = !bDirectionFWD;
@@ -389,7 +389,7 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
    PHB_ITEM pFieldStruct;
    char * colName;
    char sSql[DEFAULT_INDEX_COLUMN_MAX_LEN];
-   HB_BOOL res;
+   bool res;
 
    OCI_Resultset * rs;
 
@@ -496,7 +496,7 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
 
 HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_Statement * hStmt)
 {
-   HB_BOOL bEmpty = SR_itemEmpty2(pFieldData);
+   bool bEmpty = SR_itemEmpty2(pFieldData);
 
    switch( BindStructure->iCType ) {
       case SQL_C_CHAR: {
@@ -634,7 +634,7 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
       case SQL_C_TYPE_TIMESTAMP: {
          int iYear, iMonth, iDay;
          int iHour, iMinute;
-         HB_BOOL bEmpty = SR_itemEmpty2(pFieldData);
+         bool bEmpty = SR_itemEmpty2(pFieldData);
 
          if( (!bEmpty) && BindStructure->isBoundNULL && hStmt ) { // Param was NULL, should be re-bound
             BindStructure->isBoundNULL = false;
@@ -959,7 +959,7 @@ static void FeedCurrentRecordToBindings(SQLEXORAAREAP thiswa)
    int iCol;
    INDEXBINDORAP IndexBind;
    COLUMNBINDORAP BindStructure;
-   HB_BOOL newFieldData;
+   bool newFieldData;
 
    if( thiswa->sqlarea.hOrdCurrent == 0 ) {
       // Natural order, pretty simple
@@ -1255,11 +1255,11 @@ static HB_ERRCODE getWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType)
    // This function creates WHERE expression to some workarea movment methods,
    // including dbGoTop()/dbGobottom() and dbSkip()
 
-   HB_BOOL bWhere = false;
+   bool bWhere = false;
    int iCol;
    PHB_ITEM pFieldData, pTemp;
-   HB_BOOL bArgumentIsNull;
-   HB_BOOL bDirectionFWD;
+   bool bArgumentIsNull;
+   bool bDirectionFWD;
    COLUMNBINDORAP BindStructure;
    char * temp;
    // Culik Let Clear all memorym this is more eficient and safe the adding an \0 to position 0
@@ -1816,7 +1816,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
 
    HB_ULONG lCurrRecord;
    HB_SIZE lPos;
-   HB_BOOL bTranslate;
+   bool bTranslate;
    HB_ISIZ i, iRow;
    HB_SIZE iIndex, iEnd;
    PHB_ITEM aRecord, pKey;
@@ -2587,7 +2587,7 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
    if( getPreparedSeekora(thiswa, queryLevel, &iIndex, &hStmt, &rs) == HB_SUCCESS ) { // Fetch line from database, read RECNO and DELETED
       // Create a line array to hold the record
       PHB_ITEM temp;
-      HB_BOOL bTranslate;
+      bool bTranslate;
       int iComp;
       // HB_ITEM temp;
 
@@ -2751,7 +2751,7 @@ static HB_ERRCODE sqlExOraSkipFilter(SQLEXORAAREAP thiswa, HB_LONG lUpDown)
 {
    // This was copied from workarea.c since SUPER_ method
    // does not fir in this RDD needs.
-   HB_BOOL fBottom, fDeleted;
+   bool fBottom, fDeleted;
    HB_ERRCODE uiError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waSkipFilter(%p, %ld)", thiswa, lUpDown));
@@ -2953,7 +2953,7 @@ static HB_ERRCODE sqlExOraAppend(SQLEXORAAREAP thiswa)
 
 static HB_ERRCODE sqlExOraDeleteRec(SQLEXORAAREAP thiswa)
 {
-   HB_BOOL isDeleted;
+   bool isDeleted;
    unsigned int res;
 
    if( SELF_GOCOLD(&thiswa->sqlarea.area ) == HB_FAILURE ) {
@@ -3322,7 +3322,7 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
 
 static HB_ERRCODE sqlExOraRecall(SQLEXORAAREAP thiswa)
 {
-   HB_BOOL isDeleted;
+   bool isDeleted;
    unsigned int res;
 
    if( SELF_GOCOLD(&thiswa->sqlarea.area ) == HB_FAILURE ) {
