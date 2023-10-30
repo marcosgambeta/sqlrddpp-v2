@@ -89,6 +89,7 @@ Quick to do list, 2009 feb 23:
 #include <sqltypes.h>
 #include "sqlex.h"
 #include <time.h>
+#include <string>
 
 static RDDFUNCS sqlExSuper;
 
@@ -205,7 +206,8 @@ static void sqlGetCleanBuffer(SQLEXAREAP thiswa)
 
 void setResultSetLimit(SQLEXAREAP thiswa, int iRows)
 {
-   char * fmt1, * fmt2;
+   std::string fmt1;
+   std::string fmt2;
 
    if( iRows > 1 ) {
       iRows++; // Add one more to multiple line queries
@@ -244,8 +246,8 @@ void setResultSetLimit(SQLEXAREAP thiswa, int iRows)
          fmt1 = "";
          fmt2 = "";
    }
-   sprintf(thiswa->sLimit1, (const char *) fmt1, iRows);
-   sprintf(thiswa->sLimit2, (const char *) fmt2, iRows);
+   sprintf(thiswa->sLimit1, fmt1.c_str(), iRows);
+   sprintf(thiswa->sLimit2, fmt2.c_str(), iRows);
 }
 
 /*------------------------------------------------------------------------*/
