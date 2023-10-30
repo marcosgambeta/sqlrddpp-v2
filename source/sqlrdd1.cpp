@@ -128,9 +128,9 @@ static PHB_DYNS s_pSym_SQLSETFILTER;
 static PHB_DYNS s_pSym_SQLCLEARFILTER;
 static PHB_DYNS s_pSym_SQLFILTERTEXT;
 
-static PHB_DYNS s_pSym_SQLINIT = NULL;
-static PHB_DYNS s_pSym_SQLEXIT = NULL;
-static PHB_DYNS s_pSym_WORKAREA = NULL;
+static PHB_DYNS s_pSym_SQLINIT = nullptr;
+static PHB_DYNS s_pSym_SQLEXIT = nullptr;
+static PHB_DYNS s_pSym_WORKAREA = nullptr;
 
 /*------------------------------------------------------------------------*/
 
@@ -227,8 +227,8 @@ HB_LONG searchCacheBWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 
 void readCachePageFWD(SQLAREAP thiswa)
 {
-   PHB_ITEM pOrd = hb_itemNew(NULL);
-   PHB_ITEM pDel = hb_itemNew(NULL);
+   PHB_ITEM pOrd = hb_itemNew(nullptr);
+   PHB_ITEM pDel = hb_itemNew(nullptr);
    hb_itemPutNL(pOrd, ORD_DIR_FWD);
    hb_itemPutL(pDel, thiswa->wasdel);
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_READPAGE, 2, pOrd, pDel);
@@ -240,8 +240,8 @@ void readCachePageFWD(SQLAREAP thiswa)
 
 void readCachePageBWD(SQLAREAP thiswa)
 {
-   PHB_ITEM pOrd = hb_itemNew(NULL);
-   PHB_ITEM pDel = hb_itemNew(NULL);
+   PHB_ITEM pOrd = hb_itemNew(nullptr);
+   PHB_ITEM pDel = hb_itemNew(nullptr);
    hb_itemPutNL(pOrd, ORD_DIR_BWD);
    hb_itemPutL(pDel, thiswa->wasdel);
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_READPAGE, 2, pOrd, pDel);
@@ -260,7 +260,7 @@ void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 
    pCacheRecord = (PHB_ITEM) hb_arrayGetItemPtr(thiswa->aCache, lPos);
 
-   pCol = hb_itemNew(NULL);
+   pCol = hb_itemNew(nullptr);
 
    for( nPos = 1, nLen = hb_arrayLen(pCacheRecord); nPos <= nLen; nPos++ ) {
 
@@ -298,7 +298,7 @@ void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
 
    pCacheRecord = (PHB_ITEM) hb_arrayGetItemPtr(thiswa->aCache, lPos);
 
-   pCol = hb_itemNew(NULL);
+   pCol = hb_itemNew(nullptr);
 
    for( nPos = 1, nLen = hb_arrayLen(pCacheRecord); nPos <= nLen; nPos++ ) {
       hb_arrayGet(pCacheRecord, nPos, pCol);
@@ -332,7 +332,7 @@ static void sqlGetCleanBuffer(SQLAREAP thiswa)
    HB_SIZE nPos, nLen;
    PHB_ITEM pCol;
 
-   pCol = hb_itemNew(NULL);
+   pCol = hb_itemNew(nullptr);
    for( nPos = 1, nLen = hb_arrayLen(thiswa->aEmptyBuff); nPos <= nLen; nPos++ ) {
       hb_arrayGet(thiswa->aEmptyBuff, nPos, pCol);
       hb_arraySet(thiswa->aOldBuffer, nPos, pCol);
@@ -364,7 +364,7 @@ static HB_ERRCODE sqlBof( SQLAREAP thiswa, HB_BOOL * bof )
    thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
    *bof = thiswa->area.fBof;
 
-   // TraceLog(NULL, "sqlBof, returning %i\n", thiswa->area.fBof);
+   // TraceLog(nullptr, "sqlBof, returning %i\n", thiswa->area.fBof);
 
    return HB_SUCCESS;
 }
@@ -388,7 +388,7 @@ static HB_ERRCODE sqlEof( SQLAREAP thiswa, HB_BOOL * eof )
       *eof = thiswa->area.fEof;
    }
 
-   // TraceLog(NULL, "sqlEof, returning %i\n", thiswa->area.fEof);
+   // TraceLog(nullptr, "sqlEof, returning %i\n", thiswa->area.fEof);
 
    return HB_SUCCESS;
 }
@@ -404,7 +404,7 @@ static HB_ERRCODE sqlFound(SQLAREAP thiswa, HB_BOOL * found)
    thiswa->area.fFound = hb_arrayGetL(thiswa->aInfo, AINFO_FOUND);
    *found = thiswa->area.fFound;
 
-   // TraceLog(NULL, "sqlFound, returning %i\n", thiswa->area.fFound);
+   // TraceLog(nullptr, "sqlFound, returning %i\n", thiswa->area.fFound);
 
    return HB_SUCCESS;
 }
@@ -416,11 +416,11 @@ static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
    HB_LONG leof;
    PHB_ITEM eofat;
 
-   eofat = hb_itemNew(NULL);
+   eofat = hb_itemNew(nullptr);
 
-   //TraceLog(NULL, "sqlGoBottom\n");
+   //TraceLog(nullptr, "sqlGoBottom\n");
 
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
 
@@ -458,14 +458,14 @@ static HB_ERRCODE sqlGoTo(SQLAREAP thiswa, HB_LONG recno)
 {
    PHB_ITEM pParam1;
 
-   // TraceLog(NULL, "sqlGoTo %i\n", recno);
+   // TraceLog(nullptr, "sqlGoTo %i\n", recno);
 
    /* Reset parent rel struct */
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
 
-   pParam1 = hb_itemPutNL(NULL, recno);
+   pParam1 = hb_itemPutNL(nullptr, recno);
    if( hb_arrayGetL(thiswa->aInfo, AINFO_HOT) ) {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_WRITEBUFFER, 0);
    }
@@ -485,7 +485,7 @@ static HB_ERRCODE sqlGoToId(SQLAREAP thiswa, PHB_ITEM pItem)
 
    HB_TRACE(HB_TR_DEBUG, ("sqlGoToId1(%p, %p)", thiswa, pItem));
 
-   // TraceLog(NULL, "sqlGoToId\n");
+   // TraceLog(nullptr, "sqlGoToId\n");
 
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
@@ -512,9 +512,9 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
 {
    HB_LONG lbof;
 
-   // TraceLog(NULL, "sqlGoTop\n");
+   // TraceLog(nullptr, "sqlGoTop\n");
 
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
 
@@ -525,7 +525,7 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
    lbof = hb_arrayGetNL(thiswa->aInfo, AINFO_BOF_AT);
 
    if( lbof ) {
-      PHB_ITEM pBOF = hb_itemPutNL(NULL, lbof);
+      PHB_ITEM pBOF = hb_itemPutNL(nullptr, lbof);
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGOTO, 1, pBOF);
       hb_itemRelease(pBOF);
    } else {
@@ -554,12 +554,12 @@ int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
    PHB_ITEM pTag, pKeyVal, itemTemp;
    int iLimit, iResult = 0;
    HB_BYTE len1, len2;
-   char * valbuf = NULL;
+   char * valbuf = nullptr;
    const char * val1, * val2;
 
-   //TraceLog(NULL, "sqlKeyCompare\n");
+   //TraceLog(nullptr, "sqlKeyCompare\n");
 
-   pTag = loadTagDefault((SQLAREAP) thiswa, NULL, &lorder);
+   pTag = loadTagDefault((SQLAREAP) thiswa, nullptr, &lorder);
    if( pTag ) {
       if( ((SQLAREAP)thiswa)->firstinteract ) {
          SELF_GOTOP((AREAP) thiswa);
@@ -589,8 +589,8 @@ int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
       valbuf = (char *) hb_xgrab(9);
       val2 = hb_itemGetDS(pKey, valbuf);
    } else if( HB_IS_NUMBER(pKey) ) {
-      PHB_ITEM pLen = hb_itemPutNL(NULL, (HB_LONG) len1);
-      val2 = valbuf = hb_itemStr(pKey, pLen, NULL);
+      PHB_ITEM pLen = hb_itemPutNL(nullptr, (HB_LONG) len1);
+      val2 = valbuf = hb_itemStr(pKey, pLen, nullptr);
       len2 = (HB_BYTE) strlen(val2);
       hb_itemRelease(pLen);
    } else if( HB_IS_LOGICAL(pKey) ) {
@@ -640,17 +640,17 @@ int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 
 static HB_ERRCODE sqlSeek(SQLAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_BOOL bFindLast)
 {
-   PHB_ITEM pNewKey = NULL, pItem, pItem2;
+   PHB_ITEM pNewKey = nullptr, pItem, pItem2;
    HB_ERRCODE retvalue = HB_SUCCESS;
 
-   // TraceLog(NULL, "sqlSeek(%p, %d, %p, %d)", thiswa, bSoftSeek, pKey, bFindLast);
+   // TraceLog(nullptr, "sqlSeek(%p, %d, %p, %d)", thiswa, bSoftSeek, pKey, bFindLast);
 
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
 
-   pItem = hb_itemPutL(NULL, bSoftSeek);
-   pItem2 = hb_itemPutL(NULL, bFindLast);
+   pItem = hb_itemPutL(nullptr, bSoftSeek);
+   pItem2 = hb_itemPutL(nullptr, bFindLast);
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( HB_IS_STRING(pKey) ) {
@@ -658,7 +658,7 @@ static HB_ERRCODE sqlSeek(SQLAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_
       if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc ) {
          HB_SIZE nLen = hb_itemGetCLen(pKey);
          char * pszVal = hb_cdpnDup(hb_itemGetCPtr(pKey), &nLen, cdpSrc, thiswa->area.cdPage);
-         pKey = pNewKey = hb_itemPutCLPtr(NULL, pszVal, nLen);
+         pKey = pNewKey = hb_itemPutCLPtr(nullptr, pszVal, nLen);
       }
    }
 #endif
@@ -669,7 +669,7 @@ static HB_ERRCODE sqlSeek(SQLAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_
    thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
    thiswa->area.fEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
 
-   if( ( hb_setGetDeleted() || thiswa->area.dbfi.itmCobExpr != NULL ) && !thiswa->area.fEof ) {
+   if( ( hb_setGetDeleted() || thiswa->area.dbfi.itmCobExpr != nullptr ) && !thiswa->area.fEof ) {
       retvalue = SELF_SKIPFILTER(&thiswa->area, (bFindLast ? -1 : 1));
 
       if( thiswa->area.fEof ) {
@@ -712,7 +712,7 @@ static HB_ERRCODE sqlSkip(SQLAREAP thiswa, HB_LONG lToSkip)
 {
    HB_ERRCODE ret;
 
-   // TraceLog(NULL, "sqlSkip %i\n", lToSkip);
+   // TraceLog(nullptr, "sqlSkip %i\n", lToSkip);
 
    if( thiswa->lpdbPendingRel ) {
       SELF_FORCEREL(&thiswa->area);
@@ -744,9 +744,9 @@ HB_ERRCODE sqlSkipFilter(SQLAREAP thiswa, HB_LONG lUpDown)
    PHB_ITEM pResult;
    HB_ERRCODE uiError;
 
-   // TraceLog(NULL, "sqlSkipFilter %i\n", lUpDown);
+   // TraceLog(nullptr, "sqlSkipFilter %i\n", lUpDown);
 
-   if( !hb_setGetDeleted() && thiswa->area.dbfi.itmCobExpr == NULL ) {
+   if( !hb_setGetDeleted() && thiswa->area.dbfi.itmCobExpr == nullptr ) {
       return HB_SUCCESS;
    }
 
@@ -824,7 +824,7 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip)
    HB_BOOL bEof, bBof;
    PHB_ITEM pToSkip;
 
-   // TraceLog(NULL, "sqlSkipRaw %i\n", lToSkip);
+   // TraceLog(nullptr, "sqlSkipRaw %i\n", lToSkip);
 
    bEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
    bBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
@@ -981,7 +981,7 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip)
          hb_arraySetL(thiswa->aInfo, AINFO_BOF, HB_FALSE);
          hb_arraySetL(thiswa->aInfo, AINFO_EOF, HB_FALSE);
          hb_arraySetL(thiswa->aInfo, AINFO_FOUND, HB_FALSE);
-         pToSkip = hb_itemNew(NULL);
+         pToSkip = hb_itemNew(nullptr);
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_NORMALIZE, 1, pToSkip);
          hb_itemRelease(pToSkip);
          thiswa->area.fBof = HB_FALSE;
@@ -1015,7 +1015,7 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlAddField    NULL
+#define sqlAddField    nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -1023,10 +1023,10 @@ static HB_ERRCODE sqlAppend(SQLAREAP thiswa)
 {
    PHB_ITEM pItem;
 
-   // TraceLog(NULL, "sqlAppend\n");
+   // TraceLog(nullptr, "sqlAppend\n");
 
    /* Reset parent rel struct */
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
 
@@ -1039,7 +1039,7 @@ static HB_ERRCODE sqlAppend(SQLAREAP thiswa)
    thiswa->area.fEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
    thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
 
-   pItem = hb_itemPutL(NULL, HB_TRUE);
+   pItem = hb_itemPutL(nullptr, HB_TRUE);
    hb_arraySet(thiswa->aInfo, AINFO_HOT, pItem);
    hb_arraySet(thiswa->aInfo, AINFO_ISINSERT, pItem);
    hb_itemPutNI(pItem, 0);
@@ -1092,7 +1092,7 @@ static HB_ERRCODE sqlDeleted(SQLAREAP thiswa, HB_BOOL * isDeleted)
 
    *isDeleted = hb_arrayGetL(thiswa->aInfo, AINFO_DELETED);
 
-   //TraceLog(NULL, "sqlDeleted, returning %i\n", *isDeleted);
+   //TraceLog(nullptr, "sqlDeleted, returning %i\n", *isDeleted);
 
    return HB_SUCCESS;
 }
@@ -1102,28 +1102,28 @@ static HB_ERRCODE sqlDeleted(SQLAREAP thiswa, HB_BOOL * isDeleted)
 static HB_ERRCODE sqlFieldCount(SQLAREAP thiswa, HB_USHORT * fieldCount)
 {
    *fieldCount = thiswa->area.uiFieldCount;
-   // TraceLog(NULL, "sqlFieldCount, returning %i\n", thiswa->area.uiFieldCount);
+   // TraceLog(nullptr, "sqlFieldCount, returning %i\n", thiswa->area.uiFieldCount);
    return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
 
-#define sqlFieldDisplay       NULL
-#define sqlFieldInfo          NULL
-#define sqlFieldName          NULL
+#define sqlFieldDisplay       nullptr
+#define sqlFieldInfo          nullptr
+#define sqlFieldName          nullptr
 
 /*------------------------------------------------------------------------*/
 
 static HB_ERRCODE sqlFlush(SQLAREAP thiswa)
 {
-   //TraceLog(NULL, "sqlFlush\n");
+   //TraceLog(nullptr, "sqlFlush\n");
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLFLUSH, 0);
    return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlGetRec             NULL  /* leave it unUsed */
+#define  sqlGetRec             nullptr  /* leave it unUsed */
 
 /*------------------------------------------------------------------------*/
 
@@ -1145,7 +1145,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
 
    if( HB_IS_NIL(itemTemp) ) {
       hb_itemRelease(itemTemp);
-      pFieldNum = hb_itemNew(NULL);
+      pFieldNum = hb_itemNew(nullptr);
       hb_itemPutNI(pFieldNum, thiswa->uiBufferIndex[fieldNum - 1]);
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGETVALUE, 1, pFieldNum);
       hb_itemRelease(pFieldNum);
@@ -1164,17 +1164,17 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
        pField = thiswa->area.lpFields + fieldNum - 1;
 
       if( pField->uiType == HB_FT_MEMO ) {
-         PHB_ITEM pLangItem = hb_itemNew(NULL);
+         PHB_ITEM pLangItem = hb_itemNew(nullptr);
          if(    hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &nPos)
              || hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &nPos)
              || hb_hashScan(itemTemp, sr_getRootLang(pLangItem), &nPos) ) {
             hb_itemCopy(value, hb_hashGetValueAt(itemTemp, nPos));
          } else {
-            hb_itemPutC(value, NULL);
+            hb_itemPutC(value, nullptr);
          }
          hb_itemRelease(pLangItem);
       } else {
-         PHB_ITEM pLangItem = hb_itemNew(NULL);
+         PHB_ITEM pLangItem = hb_itemNew(nullptr);
          HB_SIZE nLen = pField->uiLen, nSrcLen;
          char * empty = (char *) hb_xgrab(nLen + 1);
 
@@ -1207,7 +1207,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
    } else {
       /*
       if( HB_IS_NIL(itemTemp) ) {
-         TraceLog(NULL, "Empty buffer found at position %i, fieldpos %i\n", (int) thiswa->uiBufferIndex[fieldNum - 1], (int) fieldNum);
+         TraceLog(nullptr, "Empty buffer found at position %i, fieldpos %i\n", (int) thiswa->uiBufferIndex[fieldNum - 1], (int) fieldNum);
       }
       */
 #ifndef HB_CDP_SUPPORT_OFF
@@ -1229,7 +1229,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlGetVarLen          NULL
+#define  sqlGetVarLen          nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -1243,8 +1243,8 @@ static HB_ERRCODE sqlGoCold(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlGoHot              NULL
-#define  sqlPutRec             NULL
+#define  sqlGoHot              nullptr
+#define  sqlPutRec             nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -1257,8 +1257,8 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
    HB_USHORT len, dec, fieldindex;
    PHB_ITEM pFieldNum;
    //HB_BOOL bOk = HB_TRUE;
-   //PHB_DYNS s_pSym_SR_FROMXML = NULL;
-   //TraceLog(NULL, "sqlPutValue, writing column %i\n", fieldNum);
+   //PHB_DYNS s_pSym_SR_FROMXML = nullptr;
+   //TraceLog(nullptr, "sqlPutValue, writing column %i\n", fieldNum);
 
    if( thiswa->firstinteract ) {
       SELF_GOTOP(&thiswa->area);
@@ -1271,9 +1271,9 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
 
    fieldindex = (HB_USHORT)thiswa->uiBufferIndex[fieldNum - 1];
    pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
-//                if( s_pSym_SR_FROMXML == NULL ) {
+//                if( s_pSym_SR_FROMXML == nullptr ) {
 //                   s_pSym_SR_FROMXML = hb_dynsymFindName("ESCREVE");
-//                   if( s_pSym_SR_FROMXML  == NULL ) {
+//                   if( s_pSym_SR_FROMXML  == nullptr ) {
 //                      printf("Could not find Symbol SR_DESERIALIZE\n");
 //                   }
 //                }
@@ -1285,7 +1285,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
 //
    if( HB_IS_NIL(pDest) ) {
       hb_itemRelease(pDest);
-      pFieldNum = hb_itemNew(NULL);
+      pFieldNum = hb_itemNew(nullptr);
       hb_itemPutNI(pFieldNum, thiswa->uiBufferIndex[fieldNum - 1]);
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGETVALUE, 1, pFieldNum);
       hb_itemRelease(pFieldNum);
@@ -1341,7 +1341,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
 
       hb_arraySet(thiswa->aBuffer, fieldindex, value);
    } else if(HB_IS_STRING(value) && HB_IS_HASH(pDest) && sr_isMultilang() ) {
-      PHB_ITEM pLangItem = hb_itemNew(NULL);
+      PHB_ITEM pLangItem = hb_itemNew(nullptr);
       hb_hashAdd(pDest, sr_getBaseLang(pLangItem), value);
       hb_itemRelease(pLangItem);
    } else if( pField->uiType == HB_FT_MEMO ) { // Memo fields can hold ANY datatype
@@ -1372,7 +1372,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
 
 static HB_ERRCODE sqlRecall(SQLAREAP thiswa)
 {
-   //TraceLog(NULL, "sqlRecall\n");
+   //TraceLog(nullptr, "sqlRecall\n");
 
    if( thiswa->lpdbPendingRel ) {
       SELF_FORCEREL(&thiswa->area);
@@ -1400,14 +1400,14 @@ static HB_ERRCODE sqlRecCount(SQLAREAP thiswa, HB_ULONG * recCount)
       *recCount = (HB_ULONG) (hb_arrayGetNL(thiswa->aInfo, AINFO_RCOUNT));
    }
 
-   //TraceLog(NULL, "sqlRecCount, returning %i\n", *recCount);
+   //TraceLog(nullptr, "sqlRecCount, returning %i\n", *recCount);
 
    return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlRecInfo            NULL
+#define  sqlRecInfo            nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -1415,7 +1415,7 @@ static HB_ERRCODE sqlRecNo(SQLAREAP thiswa, HB_ULONG * recno)
 {
 #ifdef SQLRDD_NWG_SPECIFIC
    if( hb_arrayGetNL(thiswa->aInfo, hb_arrayGetL( thiswa->aInfo, AINFO_ISINSERT)) ) {
-      commonError(&thiswa->area, EG_ARG, ESQLRDD_NOT_COMMITED_YET, NULL);
+      commonError(&thiswa->area, EG_ARG, ESQLRDD_NOT_COMMITED_YET, nullptr);
       return HB_FAILURE;
    }
 #endif
@@ -1428,7 +1428,7 @@ static HB_ERRCODE sqlRecNo(SQLAREAP thiswa, HB_ULONG * recno)
 
    *recno = (HB_ULONG) hb_arrayGetNL(thiswa->aInfo, AINFO_RECNO);
 
-   //TraceLog(NULL, "sqlRecNo %i\n", hb_arrayGetNI(thiswa->aInfo, AINFO_RECNO));
+   //TraceLog(nullptr, "sqlRecNo %i\n", hb_arrayGetNI(thiswa->aInfo, AINFO_RECNO));
 
    return HB_SUCCESS;
 }
@@ -1450,7 +1450,7 @@ static HB_ERRCODE sqlRecId(SQLAREAP thiswa, PHB_ITEM recno)
       hb_itemPutNL(recno, 0);
    }
 
-   //TraceLog(NULL, "sqlRecID %i\n", hb_arrayGetNI(thiswa->aInfo, AINFO_RECNO));
+   //TraceLog(nullptr, "sqlRecID %i\n", hb_arrayGetNI(thiswa->aInfo, AINFO_RECNO));
 
    return HB_SUCCESS;
 }
@@ -1484,7 +1484,7 @@ static HB_ERRCODE sqlSetFieldExtent(SQLAREAP thiswa, HB_USHORT uiFieldExtent)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlAlias              NULL
+#define  sqlAlias              nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -1492,10 +1492,10 @@ static HB_ERRCODE sqlClose(SQLAREAP thiswa)
 {
    HB_ERRCODE uiError;
 
-   //TraceLog(NULL, "sqlClose\n");
+   //TraceLog(nullptr, "sqlClose\n");
 
    /* Reset parent rel struct */
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
 
    if( thiswa->oWorkArea && HB_IS_OBJECT(thiswa->oWorkArea) ) {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLCLOSE, 0);
@@ -1507,7 +1507,7 @@ static HB_ERRCODE sqlClose(SQLAREAP thiswa)
 
 /*
    else {
-      commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
+      commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
       return HB_FAILURE;
    }
 */
@@ -1525,22 +1525,22 @@ static HB_ERRCODE sqlClose(SQLAREAP thiswa)
 
    if( thiswa->szDataFileName ) {
       hb_xfree(thiswa->szDataFileName);
-      thiswa->szDataFileName = NULL;
+      thiswa->szDataFileName = nullptr;
    }
 
    if( thiswa->uiBufferIndex ) {
       hb_xfree(thiswa->uiBufferIndex);
-      thiswa->uiBufferIndex = NULL;
+      thiswa->uiBufferIndex = nullptr;
    }
 
    if( thiswa->uiFieldList ) {
       hb_xfree(thiswa->uiFieldList);
-      thiswa->uiFieldList = NULL;
+      thiswa->uiFieldList = nullptr;
    }
 
    if( thiswa->oWorkArea && HB_IS_OBJECT(thiswa->oWorkArea) ) {
       hb_itemRelease(thiswa->oWorkArea);
-      thiswa->oWorkArea = NULL;
+      thiswa->oWorkArea = nullptr;
    }
    return uiError;
 }
@@ -1549,12 +1549,12 @@ static HB_ERRCODE sqlClose(SQLAREAP thiswa)
 
 static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo)
 {
-   PHB_ITEM pTable = hb_itemNew(NULL);
-   PHB_ITEM pAlias = hb_itemNew(NULL);
-   PHB_ITEM pArea = hb_itemNew(NULL);
+   PHB_ITEM pTable = hb_itemNew(nullptr);
+   PHB_ITEM pAlias = hb_itemNew(nullptr);
+   PHB_ITEM pArea = hb_itemNew(nullptr);
    HB_ERRCODE errCode;
 
-   //TraceLog(NULL, "sqlCreate(%p, %p)", thiswa, pCreateInfo);
+   //TraceLog(nullptr, "sqlCreate(%p, %p)", thiswa, pCreateInfo);
 
    thiswa->creating = 1;
 
@@ -1572,14 +1572,14 @@ static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo)
    thiswa->area.fBof = 0;
    thiswa->area.fEof = 1;
 
-//   thiswa->valResult = NULL;
+//   thiswa->valResult = nullptr;
 
    /* Create and run class object */
    hb_vmPushDynSym(s_pSym_WORKAREA);
    hb_vmPushNil();
    hb_vmDo(0);
 
-   thiswa->oWorkArea = hb_itemNew(NULL);
+   thiswa->oWorkArea = hb_itemNew(nullptr);
    hb_itemCopy(thiswa->oWorkArea, hb_stackReturnItem());
    if( s_pSym_SQLCREATE ) {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLCREATE, 4, thiswa->aCreate, pTable, pAlias, pArea);
@@ -1657,7 +1657,7 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
 {
    HB_BOOL flag = HB_TRUE;
 
-   //TraceLog(NULL, "sqlInfo(%p, %hu, %p)", thiswa, uiIndex, pItem);
+   //TraceLog(nullptr, "sqlInfo(%p, %hu, %p)", thiswa, uiIndex, pItem);
 
    switch( uiIndex ) {
       case DBI_ISDBF:
@@ -1720,7 +1720,7 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
          if( HB_IS_OBJECT(thiswa->oWorkArea) ) {
             hb_objSendMsg(thiswa->oWorkArea, "LTABLELOCKED", 0);
          } else {
-            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
+            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
             return HB_FAILURE;
          }
          hb_itemMove(pItem, hb_stackReturnItem());
@@ -1739,7 +1739,7 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
             hb_objSendMsg(thiswa->oWorkArea, "OSQL", 0);
             hb_objSendMsg(hb_stackReturnItem(), "CMGMNTVERS", 0);
          } else {
-            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
+            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
             return HB_FAILURE;
          }
          hb_itemMove(pItem, hb_stackReturnItem());
@@ -1750,7 +1750,7 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
             hb_objSendMsg(thiswa->oWorkArea, "OSQL", 0);
             hb_objSendMsg(hb_stackReturnItem(), "NSYSTEMID", 0);
          } else {
-            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
+            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
             return HB_FAILURE;
          }
          hb_itemMove(pItem, hb_stackReturnItem());
@@ -1789,7 +1789,7 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
 
 void startSQLRDDSymbols()
 {
-   if( s_pSym_WORKAREA == NULL ) {
+   if( s_pSym_WORKAREA == nullptr ) {
       s_pSym_WORKAREA            = hb_dynsymFindName(WORKAREA_CLASS);
       s_pSym_SQLGOBOTTOM         = hb_dynsymFindName("SQLGOBOTTOM");
       s_pSym_SQLGOTO             = hb_dynsymFindName("SQLGOTO");
@@ -1828,42 +1828,42 @@ void startSQLRDDSymbols()
       s_pSym_SQLCLEARFILTER      = hb_dynsymFindName("SQLCLEARFILTER");
       s_pSym_SQLFILTERTEXT       = hb_dynsymFindName("SQLFILTERTEXT");
 
-      if( s_pSym_WORKAREA            == NULL ) printf("Could not find Symbol %s\n", WORKAREA_CLASS);
-      if( s_pSym_SQLGOBOTTOM         == NULL ) printf("Could not find Symbol %s\n", "SQLGOBOTTOM");
-      if( s_pSym_SQLGOTO             == NULL ) printf("Could not find Symbol %s\n", "SQLGOTO");
-      if( s_pSym_SQLGOTOP            == NULL ) printf("Could not find Symbol %s\n", "SQLGOTOP");
-      if( s_pSym_SQLSEEK             == NULL ) printf("Could not find Symbol %s\n", "SQLSEEK");
-      if( s_pSym_SETBOF              == NULL ) printf("Could not find Symbol %s\n", "SETBOF");
-      if( s_pSym_SQLDELETEREC        == NULL ) printf("Could not find Symbol %s\n", "SQLDELETEREC");
-      if( s_pSym_SQLFLUSH            == NULL ) printf("Could not find Symbol %s\n", "SQLFLUSH");
-      if( s_pSym_SQLRECALL           == NULL ) printf("Could not find Symbol %s\n", "SQLRECALL");
-      if( s_pSym_SQLCLOSE            == NULL ) printf("Could not find Symbol %s\n", "SQLCLOSE");
-      if( s_pSym_SQLCREATE           == NULL ) printf("Could not find Symbol %s\n", "SQLCREATE");
-      if( s_pSym_SQLOPEN             == NULL ) printf("Could not find Symbol %s\n", "SQLOPENAREA");
-      if( s_pSym_SQLOPENALLINDEXES   == NULL ) printf("Could not find Symbol %s\n", "SQLOPENALLINDEXES");
-      if( s_pSym_SQLPACK             == NULL ) printf("Could not find Symbol %s\n", "SQLPACK");
-      if( s_pSym_SQLZAP              == NULL ) printf("Could not find Symbol %s\n", "SQLZAP");
-      if( s_pSym_SQLORDERLISTADD     == NULL ) printf("Could not find Symbol %s\n", "SQLORDERLISTADD");
-      if( s_pSym_SQLORDERLISTCLEAR   == NULL ) printf("Could not find Symbol %s\n", "SQLORDERLISTCLEAR");
-      if( s_pSym_SQLORDERLISTFOCUS   == NULL ) printf("Could not find Symbol %s\n", "SQLORDERLISTFOCUS");
-      if( s_pSym_SQLORDERCREATE      == NULL ) printf("Could not find Symbol %s\n", "SQLORDERCREATE");
-      if( s_pSym_SQLORDERDESTROY     == NULL ) printf("Could not find Symbol %s\n", "SQLORDERDESTROY");
-      if( s_pSym_SQLORDERCONDITION   == NULL ) printf("Could not find Symbol %s\n", "SQLORDERCONDITION");
-      if( s_pSym_SQLORDERLISTNUM     == NULL ) printf("Could not find Symbol %s\n", "SQLORDERLISTNUM");
-      if( s_pSym_SQLSETSCOPE         == NULL ) printf("Could not find Symbol %s\n", "SQLSETSCOPE");
-      if( s_pSym_SQLLOCK             == NULL ) printf("Could not find Symbol %s\n", "SQLLOCK");
-      if( s_pSym_SQLUNLOCK           == NULL ) printf("Could not find Symbol %s\n", "SQLUNLOCK");
-      if( s_pSym_SQLDROP             == NULL ) printf("Could not find Symbol %s\n", "SQLDROP");
-      if( s_pSym_SQLEXISTS           == NULL ) printf("Could not find Symbol %s\n", "SQLEXISTS");
-      if( s_pSym_SQLKEYCOUNT         == NULL ) printf("Could not find Symbol %s\n", "SQLKEYCOUNT");
-      if( s_pSym_WRITEBUFFER         == NULL ) printf("Could not find Symbol %s\n", "WRITEBUFFER");
-      if( s_pSym_READPAGE            == NULL ) printf("Could not find Symbol %s\n", "READPAGE");
-      if( s_pSym_STABILIZE           == NULL ) printf("Could not find Symbol %s\n", "STABILIZE");
-      if( s_pSym_NORMALIZE           == NULL ) printf("Could not find Symbol %s\n", "NORMALIZE");
-      if( s_pSym_SQLGETVALUE         == NULL ) printf("Could not find Symbol %s\n", "SQLGETVALUE");
-      if( s_pSym_SQLSETFILTER        == NULL ) printf("Could not find Symbol %s\n", "SQLSETFILTER");
-      if( s_pSym_SQLCLEARFILTER      == NULL ) printf("Could not find Symbol %s\n", "SQLCLEARFILTER");
-      if( s_pSym_SQLFILTERTEXT       == NULL ) printf("Could not find Symbol %s\n", "SQLFILTERTEXT");
+      if( s_pSym_WORKAREA            == nullptr ) printf("Could not find Symbol %s\n", WORKAREA_CLASS);
+      if( s_pSym_SQLGOBOTTOM         == nullptr ) printf("Could not find Symbol %s\n", "SQLGOBOTTOM");
+      if( s_pSym_SQLGOTO             == nullptr ) printf("Could not find Symbol %s\n", "SQLGOTO");
+      if( s_pSym_SQLGOTOP            == nullptr ) printf("Could not find Symbol %s\n", "SQLGOTOP");
+      if( s_pSym_SQLSEEK             == nullptr ) printf("Could not find Symbol %s\n", "SQLSEEK");
+      if( s_pSym_SETBOF              == nullptr ) printf("Could not find Symbol %s\n", "SETBOF");
+      if( s_pSym_SQLDELETEREC        == nullptr ) printf("Could not find Symbol %s\n", "SQLDELETEREC");
+      if( s_pSym_SQLFLUSH            == nullptr ) printf("Could not find Symbol %s\n", "SQLFLUSH");
+      if( s_pSym_SQLRECALL           == nullptr ) printf("Could not find Symbol %s\n", "SQLRECALL");
+      if( s_pSym_SQLCLOSE            == nullptr ) printf("Could not find Symbol %s\n", "SQLCLOSE");
+      if( s_pSym_SQLCREATE           == nullptr ) printf("Could not find Symbol %s\n", "SQLCREATE");
+      if( s_pSym_SQLOPEN             == nullptr ) printf("Could not find Symbol %s\n", "SQLOPENAREA");
+      if( s_pSym_SQLOPENALLINDEXES   == nullptr ) printf("Could not find Symbol %s\n", "SQLOPENALLINDEXES");
+      if( s_pSym_SQLPACK             == nullptr ) printf("Could not find Symbol %s\n", "SQLPACK");
+      if( s_pSym_SQLZAP              == nullptr ) printf("Could not find Symbol %s\n", "SQLZAP");
+      if( s_pSym_SQLORDERLISTADD     == nullptr ) printf("Could not find Symbol %s\n", "SQLORDERLISTADD");
+      if( s_pSym_SQLORDERLISTCLEAR   == nullptr ) printf("Could not find Symbol %s\n", "SQLORDERLISTCLEAR");
+      if( s_pSym_SQLORDERLISTFOCUS   == nullptr ) printf("Could not find Symbol %s\n", "SQLORDERLISTFOCUS");
+      if( s_pSym_SQLORDERCREATE      == nullptr ) printf("Could not find Symbol %s\n", "SQLORDERCREATE");
+      if( s_pSym_SQLORDERDESTROY     == nullptr ) printf("Could not find Symbol %s\n", "SQLORDERDESTROY");
+      if( s_pSym_SQLORDERCONDITION   == nullptr ) printf("Could not find Symbol %s\n", "SQLORDERCONDITION");
+      if( s_pSym_SQLORDERLISTNUM     == nullptr ) printf("Could not find Symbol %s\n", "SQLORDERLISTNUM");
+      if( s_pSym_SQLSETSCOPE         == nullptr ) printf("Could not find Symbol %s\n", "SQLSETSCOPE");
+      if( s_pSym_SQLLOCK             == nullptr ) printf("Could not find Symbol %s\n", "SQLLOCK");
+      if( s_pSym_SQLUNLOCK           == nullptr ) printf("Could not find Symbol %s\n", "SQLUNLOCK");
+      if( s_pSym_SQLDROP             == nullptr ) printf("Could not find Symbol %s\n", "SQLDROP");
+      if( s_pSym_SQLEXISTS           == nullptr ) printf("Could not find Symbol %s\n", "SQLEXISTS");
+      if( s_pSym_SQLKEYCOUNT         == nullptr ) printf("Could not find Symbol %s\n", "SQLKEYCOUNT");
+      if( s_pSym_WRITEBUFFER         == nullptr ) printf("Could not find Symbol %s\n", "WRITEBUFFER");
+      if( s_pSym_READPAGE            == nullptr ) printf("Could not find Symbol %s\n", "READPAGE");
+      if( s_pSym_STABILIZE           == nullptr ) printf("Could not find Symbol %s\n", "STABILIZE");
+      if( s_pSym_NORMALIZE           == nullptr ) printf("Could not find Symbol %s\n", "NORMALIZE");
+      if( s_pSym_SQLGETVALUE         == nullptr ) printf("Could not find Symbol %s\n", "SQLGETVALUE");
+      if( s_pSym_SQLSETFILTER        == nullptr ) printf("Could not find Symbol %s\n", "SQLSETFILTER");
+      if( s_pSym_SQLCLEARFILTER      == nullptr ) printf("Could not find Symbol %s\n", "SQLCLEARFILTER");
+      if( s_pSym_SQLFILTERTEXT       == nullptr ) printf("Could not find Symbol %s\n", "SQLFILTERTEXT");
    }
 }
 
@@ -1875,8 +1875,8 @@ static HB_ERRCODE sqlNewArea(SQLAREAP thiswa)
       return HB_FAILURE;
    }
 
-   thiswa->uiBufferIndex = NULL;
-   thiswa->uiFieldList = NULL;
+   thiswa->uiBufferIndex = nullptr;
+   thiswa->uiFieldList = nullptr;
    return HB_SUCCESS;
 }
 
@@ -1884,17 +1884,17 @@ static HB_ERRCODE sqlNewArea(SQLAREAP thiswa)
 
 static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo)
 {
-   PHB_ITEM pConnection = hb_itemNew(NULL);
-   PHB_ITEM pTable = hb_itemNew(NULL);
-   PHB_ITEM pArea = hb_itemNew(NULL);
-   PHB_ITEM pAlias = hb_itemNew(NULL);
-   PHB_ITEM pShared = hb_itemNew(NULL);
-   PHB_ITEM pReadOnly = hb_itemNew(NULL);
+   PHB_ITEM pConnection = hb_itemNew(nullptr);
+   PHB_ITEM pTable = hb_itemNew(nullptr);
+   PHB_ITEM pArea = hb_itemNew(nullptr);
+   PHB_ITEM pAlias = hb_itemNew(nullptr);
+   PHB_ITEM pShared = hb_itemNew(nullptr);
+   PHB_ITEM pReadOnly = hb_itemNew(nullptr);
    HB_ERRCODE errCode;
 
    char szAlias[HB_RDD_MAX_ALIAS_LEN + 1];
 
-   //TraceLog(NULL, "sqlOpen\n");
+   //TraceLog(nullptr, "sqlOpen\n");
 
    thiswa->szDataFileName = (char *) hb_xgrab(strlen((char *) pOpenInfo->abName) + 1);
    strcpy(thiswa->szDataFileName, (char *) pOpenInfo->abName);
@@ -2012,7 +2012,7 @@ static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo)
       if( HB_IS_OBJECT(thiswa->oWorkArea) ) {
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLOPENALLINDEXES, 0);
       } else {
-         commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
+         commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
          return HB_FAILURE;
       }
 
@@ -2025,7 +2025,7 @@ static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlRelease            NULL
+#define  sqlRelease            nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -2038,14 +2038,14 @@ static HB_ERRCODE sqlStructSize(SQLAREAP thiswa, HB_USHORT * StructSize)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlSysName            NULL
-#define  sqlEval               NULL
+#define  sqlSysName            nullptr
+#define  sqlEval               nullptr
 
 /*------------------------------------------------------------------------*/
 
 static HB_ERRCODE sqlPack(SQLAREAP thiswa)
 {
-   //TraceLog(NULL, "sqlPack\n");
+   //TraceLog(nullptr, "sqlPack\n");
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLPACK, 0);
    SELF_GOTOP(&thiswa->area);
    return HB_SUCCESS;
@@ -2053,16 +2053,16 @@ static HB_ERRCODE sqlPack(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlPackRec            NULL
-#define  sqlSort               NULL
-#define  sqlTrans              NULL
-#define  sqlTransRec           NULL
+#define  sqlPackRec            nullptr
+#define  sqlSort               nullptr
+#define  sqlTrans              nullptr
+#define  sqlTransRec           nullptr
 
 /*------------------------------------------------------------------------*/
 
 static HB_ERRCODE sqlZap(SQLAREAP thiswa)
 {
-   //TraceLog(NULL, "sqlZap\n");
+   //TraceLog(nullptr, "sqlZap\n");
 
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLZAP, 0);
 
@@ -2080,7 +2080,7 @@ HB_ERRCODE sqlChildEnd(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 {
    HB_ERRCODE uiError;
 
-   //TraceLog(NULL, "sqlChildEnd\n");
+   //TraceLog(nullptr, "sqlChildEnd\n");
 
    HB_TRACE(HB_TR_DEBUG, ("sqlChildEnd(%p, %p)", thiswa, pRelInfo));
 
@@ -2099,7 +2099,7 @@ HB_ERRCODE sqlChildStart(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 {
    HB_TRACE(HB_TR_DEBUG, ("sqlChildStart(%p, %p)", thiswa, pRelInfo));
 
-   //TraceLog(NULL, "sqlChildStart\n");
+   //TraceLog(nullptr, "sqlChildStart\n");
 
    if( thiswa->firstinteract ) {
       SELF_GOTOP(&thiswa->area);
@@ -2116,7 +2116,7 @@ HB_ERRCODE sqlChildSync(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 {
    HB_TRACE(HB_TR_DEBUG, ("sqlChildSync(%p, %p)", thiswa, pRelInfo));
 
-   //TraceLog(NULL, "sqlChildSync\n");
+   //TraceLog(nullptr, "sqlChildSync\n");
 
    thiswa->lpdbPendingRel = pRelInfo;
    SELF_SYNCCHILDREN(&thiswa->area);
@@ -2126,11 +2126,11 @@ HB_ERRCODE sqlChildSync(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlSyncChildren       NULL
+#define  sqlSyncChildren       nullptr
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlClearRel           NULL
+#define  sqlClearRel           nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -2143,7 +2143,7 @@ HB_ERRCODE sqlForceRel(SQLAREAP thiswa)
 
    if( thiswa->lpdbPendingRel ) {
       lpdbPendingRel = thiswa->lpdbPendingRel;
-      thiswa->lpdbPendingRel = NULL;
+      thiswa->lpdbPendingRel = nullptr;
       uiError = SELF_RELEVAL(&thiswa->area, lpdbPendingRel);
       thiswa->firstinteract = 0;
       thiswa->wasdel = 0;
@@ -2154,23 +2154,23 @@ HB_ERRCODE sqlForceRel(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlRelArea            NULL
-#define  sqlRelEval            NULL
-#define  sqlRelText            NULL
-#define  sqlSetRel             NULL
+#define  sqlRelArea            nullptr
+#define  sqlRelEval            nullptr
+#define  sqlRelText            nullptr
+#define  sqlSetRel             nullptr
 
 /*------------------------------------------------------------------------*/
 
 static HB_ERRCODE sqlOrderListAdd(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
 {
-   PHB_ITEM pNIL = NULL, pIndex, pTag;
+   PHB_ITEM pNIL = nullptr, pIndex, pTag;
 
-   //TraceLog(NULL, "sqlOrderListAdd\n");
+   //TraceLog(nullptr, "sqlOrderListAdd\n");
 
    pIndex = pOrderInfo->atomBagName;
    pTag = pOrderInfo->itmOrder;
    if( !pIndex || !pTag ) {
-      pNIL = hb_itemNew(NULL);
+      pNIL = hb_itemNew(nullptr);
       if( !pIndex ) {
          pIndex = pNIL;
       }
@@ -2197,7 +2197,7 @@ static HB_ERRCODE sqlOrderListAdd(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
 
 static HB_ERRCODE sqlOrderListClear(SQLAREAP thiswa)
 {
-   //TraceLog(NULL, "sqlOrderListClear\n");
+   //TraceLog(nullptr, "sqlOrderListClear\n");
 
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTCLEAR, 0);
 
@@ -2211,7 +2211,7 @@ static HB_ERRCODE sqlOrderListClear(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlOrderListDelete    NULL
+#define  sqlOrderListDelete    nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -2220,10 +2220,10 @@ static HB_ERRCODE sqlOrderListFocus(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
    PHB_ITEM pTag;
    HB_LONG lorder = 0;
 
-   //TraceLog(NULL, "sqlOrderListFocus\n");
+   //TraceLog(nullptr, "sqlOrderListFocus\n");
 
    //BagName.type = HB_IT_NIL;
-   pTag = loadTagDefault(thiswa, NULL, &lorder);
+   pTag = loadTagDefault(thiswa, nullptr, &lorder);
 
    if( pTag ) {
       hb_arrayGet(pTag, ORDER_TAG, pOrderInfo->itmResult);
@@ -2246,7 +2246,7 @@ static HB_ERRCODE sqlOrderListFocus(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlOrderListRebuild   NULL
+#define  sqlOrderListRebuild   nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -2255,13 +2255,13 @@ HB_ERRCODE sqlOrderCondition(SQLAREAP thiswa, LPDBORDERCONDINFO lpdbOrdCondInfo)
    PHB_ITEM pItemFor, pItemWhile, pItemStart, pItemNext, pItemRecno,
             pItemRest, pItemDesc;
 
-   pItemFor = hb_itemNew(NULL);
-   pItemWhile = hb_itemNew(NULL);
-   pItemStart = hb_itemNew(NULL);
-   pItemNext = hb_itemNew(NULL);
-   pItemRecno = hb_itemNew(NULL);
-   pItemRest = hb_itemNew(NULL);
-   pItemDesc = hb_itemNew(NULL);
+   pItemFor = hb_itemNew(nullptr);
+   pItemWhile = hb_itemNew(nullptr);
+   pItemStart = hb_itemNew(nullptr);
+   pItemNext = hb_itemNew(nullptr);
+   pItemRecno = hb_itemNew(nullptr);
+   pItemRest = hb_itemNew(nullptr);
+   pItemDesc = hb_itemNew(nullptr);
 
    if( lpdbOrdCondInfo ) {
       if( lpdbOrdCondInfo->abFor ) {
@@ -2301,21 +2301,21 @@ static HB_ERRCODE sqlOrderCreate(SQLAREAP thiswa, LPDBORDERCREATEINFO pOrderInfo
 {
    PHB_ITEM pBagName, pAtomBagName;
 
-   //TraceLog(NULL, "sqlOrderCreate\n");
+   //TraceLog(nullptr, "sqlOrderCreate\n");
 
    if( SELF_GOCOLD(&thiswa->area) == HB_FAILURE ) {
       return HB_FAILURE;
    }
 
-   pBagName = hb_itemPutC(NULL, pOrderInfo->abBagName);
-   pAtomBagName = hb_itemPutC(NULL, pOrderInfo->atomBagName);
+   pBagName = hb_itemPutC(nullptr, pOrderInfo->abBagName);
+   pAtomBagName = hb_itemPutC(nullptr, pOrderInfo->atomBagName);
 
    if( pOrderInfo->lpdbConstraintInfo ) {
       PHB_ITEM pConstrName, pTarget, pEnable;
 
-      pConstrName = hb_itemPutC(NULL, pOrderInfo->lpdbConstraintInfo->abConstrName);
-      pTarget = hb_itemPutC(NULL, pOrderInfo->lpdbConstraintInfo->abTargetName);
-      pEnable = hb_itemPutL(NULL, pOrderInfo->lpdbConstraintInfo->fEnabled);
+      pConstrName = hb_itemPutC(nullptr, pOrderInfo->lpdbConstraintInfo->abConstrName);
+      pTarget = hb_itemPutC(nullptr, pOrderInfo->lpdbConstraintInfo->abTargetName);
+      pEnable = hb_itemPutL(nullptr, pOrderInfo->lpdbConstraintInfo->fEnabled);
 
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERCREATE, 7, pBagName, pOrderInfo->abExpr, pAtomBagName, pConstrName, pTarget, pOrderInfo->lpdbConstraintInfo->itmRelationKey, pEnable);
 
@@ -2343,13 +2343,13 @@ static HB_ERRCODE sqlOrderDestroy(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
    PHB_ITEM pTag;
    HB_LONG lorder = 0;
 
-   //TraceLog(NULL, "sqlOrderDestroy\n");
+   //TraceLog(nullptr, "sqlOrderDestroy\n");
 
    if( SELF_GOCOLD(&thiswa->area) == HB_FAILURE ) {
       return HB_FAILURE;
    }
 
-   pTag = loadTagDefault(thiswa, NULL, &lorder);
+   pTag = loadTagDefault(thiswa, nullptr, &lorder);
 
    if( !pTag ) {
       return HB_FAILURE;
@@ -2376,14 +2376,14 @@ static HB_ERRCODE sqlOrderDestroy(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
 /*
 static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
 {
-   PHB_ITEM pTag = NULL;
+   PHB_ITEM pTag = nullptr;
 
    if( pInfo && pInfo->itmOrder ) {
       if( HB_IS_OBJECT(thiswa->oWorkArea) ) {
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTNUM, 1, pInfo->itmOrder);
       } else {
-         commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
-         return NULL;
+         commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
+         return nullptr;
       }
 
       if( hb_itemGetNL(hb_stackReturnItem()) ) {
@@ -2398,8 +2398,8 @@ static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
 
 PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
 {
-   PHB_ITEM pOrder = hb_itemNew(NULL);
-   PHB_ITEM pTag = NULL;
+   PHB_ITEM pOrder = hb_itemNew(nullptr);
+   PHB_ITEM pTag = nullptr;
 
 //   Order.type = HB_IT_NIL;
 
@@ -2408,16 +2408,16 @@ PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
          if( HB_IS_OBJECT(thiswa->oWorkArea) ) {
             hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTNUM, 1, pInfo->itmOrder);
          } else {
-            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
-            return NULL;
+            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
+            return nullptr;
          }
       } else {
          if( HB_IS_OBJECT(thiswa->oWorkArea) ) {
             hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTNUM, 1, pOrder);
          } else {
             hb_itemRelease(pOrder);
-            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
-            return NULL;
+            commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
+            return nullptr;
          }
       }
    } else {
@@ -2425,8 +2425,8 @@ PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTNUM, 1, pOrder);
       } else {
          hb_itemRelease(pOrder);
-         commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
-         return NULL;
+         commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
+         return nullptr;
       }
    }
 
@@ -2450,7 +2450,7 @@ static HB_ERRCODE sqlSetServerSideIndexScope(SQLAREAP thiswa, int nScope, PHB_IT
    int res;
 
    scopeval = hb_itemNew(scopeValue);
-   scopetype = hb_itemPutNI(NULL, nScope);
+   scopetype = hb_itemPutNI(nullptr, nScope);
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLSETSCOPE, 2, scopetype, scopeval);
    res = hb_itemGetNI(hb_stackReturnItem());
    hb_itemRelease(scopetype);
@@ -2471,7 +2471,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
    PHB_ITEM pTag, pTemp;
    PHB_MACRO pMacro;
 
-   //TraceLog(NULL, "sqlOrderInfo, order: %i\n", uiIndex);
+   //TraceLog(nullptr, "sqlOrderInfo, order: %i\n", uiIndex);
 
    HB_TRACE(HB_TR_DEBUG, ("sqlOrderInfo(%p, %hu, %p)", thiswa, uiIndex, pInfo));
 
@@ -2572,8 +2572,8 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
                   hb_itemPutL(pInfo->itmResult, hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX));
                   hb_itemPutL(hb_arrayGetItemPtr(pTag, DESCEND_INDEX_ORDER), hb_itemGetL(pInfo->itmNewVal));
                   hb_itemPutL(hb_arrayGetItemPtr(thiswa->aInfo, AINFO_REVERSE_INDEX), hb_itemGetL(pInfo->itmNewVal));
-                  hb_arraySetForward(pTag, ORDER_SKIP_UP, hb_itemNew(NULL));
-                  hb_arraySetForward(pTag, ORDER_SKIP_DOWN, hb_itemNew(NULL));
+                  hb_arraySetForward(pTag, ORDER_SKIP_UP, hb_itemNew(nullptr));
+                  hb_arraySetForward(pTag, ORDER_SKIP_DOWN, hb_itemNew(nullptr));
                   hb_itemPutNL(hb_arrayGetItemPtr(thiswa->aInfo, AINFO_BOF_AT), 0);
                   hb_itemPutNL(hb_arrayGetItemPtr(thiswa->aInfo, AINFO_EOF_AT), 0);
                }
@@ -2630,13 +2630,13 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
          case DBOI_SCOPETOPCLEAR :
             pTag = loadTagDefault(thiswa, pInfo, &lorder);
             if( pTag ) {
-               sqlSetServerSideIndexScope((SQLAREAP) thiswa, 0, NULL);
+               sqlSetServerSideIndexScope((SQLAREAP) thiswa, 0, nullptr);
             }
             break;
          case DBOI_SCOPEBOTTOMCLEAR :
             pTag = loadTagDefault(thiswa, pInfo, &lorder);
             if( pTag ) {
-               sqlSetServerSideIndexScope((SQLAREAP) thiswa, 1, NULL);
+               sqlSetServerSideIndexScope((SQLAREAP) thiswa, 1, nullptr);
             }
             break;
          case DBOI_SCOPESET:
@@ -2742,15 +2742,15 @@ static HB_ERRCODE sqlClearFilter(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlClearLocate        NULL
+#define  sqlClearLocate        nullptr
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlClearScope         NULL
+#define  sqlClearScope         nullptr
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlCountScope         NULL
+#define  sqlCountScope         nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -2772,18 +2772,18 @@ static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem
    HB_LONG lIndexes, lorder;
    PHB_ITEM pTag, pTemp;
 
-   //TraceLog(NULL, "sqlScopeInfo, nScope: %i\n", nScope);
+   //TraceLog(nullptr, "sqlScopeInfo, nScope: %i\n", nScope);
 
    hb_itemClear(pItem);
    lIndexes = hb_itemSize(thiswa->aOrders);
 
    if( lIndexes ) { /* Exists opened orders ? */
       if( HB_IS_OBJECT(thiswa->oWorkArea) ) {
-         PHB_ITEM pOrder = hb_itemNew(NULL);
+         PHB_ITEM pOrder = hb_itemNew(nullptr);
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTNUM, 1, pOrder);
          hb_itemRelease(pOrder);
       } else {
-         commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
+         commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
          return HB_FAILURE;
       }
       lorder = hb_itemGetNL(hb_stackReturnItem());
@@ -2831,7 +2831,7 @@ static HB_ERRCODE sqlSetFilter(SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlSetLocate          NULL
+#define  sqlSetLocate          nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -2841,9 +2841,9 @@ static HB_ERRCODE sqlSetScope(SQLAREAP thiswa, LPDBORDSCOPEINFO sInfo)
    PHB_ITEM scopeval;
    int res;
 
-   //TraceLog(NULL, "sqlSetScope\n");
+   //TraceLog(nullptr, "sqlSetScope\n");
 
-   scopetype = hb_itemPutNI(NULL, sInfo->nScope);
+   scopetype = hb_itemPutNI(nullptr, sInfo->nScope);
    scopeval = hb_itemNew(sInfo->scopeValue);
 
 #ifndef HB_CDP_SUPPORT_OFF
@@ -2871,7 +2871,7 @@ static HB_ERRCODE sqlSetScope(SQLAREAP thiswa, LPDBORDSCOPEINFO sInfo)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlSkipScope          NULL
+#define  sqlSkipScope          nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -2888,10 +2888,10 @@ static HB_ERRCODE sqlLocate(SQLAREAP thiswa, HB_BOOL fContinue)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlCompile            NULL
-#define  sqlError              NULL
-#define  sqlEvalBlock          NULL
-#define  sqlRawLock            NULL
+#define  sqlCompile            nullptr
+#define  sqlError              nullptr
+#define  sqlEvalBlock          nullptr
+#define  sqlRawLock            nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -2899,7 +2899,7 @@ static HB_ERRCODE sqlLock(SQLAREAP thiswa, LPDBLOCKINFO pLockInfo)
 {
    PHB_ITEM pRecord;
 
-   //TraceLog(NULL, "sqlLock\n");
+   //TraceLog(nullptr, "sqlLock\n");
 
    if( thiswa->firstinteract ) {
       SELF_GOTOP(&thiswa->area);
@@ -2912,11 +2912,11 @@ static HB_ERRCODE sqlLock(SQLAREAP thiswa, LPDBLOCKINFO pLockInfo)
    }
 
    if( thiswa->shared ) {
-      PHB_ITEM pMethod = hb_itemPutNI(NULL, pLockInfo->uiMethod);
+      PHB_ITEM pMethod = hb_itemPutNI(nullptr, pLockInfo->uiMethod);
 
       switch( pLockInfo->uiMethod ) {
       case DBLM_EXCLUSIVE:
-         pRecord = hb_itemNew(NULL);
+         pRecord = hb_itemNew(nullptr);
          hb_arrayGet(thiswa->aInfo, AINFO_RECNO, pRecord);
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 2, pMethod, pRecord);
          hb_itemRelease(pRecord);
@@ -2965,14 +2965,14 @@ static HB_ERRCODE sqlUnLock(SQLAREAP thiswa, PHB_ITEM pRecNo)
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlCloseMemFile       NULL
-#define  sqlCreateMemFile      NULL
-#define  sqlGetValueFile       NULL
-#define  sqlOpenMemFile        NULL
-#define  sqlPutValueFile       NULL
-#define  sqlReadDBHeader       NULL
-#define  sqlWriteDBHeader      NULL
-#define  sqlInit               NULL
+#define  sqlCloseMemFile       nullptr
+#define  sqlCreateMemFile      nullptr
+#define  sqlGetValueFile       nullptr
+#define  sqlOpenMemFile        nullptr
+#define  sqlPutValueFile       nullptr
+#define  sqlReadDBHeader       nullptr
+#define  sqlWriteDBHeader      nullptr
+#define  sqlInit               nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -2994,7 +2994,7 @@ static HB_ERRCODE sqlExit(LPRDDNODE pRDD)
 
 static HB_ERRCODE sqlDrop(PHB_ITEM pItemTable)
 {
-   //TraceLog(NULL, "sqlDrop\n");
+   //TraceLog(nullptr, "sqlDrop\n");
 
    hb_vmPushDynSym(s_pSym_WORKAREA);
    hb_vmPushNil();
@@ -3003,7 +3003,7 @@ static HB_ERRCODE sqlDrop(PHB_ITEM pItemTable)
    if( hb_stackReturnItem() ) {
       hb_objSendMessage(hb_stackReturnItem(), s_pSym_SQLDROP, 1, pItemTable);
    } else {
-      commonError(NULL, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
+      commonError(nullptr, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
       return HB_FAILURE;
    }
 
@@ -3015,7 +3015,7 @@ static HB_ERRCODE sqlDrop(PHB_ITEM pItemTable)
 
 HB_BOOL sqlExists(PHB_ITEM pItemTable, PHB_ITEM pItemIndex)
 {
-   //TraceLog(NULL, "sqlExists\n");
+   //TraceLog(nullptr, "sqlExists\n");
 
    hb_vmPushDynSym(s_pSym_WORKAREA);
    hb_vmPushNil();
@@ -3030,7 +3030,7 @@ HB_BOOL sqlExists(PHB_ITEM pItemTable, PHB_ITEM pItemIndex)
          return HB_FAILURE;
       }
    } else {
-      commonError(NULL, EG_DATATYPE, ESQLRDD_DATATYPE, NULL);
+      commonError(nullptr, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
       return HB_FAILURE;
    }
 
@@ -3047,7 +3047,7 @@ static HB_ERRCODE sqlRddInfo(LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConne
       case RDDI_ORDBAGEXT:
       case RDDI_ORDEREXT:
       case RDDI_ORDSTRUCTEXT: {
-         hb_itemPutC(pItem, NULL);
+         hb_itemPutC(pItem, nullptr);
          break;
       }
 
@@ -3067,7 +3067,7 @@ static HB_ERRCODE sqlRddInfo(LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConne
 
 /*------------------------------------------------------------------------*/
 
-#define  sqlWhoCares           NULL
+#define  sqlWhoCares           nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3430,7 +3430,7 @@ static const RDDFUNCS sqlTable =
    ( DBENTRYP_R )     sqlExit,
    ( DBENTRYP_RVVL )  sqlDrop,
    ( DBENTRYP_RVVL )  sqlExists,
-   ( DBENTRYP_RVVVL ) NULL, /* sqlRename */
+   ( DBENTRYP_RVVVL ) nullptr, /* sqlRename */
    ( DBENTRYP_RSLV )  sqlRddInfo,
 
    /* Special and reserved methods */
@@ -3460,7 +3460,7 @@ HB_FUNC( SQLRDD_GETFUNCTABLE )
       if( uiCount ) {
          *uiCount = RDDFUNCSCOUNT;
       }
-      errCode = hb_rddInherit(pTable, &sqlTable, &sqlrddSuper, NULL);
+      errCode = hb_rddInherit(pTable, &sqlTable, &sqlrddSuper, nullptr);
       hb_retni(errCode);
    } else {
       hb_retni(HB_FAILURE);
@@ -3502,16 +3502,16 @@ static void hb_sqlrddRddInit(void * cargo)
       return;
    }
 
-   hb_errInternal(HB_EI_RDDINVALID, NULL, NULL, NULL);
+   hb_errInternal(HB_EI_RDDINVALID, nullptr, nullptr, nullptr);
 }
 
 HB_INIT_SYMBOLS_BEGIN(sqlrdd1__InitSymbols)
-   {"SQLRDD",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME(SQLRDD)}, NULL},
-   {"SQLRDD_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME(SQLRDD_GETFUNCTABLE)}, NULL}
+   {"SQLRDD",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME(SQLRDD)}, nullptr},
+   {"SQLRDD_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME(SQLRDD_GETFUNCTABLE)}, nullptr}
 HB_INIT_SYMBOLS_END(sqlrdd1__InitSymbols)
 
 HB_CALL_ON_STARTUP_BEGIN(_hb_sqlrdd_rdd_init_)
-   hb_vmAtInit(hb_sqlrddRddInit, NULL);
+   hb_vmAtInit(hb_sqlrddRddInit, nullptr);
 HB_CALL_ON_STARTUP_END(_hb_sqlrdd_rdd_init_)
 
 #if defined(HB_PRAGMA_STARTUP)
@@ -3536,6 +3536,6 @@ HB_FUNC( SR_SETFOUND )
          hb_arraySetForward(pArea->aInfo, AINFO_FOUND, pFound);
       }
    } else {
-      hb_errRT_DBCMD(EG_NOTABLE, EDBCMD_NOTABLE, NULL, HB_ERR_FUNCNAME);
+      hb_errRT_DBCMD(EG_NOTABLE, EDBCMD_NOTABLE, nullptr, HB_ERR_FUNCNAME);
    }
 }

@@ -62,8 +62,8 @@
 #define MAX_CURSORS        65535
 #define MAX_COLUMNS        1024
 
-static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
-static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
+static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 
 //-----------------------------------------------------------------------------//
 
@@ -236,7 +236,7 @@ HB_FUNC( SQLO_EXECUTE )
             SQLO_USLEEP;
          }
       } else {
-         while( SQLO_STILL_EXECUTING == (session->status = sqlo_open2(&(session->stmt), session->dbh, hb_parcx(2), 0, NULL)) ) {
+         while( SQLO_STILL_EXECUTING == (session->status = sqlo_open2(&(session->stmt), session->dbh, hb_parcx(2), 0, nullptr)) ) {
             SQLO_USLEEP;
          }
       }
@@ -553,16 +553,16 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
          }
          case SQL_LONGVARCHAR: {
             if( lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2) )&& (sr_lSerializeArrayAsJson()) ) {
-               if( s_pSym_SR_FROMJSON == NULL ) {
+               if( s_pSym_SR_FROMJSON == nullptr ) {
                   s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-                  if( s_pSym_SR_FROMJSON  == NULL ) {
+                  if( s_pSym_SR_FROMJSON  == nullptr ) {
                      printf("Could not find Symbol HB_JSONDECODE\n");
                   }
                }
                hb_vmPushDynSym(s_pSym_SR_FROMJSON);
                hb_vmPushNil();
                hb_vmPushString(bBuffer, lLenBuff);
-               pTemp = hb_itemNew(NULL);
+               pTemp = hb_itemNew(nullptr);
                hb_vmPush(pTemp);
                hb_vmDo(2);
                /* TOFIX: */
@@ -570,9 +570,9 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
                hb_itemRelease(pTemp);
 
             } else if( lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString()) ) {
-               if( s_pSym_SR_DESERIALIZE == NULL ) {
+               if( s_pSym_SR_DESERIALIZE == nullptr ) {
                   s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-                  if( s_pSym_SR_DESERIALIZE  == NULL ) {
+                  if( s_pSym_SR_DESERIALIZE  == nullptr ) {
                      printf("Could not find Symbol SR_DESERIALIZE\n");
                   }
                }
@@ -581,11 +581,11 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
                hb_vmPushString(bBuffer, lLenBuff);
                hb_vmDo(1);
 
-               pTemp = hb_itemNew(NULL);
+               pTemp = hb_itemNew(nullptr);
                hb_itemMove(pTemp, hb_stackReturnItem());
 
                if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
-                  PHB_ITEM pLangItem = hb_itemNew(NULL);
+                  PHB_ITEM pLangItem = hb_itemNew(nullptr);
                   HB_SIZE ulPos;
                   if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
                       || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -637,16 +637,16 @@ HB_FUNC( SQLO_LINE )
    HB_USHORT i;
    sqlo_stmt_handle_t stmtParamRes;
 
-   ret = hb_itemNew(NULL);
+   ret = hb_itemNew(nullptr);
 
    if( session ) {
       stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
-      line = sqlo_values(stmtParamRes, NULL, 0);
-      lens = sqlo_value_lens(stmtParamRes, NULL);
+      line = sqlo_values(stmtParamRes, nullptr, 0);
+      lens = sqlo_value_lens(stmtParamRes, nullptr);
       hb_arrayNew(ret, session->numcols);
 
       for( i = 0; i < session->numcols; i++ ) {
-         temp = hb_itemNew(NULL);
+         temp = hb_itemNew(nullptr);
          hb_arraySetForward(ret, i + 1, hb_itemPutCL(temp, (char *) line[i], lens[i]));
          hb_itemRelease(temp);
       }
@@ -674,14 +674,14 @@ HB_FUNC( SQLO_LINEPROCESSED )
 
    if( session ) {
       stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
-      line = sqlo_values(stmtParamRes, NULL, 0);
-      lens = sqlo_value_lens(stmtParamRes, NULL);
+      line = sqlo_values(stmtParamRes, nullptr, 0);
+      lens = sqlo_value_lens(stmtParamRes, nullptr);
 
       cols = hb_arrayLen(pFields);
 
       for( i = 0; i < cols; i++ ) {
          lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i + 1), FIELD_ENUM);
-         temp = hb_itemNew(NULL);
+         temp = hb_itemNew(nullptr);
 
          if( lIndex != 0 ) {
             SQLO_FieldGet(hb_arrayGetItemPtr(pFields, i + 1), temp, (char *) line[lIndex - 1], lens[lIndex - 1], bQueryOnly, ulSystemID, bTranslate);
@@ -723,7 +723,7 @@ HB_FUNC( ORACLEWRITEMEMO )
 
          sth = sqlo_prepare(session->dbh, szSql);
          sqlo_alloc_lob_desc(session->dbh, &loblp);
-         sqlo_bind_by_pos(sth, 1, SQLOT_CLOB, &loblp, 0, NULL, 0);
+         sqlo_bind_by_pos(sth, 1, SQLOT_CLOB, &loblp, 0, nullptr, 0);
          status = sqlo_execute(sth, 1);
 
          if( SQLO_SUCCESS != status ) {
@@ -764,7 +764,7 @@ void OracleFreeLink(int num_recs, POCI_SESSION p)
       }
 
       hb_xfree(p->pLink);
-      p->pLink = NULL;
+      p->pLink = nullptr;
       p->ubBindNum = 0;
    }
 

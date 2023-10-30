@@ -84,10 +84,10 @@ enum SQLO2_iStatus_codes {
   SQLO2_NO_DATA             = 100                         /**< Maps to OCI_NO_DATA */
 };
 
-static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
-static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
+static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 
-// static OCI_ConnPool * pool = NULL;
+// static OCI_ConnPool * pool = nullptr;
 //-----------------------------------------------------------------------------//
 
 // typedef struct _OCI_ORASESSION
@@ -148,7 +148,7 @@ HB_FUNC( SQLO2_CONNECT )
 
    // memset(session, 0, sizeof(OCI_ORASESSION));
    if( !OCI_initilized ) {
-      if( !OCI_Initialize(NULL, NULL, OCI_ENV_DEFAULT | OCI_ENV_CONTEXT | OCI_ENV_THREADED ) ) { // OCI_ENV_CONTEXT))
+      if( !OCI_Initialize(nullptr, nullptr, OCI_ENV_DEFAULT | OCI_ENV_CONTEXT | OCI_ENV_THREADED ) ) { // OCI_ENV_CONTEXT))
          session->iStatus = SQLO2_ERROR;
       } else {
          session->iStatus = SQLO2_SUCCESS;
@@ -166,7 +166,7 @@ HB_FUNC( SQLO2_CONNECT )
    //session->iStatus = SQLO2_connect(&(session->dbh), hb_parcx(1));
    //if( lPool )
    //{
-   //   if( pool == NULL ) {
+   //   if( pool == nullptr ) {
    //      pool = OCI_PoolCreate(hb_parc(1), hb_parc(2), hb_parc(3), OCI_POOL_CONNECTION, OCI_ORASESSION_DEFAULT, 0, MAX_CONN, 1);
    //   }
    //   TraceLog("pool.log","pool %p \n",pool);
@@ -180,7 +180,7 @@ HB_FUNC( SQLO2_CONNECT )
 
    //}
 
-   if( session->cn != NULL ) {
+   if( session->cn != nullptr ) {
        session->iStatus = SQLO_SUCCESS;
    }
 
@@ -563,7 +563,7 @@ HB_FUNC(ORACLEEXECDIR2)
       ret1 = OCI_Execute(session->stmt);
       if( ret1 ) {
          OCI_StatementFree(session->stmt);
-         session->stmt = NULL;
+         session->stmt = nullptr;
 //          session->rs = OCI_GetResultset(session->stmt);
          hb_retni(0);
          return;
@@ -632,7 +632,7 @@ void OracleFreeLink2(int num_recs, POCI_ORASESSION p)
       }
 
       hb_xfree(p->pLink);
-      p->pLink = NULL;
+      p->pLink = nullptr;
       p->ubBindNum = 0;
    }
 
@@ -748,16 +748,16 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
             char * bBuffer = (char *) OCI_GetString(rs, iField);
             HB_SIZE lLenBuff = strlen(bBuffer);
             if( lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2) ) && (sr_lSerializeArrayAsJson()) ) {
-               if( s_pSym_SR_FROMJSON == NULL ) {
+               if( s_pSym_SR_FROMJSON == nullptr ) {
                   s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-                  if( s_pSym_SR_FROMJSON  == NULL ) {
+                  if( s_pSym_SR_FROMJSON  == nullptr ) {
                      printf("Could not find Symbol HB_JSONDECODE\n");
                   }   
                }
                hb_vmPushDynSym(s_pSym_SR_FROMJSON);
                hb_vmPushNil();
                hb_vmPushString(bBuffer, lLenBuff);
-               pTemp = hb_itemNew(NULL);
+               pTemp = hb_itemNew(nullptr);
                hb_vmPush(pTemp);
                hb_vmDo(2);
                /* TOFIX: */
@@ -765,9 +765,9 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
                hb_itemRelease(pTemp);
 
             } else if( lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString()) ) {
-               if( s_pSym_SR_DESERIALIZE == NULL ) {
+               if( s_pSym_SR_DESERIALIZE == nullptr ) {
                   s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-                  if( s_pSym_SR_DESERIALIZE  == NULL ) {
+                  if( s_pSym_SR_DESERIALIZE  == nullptr ) {
                      printf("Could not find Symbol SR_DESERIALIZE\n");
                   }
                }
@@ -776,11 +776,11 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
                hb_vmPushString(bBuffer, lLenBuff);
                hb_vmDo(1);
 
-               pTemp = hb_itemNew(NULL);
+               pTemp = hb_itemNew(nullptr);
                hb_itemMove(pTemp, hb_stackReturnItem());
 
                if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
-                  PHB_ITEM pLangItem = hb_itemNew(NULL);
+                  PHB_ITEM pLangItem = hb_itemNew(nullptr);
                   HB_SIZE ulPos;
                   if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
                       || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -840,16 +840,16 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
 //   HB_USHORT i;
 //   SQLO2_stmt_handle_t stmtParamRes;
 //
-//   ret = hb_itemNew(NULL);
+//   ret = hb_itemNew(nullptr);
 //
 //   if( session ) {
 //      stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
-//      line = SQLO2_values(stmtParamRes, NULL, 0);
-//      lens = SQLO2_value_lens(stmtParamRes, NULL);
+//      line = SQLO2_values(stmtParamRes, nullptr, 0);
+//      lens = SQLO2_value_lens(stmtParamRes, nullptr);
 //      hb_arrayNew(ret, session->numcols);
 //
 //      for( i = 0; i < session->numcols; i++ ) {
-//         temp = hb_itemNew(NULL);
+//         temp = hb_itemNew(nullptr);
 //         hb_arraySetForward(ret, i + 1, hb_itemPutCL(temp, (char *) line[i], lens[i]));
 //         hb_itemRelease(temp);
 //      }
@@ -875,14 +875,14 @@ HB_FUNC( SQLO2_LINEPROCESSED )
 
    if( session ) {
       //stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
-      //line = SQLO2_values(stmtParamRes, NULL, 0);
-      //lens = SQLO2_value_lens(stmtParamRes, NULL);
+      //line = SQLO2_values(stmtParamRes, nullptr, 0);
+      //lens = SQLO2_value_lens(stmtParamRes, nullptr);
 
       cols = hb_arrayLen(pFields);
 
       for( i = 0; i < cols; i++ ) {
          lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i + 1), FIELD_ENUM);
-         temp = hb_itemNew(NULL);
+         temp = hb_itemNew(nullptr);
 
          if( lIndex != 0 ) {
             SQLO2_FieldGet(hb_arrayGetItemPtr(pFields, i + 1), temp, lIndex, bQueryOnly, ulSystemID, bTranslate, session->rs);
@@ -1050,14 +1050,14 @@ HB_FUNC( SQLO2_CLOSESTMT )
    if( session ) {
       if( session->stmtParamRes ) {
          OCI_StatementFree(session->stmtParamRes);
-         session->stmtParamRes = NULL;
+         session->stmtParamRes = nullptr;
       }
       if( session->stmt ) {
          session->iStatus = OCI_StatementFree(session->stmt ) ? 1 : -1;
       } else {
          session->iStatus = 1;
       }
-      session->stmt = NULL;
+      session->stmt = nullptr;
       hb_retni(session->iStatus);
    }
    hb_retni(SQL_SUCCESS);
@@ -1095,7 +1095,7 @@ HB_FUNC( ORACLEWRITEMEMO2 )
 
          //sth = SQLO2_prepare(session->dbh, szSql);
          //SQLO2_alloc_lob_desc(session->dbh, &loblp);
-         //SQLO2_bind_by_pos(sth, 1, SQLOT_CLOB, &loblp, 0, NULL, 0);
+         //SQLO2_bind_by_pos(sth, 1, SQLOT_CLOB, &loblp, 0, nullptr, 0);
          stmt = OCI_StatementCreate(session->cn);
          OCI_Prepare(stmt, szSql);
          OCI_RegisterLob(stmt, ":b1", OCI_CLOB);

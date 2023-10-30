@@ -194,16 +194,16 @@ HB_ERRCODE prepareSeekQueryOra(SQLEXORAAREAP thiswa, INDEXBINDORAP SeekBind)
    }
 
    if( thiswa->recordListDirection == LIST_FORWARD ) {
-      if( SeekBind->SeekFwdStmt == NULL ) {
+      if( SeekBind->SeekFwdStmt == nullptr ) {
          return HB_FAILURE;
       }
    } else {
-      if( SeekBind->SeekBwdStmt == NULL ) {
+      if( SeekBind->SeekBwdStmt == nullptr ) {
          return HB_FAILURE;
       }
    }
 
-   // if( hPrep == NULL ) {
+   // if( hPrep == nullptr ) {
    //    return HB_FAILURE;
    // }
    OCI_AllowRebinding(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt, 1);
@@ -260,12 +260,12 @@ HB_BOOL CreateSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
 
       if( SeekBind->SeekFwdStmt ) {
          OCI_StatementFree(SeekBind->SeekFwdStmt);
-         SeekBind->SeekFwdStmt = NULL;
+         SeekBind->SeekFwdStmt = nullptr;
       }
 
       if( SeekBind->SeekBwdStmt ) {
          OCI_StatementFree(SeekBind->SeekBwdStmt);
-         SeekBind->SeekBwdStmt = NULL;
+         SeekBind->SeekBwdStmt = nullptr;
       }
 
       getSeekWhereExpressionOra(thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD, queryLevel, &bUseOptimizerHints);
@@ -317,11 +317,11 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
 
          if( SeekBind->SeekFwdStmt ) {
             OCI_StatementFree(SeekBind->SeekFwdStmt);
-            SeekBind->SeekFwdStmt = NULL;
+            SeekBind->SeekFwdStmt = nullptr;
          }
          if( SeekBind->SeekBwdStmt ) {
             OCI_StatementFree(SeekBind->SeekBwdStmt);
-            SeekBind->SeekBwdStmt = NULL;
+            SeekBind->SeekBwdStmt = nullptr;
          }
 
          SeekBind++;
@@ -412,13 +412,13 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
                   datemask[iPos] = szKey[iPos];
                }
 
-               hb_compStrToNum(datemask, 4, &lVal, &dVal, NULL, NULL);
+               hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
                BindStructure->asTimestamp.year = (unsigned int) lVal;
                mask += 4;
-               hb_compStrToNum(mask, 2, &lVal, &dVal, NULL, NULL);
+               hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
                BindStructure->asTimestamp.month = (unsigned int) lVal;
                mask += 2;
-               hb_compStrToNum(mask, 2, &lVal, &dVal, NULL, NULL);
+               hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
                BindStructure->asTimestamp.day = (unsigned int) lVal;
                BindStructure->asTimestamp.hour = 0;
                BindStructure->asTimestamp.minute = 0;
@@ -441,13 +441,13 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
                   datemask[iPos] = szKey[iPos];
                }
 
-               hb_compStrToNum(datemask, 4, &lVal, &dVal, NULL, NULL);
+               hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
                BindStructure->asDate.year = (unsigned int) lVal;
                mask += 4;
-               hb_compStrToNum(mask, 2, &lVal, &dVal, NULL, NULL);
+               hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
                BindStructure->asDate.month = (unsigned int) lVal;
                mask += 2;
-               hb_compStrToNum(mask, 2, &lVal, &dVal, NULL, NULL);
+               hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
                BindStructure->asDate.day = (unsigned int) lVal;
 
                break;
@@ -551,7 +551,7 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
                //                        BindStructure->iSQLType,
                //                        BindStructure->ColumnSize,
                //                        BindStructure->DecimalDigits,
-               //                        BindStructure->asChar.value, 0, NULL);
+               //                        BindStructure->asChar.value, 0, nullptr);
                res = OCI_BindString(hStmt, BindStructure->szBindName, BindStructure->asChar.value, BindStructure->ColumnSize);
                break;
             }
@@ -565,7 +565,7 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
                //                        BindStructure->iSQLType,
                //                        BindStructure->ColumnSize,
                //                        BindStructure->DecimalDigits,
-               //                        &(BindStructure->asNumeric), 0, NULL);
+               //                        &(BindStructure->asNumeric), 0, nullptr);
                res = OCI_BindDouble(hStmt, BindStructure->szBindName, &BindStructure->asDouble);
                break;
             }
@@ -587,7 +587,7 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
                //                        SQL_TYPE_DATE,
                //                        SQL_DATE_LEN,
                //                        0,
-               //                        &(BindStructure->asDate), 0, NULL);
+               //                        &(BindStructure->asDate), 0, nullptr);
                // TraceLog("sqltrace.log", " %s  %i %i %i \n", sSql, BindStructure->asDate.year, BindStructure->asDate.month, BindStructure->asDate.day);
                BindStructure->asDate1 = OCI_DateCreate(GetConnection(thiswa->hDbc));
                OCI_DateSetDate(BindStructure->asDate1, BindStructure->asDate.year, BindStructure->asDate.month, BindStructure->asDate.day);
@@ -601,7 +601,7 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
                //                        BindStructure->iSQLType,
                //                        BindStructure->ColumnSize,
                //                        BindStructure->DecimalDigits,
-               //                        &(BindStructure->asLogical), 0, NULL);
+               //                        &(BindStructure->asLogical), 0, nullptr);
                break;
             }
          }
@@ -641,7 +641,7 @@ HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT * 
    }
 
    *rs = OCI_GetResultset(*hStmt);
-   if( *rs ==  NULL ) {
+   if( *rs ==  nullptr ) {
       return HB_FAILURE;
    }
 
@@ -656,7 +656,7 @@ HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT * 
       char szValue[2];
       unsigned int uiLen;
 
-      if( OCI_GetString(*rs,2 ) == NULL ) {
+      if( OCI_GetString(*rs,2 ) == nullptr ) {
          // OCI_StatementFree(*hStmt);
          return HB_FAILURE;
       }

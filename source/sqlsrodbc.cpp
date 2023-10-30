@@ -97,8 +97,8 @@
 
 #define LOGFILE "odbc.log"
 
-static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
-static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
+static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 void odbcErrorDiagRTE(SQLHSTMT hStmt, const char * routine, const char * szSql, SQLRETURN res, int line, const char * module);
 void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate, HB_USHORT ui);
 
@@ -151,10 +151,10 @@ HB_FUNC( SR_INSTALLDSN )
       }
 
       // remove the DSN if it already existed
-      SQLConfigDataSource(NULL, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
+      SQLConfigDataSource(nullptr, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
 
       // create a new DSN
-      hb_retl(SQLConfigDataSource(NULL, ODBC_ADD_SYS_DSN, szDriver, szAttributes));
+      hb_retl(SQLConfigDataSource(nullptr, ODBC_ADD_SYS_DSN, szDriver, szAttributes));
 
       hb_xfree((void *) szAttributes);
    }
@@ -179,7 +179,7 @@ HB_FUNC( SR_UNINSTALLDSN )
       }
 
       // remove the DSN if it already existed
-      SQLConfigDataSource(NULL, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
+      SQLConfigDataSource(nullptr, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
 
       hb_xfree((void *) szAttributes);
    }
@@ -512,25 +512,25 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
          case SQL_LONGVARBINARY:
          case SQL_VARBINARY: {
             if( lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2) )&& (sr_lSerializeArrayAsJson()) ) {
-               if( s_pSym_SR_FROMJSON == NULL ) {
+               if( s_pSym_SR_FROMJSON == nullptr ) {
                   s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-                  if( s_pSym_SR_FROMJSON  == NULL ) {
+                  if( s_pSym_SR_FROMJSON  == nullptr ) {
                      printf("Could not find Symbol HB_JSONDECODE\n");
                   }
                }
                hb_vmPushDynSym(s_pSym_SR_FROMJSON);
                hb_vmPushNil();
                hb_vmPushString(bBuffer, lLenBuff);
-               pTemp = hb_itemNew(NULL);
+               pTemp = hb_itemNew(nullptr);
                hb_vmPush(pTemp);
                hb_vmDo(2);
                // TOFIX:
                hb_itemMove(pItem, pTemp);
                hb_itemRelease(pTemp);
             } else if( lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString()) ) {
-               if( s_pSym_SR_DESERIALIZE == NULL ) {
+               if( s_pSym_SR_DESERIALIZE == nullptr ) {
                   s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-                  if( s_pSym_SR_DESERIALIZE == NULL ) {
+                  if( s_pSym_SR_DESERIALIZE == nullptr ) {
                      printf("Could not find Symbol SR_DESERIALIZE\n");
                   }
                }
@@ -539,11 +539,11 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
                hb_vmPushString(bBuffer, lLenBuff);
                hb_vmDo(1);
 
-               pTemp = hb_itemNew(NULL);
+               pTemp = hb_itemNew(nullptr);
                hb_itemMove(pTemp, hb_stackReturnItem());
 
                if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
-                  PHB_ITEM pLangItem = hb_itemNew(NULL);
+                  PHB_ITEM pLangItem = hb_itemNew(nullptr);
                   HB_SIZE ulPos;
                   if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
                       || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -606,25 +606,25 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
    PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
 
    if( !pFields ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 1111, NULL, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
+      hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
    }
 
    cols = hb_arrayLen(pFields);
 
    if( cols <= 0 ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 1111, NULL, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
+      hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
    }
 
    lLen = (HB_LONG) (hb_pcount() > 1 ? hb_parnl(2) : 4096);
 
    if( lLen <= 0 ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 1111, NULL, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
+      hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
    }
 
    // bBuffer = hb_xgrab((HB_ULONG) lLen + 1);
 
    for( i = 1; i <= cols; i++ ) {
-      temp = hb_itemNew(NULL);
+      temp = hb_itemNew(nullptr);
       lIndex = (HB_USHORT) hb_arrayGetNI(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM);
 
       if( lIndex == 0 ) {
@@ -668,19 +668,19 @@ HB_FUNC( SR_ODBCGETLINES ) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lT
    HB_ULONG ulPosCache = hb_arrayGetNL(pInfo, AINFO_NPOSCACHE);
 
    if( !pFields ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 1111, NULL, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
+      hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
    }
 
    cols = hb_arrayLen(pFields);
 
    if( cols <= 0 ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 1111, NULL, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
+      hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
    }
 
    lLen = (hb_pcount() > 1 ? hb_parnl(2) : 4096);
 
    if( lLen <= 0 ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 1111, NULL, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
+      hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
    }
 
    bBuffer = hb_xgrab(lLen + 1);
@@ -721,11 +721,11 @@ HB_FUNC( SR_ODBCGETLINES ) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lT
       }
 
       for( i = 1; i <= cols; i++ ) {
-         bOut = NULL;
+         bOut = nullptr;
          lInitBuff = lLen;
          lLenOut = 0;
          iReallocs = 0;
-         temp = hb_itemNew(NULL);
+         temp = hb_itemNew(nullptr);
          lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM);
          lIndex = lIndex ? lIndex : i;
 
@@ -821,7 +821,7 @@ void odbcErrorDiagRTE(SQLHSTMT hStmt, const char * routine, const char * szSql, 
    sprintf(ErrMsg, "SQL execution error at %s, return code: %i, state: %s, description: %s.", routine, res, SqlState, Msg);
 
    if( szSql ) {
-      pArg = hb_itemNew(NULL);
+      pArg = hb_itemNew(nullptr);
       hb_itemPutC(pArg, szSql);
       if( hb_itemGetCLen(pArg) ) {
          hb_errPutArgs(pError, 1, pArg);
@@ -1061,7 +1061,7 @@ void odbcErrorDiag(SQLHSTMT hStmt, const char * routine, const char * szSql, int
 HB_FUNC( SR_TABLES )
 {
    RETCODE ret;
-   ret = SQLTables((SQLHSTMT) hb_parptr(1), NULL, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS, (SQLCHAR *) "TABLE", 5);
+   ret = SQLTables((SQLHSTMT) hb_parptr(1), nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS, (SQLCHAR *) "TABLE", 5);
    hb_retni(ret);
 }
 
@@ -1162,7 +1162,7 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
          res = SQLGetData((HSTMT) hStmt, ui, SQL_CHAR, buffer, 0, &lLenOut);
          if( SQL_SUCCEEDED(res) ) {
             if( (int) lLenOut == SQL_NULL_DATA || lLenOut == 0) {
-               odbcFieldGet(pField, pItem, NULL, -1, bQueryOnly, ulSystemID, bTranslate);
+               odbcFieldGet(pField, pItem, nullptr, -1, bQueryOnly, ulSystemID, bTranslate);
             } else if( lLenOut > 0 ) {
                char * val = (char *) hb_xgrab(lLenOut + 1);
                res = SQLGetData((HSTMT) hStmt, ui, SQL_CHAR, val, lLenOut + 1, &lLenOut);

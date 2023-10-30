@@ -99,9 +99,9 @@ void startSQLEXSymbols()
 {
    HB_THREAD_STUB
 
-   if( s_pSym_SOLVERESTRICTORS == NULL ) {
+   if( s_pSym_SOLVERESTRICTORS == nullptr ) {
       s_pSym_SOLVERESTRICTORS = hb_dynsymFindName("SOLVERESTRICTORS");
-      if( s_pSym_SOLVERESTRICTORS == NULL ) {
+      if( s_pSym_SOLVERESTRICTORS == nullptr ) {
          printf("Could not find Symbol %s\n", "SOLVERESTRICTORS");
       }
    }
@@ -118,7 +118,7 @@ static int bufferPoolSize = BUFFER_POOL_SIZE;
 static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa);
 static int bOldReverseIndex = 0;
 static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact);
-static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 // static HB_BOOL _SqlExIsLogFirst = HB_TRUE; not used
 static HB_BOOL _SqlExIsLogFile = HB_FALSE;
 
@@ -186,7 +186,7 @@ static void sqlGetCleanBuffer(SQLEXAREAP thiswa)
    HB_SIZE nPos, nLen;
    PHB_ITEM pCol;
 
-   pCol = hb_itemNew(NULL);
+   pCol = hb_itemNew(nullptr);
    for( nPos = 1, nLen = hb_arrayLen(thiswa->aEmptyBuff); nPos <= nLen; nPos++) {
       hb_arrayGet(thiswa->aEmptyBuff, nPos, pCol);
       hb_arraySet(thiswa->aOldBuffer, nPos, pCol);
@@ -420,7 +420,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
    HB_ERRCODE res;
    // HB_LONG lLen, lLenOut, lInitBuff;
    // char * bBuffer;
-   // char * bOut = NULL;
+   // char * bOut = nullptr;
    // int iReallocs = 0;
    // int iError = 0;
    // char buffer[2];
@@ -428,7 +428,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
 
    pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB);
 
-   if( thiswa->colStmt[lFieldPosDB - 1] == NULL ) {
+   if( thiswa->colStmt[lFieldPosDB - 1] == nullptr ) {
       res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->colStmt[lFieldPosDB - 1]));
 
       if( CHECK_SQL_N_OK(res) ) {
@@ -466,7 +466,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
          return HB_FAILURE;
       }
 
-      res = SQLBindParameter(thiswa->colStmt[lFieldPosDB - 1], 1, SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0, &(thiswa->lCurrentRecord), 0, NULL);
+      res = SQLBindParameter(thiswa->colStmt[lFieldPosDB - 1], 1, SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0, &(thiswa->lCurrentRecord), 0, nullptr);
 
       if( CHECK_SQL_N_OK(res) ) {
          return HB_FAILURE;
@@ -828,7 +828,7 @@ void ReleaseIndexBindStructure(SQLEXAREAP thiswa)
             IndexBind++;
          }
          hb_xfree(thiswa->IndexBindings[i]);
-         thiswa->IndexBindings[i] = NULL;
+         thiswa->IndexBindings[i] = nullptr;
       }
    }
 }
@@ -871,7 +871,7 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
                              BindStructure->DecimalDigits,
                              &(BindStructure->asNumeric),
                              0,
-                             NULL);
+                             nullptr);
 
       if( CHECK_SQL_N_OK(res) ) {
          odbcErrorDiagRTE(hStmt, "BindAllIndexStmts", sSql, res, __LINE__, __FILE__);
@@ -899,7 +899,7 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
                                             BindStructure->DecimalDigits,
                                             BindStructure->asChar.value,
                                             0,
-                                            NULL);
+                                            nullptr);
                      break;
                   }
                   case SQL_C_DOUBLE: {
@@ -912,7 +912,7 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
                                             BindStructure->DecimalDigits,
                                             &(BindStructure->asNumeric),
                                             0,
-                                            NULL);
+                                            nullptr);
                      break;
                   }
                   case SQL_C_TYPE_TIMESTAMP: {
@@ -962,7 +962,7 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
                                             BindStructure->DecimalDigits,
                                             &(BindStructure->asLogical),
                                             0,
-                                            NULL);
+                                            nullptr);
                      break;
                   }
                }
@@ -1003,7 +1003,7 @@ static void FeedCurrentRecordToBindings(SQLEXAREAP thiswa)
             pFieldData = hb_arrayGetItemPtr(thiswa->aBuffer, BindStructure->lFieldPosWA);
             newFieldData = HB_FALSE;
          } else {
-            pFieldData = hb_itemNew(NULL);
+            pFieldData = hb_itemNew(nullptr);
             newFieldData = HB_TRUE;
          }
 
@@ -1350,8 +1350,8 @@ static HB_ERRCODE getWhereExpression(SQLEXAREAP thiswa, int iListType)
          for( iCol = 1; iCol <= thiswa->indexLevel; iCol++ ) {
             BindStructure = GetBindStruct(thiswa, IndexBind);
 
-            pTemp = NULL;
-            pFieldData = NULL;
+            pTemp = nullptr;
+            pFieldData = nullptr;
 
             if( BindStructure->lFieldPosWA > 0 ) {
                // Get item value from Workarea
@@ -1359,12 +1359,12 @@ static HB_ERRCODE getWhereExpression(SQLEXAREAP thiswa, int iListType)
             }
 
             if( BindStructure->lFieldPosDB == (HB_LONG) (thiswa->ulhRecno) ) {
-               pTemp = hb_itemNew(NULL);
+               pTemp = hb_itemNew(nullptr);
                hb_itemPutNL(pTemp, thiswa->recordList[thiswa->recordListPos]);
                pFieldData = pTemp;
             } else if( BindStructure->lFieldPosWA == 0 || (pFieldData && HB_IS_NIL(pFieldData)) ) {
                if( !pFieldData ) {
-                  pTemp = hb_itemNew(NULL);
+                  pTemp = hb_itemNew(nullptr);
                   pFieldData = pTemp;
                }
                getMissingColumn(thiswa, pFieldData, BindStructure->lFieldPosDB);
@@ -1538,7 +1538,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXAREAP thiswa, int iMax) // Returns 
       if( CHECK_SQL_N_OK(res) ) {
          return HB_FAILURE; // Any other error means a fault in SQL statement
       }
-      res = SQLGetData(hStmt, 1, SQL_C_ULONG, &lRecord, sizeof(SQL_C_ULONG), NULL);
+      res = SQLGetData(hStmt, 1, SQL_C_ULONG, &lRecord, sizeof(SQL_C_ULONG), nullptr);
       if( CHECK_SQL_N_OK(res) ) {
          return HB_FAILURE; // Any other error means a fault in SQL statement
       }
@@ -1564,7 +1564,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXAREAP thiswa, int iMax) // Returns 
          }
          break;
       }
-      res = SQLGetData(hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[i]), sizeof(SQL_C_ULONG), NULL);
+      res = SQLGetData(hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[i]), sizeof(SQL_C_ULONG), nullptr);
       if( res == SQL_ERROR ) {
          SQLFreeStmt(hStmt, SQL_CLOSE);
          return HB_FAILURE;
@@ -1574,7 +1574,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXAREAP thiswa, int iMax) // Returns 
 
       if( thiswa->ulhDeleted > 0 ) {
          SQLCHAR szValue[2];
-         res = SQLGetData(hStmt, 2, SQL_C_CHAR, szValue, 2, NULL);
+         res = SQLGetData(hStmt, 2, SQL_C_CHAR, szValue, 2, nullptr);
          if( res == SQL_ERROR ) {
             SQLFreeStmt(hStmt, SQL_CLOSE);
             return HB_FAILURE;
@@ -1634,7 +1634,7 @@ static HB_ERRCODE getRecordList(SQLEXAREAP thiswa, int iMax) // Returns HB_TRUE 
          SQLFreeStmt(thiswa->hStmt, SQL_CLOSE);
          break;
       }
-      res = SQLGetData(thiswa->hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[i]), sizeof(SQL_C_ULONG), NULL);
+      res = SQLGetData(thiswa->hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[i]), sizeof(SQL_C_ULONG), nullptr);
       if( res == SQL_ERROR ) {
          SQLFreeStmt(thiswa->hStmt, SQL_CLOSE);
          return HB_FAILURE;
@@ -1644,7 +1644,7 @@ static HB_ERRCODE getRecordList(SQLEXAREAP thiswa, int iMax) // Returns HB_TRUE 
 
       if( thiswa->ulhDeleted > 0 ) {
          SQLCHAR szValue[2];
-         res = SQLGetData(thiswa->hStmt, 2, SQL_C_CHAR, szValue, 2, NULL);
+         res = SQLGetData(thiswa->hStmt, 2, SQL_C_CHAR, szValue, 2, nullptr);
          if( res == SQL_ERROR ) {
             SQLFreeStmt(thiswa->hStmt, SQL_CLOSE);
             return HB_FAILURE;
@@ -1695,7 +1695,7 @@ static HB_ERRCODE getFirstColumnAsLong(SQLEXAREAP thiswa, long * szValue) // Ret
       return HB_FAILURE; // It means a fault in SQL statement
    }
 
-   res = SQLGetData(thiswa->hStmt, 1, SQL_C_ULONG, szValue, sizeof(SQL_C_ULONG), NULL);
+   res = SQLGetData(thiswa->hStmt, 1, SQL_C_ULONG, szValue, sizeof(SQL_C_ULONG), nullptr);
    if( res == SQL_ERROR ) {
       SQLFreeStmt(thiswa->hStmt, SQL_CLOSE);
       return HB_FAILURE;
@@ -1866,7 +1866,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
    HB_BOOL bTranslate;
    // PTR bBuffer, bOut;
    // char * bBuffer;
-   // char * bOut = NULL;
+   // char * bOut = nullptr;
    HB_USHORT i, iIndex, iEnd, iRow;
    PHB_ITEM aRecord, pKey;
    PHB_ITEM temp;
@@ -1877,13 +1877,13 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
    // First, try to look for record in current buffer pool
 
-   pKey = hb_itemNew(NULL);
+   pKey = hb_itemNew(nullptr);
    hb_itemPutNL(pKey, thiswa->recordList[thiswa->recordListPos]);
 
    if( !bUpdateDeleted ) { // Cache NEVER holds deleted() information
       if( hb_hashScan(thiswa->hBufferPool, pKey, &lPos) ) {
          aRecord = hb_hashGetValueAt(thiswa->hBufferPool, lPos);
-         hb_arrayCopy(aRecord, thiswa->aBuffer, NULL, NULL, NULL);
+         hb_arrayCopy(aRecord, thiswa->aBuffer, nullptr, nullptr, nullptr);
          hb_itemRelease(pKey);
          return HB_SUCCESS;
       }
@@ -1898,7 +1898,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
    // Not found, so let's try the database...
 
-   if( getColumnList(thiswa) || thiswa->hStmtBuffer == NULL ) { // Check if field list has changed and if so
+   if( getColumnList(thiswa) || thiswa->hStmtBuffer == nullptr ) { // Check if field list has changed and if so
                                                                 // creates a new one in thiswa structure
       thiswa->bConditionChanged2 = HB_TRUE; // SEEK statements are no longer valid - column list has changed!
       memset(thiswa->sSqlBuffer, 0, MAX_SQL_QUERY_LEN / 5 * sizeof(char));
@@ -1943,7 +1943,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
          if( CHECK_SQL_N_OK(res) ) {
             return HB_FAILURE;
          }
-         // thiswa->hStmtBuffer = NULL;
+         // thiswa->hStmtBuffer = nullptr;
       }
 
       res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmtBuffer));
@@ -1957,10 +1957,10 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
       }
 
       for( i = 0; i < pageReadSize; i++ ) {
-         res = SQLBindParameter(thiswa->hStmtBuffer, i + 1, SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0, &(thiswa->lRecordToRetrieve[i]), 0, NULL);
+         res = SQLBindParameter(thiswa->hStmtBuffer, i + 1, SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0, &(thiswa->lRecordToRetrieve[i]), 0, nullptr);
 
          if( CHECK_SQL_N_OK(res) ) {
-            // thiswa->hStmtBuffer =NULL;
+            // thiswa->hStmtBuffer =nullptr;
             return HB_FAILURE;
          }
       }
@@ -1979,7 +1979,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
       odbcErrorDiagRTE(thiswa->hStmtBuffer, "updateRecordBuffer", thiswa->sSqlBuffer, res, __LINE__, __FILE__);
       SQLCloseCursor(thiswa->hStmtBuffer);
       // culik null the handle
-      // thiswa->hStmtBuffer = NULL;
+      // thiswa->hStmtBuffer = nullptr;
       return HB_FAILURE;
    }
 
@@ -1995,10 +1995,10 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
       // Get the RECNO from 1st column in result set
 
-      res = SQLGetData(thiswa->hStmtBuffer, 1, SQL_C_ULONG, &(lCurrRecord), sizeof(SQL_C_ULONG), NULL);
+      res = SQLGetData(thiswa->hStmtBuffer, 1, SQL_C_ULONG, &(lCurrRecord), sizeof(SQL_C_ULONG), nullptr);
       if( res == SQL_ERROR ) {
          SQLFreeStmt(thiswa->hStmtBuffer, SQL_CLOSE);
-         // thiswa->hStmtBuffer = NULL;
+         // thiswa->hStmtBuffer = nullptr;
          return HB_FAILURE;
       }
 
@@ -2009,10 +2009,10 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
       if( thiswa->ulhDeleted > 0 ) {
          if( ((HB_LONG) (thiswa->recordList[thiswa->recordListPos])) == lCurrRecord ) {
             SQLCHAR szValue[2];
-            res = SQLGetData(thiswa->hStmtBuffer, 2, SQL_C_CHAR, szValue, 2, NULL);
+            res = SQLGetData(thiswa->hStmtBuffer, 2, SQL_C_CHAR, szValue, 2, nullptr);
             if( res == SQL_ERROR ) {
                SQLFreeStmt(thiswa->hStmtBuffer, SQL_CLOSE);
-               // thiswa->hStmtBuffer = NULL;
+               // thiswa->hStmtBuffer = nullptr;
                return HB_FAILURE;
             } else {
                if( szValue[0] == 0 ) {
@@ -2026,20 +2026,20 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
       }
 
       // Create a line array to hold the record
-      aRecord = hb_itemNew(NULL);
+      aRecord = hb_itemNew(nullptr);
       hb_arrayNew(aRecord, hb_arrayLen(thiswa->aBuffer));
 
       for( i = 1; i <= thiswa->area.uiFieldCount; i++ ) {
          // bBuffer = (char *) hb_xgrab(COLUMN_BLOCK_SIZE + 1);
          // lLen = COLUMN_BLOCK_SIZE;
          // memset(bBuffer, 0, COLUMN_BLOCK_SIZE);
-         // bOut = NULL;
+         // bOut = nullptr;
          // lInitBuff = lLen;
          // lLenOut = 0;
          // iReallocs = 0;
          // temp.type = HB_IT_NIL; // I know this is not a good practice, but we save tons of allocs.
                                    // please keep as is. ML.
-         temp = hb_itemNew(NULL);
+         temp = hb_itemNew(nullptr);
 
          if( (thiswa->uiFieldList[i - 1] == 0) && thiswa->iColumnListStatus != FIELD_LIST_LEARNING ) {
             hb_arraySetForward(aRecord, i, temp); // Field is temporaly NIL since it's have never
@@ -2059,7 +2059,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
       // Feeds current record when it is found
       if( ((HB_LONG) (thiswa->recordList[thiswa->recordListPos])) == lCurrRecord ) {
-         hb_arrayCopy(aRecord, thiswa->aBuffer, NULL, NULL, NULL);
+         hb_arrayCopy(aRecord, thiswa->aBuffer, nullptr, nullptr, nullptr);
       }
       hb_itemRelease(aRecord);
    }
@@ -2214,12 +2214,12 @@ static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa)
       for( i = 1; i <= thiswa->indexColumns; i++ ) {
          if( IndexBind->SkipFwdStmt ) {
             SQLFreeStmt(IndexBind->SkipFwdStmt, SQL_DROP);
-            IndexBind->SkipFwdStmt = NULL;
+            IndexBind->SkipFwdStmt = nullptr;
          }
 
          if( IndexBind->SkipBwdStmt ) {
             SQLFreeStmt(IndexBind->SkipBwdStmt, SQL_DROP);
-            IndexBind->SkipBwdStmt = NULL;
+            IndexBind->SkipBwdStmt = nullptr;
          }
          IndexBind++;
       }
@@ -2300,7 +2300,7 @@ static HB_ERRCODE sqlExFound(SQLEXAREAP thiswa, HB_BOOL * found)
 
 static HB_ERRCODE sqlExGoBottom(SQLEXAREAP thiswa)
 {
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
    thiswa->area.fFound = HB_FALSE;
@@ -2378,7 +2378,7 @@ static HB_ERRCODE sqlExGoTo(SQLEXAREAP thiswa, HB_LONG recno)
    }
 
    // Reset parent rel struct
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
    thiswa->area.fFound = HB_FALSE;
@@ -2446,7 +2446,7 @@ static HB_ERRCODE sqlExGoToId(SQLEXAREAP thiswa, PHB_ITEM pItem)
 
 static HB_ERRCODE sqlExGoTop(SQLEXAREAP thiswa)
 {
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
    thiswa->area.fFound = HB_FALSE;
@@ -2524,10 +2524,10 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
    HB_USHORT iIndex;
    HB_SIZE i;
    HB_ERRCODE retvalue = HB_SUCCESS;
-   PHB_ITEM pNewKey = NULL;
-   HSTMT hStmt = NULL;
+   PHB_ITEM pNewKey = nullptr;
+   HSTMT hStmt = nullptr;
 
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
    thiswa->area.fTop = thiswa->area.fBottom = HB_FALSE;
@@ -2549,7 +2549,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
       if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc ) {
          HB_SIZE nLen = hb_itemGetCLen(pKey);
          char * pszVal = hb_cdpnDup(hb_itemGetCPtr(pKey), &nLen, cdpSrc, thiswa->area.cdPage);
-         pKey = pNewKey = hb_itemPutCLPtr(NULL, pszVal, nLen);
+         pKey = pNewKey = hb_itemPutCLPtr(nullptr, pszVal, nLen);
       }
    }
 #endif
@@ -2590,7 +2590,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
       PHB_ITEM temp;
       // HB_ITEM temp;
       int iComp;
-      PHB_ITEM aRecord = hb_itemNew(NULL);
+      PHB_ITEM aRecord = hb_itemNew(nullptr);
 
       hb_arrayNew(aRecord, hb_arrayLen(thiswa->aBuffer));
 
@@ -2602,12 +2602,12 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
          // // bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1);
          // lLen = COLUMN_BLOCK_SIZE;
          // memset(bBuffer, 0, lLen);
-         // bOut = NULL;
+         // bOut = nullptr;
          // lInitBuff = lLen;
          // lLenOut = 0;
          // iReallocs = 0;
 
-         temp = hb_itemNew(NULL);
+         temp = hb_itemNew(nullptr);
          // temp.type = HB_IT_NIL; // I know this is not a good practice, but we save tons of allocs.
                                    // please keep as is. ML.
 
@@ -2623,7 +2623,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
          hb_itemRelease(temp);
       }
 
-      hb_arrayCopy(aRecord, thiswa->aBuffer, NULL, NULL, NULL);
+      hb_arrayCopy(aRecord, thiswa->aBuffer, nullptr, nullptr, nullptr);
       hb_itemRelease(aRecord);
 
       SQLFreeStmt(hStmt, SQL_CLOSE);
@@ -2643,7 +2643,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
          }
       }
 
-      if(( hb_setGetDeleted() || thiswa->area.dbfi.itmCobExpr != NULL ) && !thiswa->area.fEof ) {
+      if(( hb_setGetDeleted() || thiswa->area.dbfi.itmCobExpr != nullptr ) && !thiswa->area.fEof ) {
          retvalue = SELF_SKIPFILTER((AREAP) thiswa, (bFindLast ? -1 : 1));
 
          if( thiswa->area.fEof ) {
@@ -2742,7 +2742,7 @@ static HB_ERRCODE sqlExSkipFilter(SQLEXAREAP thiswa, HB_LONG lUpDown)
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waSkipFilter(%p, %ld)", thiswa, lUpDown));
 
-   if( !hb_setGetDeleted() && thiswa->area.dbfi.itmCobExpr == NULL ) {
+   if( !hb_setGetDeleted() && thiswa->area.dbfi.itmCobExpr == nullptr ) {
       return HB_SUCCESS;
    }
 
@@ -2907,14 +2907,14 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREAP thiswa, HB_LONG lToSkip)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExAddField                  NULL
+#define sqlExAddField                  nullptr
 
 /*------------------------------------------------------------------------*/
 
 static HB_ERRCODE sqlExAppend(SQLEXAREAP thiswa)
 {
    // Reset parent rel struct
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
 
@@ -2934,7 +2934,7 @@ static HB_ERRCODE sqlExAppend(SQLEXAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExCreateFields            NULL
+#define sqlExCreateFields            nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3029,10 +3029,10 @@ static HB_ERRCODE sqlExDeleted(SQLEXAREAP thiswa, HB_BOOL * isDeleted)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExFieldCount              NULL
-#define sqlExFieldDisplay            NULL
-#define sqlExFieldInfo               NULL
-#define sqlExFieldName               NULL
+#define sqlExFieldCount              nullptr
+#define sqlExFieldDisplay            nullptr
+#define sqlExFieldInfo               nullptr
+#define sqlExFieldName               nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3043,7 +3043,7 @@ static HB_ERRCODE sqlExFlush(SQLEXAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExGetRec                  NULL
+#define sqlExGetRec                  nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3071,9 +3071,9 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
       HB_LONG lLenBuff = hb_itemGetCLen(itemTemp);
       PHB_ITEM pTemp;
       if( lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString()) ) {
-         if( s_pSym_SR_DESERIALIZE == NULL ) {
+         if( s_pSym_SR_DESERIALIZE == nullptr ) {
             s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-            if( s_pSym_SR_DESERIALIZE  == NULL ) {
+            if( s_pSym_SR_DESERIALIZE  == nullptr ) {
                printf("Could not find Symbol SR_DESERIALIZE\n");
             }
          }
@@ -3082,11 +3082,11 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
          hb_vmPushString(bBuffer, lLenBuff);
          hb_vmDo(1);
 
-         pTemp = hb_itemNew(NULL);
+         pTemp = hb_itemNew(nullptr);
          hb_itemMove(pTemp, hb_stackReturnItem());
 
          if( HB_IS_HASH(pTemp) && sr_isMultilang() ) {
-            PHB_ITEM pLangItem = hb_itemNew(NULL);
+            PHB_ITEM pLangItem = hb_itemNew(nullptr);
             // HB_SIZE ulPos; declared at beginning
             if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
                 || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -3111,19 +3111,19 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
       LPFIELD pField = thiswa->area.lpFields + fieldNum - 1;
 
       if( pField->uiType == HB_FT_MEMO ) {
-         PHB_ITEM pLangItem = hb_itemNew(NULL);
+         PHB_ITEM pLangItem = hb_itemNew(nullptr);
 
          if(    hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &ulPos)
              || hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &ulPos)
              || hb_hashScan(itemTemp, sr_getRootLang(pLangItem), &ulPos) ) {
             hb_itemCopy(value, hb_hashGetValueAt(itemTemp, ulPos));
          } else {
-            hb_itemPutC(pLangItem, NULL);
+            hb_itemPutC(pLangItem, nullptr);
             hb_itemMove(value, pLangItem);
          }
          hb_itemRelease(pLangItem);
       } else {
-         PHB_ITEM pLangItem = hb_itemNew(NULL);
+         PHB_ITEM pLangItem = hb_itemNew(nullptr);
          HB_SIZE nLen = pField->uiLen, nSrcLen;
          char * empty = (char *) hb_xgrab(nLen + 1);
 
@@ -3162,7 +3162,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExGetVarLen               NULL
+#define sqlExGetVarLen               nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3224,8 +3224,8 @@ static HB_ERRCODE sqlExGoCold(SQLEXAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExGoHot                  NULL
-#define sqlExPutRec                  NULL
+#define sqlExGoHot                  nullptr
+#define sqlExPutRec                  nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3302,7 +3302,7 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
 
       hb_arraySet(thiswa->aBuffer, fieldindex, value);
    } else if(HB_IS_STRING(value) && HB_IS_HASH(pDest) && sr_isMultilang() ) {
-      PHB_ITEM pLangItem = hb_itemNew(NULL);
+      PHB_ITEM pLangItem = hb_itemNew(nullptr);
       hb_hashAdd(pDest, sr_getBaseLang(pLangItem), value);
       hb_itemRelease(pLangItem);
    } else if( pField->uiType == HB_FT_MEMO ) { // Memo fields can hold ANY datatype
@@ -3393,7 +3393,7 @@ static HB_ERRCODE sqlExRecCount(SQLEXAREAP thiswa, HB_ULONG * recCount)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExRecInfo                  NULL
+#define sqlExRecInfo                  nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3401,7 +3401,7 @@ static HB_ERRCODE sqlExRecNo(SQLEXAREAP thiswa, HB_ULONG * recno)
 {
 #ifdef SQLRDD_NWG_SPECIFIC
    if( thiswa->bIsInsert ) {
-      commonError((AREAP) thiswa, EG_ARG, ESQLRDD_NOT_COMMITED_YET, NULL);
+      commonError((AREAP) thiswa, EG_ARG, ESQLRDD_NOT_COMMITED_YET, nullptr);
       return HB_FAILURE;
    }
 #endif
@@ -3443,8 +3443,8 @@ static HB_ERRCODE sqlExRecId(SQLEXAREAP thiswa, PHB_ITEM recno)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExSetFieldExtent            NULL
-#define sqlExAlias                     NULL
+#define sqlExSetFieldExtent            nullptr
+#define sqlExAlias                     nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3456,7 +3456,7 @@ static HB_ERRCODE sqlExClose(SQLEXAREAP thiswa)
    }
    code = (SUPER_CLOSE((AREAP) thiswa));
    // Reset parent rel struct
-   thiswa->lpdbPendingRel = NULL;
+   thiswa->lpdbPendingRel = nullptr;
 
    if( (thiswa->oSql) && HB_IS_OBJECT(thiswa->oSql) ) {
       hb_itemRelease(thiswa->oSql);
@@ -3546,7 +3546,7 @@ static HB_ERRCODE sqlExCreate(SQLEXAREAP thiswa, LPDBOPENINFO OpenInfo)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExInfo                     NULL
+#define sqlExInfo                     nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3557,26 +3557,26 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREAP thiswa)
 
    errCode = SUPER_NEW((AREAP) thiswa);
 
-   thiswa->oSql = NULL;
-   thiswa->hBufferPool = hb_hashNew(NULL);
-   thiswa->aFields = NULL;
-   thiswa->sTable = NULL;
-   thiswa->sOwner = NULL;
-   thiswa->sRecnoName = NULL;
-   thiswa->sDeletedName = NULL;
+   thiswa->oSql = nullptr;
+   thiswa->hBufferPool = hb_hashNew(nullptr);
+   thiswa->aFields = nullptr;
+   thiswa->sTable = nullptr;
+   thiswa->sOwner = nullptr;
+   thiswa->sRecnoName = nullptr;
+   thiswa->sDeletedName = nullptr;
    thiswa->iColumnListStatus = FIELD_LIST_LEARNING;
-   thiswa->hStmt = NULL;
-   thiswa->hStmtBuffer = NULL;
-   thiswa->hStmtInsert = NULL;
-   thiswa->hStmtNextval = NULL;
-   thiswa->hStmtUpdate = NULL;
+   thiswa->hStmt = nullptr;
+   thiswa->hStmtBuffer = nullptr;
+   thiswa->hStmtInsert = nullptr;
+   thiswa->hStmtNextval = nullptr;
+   thiswa->hStmtUpdate = nullptr;
    thiswa->recordListPos = 0;
    thiswa->indexColumns = 0;
    thiswa->skipDirection = 0;
    thiswa->lBofAt = 0;
    thiswa->lEofAt = 0;
    thiswa->indexLevel = -1;
-   thiswa->sFields = NULL;
+   thiswa->sFields = nullptr;
    thiswa->iTCCompat = 0;
    thiswa->bIsInsert = HB_FALSE;
    thiswa->bufferHot = HB_FALSE;
@@ -3595,8 +3595,8 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREAP thiswa)
    memset(thiswa->sOrderBy, 0, MAX_SQL_QUERY_LEN / 20 * sizeof(char));
    thiswa->sWhere = (char *) hb_xgrab(MAX_SQL_QUERY_LEN / 10 * sizeof(char));
    memset(thiswa->sWhere, 0, MAX_SQL_QUERY_LEN / 10 * sizeof(char));
-   thiswa->InsertRecord = NULL;
-   thiswa->CurrRecord = NULL;
+   thiswa->InsertRecord = nullptr;
+   thiswa->CurrRecord = nullptr;
 
    hb_hashPreallocate(thiswa->hBufferPool, (HB_ULONG) (bufferPoolSize * 1.2));
 
@@ -3635,7 +3635,7 @@ static HB_ERRCODE sqlExOpen(SQLEXAREAP thiswa, LPDBOPENINFO OpenInfo)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExRelease                  NULL
+#define sqlExRelease                  nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3648,24 +3648,24 @@ static HB_ERRCODE sqlExStructSize(SQLEXAREAP thiswa, HB_USHORT * StructSize)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExSysName                   NULL
-#define sqlExEval                      NULL
-#define sqlExPack                      NULL
-#define sqlExPackRec                   NULL
-#define sqlExSort                      NULL
-#define sqlExTrans                     NULL
-#define sqlExTransRec                  NULL
-#define sqlExZap                       NULL
-#define sqlExChildEnd                  NULL
-#define sqlExChildStart                NULL
-#define sqlExChildSync                 NULL
-#define sqlExSyncChildren              NULL
-#define sqlExClearRel                  NULL
-#define sqlExForceRel                  NULL
-#define sqlExRelArea                   NULL
-#define sqlExRelEval                   NULL
-#define sqlExRelText                   NULL
-#define sqlExSetRel                    NULL
+#define sqlExSysName                   nullptr
+#define sqlExEval                      nullptr
+#define sqlExPack                      nullptr
+#define sqlExPackRec                   nullptr
+#define sqlExSort                      nullptr
+#define sqlExTrans                     nullptr
+#define sqlExTransRec                  nullptr
+#define sqlExZap                       nullptr
+#define sqlExChildEnd                  nullptr
+#define sqlExChildStart                nullptr
+#define sqlExChildSync                 nullptr
+#define sqlExSyncChildren              nullptr
+#define sqlExClearRel                  nullptr
+#define sqlExForceRel                  nullptr
+#define sqlExRelArea                   nullptr
+#define sqlExRelEval                   nullptr
+#define sqlExRelText                   nullptr
+#define sqlExSetRel                    nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3705,7 +3705,7 @@ static HB_ERRCODE sqlExOrderListClear(SQLEXAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExOrderListDelete          NULL
+#define sqlExOrderListDelete          nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3728,7 +3728,7 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
       thiswa->bReverseIndex = hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX);
       if( thiswa->IndexBindings[thiswa->hOrdCurrent] ) {
          hb_xfree(thiswa->IndexBindings[thiswa->hOrdCurrent]);
-         thiswa->IndexBindings[thiswa->hOrdCurrent] = NULL;
+         thiswa->IndexBindings[thiswa->hOrdCurrent] = nullptr;
        }
    } else {
       thiswa->indexColumns = 1; // Natural order, RECNO
@@ -3739,8 +3739,8 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExOrderListRebuild          NULL
-#define sqlExOrderCondition            NULL
+#define sqlExOrderListRebuild          nullptr
+#define sqlExOrderCondition            nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3862,10 +3862,10 @@ static HB_ERRCODE sqlExClearFilter(SQLEXAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExClearLocate               NULL
-#define sqlExClearScope                NULL
-#define sqlExCountScope                NULL
-#define sqlExFilterText                NULL
+#define sqlExClearLocate               nullptr
+#define sqlExClearScope                nullptr
+#define sqlExCountScope                nullptr
+#define sqlExFilterText                nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3881,7 +3881,7 @@ static HB_ERRCODE sqlExScopeInfo(SQLEXAREAP thiswa, HB_USHORT nScope, PHB_ITEM p
 
 /*------------------------------------------------------------------------*/
 
-//#define sqlExSetFilter                 NULL // Must be written to update thiswa->bConditionChanged
+//#define sqlExSetFilter                 nullptr // Must be written to update thiswa->bConditionChanged
 
 // culik 2010/07/07 implemented sqlExSetFilter
 static HB_ERRCODE sqlExSetFilter(SQLEXAREAP thiswa, LPDBFILTERINFO pFilterInfo)
@@ -3897,7 +3897,7 @@ static HB_ERRCODE sqlExSetFilter(SQLEXAREAP thiswa, LPDBFILTERINFO pFilterInfo)
    return ret;
 }
 
-#define sqlExSetLocate                 NULL
+#define sqlExSetLocate                 nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3913,12 +3913,12 @@ static HB_ERRCODE sqlExSetScope(SQLEXAREAP thiswa, LPDBORDSCOPEINFO sInfo)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExSkipScope                 NULL
-#define sqlExLocate                    NULL
-#define sqlExCompile                   NULL
-#define sqlExError                     NULL
-#define sqlExEvalBlock                 NULL
-#define sqlExRawLock                   NULL
+#define sqlExSkipScope                 nullptr
+#define sqlExLocate                    nullptr
+#define sqlExCompile                   nullptr
+#define sqlExError                     nullptr
+#define sqlExEvalBlock                 nullptr
+#define sqlExRawLock                   nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -3962,19 +3962,19 @@ static HB_ERRCODE sqlExUnLock(SQLEXAREAP thiswa, PHB_ITEM pRecNo)
 
 /*------------------------------------------------------------------------*/
 
-#define sqlExCloseMemFile              NULL
-#define sqlExCreateMemFile             NULL
-#define sqlExGetValueFile              NULL
-#define sqlExOpenMemFile               NULL
-#define sqlExPutValueFile              NULL
-#define sqlExReadDBHeader              NULL
-#define sqlExWriteDBHeader             NULL
-#define sqlExInit                      NULL
-#define sqlExExit                      NULL
-#define sqlExDrop                      NULL
-#define sqlExExists                    NULL
-#define sqlExInfo                      NULL
-#define sqlExWhoCares                  NULL
+#define sqlExCloseMemFile              nullptr
+#define sqlExCreateMemFile             nullptr
+#define sqlExGetValueFile              nullptr
+#define sqlExOpenMemFile               nullptr
+#define sqlExPutValueFile              nullptr
+#define sqlExReadDBHeader              nullptr
+#define sqlExWriteDBHeader             nullptr
+#define sqlExInit                      nullptr
+#define sqlExExit                      nullptr
+#define sqlExDrop                      nullptr
+#define sqlExExists                    nullptr
+#define sqlExInfo                      nullptr
+#define sqlExWhoCares                  nullptr
 
 /*------------------------------------------------------------------------*/
 
@@ -4109,7 +4109,7 @@ static const RDDFUNCS sqlTable =
    ( DBENTRYP_R )     sqlExExit,
    ( DBENTRYP_RVVL )  sqlExDrop,
    ( DBENTRYP_RVVL )  sqlExExists,
-   ( DBENTRYP_RVVVL ) NULL, /* sqlExRename */
+   ( DBENTRYP_RVVVL ) nullptr, /* sqlExRename */
    ( DBENTRYP_RSLV )  sqlExInfo,
 
    // Special and reserved methods
@@ -4177,19 +4177,19 @@ static void hb_sqlExRddInit(void * cargo)
       }
    }
 
-   hb_errInternal(HB_EI_RDDINVALID, NULL, NULL, NULL);
+   hb_errInternal(HB_EI_RDDINVALID, nullptr, nullptr, nullptr);
 
    // not executed, only to force DBF RDD linking
    HB_FUNC_EXEC( SQLRDD );
 }
 
 HB_INIT_SYMBOLS_BEGIN(sqlEx1__InitSymbols)
-   {"SQLEX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME(SQLEX)}, NULL},
-   {"SQLEX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME(SQLEX_GETFUNCTABLE)}, NULL}
+   {"SQLEX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME(SQLEX)}, nullptr},
+   {"SQLEX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME(SQLEX_GETFUNCTABLE)}, nullptr}
 HB_INIT_SYMBOLS_END(sqlEx1__InitSymbols)
 
 HB_CALL_ON_STARTUP_BEGIN(_hb_sqlEx_rdd_init_)
-   hb_vmAtInit(hb_sqlExRddInit, NULL);
+   hb_vmAtInit(hb_sqlExRddInit, nullptr);
 HB_CALL_ON_STARTUP_END(_hb_sqlEx_rdd_init_)
 
 #if defined(HB_PRAGMA_STARTUP)
@@ -4222,9 +4222,9 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
    int iLimit, iResult = 0;
    HB_BYTE len1, len2;
    const char * val1, * val2;
-   char * valbuf = NULL;
+   char * valbuf = nullptr;
 
-   pTag = loadTagDefault(thiswa, NULL, &lorder);
+   pTag = loadTagDefault(thiswa, nullptr, &lorder);
    if( pTag ) {
       if( thiswa->firstinteract ) {
          SELF_GOTOP((AREAP) thiswa);
@@ -4263,8 +4263,8 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
       valbuf = (char *) hb_xgrab(9);
       val2 = hb_itemGetDS(pKey, valbuf);
    } else if( HB_IS_NUMBER(pKey) ) {
-      PHB_ITEM pLen = hb_itemPutNL(NULL, (HB_LONG) len1);
-      val2 = valbuf = hb_itemStr(pKey, pLen, NULL);
+      PHB_ITEM pLen = hb_itemPutNL(nullptr, (HB_LONG) len1);
+      val2 = valbuf = hb_itemStr(pKey, pLen, nullptr);
       len2 = (HB_BYTE) strlen(val2);
       hb_itemRelease(pLen);
    } else if( HB_IS_LOGICAL(pKey) ) {
@@ -4286,8 +4286,8 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
       case HB_IT_INTEGER:
       case HB_IT_LONG:
       case HB_IT_DOUBLE: {
-         PHB_ITEM pLen = hb_itemPutNL(NULL, (HB_LONG) len1);
-         val2 = valbuf = hb_itemStr(pKey, pLen, NULL);
+         PHB_ITEM pLen = hb_itemPutNL(nullptr, (HB_LONG) len1);
+         val2 = valbuf = hb_itemStr(pKey, pLen, nullptr);
          len2 = (HB_BYTE) strlen(val2);
          hb_itemRelease(pLen);
          break;
