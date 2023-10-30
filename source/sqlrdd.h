@@ -64,7 +64,7 @@
 *  SQL WORKAREA
 */
 
-typedef struct _SQLAREA
+struct _SQLAREA
 {
    AREA area;
 
@@ -108,8 +108,9 @@ typedef struct _SQLAREA
    LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
    char editMask[MAX_FIELDS];    /* Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD */
 
-} SQLAREA;
+};
 
+using SQLAREA = _SQLAREA;
 using LPSQLAREA = SQLAREA *;
 
 #ifndef SQLAREAP

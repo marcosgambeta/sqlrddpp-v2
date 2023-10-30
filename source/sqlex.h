@@ -96,14 +96,16 @@ static const char * closeQuotes = "\"\"\"]\"\"\"\"\"\"\"\"`\"\"\"`\"\"`\"\"\"";
 // other parts... I mean, it's duplicated, but I prefer to waste a few bytes more and have
 // things at hand, making this RDD faster
 
-typedef struct _SQL_CHAR_STRUCT
+struct _SQL_CHAR_STRUCT
 {
    SQLCHAR * value;
    int size;
    int size_alloc;
-} SQL_CHAR_STRUCT;
+};
 
-typedef struct _INDEXBIND
+using SQL_CHAR_STRUCT = _SQL_CHAR_STRUCT;
+
+struct _INDEXBIND
 {
    HB_LONG lFieldPosDB;               // Relative field position in aFields
    HB_LONG hIndexOrder;               // Index order
@@ -117,11 +119,12 @@ typedef struct _INDEXBIND
    char SkipBwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
    char SeekFwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
    char SeekBwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
-} INDEXBIND;
+};
 
+using INDEXBIND = _INDEXBIND;
 using INDEXBINDP = INDEXBIND *;
 
-typedef struct _COLUMNBIND
+struct _COLUMNBIND
 {
    int iParNum;                      // Parameter number in binded parameters
    int iSQLType;                     // SQL data type of column
@@ -146,13 +149,14 @@ typedef struct _COLUMNBIND
    SQLLEN lIndPtr;                   // Buffer lenght pointer to be used in SQLBindParam()
    HB_BOOL isMemo;                   // Field is MEMO ?
    HB_BOOL isMultiLang;              // Fiels is multi language ?
-} COLUMNBIND;
+};
 
+using COLUMNBIND = _COLUMNBIND;
 using COLUMNBINDP = COLUMNBIND *;
 
 // SQL WORKAREA
 
-typedef struct _SQLEXAREA
+struct _SQLEXAREA
 {
    AREA area;
 
@@ -263,8 +267,9 @@ typedef struct _SQLEXAREA
    char specialMask[MAX_FIELDS];  // Same of updateMask but for special cols (INDKEY_xx and FORKEY_xx)
    HB_BOOL bIndexTouchedInUpdate; // If any index column is affected by UPDATE
    HB_BOOL bIsSelect;             // Table open is an select statement
-} SQLEXAREA;
+};
 
+using SQLEXAREA = _SQLEXAREA;
 using LPSQLEXAREA = SQLEXAREA *;
 
 #ifndef SQLEXAREAP

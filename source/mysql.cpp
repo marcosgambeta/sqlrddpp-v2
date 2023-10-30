@@ -79,7 +79,7 @@ static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 static int iConnectionCount = 0;
 #define LOGFILE               "mysql.log"
-typedef struct _MYSQL_SESSION
+struct _MYSQL_SESSION
 {
    int status;                   // Execution return value
    int numcols;                  // Result set columns
@@ -87,8 +87,9 @@ typedef struct _MYSQL_SESSION
    MYSQL * dbh;                  // Connection handler
    MYSQL_RES * stmt;             // Current statement handler
    HB_ULONGLONG ulAffected_rows;    // Number of affected rows
-} MYSQL_SESSION;
+};
 
+using MYSQL_SESSION = _MYSQL_SESSION;
 using PMYSQL_SESSION = MYSQL_SESSION *;
 
 HB_FUNC( MYSCONNECT )

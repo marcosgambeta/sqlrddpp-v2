@@ -57,39 +57,40 @@
 #endif
 
 #ifdef SQLORA2
-typedef struct _ORA_BIND_COLS2
+struct _ORA_BIND_COLS2
 {
-   char * col_name;	
+   char * col_name;
    char *bindname;
    int iType;
    short sVal;
    double  dValue;
    unsigned int  ulValue;
-   char sDate[ 7 ];  
+   char sDate[ 7 ];
    HB_LONGLONG iValue;
-   HB_LONGLONG lValue; 
-   OCI_Date *date;  
+   HB_LONGLONG lValue;
+   OCI_Date *date;
    int iFieldSize;
-} ORA_BIND_COLS2 ;
-
+};
+using ORA_BIND_COLS2 = _ORA_BIND_COLS2;
 #else
-typedef struct _ORA_BIND_COLS
+struct _ORA_BIND_COLS
 {
-   char * col_name;	
+   char * col_name;
    char *bindname;
    int iType;
    short sVal;
    double  dValue;
    unsigned int  ulValue;
-   char sDate[ 7 ];  
+   char sDate[ 7 ];
    HB_LONGLONG iValue;
-   HB_LONGLONG lValue; 
-   OCI_Date *date;  
+   HB_LONGLONG lValue;
+   OCI_Date *date;
    int iFieldSize;
-} ORA_BIND_COLS ;
+};
+using ORA_BIND_COLS = _ORA_BIND_COLS;
 #endif
 
-typedef struct _OCI_ORASESSION
+struct _OCI_ORASESSION
 {
 	OCI_Connection *cn;
     OCI_Statement *stmt ;
@@ -104,7 +105,9 @@ typedef struct _OCI_ORASESSION
    ORA_BIND_COLS *  pLink;
 #endif
    unsigned int   ubBindNum;
-} OCI_ORASESSION;	
+};
+
+using OCI_ORASESSION = _OCI_ORASESSION;
 using POCI_ORASESSION = OCI_ORASESSION *;
 
 #endif

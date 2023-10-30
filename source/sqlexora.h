@@ -138,31 +138,40 @@ static const char * closeQuotes = "\"\"\"]\"\"\"\"\"\"\"\"`\"\"\"`\"\"\"";
 // other parts... I mean, it's duplicated, but I prefer to waste a few bytes more and have
 // things at hand, making this RDD faster
 
-typedef struct _STATEMENT_DATA
+struct _STATEMENT_DATA
 {
    OCI_Statement * pStmt;
-} STATEMENT_DATA;
+};
 
-typedef struct _SQL_CHAR_STRUCT
+using STATEMENT_DATA = _STATEMENT_DATA;
+
+struct _SQL_CHAR_STRUCT
 {
    char * value;
    int size;
    int size_alloc;
-} SQL_CHAR_STRUCT;
+};
 
-typedef struct tagDATE_STRUCTORA {
+using SQL_CHAR_STRUCT = _SQL_CHAR_STRUCT;
+
+struct tagDATE_STRUCTORA {
     unsigned int year;
     unsigned int month;
     unsigned int day;
-} DATE_STRUCTORA, SQL_DATE_STRUCTORA;
+};
 
-typedef struct tagTIME_STRUCTORA {
+using DATE_STRUCTORA = tagDATE_STRUCTORA;
+using SQL_DATE_STRUCTORA = tagDATE_STRUCTORA;
+
+struct tagTIME_STRUCTORA {
     unsigned int hour;
     unsigned int minute;
     unsigned int second;
-} TIME_STRUCTORA;
+};
 
-typedef struct tagTIMESTAMP_STRUCTORA {
+using TIME_STRUCTORA = tagTIME_STRUCTORA;
+
+struct tagTIMESTAMP_STRUCTORA {
     unsigned int  year;
     unsigned int  month;
     unsigned int  day;
@@ -170,12 +179,15 @@ typedef struct tagTIMESTAMP_STRUCTORA {
     unsigned int  minute;
     unsigned int  second;
     unsigned int fraction;
-} TIMESTAMP_STRUCORAT, SQL_TIMESTAMP_STRUCTORA;
+};
+
+using TIMESTAMP_STRUCORAT = tagTIMESTAMP_STRUCTORA;
+using SQL_TIMESTAMP_STRUCTORA = tagTIMESTAMP_STRUCTORA;
 
 //using SQL_DATE_STRUCTORA = DATE_STRUCTORA;
 //using SQL_TIMESTAMP_STRUCTORA = TIMESTAMP_STRUCTORA;
 
-typedef struct _INDEXBINDORA
+struct _INDEXBINDORA
 {
    HB_LONG lFieldPosDB;               // Relative field position in aFields
    HB_LONG hIndexOrder;               // Index order
@@ -189,11 +201,12 @@ typedef struct _INDEXBINDORA
    char SkipBwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
    char SeekFwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
    char SeekBwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
-} INDEXBINDORA;
+};
 
+using INDEXBINDORA = _INDEXBINDORA;
 using INDEXBINDORAP = INDEXBINDORA *;
 
-typedef struct _COLUMNBINDORA
+struct _COLUMNBINDORA
 {
    int iParNum;                         // Parameter number in binded parameters
    int iSQLType;                        // SQL data type of column
@@ -223,18 +236,22 @@ typedef struct _COLUMNBINDORA
    HB_BOOL isMemo;                      // Field is MEMO ?
    HB_BOOL isMultiLang;                 // Fiels is multi language ?
    OCI_Lob *lob1;
-} COLUMNBINDORA;
+};
 
+using COLUMNBINDORA = _COLUMNBINDORA;
 using COLUMNBINDORAP = COLUMNBINDORA *;
 
-typedef struct _COLUMNSTATEMENT
+struct _COLUMNSTATEMENT
 {
    OCI_Statement * st;
-} COLUMNSTATEMENT,* PCOLUMNSTATEMENT;
+};
+
+using COLUMNSTATEMENT = _COLUMNSTATEMENT;
+using PCOLUMNSTATEMENT = COLUMNSTATEMENT *;
 
 // SQL WORKAREA
 
-typedef struct _SQLAREA
+struct _SQLAREA
 {
    AREA area;
 
@@ -276,15 +293,16 @@ typedef struct _SQLAREA
 
    LPDBRELINFO lpdbPendingRel; // Pointer to parent rel struct
    char editMask[MAX_FIELDS];  // Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD
-} SQLAREA;
+};
 
+using SQLAREA = _SQLAREA;
 using LPSQLAREA = SQLAREA *;
 
 #ifndef SQLAREAP
    #define SQLAREAP LPSQLAREA
 #endif
 
-typedef struct _SQLEXORAAREA
+struct _SQLEXORAAREA
 {
    SQLAREA sqlarea;
 
@@ -398,8 +416,9 @@ typedef struct _SQLEXORAAREA
    HB_BOOL bIndexTouchedInUpdate;    // If any index column is affected by UPDATE
    HB_BOOL bIsSelect;                // Table open is an select statement
    HB_BOOL bOracle12;
-} SQLEXORAAREA;
+};
 
+using SQLEXORAAREA = _SQLEXORAAREA;
 using LPSQLEXORAAREA = SQLEXORAAREA *;
 
 #ifndef SQLEXORAAREAP

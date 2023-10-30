@@ -420,18 +420,18 @@ using bool_t = unsigned char;
 /**
  * Cursor types
  */
-typedef enum {
+enum sqlo_cursor_type_e {
   DEFAULT   = 0,                /**< standard cursor */
   REFCURSOR = 1,                /**< ref cursor type */
   NTABLE    = 2                 /**< nested table cursor */
-} sqlo_cursor_type_e;
+};
 
 
 
 /**
  * Stores information about the database connection.
  */
-typedef struct _sqlo_db_struct {
+struct _sqlo_db_struct {
   struct _sqlo_stmt_struct *stmtv;  /**< The statements (cursors) for this connection */
   unsigned int stmtv_size;          /**< max size of stmtv[] */
   ub4 dbh;                          /**< The db handle used to address this entry */
@@ -455,7 +455,10 @@ typedef struct _sqlo_db_struct {
   FILE * trace_fp;                  /**< connection specific trace file */
   sqlo_thread_t thread_id;          /**< The thread id of the thread who opened this cursor */
   ub4 exec_flags;                   /**< mode flags passed to OCIStmtExecute to facilitate OCI_COMMIT_ON_SUCCESS (@see sqlo_set_autocommit) */
-} sqlo_db_struct_t, * sqlo_db_struct_ptr_t;
+};
+
+using sqlo_db_struct_t = _sqlo_db_struct;
+using sqlo_db_struct_ptr_t = sqlo_db_struct_t *;
 
 
 
@@ -471,7 +474,7 @@ using const_sqlo_db_struct_ptr_t = const sqlo_db_struct_t *;
  * This structure is not used if you bind the select list manually be
  * @ref sqlo_define_by_pos or @ref sqlo_define_by_pos2.
  */
-typedef struct  _sqlo_col_struct {
+struct  _sqlo_col_struct {
 
   ub4 pos;                 /**< The position in the select list (0 based).
                                  * This variable can be used to address the right
@@ -489,12 +492,15 @@ typedef struct  _sqlo_col_struct {
 #else
   ub1  prec;                    /**< The precision */
   ub1  scale;                   /** The scale */
-#endif  
+#endif
   ub1  nullok;                  /**< Flag: Null allowed */
   sqlo_lob_desc_t loblp;        /**< The LOB descriptor - if column is MEMO */
   struct _sqlo_stmt_struct_t * stp;    /**< link to the stmt structure (see @ref sqlo_stmt_struct_t) */
 
-} sqlo_col_struct_t, * sqlo_col_struct_ptr_t;
+};
+
+using sqlo_col_struct_t = _sqlo_col_struct;
+using sqlo_col_struct_ptr_t = sqlo_col_struct_t *;
 
 
 
@@ -503,7 +509,7 @@ typedef struct  _sqlo_col_struct {
  * This structure stores all OCI handles plus the data buffers used to
  * retrieve the data.
  */
-typedef struct _sqlo_stmt_struct {
+struct _sqlo_stmt_struct {
   ub4 sth;                      /**< The own handle that identifies this entry. This
                                      is the plain sth, not the encoded one. */
   sqlo_db_struct_ptr_t  dbp;    /**< The link to the database connection (see @ref sqlo_db_struct_t). */
@@ -542,7 +548,10 @@ typedef struct _sqlo_stmt_struct {
                                  to OCIStmtExecute returned OCI_STILL_EXECUTING */
   ub4 num_executions;  /**< number of times the statement was executed  */
   int stmtid;
-} sqlo_stmt_struct_t, * sqlo_stmt_struct_ptr_t;
+};
+
+using sqlo_stmt_struct_t = _sqlo_stmt_struct;
+using sqlo_stmt_struct_ptr_t = sqlo_stmt_struct_t *;
 
 
 
@@ -560,14 +569,14 @@ using const_sqlo_stmt_struct_ptr_t = const sqlo_stmt_struct_t *;
  * @see g_params.
  */
 
-using vtyp_ = enum {INTEGER, STRING};
+enum vtyp_ {INTEGER, STRING};
 
-typedef struct {
+struct sqlora_param_t {
   char * name;                       /**< parameter name */
   vtyp_ vtyp;                        /**< type of value */
   VOID * value;                      /**< The address of the value */
   int (*trigger_fct) __P((int));     /**< Function that handles this type */
-} sqlora_param_t;
+};
 
 
 /*-------------------------------------------------------------------------

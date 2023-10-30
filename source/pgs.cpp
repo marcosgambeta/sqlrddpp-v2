@@ -58,7 +58,7 @@ static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 static PHB_DYNS s_pSym_SR_FROMXML = nullptr;
 static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 #define LOGFILE               "pgs.log"
-typedef struct _PSQL_SESSION
+struct _PSQL_SESSION
 {
    int status;                   // Execution return value
    int numcols;                  // Result set columns
@@ -66,7 +66,9 @@ typedef struct _PSQL_SESSION
    PGconn * dbh;                 // Connection handler
    PGresult * stmt;              // Current statement handler
    int iAffectedRows;            // Number of affected rows by command
-} PSQL_SESSION;
+};
+
+using PSQL_SESSION = _PSQL_SESSION;
 
 // culik 11/9/2010 variavel para setar o comportamento do postgresql
 

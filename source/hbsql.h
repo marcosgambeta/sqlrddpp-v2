@@ -59,7 +59,7 @@
 #define PARSE_ALL_QUERY    0
 #define isalnum_(c) (isalnum(c) || c == '_')
 
-typedef struct sql_stmt_s {
+struct sql_stmt_s {
    int command;
    int numParam;
    int errMsg;
@@ -70,7 +70,9 @@ typedef struct sql_stmt_s {
    const char* errPtr;
    PHB_ITEM pArray;
    PHB_ITEM pTemp;
-} sql_stmt;
+};
+
+using sql_stmt = sql_stmt_s;
 
 /* Prototypes */
 

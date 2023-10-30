@@ -98,7 +98,7 @@ static char isc_tpb[] = {isc_tpb_version3,
                          isc_tpb_rec_version,
                          isc_tpb_nowait};
 
-typedef struct _FB_SESSION
+struct _FB_SESSION
 {
    isc_db_handle db;
    ISC_STATUS status[20];
@@ -109,14 +109,17 @@ typedef struct _FB_SESSION
    long errorcode;
    int transactionPending;
    int queryType;
-} FB_SESSION;
+};
 
+using FB_SESSION = _FB_SESSION;
 using PFB_SESSION = FB_SESSION *;
 
-typedef struct vary1 {
+struct vary1 {
    short vary_length;
    char vary_string[1];
-} VARY;
+};
+
+using VARY = vary1;
 
 const double divider5[19] = {1, 1E1, 1E2, 1E3, 1E4, 1E5, 1E6, 1E7, 1E8, 1E9, 1E10, 1E11, 1E12, 1E13, 1E14, 1E15, 1E16, 1E17, 1E18};
 

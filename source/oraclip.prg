@@ -1849,7 +1849,7 @@ RETURN NIL
 
 using sqlo_stmt_handle_t = int;
 
-typedef struct _ORA_BIND_COLS
+struct _ORA_BIND_COLS
 {
    char * col_name;
    short sVal;
@@ -1860,9 +1860,11 @@ typedef struct _ORA_BIND_COLS
    int iValue;
    char sValue[31];
 //    OCIRowId * RowId;
-} ORA_BIND_COLS ;
+};
 
-typedef struct _OCI_SESSION
+using ORA_BIND_COLS = _ORA_BIND_COLS;
+
+struct _OCI_SESSION
 {
    int dbh;                      // Connection handler
    int stmt;                     // Current statement handler
@@ -1875,8 +1877,9 @@ typedef struct _OCI_SESSION
    unsigned int ubBindNum;
    sqlo_stmt_handle_t stmtParamRes;
    unsigned int uRows;
-} OCI_SESSION;
+};
 
+using OCI_SESSION = _OCI_SESSION;
 using POCI_SESSION = OCI_SESSION *;
 
 HB_FUNC( GETORAHANDLE )
