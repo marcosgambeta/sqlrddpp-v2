@@ -643,7 +643,7 @@ HB_FUNC( FBGETDATA )    // FBGetData(hEnv, nField, @uData)
    char res_buffer[20];
    HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
    short length;
-   HB_BOOL bEnd = HB_FALSE;
+   HB_BOOL bEnd = false;
    XSQLVAR * var;
    VARY * vary;
 
@@ -783,7 +783,7 @@ HB_FUNC( FBGETDATA )    // FBGetData(hEnv, nField, @uData)
                      num_segments = isc_vax_integer(resp, length);
                      break;
                   case isc_info_truncated:
-                     bEnd = HB_TRUE;
+                     bEnd = true;
                      break;
                   default:
                      break;
@@ -955,7 +955,7 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
          }
          case SQL_BIT:
          case SQL_SMALLINT: {
-            hb_itemPutL(pItem, HB_FALSE);
+            hb_itemPutL(pItem, false);
             break;
          }
 
@@ -1068,9 +1068,9 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
          }
          case SQL_BIT:
          case SQL_SMALLINT: {
-            hb_itemPutL(pItem, hb_strVal(bBuffer, lLenBuff) > 0 ? HB_TRUE : HB_FALSE);
-            //hb_itemPutL(pItem, bBuffer[0] == '1' ? HB_TRUE : HB_FALSE);
-            //hb_itemPutL(pItem, hb_strValInt(bBuffer, &iOverflow) > 0 ? HB_TRUE : HB_FALSE);
+            hb_itemPutL(pItem, hb_strVal(bBuffer, lLenBuff) > 0 ? true : false);
+            //hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
+            //hb_itemPutL(pItem, hb_strValInt(bBuffer, &iOverflow) > 0 ? true : false);
             break;
          }
 
@@ -1118,7 +1118,7 @@ HB_FUNC( FBLINEPROCESSED )
    char res_buffer[20];
    HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
    short length;
-   HB_BOOL bEnd = HB_FALSE;
+   HB_BOOL bEnd = false;
    XSQLVAR * var;
    VARY * vary;
 
@@ -1313,7 +1313,7 @@ HB_FUNC( FBLINEPROCESSED )
                         num_segments = isc_vax_integer(resp, length);
                         break;
                      case isc_info_truncated:
-                        bEnd = HB_TRUE;
+                        bEnd = true;
                         break;
                      default:
                         break;

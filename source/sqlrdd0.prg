@@ -2197,20 +2197,20 @@ RETURN SYSTEMID_UNKNOW
 
 #include "compat.h"
 
-static HB_BOOL s_fMultiLang               = HB_FALSE;
-static HB_BOOL s_fShutDown                = HB_FALSE;
-static HB_BOOL s_fGoTopOnScope            = HB_TRUE;
-static HB_BOOL s_fSerializedAsString      = HB_FALSE;
-static HB_BOOL s_fHideRecno               = HB_TRUE;
-static HB_BOOL s_fHideHistoric            = HB_FALSE;
-static HB_BOOL s_fUseDeleteds             = HB_TRUE;
+static HB_BOOL s_fMultiLang               = false;
+static HB_BOOL s_fShutDown                = false;
+static HB_BOOL s_fGoTopOnScope            = true;
+static HB_BOOL s_fSerializedAsString      = false;
+static HB_BOOL s_fHideRecno               = true;
+static HB_BOOL s_fHideHistoric            = false;
+static HB_BOOL s_fUseDeleteds             = true;
 /* Culik added new global to tell if we will serialize arrays as json or xml */
-static HB_BOOL s_fSerializeArrayAsJson    = HB_FALSE;
+static HB_BOOL s_fSerializeArrayAsJson    = false;
 /* Culik added new global to tell if we are using sqlverser 2008 or newer */
-static HB_BOOL s_fSql2008newTypes         = HB_FALSE;
+static HB_BOOL s_fSql2008newTypes         = false;
 
-static HB_BOOL s_iOldPgsBehavior          = HB_FALSE;
-static HB_BOOL s_fShortasNum              = HB_FALSE;
+static HB_BOOL s_iOldPgsBehavior          = false;
+static HB_BOOL s_fShortasNum              = false;
 
 HB_BOOL HB_EXPORT sr_isMultilang(void)
 {

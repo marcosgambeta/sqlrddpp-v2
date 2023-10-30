@@ -263,12 +263,12 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
 
       InsertRecord->iSQLType = (int) lType;
       InsertRecord->isNullable = bNullable;
-      InsertRecord->isBoundNULL = HB_FALSE;
+      InsertRecord->isBoundNULL = false;
       InsertRecord->lFieldPosDB = i;
       InsertRecord->lFieldPosWA = lFieldPosWA;
       InsertRecord->ColumnSize = (SQLUINTEGER) hb_itemGetNI(pFieldLen);
       InsertRecord->DecimalDigits = (SQLSMALLINT) hb_itemGetNI(pFieldDec);
-      InsertRecord->isArgumentNull = HB_FALSE;
+      InsertRecord->isArgumentNull = false;
       InsertRecord->isMemo = bIsMemo;
       InsertRecord->isMultiLang = bMultiLang;
 
@@ -751,7 +751,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
    iCols = (int) hb_arrayLen(thiswa->aFields);
    CurrRecord = thiswa->CurrRecord;
    iBind = 0;
-   thiswa->bIndexTouchedInUpdate = HB_FALSE;
+   thiswa->bIndexTouchedInUpdate = false;
    if( thiswa->sSql ) {
       memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
    }
@@ -762,7 +762,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
          if( !thiswa->specialMask[i] ) {
             thiswa->updatedMask[i] = '1';
          } else if( thiswa->hOrdCurrent != 0 ) {
-            thiswa->bIndexTouchedInUpdate = HB_TRUE; // If there is any special column, we cannot be sure
+            thiswa->bIndexTouchedInUpdate = true; // If there is any special column, we cannot be sure
                                                      // current order is not affected by UPDATE, so it takes
                                                      // worst scenario
          }
@@ -914,7 +914,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
 
       for( i = 1; i <= thiswa->indexColumns; i++ ) {
          if( thiswa->editMask[hb_arrayGetNL(hb_arrayGetItemPtr(pColumns, i), 2) - 1]) {
-            thiswa->bIndexTouchedInUpdate = HB_TRUE;
+            thiswa->bIndexTouchedInUpdate = true;
          }
       }
    }
@@ -934,7 +934,7 @@ HB_ERRCODE ExecuteUpdateStmt(SQLEXAREAP thiswa)
 
    thiswa->lUpdatedRecord = GetCurrentRecordNum(thiswa);
 
-   if( FeedRecordCols(thiswa, HB_TRUE) == HB_FAILURE ) { // Stmt created and prepared, only need to push data
+   if( FeedRecordCols(thiswa, true) == HB_FAILURE ) { // Stmt created and prepared, only need to push data
       return HB_FAILURE;
    }
 

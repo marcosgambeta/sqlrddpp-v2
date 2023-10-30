@@ -355,7 +355,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
          case SQL_BIGINT:
          case SQL_FAKE_NUM: {
             if( cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE ) {
-               hb_itemPutL(pItem, HB_FALSE);
+               hb_itemPutL(pItem, false);
             } else {
                char szResult[2] = {' ', '\0'};
                sr_escapeNumber(szResult, lLen, lDec, pItem);
@@ -402,7 +402,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
             break;
          }
          case SQL_BIT: {
-            hb_itemPutL(pItem, HB_FALSE);
+            hb_itemPutL(pItem, false);
             break;
          }
          case SQL_SMALLINT:
@@ -410,7 +410,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
             if( bQueryOnly ) {
                hb_itemPutNI(pItem, 0);
             } else {
-               hb_itemPutL(pItem, HB_FALSE);
+               hb_itemPutL(pItem, false);
             }
             break;
          }
@@ -452,7 +452,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
          case SQL_BIGINT:
          case SQL_FAKE_NUM: {
             if( cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE ) {
-               hb_itemPutL(pItem, bBuffer[0] == '1' ? HB_TRUE : HB_FALSE);
+               hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
             } else {
                sr_escapeNumber(bBuffer, lLen, lDec, pItem);
             }
@@ -561,7 +561,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
             break;
          }
          case SQL_BIT: {
-            hb_itemPutL(pItem, bBuffer[0] == '1' ? HB_TRUE : HB_FALSE);
+            hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
             break;
          }
          case SQL_SMALLINT:
@@ -569,7 +569,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
             if( bQueryOnly ) {
                hb_itemPutNI(pItem, (int) hb_strVal(bBuffer, lLenBuff));
             } else {
-               hb_itemPutL(pItem, hb_strVal(bBuffer, lLenBuff) > 0 ? HB_TRUE : HB_FALSE);
+               hb_itemPutL(pItem, hb_strVal(bBuffer, lLenBuff) > 0 ? true : false);
             }
             break;
          }
@@ -1187,7 +1187,7 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
             }
             if( (int) iLen == SQL_NULL_DATA ) {
                if( cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE ) {
-                  hb_itemPutL(pItem, HB_FALSE);
+                  hb_itemPutL(pItem, false);
                } else {
                   hb_itemPutNLLen(pItem, 0, lLen);
                }
@@ -1199,7 +1199,7 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
             }
             if( (int) iLen ==  SQL_NULL_DATA ) {
                if( cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE ) {
-                  hb_itemPutL(pItem, HB_FALSE);
+                  hb_itemPutL(pItem, false);
                } else {
                  hb_itemPutNIntLen(pItem, 0, lLen);
                }
@@ -1231,7 +1231,7 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
             pItem = hb_itemPutL(pItem, val != 0);
          }
          if( (int) iLen ==  SQL_NULL_DATA ) {
-            hb_itemPutL(pItem, HB_FALSE);
+            hb_itemPutL(pItem, false);
          }
          break;
       }

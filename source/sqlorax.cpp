@@ -229,7 +229,7 @@ HB_FUNC( SQLO_EXECDIRECT )
 HB_FUNC( SQLO_EXECUTE )
 {
    POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : HB_FALSE;
+   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
    if( session ) {
      if( lStmt ) {
          while( SQLO_STILL_EXECUTING == (session->status = sqlo_executeselect(session->stmt, 1)) ) {
@@ -501,7 +501,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
             break;
          }
          case SQL_BIT: {
-            hb_itemPutL(pItem, HB_FALSE);
+            hb_itemPutL(pItem, false);
             break;
          }
 
@@ -603,7 +603,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
             break;
          }
          case SQL_BIT: {
-            hb_itemPutL(pItem, bBuffer[0] == '1' ? HB_TRUE : HB_FALSE);
+            hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
             break;
          }
 
@@ -793,8 +793,8 @@ HB_FUNC( ORACLEINBINDPARAM )
    int iFieldSize = hb_parni(4);
    int iPos = iParamNum - 1;
    int ret = SQL_ERROR;
-   HB_BOOL lStmt = HB_ISLOG(7) ? hb_parl(7) : HB_FALSE;
-   HB_BOOL isNull = HB_ISLOG(8) ? hb_parl(8) : HB_FALSE;
+   HB_BOOL lStmt = HB_ISLOG(7) ? hb_parl(7) : false;
+   HB_BOOL isNull = HB_ISLOG(8) ? hb_parl(8) : false;
 
 
 
@@ -990,7 +990,7 @@ HB_FUNC(ORACLEPREPARE)
 {
    POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
    const char * szSql = hb_parc(2);
-   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : HB_FALSE;
+   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
 
    if( session ) {
      if( lStmt ) {

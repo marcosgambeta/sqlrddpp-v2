@@ -2079,7 +2079,7 @@ RETURN .F.
 HB_FUNC( SR_PHFILE )
 {
    PHB_ITEM pFile = hb_param(1, HB_IT_STRING);
-   hb_retl((pFile && hb_itemGetCLen(pFile) < HB_PATH_MAX - 1) ? hb_spFile(hb_itemGetCPtr(pFile), NULL) : HB_FALSE);
+   hb_retl((pFile && hb_itemGetCLen(pFile) < HB_PATH_MAX - 1) ? hb_spFile(hb_itemGetCPtr(pFile), NULL) : false);
 }
 
 #PRAGMA ENDDUMP
