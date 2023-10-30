@@ -66,7 +66,7 @@
 #include <assert.h>
 #if !defined(HB_OS_WIN)
    #if !defined(SQLLEN) && !defined(SQLTCHAR)
-      typedef unsigned char SQLTCHAR;
+      using SQLTCHAR = unsigned char;
    #endif
 #endif
 

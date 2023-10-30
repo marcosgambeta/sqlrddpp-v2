@@ -110,7 +110,7 @@ typedef struct _SQLAREA
 
 } SQLAREA;
 
-typedef SQLAREA * LPSQLAREA;
+using LPSQLAREA = SQLAREA *;
 
 #ifndef SQLAREAP
 #define SQLAREAP LPSQLAREA

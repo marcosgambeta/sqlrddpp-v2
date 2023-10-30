@@ -96,7 +96,7 @@ typedef struct _OCI_SESSION
    unsigned int uRows;
 } OCI_SESSION;
 
-typedef OCI_SESSION * POCI_SESSION;
+using POCI_SESSION = OCI_SESSION *;
 
 static HB_USHORT OCI_initilized = 0;
 

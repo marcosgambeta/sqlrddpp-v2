@@ -71,7 +71,7 @@ typedef struct _PSQL_SESSION
 // culik 11/9/2010 variavel para setar o comportamento do postgresql
 
 
-typedef PSQL_SESSION * PPSQL_SESSION;
+using PPSQL_SESSION = PSQL_SESSION *;
 
 static void myNoticeProcessor(void * arg, const char * message)
 {

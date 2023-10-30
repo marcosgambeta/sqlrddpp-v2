@@ -1847,7 +1847,7 @@ RETURN NIL
 #include <hbapi.h>
 #include <hbapiitm.h>
 
-typedef int sqlo_stmt_handle_t;
+using sqlo_stmt_handle_t = int;
 
 typedef struct _ORA_BIND_COLS
 {
@@ -1877,7 +1877,7 @@ typedef struct _OCI_SESSION
    unsigned int uRows;
 } OCI_SESSION;
 
-typedef OCI_SESSION * POCI_SESSION;
+using POCI_SESSION = OCI_SESSION *;
 
 HB_FUNC( GETORAHANDLE )
 {

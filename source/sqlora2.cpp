@@ -117,7 +117,7 @@ static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 //    ORA_BIND_COLS *  pLink;
 //    unsigned int   ubBindNum;
 // } OCI_ORASESSION;   
-// typedef OCI_ORASESSION * POCI_ORASESSION;
+// using POCI_ORASESSION = OCI_ORASESSION *;
 
 static HB_USHORT OCI_initilized = 0;
 

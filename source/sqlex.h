@@ -119,7 +119,7 @@ typedef struct _INDEXBIND
    char SeekBwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
 } INDEXBIND;
 
-typedef INDEXBIND * INDEXBINDP;
+using INDEXBINDP = INDEXBIND *;
 
 typedef struct _COLUMNBIND
 {
@@ -148,7 +148,7 @@ typedef struct _COLUMNBIND
    HB_BOOL isMultiLang;              // Fiels is multi language ?
 } COLUMNBIND;
 
-typedef COLUMNBIND * COLUMNBINDP;
+using COLUMNBINDP = COLUMNBIND *;
 
 // SQL WORKAREA
 
@@ -265,7 +265,7 @@ typedef struct _SQLEXAREA
    HB_BOOL bIsSelect;             // Table open is an select statement
 } SQLEXAREA;
 
-typedef SQLEXAREA * LPSQLEXAREA;
+using LPSQLEXAREA = SQLEXAREA *;
 
 #ifndef SQLEXAREAP
 #define SQLEXAREAP LPSQLEXAREA

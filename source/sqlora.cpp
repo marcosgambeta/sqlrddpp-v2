@@ -163,19 +163,19 @@ enum {THREADS_ENABLED = 0};
 
 
 #ifdef ENABLE_PTHREADS
-typedef pthread_t sqlo_thread_t;
-typedef pthread_mutex_t sqlo_mutex_t;
+using sqlo_thread_t = pthread_t;
+using sqlo_mutex_t = pthread_mutex_t;
 #else
 #  ifdef ENABLE_ORATHREADS
-typedef OCIThreadMutex * sqlo_mutex_t;
-typedef OCIThreadId * sqlo_thread_t;
+using sqlo_mutex_t = OCIThreadMutex *;
+using sqlo_thread_t = OCIThreadId *;
 #  else
 #    ifdef ENABLE_WINTHREADS
-typedef HANDLE sqlo_mutex_t;
-typedef unsigned long sqlo_thread_t;
+using sqlo_mutex_t = HANDLE;
+using sqlo_thread_t = unsigned long;
 #    else
-typedef unsigned long sqlo_mutex_t; /* dummy */
-typedef unsigned long sqlo_thread_t; /* dummy */
+using sqlo_mutex_t = unsigned long; /* dummy */
+using sqlo_thread_t = unsigned long; /* dummy */
 #    endif
 #  endif
 #endif
@@ -413,7 +413,7 @@ enum _sqlora_constants {
 /**
  * Boolean type
  */
-typedef unsigned char bool_t;
+using bool_t = unsigned char;
 
 
 
@@ -462,7 +462,7 @@ typedef struct _sqlo_db_struct {
 /**
  * This pointer type defines a pointer to a const sqlo_db_struct_t.
  */
-typedef const sqlo_db_struct_t * const_sqlo_db_struct_ptr_t;
+using const_sqlo_db_struct_ptr_t = const sqlo_db_struct_t *;
 
 
 
@@ -549,7 +549,7 @@ typedef struct _sqlo_stmt_struct {
 /**
  * This pointer type defines a pointer to a const sqlo_stmt_struct_t.
  */
-typedef const sqlo_stmt_struct_t * const_sqlo_stmt_struct_ptr_t;
+using const_sqlo_stmt_struct_ptr_t = const sqlo_stmt_struct_t *;
 
 
 
@@ -560,7 +560,7 @@ typedef const sqlo_stmt_struct_t * const_sqlo_stmt_struct_ptr_t;
  * @see g_params.
  */
 
-typedef enum {INTEGER, STRING} vtyp_;
+using vtyp_ = enum {INTEGER, STRING};
 
 typedef struct {
   char * name;                       /**< parameter name */

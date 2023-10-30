@@ -105,6 +105,6 @@ typedef struct _OCI_ORASESSION
 #endif
    unsigned int   ubBindNum;
 } OCI_ORASESSION;	
-typedef OCI_ORASESSION * POCI_ORASESSION;
+using POCI_ORASESSION = OCI_ORASESSION *;
 
 #endif

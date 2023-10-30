@@ -172,8 +172,8 @@ typedef struct tagTIMESTAMP_STRUCTORA {
     unsigned int fraction;
 } TIMESTAMP_STRUCORAT, SQL_TIMESTAMP_STRUCTORA;
 
-//typedef DATE_STRUCTORA SQL_DATE_STRUCTORA;
-//typedef TIMESTAMP_STRUCTORA SQL_TIMESTAMP_STRUCTORA;
+//using SQL_DATE_STRUCTORA = DATE_STRUCTORA;
+//using SQL_TIMESTAMP_STRUCTORA = TIMESTAMP_STRUCTORA;
 
 typedef struct _INDEXBINDORA
 {
@@ -191,7 +191,7 @@ typedef struct _INDEXBINDORA
    char SeekBwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
 } INDEXBINDORA;
 
-typedef INDEXBINDORA * INDEXBINDORAP;
+using INDEXBINDORAP = INDEXBINDORA *;
 
 typedef struct _COLUMNBINDORA
 {
@@ -225,7 +225,7 @@ typedef struct _COLUMNBINDORA
    OCI_Lob *lob1;
 } COLUMNBINDORA;
 
-typedef COLUMNBINDORA * COLUMNBINDORAP;
+using COLUMNBINDORAP = COLUMNBINDORA *;
 
 typedef struct _COLUMNSTATEMENT
 {
@@ -278,7 +278,7 @@ typedef struct _SQLAREA
    char editMask[MAX_FIELDS];  // Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD
 } SQLAREA;
 
-typedef SQLAREA * LPSQLAREA;
+using LPSQLAREA = SQLAREA *;
 
 #ifndef SQLAREAP
    #define SQLAREAP LPSQLAREA
@@ -400,7 +400,7 @@ typedef struct _SQLEXORAAREA
    HB_BOOL bOracle12;
 } SQLEXORAAREA;
 
-typedef SQLEXORAAREA * LPSQLEXORAAREA;
+using LPSQLEXORAAREA = SQLEXORAAREA *;
 
 #ifndef SQLEXORAAREAP
    #define SQLEXORAAREAP LPSQLEXORAAREA

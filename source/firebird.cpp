@@ -99,7 +99,7 @@ typedef struct _FB_SESSION
    int transactionPending;
 } FB_SESSION;
 
-typedef FB_SESSION * PFB_SESSION;
+using PFB_SESSION = FB_SESSION *;
 
 typedef struct vary1 {
     short vary_length;

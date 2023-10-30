@@ -89,7 +89,7 @@ typedef struct _MYSQL_SESSION
    HB_ULONGLONG ulAffected_rows;    // Number of affected rows
 } MYSQL_SESSION;
 
-typedef MYSQL_SESSION * PMYSQL_SESSION;
+using PMYSQL_SESSION = MYSQL_SESSION *;
 
 HB_FUNC( MYSCONNECT )
 {
