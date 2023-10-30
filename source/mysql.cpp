@@ -159,7 +159,7 @@ HB_FUNC( MYSGETCONNID )
 HB_FUNC( MYSKILLCONNID )
 {
    PMYSQL_SESSION session = ( PMYSQL_SESSION ) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   HB_ULONG ulThreadID = (HB_ULONG) hb_itemGetNL(hb_param(2, HB_IT_LONG));
+   HB_ULONG ulThreadID = static_cast<HB_ULONG>(hb_itemGetNL(hb_param(2, HB_IT_LONG)));
 
    assert(session != nullptr);
    assert(session->dbh != nullptr);
@@ -228,7 +228,7 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   lType = (HB_LONG) hb_arrayGetNL(pField, FIELD_DOMAIN);
+   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
    lLen = hb_arrayGetNL(pField, FIELD_LEN);
    lDec = hb_arrayGetNL(pField, FIELD_DEC);
 
@@ -486,7 +486,7 @@ HB_FUNC( MYSRESULTSTATUS )
       ret = (HB_UINT)SQL_ERROR;
       break;
    }
-   hb_retnl((HB_LONG) ret);
+   hb_retnl(static_cast<HB_LONG>(ret));
 }
 
 HB_FUNC( MYSRESSTATUS )

@@ -252,7 +252,7 @@ HB_BOOL CreateSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
        || (thiswa->recordListDirection == LIST_FORWARD && (!SeekBind->SeekFwdStmt))
        || (thiswa->recordListDirection == LIST_BACKWARD && (!SeekBind->SeekBwdStmt)) ) {
 
-      pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG) thiswa->sqlarea.hOrdCurrent);
+      pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
       pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
       thiswa->indexColumns = hb_arrayLen(pColumns);
 
@@ -389,12 +389,12 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
             }
             case SQL_C_NUMERIC: {
                size = BindStructure->ColumnSize;
-               BindStructure->asNumeric = (HB_LONG) hb_strVal(szKey, BindStructure->ColumnSize);
+               BindStructure->asNumeric = static_cast<HB_LONG>(hb_strVal(szKey, BindStructure->ColumnSize));
                break;
             }
             case SQL_C_DOUBLE: {
                size = BindStructure->ColumnSize;
-               BindStructure->asDouble = (double) hb_strVal(szKey, BindStructure->ColumnSize);
+               BindStructure->asDouble = static_cast<double>(hb_strVal(szKey, BindStructure->ColumnSize));
                break;
             }
             case SQL_C_TYPE_TIMESTAMP: {
@@ -500,9 +500,9 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
             return HB_FAILURE;
          }
          if( BindStructure->iCType == SQL_C_NUMERIC ) {
-            BindStructure->asNumeric = (HB_LONG) hb_itemGetNInt(pKey);
+            BindStructure->asNumeric = static_cast<HB_LONG>(hb_itemGetNInt(pKey));
          } else {
-            BindStructure->asDouble = (double) hb_itemGetND(pKey);
+            BindStructure->asDouble = static_cast<double>(hb_itemGetND(pKey));
          }
       } else if( HB_IS_LOGICAL(pKey) ) {
          if( BindStructure->iCType != SQL_C_BIT ) { // Check column data type

@@ -330,7 +330,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
    PHB_ITEM pTemp;
 
    cType = (char *) hb_arrayGetCPtr(pField, FIELD_TYPE);
-   lType = (HB_LONG) hb_arrayGetNL(pField, FIELD_DOMAIN);
+   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
    lLen = hb_arrayGetNL(pField, FIELD_LEN);
    lDec = hb_arrayGetNL(pField, FIELD_DEC);
 
@@ -615,13 +615,13 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
       hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
    }
 
-   lLen = (HB_LONG) (hb_pcount() > 1 ? hb_parnl(2) : 4096);
+   lLen = static_cast<HB_LONG>(hb_pcount() > 1 ? hb_parnl(2) : 4096);
 
    if( lLen <= 0 ) {
       hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
    }
 
-   // bBuffer = hb_xgrab((HB_ULONG) lLen + 1);
+   // bBuffer = hb_xgrab(static_cast<HB_ULONG>(lLen) + 1);
 
    for( i = 1; i <= cols; i++ ) {
       temp = hb_itemNew(nullptr);
@@ -630,7 +630,7 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
       if( lIndex == 0 ) {
          hb_arraySetForward(pRet, i, temp);
       } else {
-         odbcGetData((SQLHSTMT) hb_parptr(1), (PHB_ITEM) hb_arrayGetItemPtr(pFields, i),(PHB_ITEM) temp, (HB_BOOL) bQueryOnly, (HB_ULONG) ulSystemID, (HB_BOOL) bTranslate, (HB_USHORT) lIndex);
+         odbcGetData((SQLHSTMT) hb_parptr(1), (PHB_ITEM) hb_arrayGetItemPtr(pFields, i),(PHB_ITEM) temp, (HB_BOOL) bQueryOnly, static_cast<HB_ULONG>(ulSystemID), (HB_BOOL) bTranslate, (HB_USHORT) lIndex);
          hb_arraySetForward(pRet, i, temp);
       }
       hb_itemRelease(temp);
@@ -693,7 +693,7 @@ HB_FUNC( SR_ODBCGETLINES ) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lT
          if( wReturn == SQL_ERROR ) {
             break;
          }
-         if( ulDirect == (HB_ULONG) ORD_DIR_FWD ) {
+         if( ulDirect == static_cast<HB_ULONG>(ORD_DIR_FWD) ) {
             hb_arraySet(pInfo, AINFO_EOF_AT, pRec);
             hb_arraySetNL(pInfo, AINFO_NCACHEEND, lPos);
          } else {
@@ -703,7 +703,7 @@ HB_FUNC( SR_ODBCGETLINES ) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lT
          break;
       }
 
-      if( ulDirect == (HB_ULONG) ORD_DIR_FWD ) {
+      if( ulDirect == static_cast<HB_ULONG>(ORD_DIR_FWD) ) {
          lPos++;
          if( lPos > (CAHCE_PAGE_SIZE * 3) ) {
             lPos -= (CAHCE_PAGE_SIZE * 3);
@@ -785,7 +785,7 @@ HB_FUNC( SR_NUMRES )
    SQLHSTMT hstmt = (SQLHSTMT) hb_parptr(1);
 
    RETCODE wResult = SQLNumResultCols(hstmt, &nCols);
-   hb_stornl((HB_LONG) nCols, 2);
+   hb_stornl(static_cast<HB_LONG>(nCols), 2);
    hb_retni(wResult);
 
    // Execute the SQL statement and return any errors or warnings.
@@ -916,7 +916,7 @@ HB_FUNC( SR_COLATTRIBUTE )
 
    if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO ) {
       // hb_storclen((LPSTR) bBuffer, static_cast<int>(wBufLen), 4);
-      // hb_stornl((HB_LONG) wBufLen, 6);
+      // hb_stornl(static_cast<HB_LONG>(wBufLen), 6);
       hb_stornint(wNumPtr, 7);
    }
 
@@ -955,8 +955,8 @@ HB_FUNC( SR_GETINFO )
 
 HB_FUNC( SR_SETCONNECTATTR )
 {
-   // hb_retnl((HB_LONG) SQLSetConnectAttr((SQLHDBC) hb_parptr(1), (UWORD) hb_parnl(2),
-   //    (HB_ULONG) HB_ISCHAR(3) ? (SQLPOINTER) hb_parcx(3) : (SQLPOINTER) hb_parnl(3), hb_parni(4)));
+   // hb_retnl(static_cast<HB_LONG>(SQLSetConnectAttr((SQLHDBC) hb_parptr(1), (UWORD) hb_parnl(2),
+   //    static_cast<HB_ULONG>(HB_ISCHAR(3)) ? (SQLPOINTER) hb_parcx(3) : (SQLPOINTER) hb_parnl(3), hb_parni(4))));
 #if ODBCVER >= 0x0300
    hb_retni(SQLSetConnectAttr((SQLHDBC) hb_parptr(1), (SQLINTEGER) hb_parnl(2),
       HB_ISCHAR(3) ? (SQLPOINTER) hb_parc(3) : (SQLPOINTER) (HB_PTRUINT) hb_parnint(3),
@@ -1140,7 +1140,7 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
    SQLRETURN res;
 
    cType = (char *) hb_arrayGetCPtr(pField, FIELD_TYPE);
-   lType = (HB_LONG) hb_arrayGetNL(pField, FIELD_DOMAIN);
+   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
    lLen = hb_arrayGetNL(pField, FIELD_LEN);
    lDec = hb_arrayGetNL(pField, FIELD_DEC);
    iLen = SQL_NULL_DATA;

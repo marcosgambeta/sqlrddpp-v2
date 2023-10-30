@@ -541,7 +541,7 @@ HB_FUNC( ORACLEGETBINDDATA2)
        //p->pLink[iPos - 1].date = OCI_GetDate( p->rs, iPos);
        OCI_DateGetDateTime(p->pLink[iPos - 1].date, &iYear, &iMonth, &iDay,&iHour,&iMin,&iSeconds);
        lDate = hb_dateEncode(iYear, iMonth, iDay);
-        lTime =hb_timeEncode(iHour, iMin, (double) iSeconds);
+        lTime =hb_timeEncode(iHour, iMin, static_cast<double>(iSeconds));
 
        hb_retdtl(lDate, lTime);
       } else {
@@ -662,7 +662,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   lType = (HB_LONG) hb_arrayGetNL(pField, 6);
+   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
    lLen = hb_arrayGetNS(pField, 3);
    lDec = hb_arrayGetNS(pField, 4);
 
@@ -679,7 +679,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
          case SQL_NUMERIC:
          case SQL_FAKE_NUM: {
 //             char szResult[2] = {' ', '\0'};
-//             sr_escapeNumber(szResult, (HB_ULONG) lLen, (HB_ULONG) lDec, pItem);
+//             sr_escapeNumber(szResult, static_cast<HB_ULONG>(lLen), static_cast<HB_ULONG>(lDec), pItem);
 //             hb_itemPutNL(pItem,0);
             if( lDec > 0 ) {
                hb_itemPutNDLen(pItem, 0, lLen, lDec);
@@ -818,7 +818,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
 //           DebugBreak();            
 
             OCI_TimestampGetDateTime(pTime, &iYear, &iMonth, &iDay, &iHour, &iMin, &dSec, &fsec);
-            hb_itemPutDT(pItem, iYear, iMonth, iDay, iHour, iMin, (double) dSec, 0);
+            hb_itemPutDT(pItem, iYear, iMonth, iDay, iHour, iMin, static_cast<double>(dSec), 0);
             OCI_TimestampFree(pTime);
             break;
          }

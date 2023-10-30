@@ -314,7 +314,7 @@ HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr(ResultSet) => aStruct */
       //nullable = PQgetisnull(session->stmt, row,PQfnumber(session->stmt, PQfname(session->stmt, row)));
       
       if( typmod < 0L ) {
-         typmod = (HB_LONG) PQfsize(session->stmt, row);
+         typmod = static_cast<HB_LONG>(PQfsize(session->stmt, row));
       }
 /*
       if( typmod < 0L ) {
@@ -648,7 +648,7 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   lType = (HB_LONG) hb_arrayGetNL(pField, 6);
+   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
    lLen = hb_arrayGetNL(pField, 3);
    lDec = hb_arrayGetNL(pField, 4);
 

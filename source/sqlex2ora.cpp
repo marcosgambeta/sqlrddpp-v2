@@ -261,7 +261,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
       InsertRecord->lFieldPosDB = i;
       InsertRecord->lFieldPosWA = lFieldPosWA;
       InsertRecord->ColumnSize = static_cast<unsigned int>(hb_itemGetNI(pFieldLen));
-      InsertRecord->DecimalDigits = (unsigned short) hb_itemGetNI(pFieldDec);
+      InsertRecord->DecimalDigits = static_cast<unsigned short>(hb_itemGetNI(pFieldDec));
       InsertRecord->isArgumentNull = false;
       InsertRecord->isMemo = bIsMemo;
       InsertRecord->isMultiLang = bMultiLang;
@@ -861,7 +861,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
 
    if( (!thiswa->bIndexTouchedInUpdate) && thiswa->sqlarea.hOrdCurrent ) {
       // Check if any updated column is included in current index column list
-      pColumns = hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG) thiswa->sqlarea.hOrdCurrent), INDEX_FIELDS);
+      pColumns = hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent)), INDEX_FIELDS);
       thiswa->indexColumns = hb_arrayLen(pColumns);
 
       for( i = 1; i <= thiswa->indexColumns; i++ ) {

@@ -319,11 +319,11 @@ char * sr_Hex2Str(const char * cStr, int len, int * lenOut)
       iCipher = 0;
 
       if( c >= '0' && c <= '9' ) {
-         iCipher = (HB_ULONG) (c - '0');
+         iCipher = static_cast<HB_ULONG>(c - '0');
       } else if( c >= 'A' && c <= 'F' ) {
-         iCipher = (HB_ULONG) (c - 'A') + 10;
+         iCipher = static_cast<HB_ULONG>(c - 'A') + 10;
       } else if( c >= 'a' && c <= 'f' ) {
-         iCipher = (HB_ULONG) (c - 'a') + 10;
+         iCipher = static_cast<HB_ULONG>(c - 'a') + 10;
       }
 
       iNum += iCipher;
@@ -336,11 +336,11 @@ char * sr_Hex2Str(const char * cStr, int len, int * lenOut)
       iCipher = 0;
 
       if( c >= '0' && c <= '9' ) {
-         iCipher = (HB_ULONG) (c - '0');
+         iCipher = static_cast<HB_ULONG>(c - '0');
       } else if( c >= 'A' && c <= 'F' ) {
-         iCipher = (HB_ULONG) (c - 'A') + 10;
+         iCipher = static_cast<HB_ULONG>(c - 'A') + 10;
       } else if( c >= 'a' && c <= 'f' ) {
-         iCipher = (HB_ULONG) (c - 'a') + 10;
+         iCipher = static_cast<HB_ULONG>(c - 'a') + 10;
       }
 
       iNum += iCipher;
@@ -731,7 +731,7 @@ HB_FUNC( SR_ESCAPENUM )
       lValue = hb_strValInt(ToBuffer, &iOverflow);
 
       if( !iOverflow ) {
-         double dValue = (double) lValue;
+         double dValue = static_cast<double>(lValue);
          hb_retnlen(dValue, len, dec);
       } else {
          double dValue = hb_strVal(ToBuffer, iSize);
@@ -834,7 +834,7 @@ PHB_ITEM sr_escapeNumber(char * FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM p
       lValue = hb_strValInt(ToBuffer, &iOverflow);
 
       if( !iOverflow ) {
-         double dValue = (double) lValue;
+         double dValue = static_cast<double>(lValue);
          hb_itemPutNLen(pRet, dValue, len, dec);
       } else {
          double dValue = hb_strVal(ToBuffer, iSize);

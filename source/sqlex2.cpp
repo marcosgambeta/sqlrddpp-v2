@@ -909,7 +909,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
 
    if( (!thiswa->bIndexTouchedInUpdate) && thiswa->hOrdCurrent ) {
       // Check if any updated column is included in current index column list
-      pColumns = hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG) thiswa->hOrdCurrent), INDEX_FIELDS);
+      pColumns = hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent)), INDEX_FIELDS);
       thiswa->indexColumns = hb_arrayLen(pColumns);
 
       for( i = 1; i <= thiswa->indexColumns; i++ ) {
