@@ -101,7 +101,7 @@ char * QualifyName(char * szName, SQLEXAREAP thiswa)
       case SYSTEMID_FIREBR5:
       case SYSTEMID_IBMDB2:
       case SYSTEMID_ADABAS:
-         szName[i] = static_cast<char>(toupper((HB_BYTE) szName[i]));
+         szName[i] = static_cast<char>(toupper(static_cast<HB_BYTE>(szName[i])));
          break;
       case SYSTEMID_INGRES:
       case SYSTEMID_POSTGR:
@@ -109,7 +109,7 @@ char * QualifyName(char * szName, SQLEXAREAP thiswa)
       case SYSTEMID_MARIADB:
       case SYSTEMID_OTERRO:
       case SYSTEMID_INFORM:
-         szName[i] = static_cast<char>(tolower((HB_BYTE) szName[i]));
+         szName[i] = static_cast<char>(tolower(static_cast<HB_BYTE>(szName[i])));
          break;
       }
    }
@@ -203,7 +203,7 @@ static void SerializeMemo(PHB_ITEM pFieldData)
 
 void SetInsertRecordStructure(SQLEXAREAP thiswa)
 {
-   thiswa->InsertRecord = (COLUMNBINDP) hb_xgrab(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND));
+   thiswa->InsertRecord = static_cast<COLUMNBINDP>(hb_xgrab(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND)));
    memset(thiswa->InsertRecord, 0, hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND));
 }
 
@@ -230,8 +230,8 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
    }
 
    InsertRecord = thiswa->InsertRecord;
-   sFields = (char *) hb_xgrab(FIELD_LIST_SIZE * sizeof(char));
-   sParams = (char *) hb_xgrab((FIELD_LIST_SIZE_PARAM) * sizeof(char));
+   sFields = static_cast<char*>(hb_xgrab(FIELD_LIST_SIZE * sizeof(char)));
+   sParams = static_cast<char*>(hb_xgrab((FIELD_LIST_SIZE_PARAM) * sizeof(char)));
    uiPos = 0;
    sFields[0] = '\0';
 
@@ -288,7 +288,7 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
       switch( cType ) {
          case 'M': {
             InsertRecord->iCType = SQL_C_BINARY;
-            InsertRecord->asChar.value = (SQLCHAR *) hb_xgrab(INITIAL_MEMO_ALLOC);
+            InsertRecord->asChar.value = static_cast<SQLCHAR*>(hb_xgrab(INITIAL_MEMO_ALLOC));
             InsertRecord->asChar.size_alloc = INITIAL_MEMO_ALLOC;
             InsertRecord->asChar.size = 0;
             InsertRecord->asChar.value[0] = '\0';
@@ -296,7 +296,7 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
             break;
          }
          case 'C': {
-            InsertRecord->asChar.value = (SQLCHAR *) hb_xgrab(InsertRecord->ColumnSize + 1);
+            InsertRecord->asChar.value = static_cast<SQLCHAR*>(hb_xgrab(InsertRecord->ColumnSize + 1));
             InsertRecord->asChar.size_alloc = InsertRecord->ColumnSize + 1;
             InsertRecord->iCType = SQL_C_CHAR;
             InsertRecord->asChar.size = 0;
@@ -379,7 +379,7 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
    if( thiswa->sSql ) {
       hb_xfree(thiswa->sSql);
    }
-   thiswa->sSql = (char *) hb_xgrab(MAX_SQL_QUERY_LEN * sizeof(char));
+   thiswa->sSql = static_cast<char*>(hb_xgrab(MAX_SQL_QUERY_LEN * sizeof(char)));
    memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
    if( thiswa->nSystemID ==  SYSTEMID_MSSQL7 ) {
       sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData(%s) VALUES (%s );%s",

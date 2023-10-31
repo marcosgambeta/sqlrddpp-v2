@@ -134,14 +134,14 @@ static HB_USHORT OCI_initilized = 0;
 void err_handler(OCI_Error *err)
 {
     int   err_type = OCI_ErrorGetType(err);
-    char *err_msg = (char *)OCI_ErrorGetString(err);
+    char *err_msg = static_cast<char*>(OCI_ErrorGetString(err));
 
     printf("%s - %s\n", err_type == OCI_ERR_WARNING ? "warning" : "error", err_msg);
 }
 
 HB_FUNC( SQLO2_CONNECT )
 {
-   // POCI_ORASESSION session = (POCI_ORASESSION) hb_xgrab(sizeof(OCI_ORASESSION));
+   // POCI_ORASESSION session = static_cast<POCI_ORASESSION>(hb_xgrab(sizeof(OCI_ORASESSION)));
    POCI_ORASESSION session = (POCI_ORASESSION)hb_xgrabz(sizeof(OCI_ORASESSION));
 //    int lPool = 0; //  HB_ISLOG(5) ? hb_parl(5) : 0;
 //    char sPool[30] = {0};
@@ -237,7 +237,7 @@ HB_FUNC( SQLO2_GETERRORDESCR )
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
 
    if( session ) {
-      hb_retc((char *) OCI_ErrorGetString(OCI_GetLastError()));
+      hb_retc(static_cast<char*>(OCI_ErrorGetString(OCI_GetLastError())));
    } else {
       hb_retc("Not connected to Oracle");
    }
@@ -327,7 +327,7 @@ HB_FUNC( SQLO2_EXECUTE )
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
    bool lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
    if( session ) {
-      char * stm = (char *) hb_parc(2);
+      char * stm = static_cast<char*>(hb_parc(2));
       if( lStmt ) {
          OCI_SetPrefetchSize(session->stmt, 100);
 
@@ -382,7 +382,7 @@ HB_FUNC( ORACLEINBINDPARAM2 )
 
    if( Stmt ) {
 
-      Stmt->pLink[iPos].bindname = (char *) hb_xgrabz(sizeof(char) * 10);
+      Stmt->pLink[iPos].bindname = static_cast<char*>(hb_xgrabz(sizeof(char) * 10));
 //      memset(Stmt->pLink[iPos].bindname,'\0',10 * sizeof(char));
       sprintf(Stmt->pLink[iPos].bindname,":%i",iParamNum);
       Stmt->pLink[iPos].iFieldSize = iFieldSize;
@@ -473,7 +473,7 @@ HB_FUNC( ORACLEINBINDPARAM2 )
          break;
 
          default : {
-            Stmt->pLink[iPos].col_name = (char *) hb_xgrabz(sizeof(char) * (iFieldSize + 1));
+            Stmt->pLink[iPos].col_name = static_cast<char*>(hb_xgrabz(sizeof(char) * (iFieldSize + 1)));
 //            memset(Stmt->pLink[iPos].col_name,'\0',(iFieldSize + 1) * sizeof(char));
 
 
@@ -670,7 +670,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
    if( OCI_IsNull(rs, iField) ) {
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = (char *) hb_xgrab(lLen + 1);
+            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemset(szResult, ' ', lLen);
             szResult[lLen] = '\0';
             hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -719,10 +719,10 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
    } else {
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = (char *) hb_xgrab(lLen + 1);
+            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             memset(szResult,' ', lLen);
             uiLen = OCI_GetDataLength(rs,iField);
-            hb_xmemcpy(szResult, (char *) OCI_GetString(rs, iField), uiLen);
+            hb_xmemcpy(szResult, static_cast<char*>(OCI_GetString(rs, iField)), uiLen);
             szResult[lLen] = '\0';
             hb_itemPutCPtr(pItem, szResult, lLen);
             break;
@@ -745,7 +745,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
             break;
          }
          case SQL_LONGVARCHAR: {
-            char * bBuffer = (char *) OCI_GetString(rs, iField);
+            char * bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
             HB_SIZE lLenBuff = strlen(bBuffer);
             if( lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2) ) && (sr_lSerializeArrayAsJson()) ) {
                if( s_pSym_SR_FROMJSON == nullptr ) {
@@ -850,7 +850,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
 //
 //      for( i = 0; i < session->numcols; i++ ) {
 //         temp = hb_itemNew(nullptr);
-//         hb_arraySetForward(ret, i + 1, hb_itemPutCL(temp, (char *) line[i], lens[i]));
+//         hb_arraySetForward(ret, i + 1, hb_itemPutCL(temp, static_cast<char*>(line[i]), lens[i]));
 //         hb_itemRelease(temp);
 //      }
 //   }
@@ -958,7 +958,7 @@ HB_FUNC( SQLO2_DESCRIBECOL ) // ( hStmt, nCol, @cName, @nDataType, @nColSize, @n
 
       col = OCI_GetColumn(session->rs, ncol);
       nullok = OCI_GetColumnNullable(col);
-      name = (char *) OCI_GetColumnName(col);
+      name = static_cast<char*>(OCI_GetColumnName(col));
       prec = OCI_GetColumnPrecision(col);
       scale = OCI_GetColumnScale(col);
       dbsize = OCI_GetColumnSize(col);

@@ -70,7 +70,7 @@ HB_FUNC( SR_SQLPARSE )     /* SqlParse(cCommand, @nError, @nErrorPos) */
    HB_SIZE uLenPhrase = hb_parclen(1);
 
    if( uLenPhrase ) {
-      // sql_stmt * stmt = (sql_stmt *) hb_xgrab(sizeof(sql_stmt));
+      // sql_stmt * stmt = static_cast<sql_stmt*>(hb_xgrab(sizeof(sql_stmt)));
       sql_stmt * stmt = (sql_stmt *) hb_xgrabz(sizeof(sql_stmt));
 
       const char * sqlPhrase;
@@ -267,7 +267,7 @@ HB_FUNC( SR_STRTOHEX )
 
    cStr = hb_parc(1);
    len = static_cast<int>(hb_parclen(1));
-   outbuff = (char *) hb_xgrab((len * 2) + 1);
+   outbuff = static_cast<char*>(hb_xgrab((len * 2) + 1));
    c = outbuff;
 
    for( i = 0; i < len; i++ ) {
@@ -308,7 +308,7 @@ char * sr_Hex2Str(const char * cStr, int len, int * lenOut)
    int iCipher, iNum;
 
    nalloc = static_cast<int>(len / 2);
-   outbuff = (char *) hb_xgrab(nalloc + 1);
+   outbuff = static_cast<char*>(hb_xgrab(nalloc + 1));
 
    for( i = 0; i < nalloc; i++ ) {
       // First byte
@@ -410,7 +410,7 @@ static HB_SIZE escape_mysql(char * to, const char * from, HB_SIZE length)
      }
    }
    *to = 0;
-   return (HB_SIZE) (to - to_start);
+   return static_cast<HB_SIZE>(to - to_start);
 }
 
 static HB_SIZE escape_single(char * to, const char * from, HB_SIZE length)
@@ -428,7 +428,7 @@ static HB_SIZE escape_single(char * to, const char * from, HB_SIZE length)
      }
    }
    *to = 0;
-   return (HB_SIZE) (to - to_start);
+   return static_cast<HB_SIZE>(to - to_start);
 }
 
 static HB_SIZE escape_firebird(char * to, const char * from, HB_SIZE length)
@@ -449,7 +449,7 @@ static HB_SIZE escape_firebird(char * to, const char * from, HB_SIZE length)
       }
    }
    *to = 0;
-   return (HB_SIZE) (to - to_start);
+   return static_cast<HB_SIZE>(to - to_start);
 }
 
 static HB_SIZE escape_db2(char * to, const char * from, HB_SIZE length)
@@ -470,7 +470,7 @@ static HB_SIZE escape_db2(char * to, const char * from, HB_SIZE length)
       }
    }
    *to = 0;
-   return (HB_SIZE) (to - to_start);
+   return static_cast<HB_SIZE>(to - to_start);
 }
 
 static HB_SIZE escape_pgs(char * to, const char * from, HB_SIZE length)
@@ -494,7 +494,7 @@ static HB_SIZE escape_pgs(char * to, const char * from, HB_SIZE length)
       }
    }
    *to = 0;
-   return (HB_SIZE) (to - to_start);
+   return static_cast<HB_SIZE>(to - to_start);
 }
 
 static HB_SIZE escape_oci(char * to, const char * from, HB_SIZE length)
@@ -514,7 +514,7 @@ static HB_SIZE escape_oci(char * to, const char * from, HB_SIZE length)
       }
    }
    *to = 0;
-   return (HB_SIZE) (to - to_start);
+   return static_cast<HB_SIZE>(to - to_start);
 }
 
 HB_FUNC( SR_ESCAPESTRING )
@@ -534,7 +534,7 @@ HB_FUNC( SR_ESCAPESTRING )
 
    if( iSize ) {
       FromBuffer = hb_parc(1);
-      ToBuffer = (char *) hb_xgrab((iSize * 2) + 1);
+      ToBuffer = static_cast<char*>(hb_xgrab((iSize * 2) + 1));
       if( ToBuffer ) {
          switch( idatabase ) {
          case SYSTEMID_MYSQL:
@@ -568,7 +568,7 @@ HB_FUNC( SR_ESCAPESTRING )
             break;
          }
       }
-      hb_retclen_buffer((char *) ToBuffer, iSize);
+      hb_retclen_buffer(static_cast<char*>(ToBuffer), iSize);
    } else {
       hb_retc("");
    }
@@ -578,7 +578,7 @@ char * QuoteTrimEscapeString(const char * FromBuffer, HB_SIZE iSize, int idataba
 {
    char * ToBuffer;
 
-   ToBuffer = (char *) hb_xgrab((iSize * 2) + 3);
+   ToBuffer = static_cast<char*>(hb_xgrab((iSize * 2) + 3));
 
    ToBuffer[0] = '\'';
    ToBuffer++;
@@ -648,7 +648,7 @@ HB_FUNC( SR_ESCAPENUM )
       return;
    }
 
-   ToBuffer = (char *) hb_xgrab((iSize) + 33);
+   ToBuffer = static_cast<char*>(hb_xgrab((iSize) + 33));
    memset(ToBuffer, 0, (iSize) + 33);
 
    len = hb_parnl(2);
@@ -754,7 +754,7 @@ PHB_ITEM sr_escapeNumber(char * FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM p
    double dMultpl;
 
    iSize = strlen(FromBuffer);
-   ToBuffer = (char *) hb_xgrab((iSize) + 33);
+   ToBuffer = static_cast<char*>(hb_xgrab((iSize) + 33));
    memset(ToBuffer, 0, (iSize) + 33);
 
    if( dec > 0 ) {
@@ -860,7 +860,7 @@ HB_FUNC( SR_DBQUALIFY )
 
       pszBuffer = hb_itemGetCPtr(pText);
       ulLen = hb_itemGetCLen(pText);
-      szOut = (char *) hb_xgrab(ulLen + 3);
+      szOut = static_cast<char*>(hb_xgrab(ulLen + 3));
 
       // Firebird, DB2, ADABAS and Oracle must be uppercase
       // Postgres, MySQL and Ingres must be lowercase
@@ -876,7 +876,7 @@ HB_FUNC( SR_DBQUALIFY )
       case SYSTEMID_ADABAS:
          szOut[0] = '"';
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i + 1] = static_cast<char>(toupper((HB_BYTE) pszBuffer[i]));
+            szOut[i + 1] = static_cast<char>(toupper(static_cast<HB_BYTE>(pszBuffer[i])));
          }
          szOut[i + 1] = '"';
          break;
@@ -884,14 +884,14 @@ HB_FUNC( SR_DBQUALIFY )
       case SYSTEMID_POSTGR:
          szOut[0] = '"';
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i + 1] = static_cast<char>(tolower((HB_BYTE) pszBuffer[i]));
+            szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
          }
          szOut[i + 1] = '"';
          break;
       case SYSTEMID_MSSQL7:
          szOut[0] = '[';
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i + 1] = (HB_BYTE) pszBuffer[i];
+            szOut[i + 1] = static_cast<HB_BYTE>(pszBuffer[i]);
          }
          szOut[i + 1] = ']';
          break;
@@ -900,20 +900,20 @@ HB_FUNC( SR_DBQUALIFY )
       case SYSTEMID_MARIADB:
          szOut[0] = '`';
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i + 1] = static_cast<char>(tolower((HB_BYTE) pszBuffer[i]));
+            szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
          }
          szOut[i + 1] = '`';
          break;
       case SYSTEMID_INFORM:
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i] = static_cast<char>(tolower((HB_BYTE) pszBuffer[i]));
+            szOut[i] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
          }
          ulLen -=2;
          break;
       default:
          szOut[0] = '"';
          for( i = 0; i < ulLen; i++ ) {
-            szOut[i + 1] = (HB_BYTE) pszBuffer[i];
+            szOut[i + 1] = static_cast<HB_BYTE>(pszBuffer[i]);
          }
          szOut[i + 1] = '"';
       }
@@ -1020,7 +1020,7 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
       && (((nSystemID == SYSTEMID_POSTGR) && HB_IS_DATE(pFieldData))
       || ((nSystemID != SYSTEMID_POSTGR) && (!HB_IS_LOGICAL(pFieldData)))) ) {
       if( bNullable || HB_IS_DATE(pFieldData) ) {
-         sValue = (char *) hb_xgrab(5);
+         sValue = static_cast<char*>(hb_xgrab(5));
          sValue[0] = 'N';
          sValue[1] = 'U';
          sValue[2] = 'L';
@@ -1034,14 +1034,14 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
             sValue = QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false, &iSizeOut);
             return sValue;
          } else if( HB_IS_STRING(pFieldData) ) {
-            sValue = (char *) hb_xgrab(4);
+            sValue = static_cast<char*>(hb_xgrab(4));
             sValue[0] = '\'';
             sValue[1] = ' ';
             sValue[2] = '\'';
             sValue[3] = '\0';
             return sValue;
          } else if( HB_IS_NUMBER(pFieldData) ) {
-            sValue = (char *) hb_xgrab(2);
+            sValue = static_cast<char*>(hb_xgrab(2));
             sValue[0] = '0';
             sValue[1] = '\0';
             return sValue;
@@ -1054,7 +1054,7 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
                   sValue = QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false, &iSizeOut);
                   return sValue;
                } else {
-                  sValue = (char *) hb_xgrab(4);
+                  sValue = static_cast<char*>(hb_xgrab(4));
                   sValue[0] = '\'';
                   sValue[1] = ' ';
                   sValue[2] = '\'';
@@ -1065,7 +1065,7 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
             case HB_IT_INTEGER:
             case HB_IT_LONG:
             case HB_IT_DOUBLE: {
-               sValue = (char *) hb_xgrab(2);
+               sValue = static_cast<char*>(hb_xgrab(2));
                sValue[0] = '0';
                sValue[1] = '\0';
                return sValue;
@@ -1092,7 +1092,7 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
       }
    } else if( HB_IS_DATE(pFieldData) ) {
       hb_dateDecStr(sDate, hb_itemGetDL(pFieldData));
-      sValue = (char *) hb_xgrab(30);
+      sValue = static_cast<char*>(hb_xgrab(30));
       switch( nSystemID ) {
          case SYSTEMID_ORACLE: {
             if( !bMemo ) {
@@ -1108,7 +1108,7 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
          }
       }
    } else if( HB_IS_LOGICAL(pFieldData) ) {
-      sValue = (char *) hb_xgrab(6);
+      sValue = static_cast<char*>(hb_xgrab(6));
       if( hb_itemGetL(pFieldData) ) {
          if( nSystemID == SYSTEMID_POSTGR ) {
             sValue[0] = 't';
@@ -1170,7 +1170,7 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
       }
       case HB_IT_DATE: {
          hb_dateDecStr(sDate, hb_itemGetDL(pFieldData));
-         sValue = (char *) hb_xgrab(30);
+         sValue = static_cast<char*>(hb_xgrab(30));
          switch( nSystemID ) {
             case SYSTEMID_ORACLE: {
                if( !bMemo ) {
@@ -1188,7 +1188,7 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
          break;
       }
       case HB_IT_LOGICAL: {
-         sValue = (char *) hb_xgrab(6);
+         sValue = static_cast<char*>(hb_xgrab(6));
          if( hb_itemGetL(pFieldData) ) {
             switch( nSystemID ) {
                case SYSTEMID_POSTGR: {

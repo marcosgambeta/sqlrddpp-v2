@@ -94,7 +94,7 @@ using PMYSQL_SESSION = MYSQL_SESSION *;
 
 HB_FUNC( MYSCONNECT )
 {
-   // PMYSQL_SESSION session = (PMYSQL_SESSION) hb_xgrab(sizeof(MYSQL_SESSION));
+   // PMYSQL_SESSION session = static_cast<PMYSQL_SESSION>(hb_xgrab(sizeof(MYSQL_SESSION)));
    PMYSQL_SESSION session = (PMYSQL_SESSION) hb_xgrabz(sizeof(MYSQL_SESSION));
    const char * szHost = hb_parc(1);
    const char * szUser = hb_parc(2);
@@ -235,7 +235,7 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
    if( lLenBuff <= 0 ) { // database content is NULL
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = ( char * ) hb_xgrab(lLen + 1);
+            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemset(szResult, ' ', lLen);
             szResult[lLen] = '\0';
             hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -283,7 +283,7 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
       switch( lType ) {
          case SQL_CHAR: {
             HB_SIZE lPos;
-            char * szResult = ( char * ) hb_xgrab(lLen + 1);
+            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             memset(szResult, ' ', lLen);
             hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
 
@@ -431,9 +431,9 @@ HB_FUNC( MYSLINEPROCESSED )
 
             if( lIndex != 0 ) {
                if( thisrow[lIndex - 1] ) {
-                  MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), temp, (char *) thisrow[lIndex - 1], lens[lIndex - 1], bQueryOnly, ulSystemID, bTranslate);
+                  MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), temp, static_cast<char*>(thisrow[lIndex - 1]), lens[lIndex - 1], bQueryOnly, ulSystemID, bTranslate);
                } else {
-                  MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), temp, "", 0, bQueryOnly, ulSystemID, bTranslate);
+                  MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), temp, const_cast<char*>(""), 0, bQueryOnly, ulSystemID, bTranslate);
                }
             }
             hb_arraySetForward(pRet, col + 1, temp);
@@ -495,7 +495,7 @@ HB_FUNC( MYSRESSTATUS )
 
    assert(session != nullptr);
    assert(session->dbh != nullptr);
-   hb_retc((char *) mysql_error(session->dbh));
+   hb_retc(const_cast<char*>(mysql_error(session->dbh)));
 }
 
 HB_FUNC( MYSCLEAR )
@@ -534,7 +534,7 @@ HB_FUNC( MYSERRMSG )
    PMYSQL_SESSION session = (PMYSQL_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
    assert(session != nullptr);
    assert(session->dbh != nullptr);
-   hb_retc((char *) mysql_error(session->dbh));
+   hb_retc(const_cast<char*>(mysql_error(session->dbh)));
 }
 
 HB_FUNC( MYSCOMMIT )

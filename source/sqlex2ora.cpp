@@ -222,8 +222,8 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
    }
 
    InsertRecord = thiswa->InsertRecord;
-   sFields = (char *) hb_xgrabz(FIELD_LIST_SIZE * sizeof(char));
-   sParams = (char *) hb_xgrabz((FIELD_LIST_SIZE * 2) * sizeof(char));
+   sFields = static_cast<char*>(hb_xgrabz(FIELD_LIST_SIZE * sizeof(char)));
+   sParams = static_cast<char*>(hb_xgrabz((FIELD_LIST_SIZE * 2) * sizeof(char)));
 
    sFields[0] = '\0';
 
@@ -282,7 +282,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
       switch( cType ) {
          case 'M': {
             InsertRecord->iCType = SQL_C_BINARY;
-            InsertRecord->asChar.value = (char *) hb_xgrab(INITIAL_MEMO_ALLOC);
+            InsertRecord->asChar.value = static_cast<char*>(hb_xgrab(INITIAL_MEMO_ALLOC));
             InsertRecord->asChar.size_alloc = INITIAL_MEMO_ALLOC;
             InsertRecord->asChar.size = 0;
             InsertRecord->asChar.value[0] = '\0';
@@ -290,7 +290,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
             break;
          }
          case 'C': {
-            InsertRecord->asChar.value = (char *) hb_xgrab(InsertRecord->ColumnSize + 1);
+            InsertRecord->asChar.value = static_cast<char*>(hb_xgrab(InsertRecord->ColumnSize + 1));
             InsertRecord->asChar.size_alloc = InsertRecord->ColumnSize + 1;
             InsertRecord->iCType = SQL_C_CHAR;
             InsertRecord->asChar.size = 0;
@@ -364,7 +364,7 @@ HB_ERRCODE PrepareInsertStmtOra(SQLEXORAAREAP thiswa)
       return HB_FAILURE;
    }
    OCI_AllowRebinding(thiswa->hStmtInsert, 1);
-   // res = SQLPrepare(thiswa->hStmtInsert, (char *) (thiswa->sSql), SQL_NTS);
+   // res = SQLPrepare(thiswa->hStmtInsert, static_cast<char*>(thiswa->sSql), SQL_NTS);
 
    if( !OCI_Prepare(thiswa->hStmtInsert, (thiswa->sSql)) ) { // if( CHECK_SQL_N_OK(res) )
       OraErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmtOra", thiswa->sSql, 0, __LINE__, __FILE__);
@@ -723,7 +723,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
       szBindName);
    hb_xfree(temp);
    // TraceLog("aaa.log", "query update %s\n", thiswa->sSql);
-   res = OCI_Prepare(thiswa->hStmtUpdate, (char *) (thiswa->sSql));
+   res = OCI_Prepare(thiswa->hStmtUpdate, static_cast<char*>(thiswa->sSql));
    if( !res ) {
       OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, res, __LINE__, __FILE__);
       return HB_FAILURE;
@@ -852,8 +852,8 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
       return HB_FAILURE;
    }
 
-   // res = SQLPrepare(thiswa->hStmtUpdate, (char *) (thiswa->sSql), SQL_NTS);
-   // res = OCI_Prepare(thiswa->hStmtUpdate, (char *) (thiswa->sSql));
+   // res = SQLPrepare(thiswa->hStmtUpdate, static_cast<char*>(thiswa->sSql), SQL_NTS);
+   // res = OCI_Prepare(thiswa->hStmtUpdate, static_cast<char*>(thiswa->sSql));
    // if( !res ) {
    //    OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, res, __LINE__, __FILE__);
    //    return HB_FAILURE;

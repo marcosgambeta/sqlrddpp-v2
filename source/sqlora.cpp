@@ -981,7 +981,7 @@ extern char * strdup __P((const char *s));
 char * DEFUN(strdup, (s), const char * s)
 {
   char *n;
-  n = (char *) MALLOC(sizeof(char) * (strlen(s) + 1));
+  n = static_cast<char*>(MALLOC(sizeof(char) * (strlen(s) + 1)));
   TRACE(4, fprintf(_trace_fp,"strdup: Allocated %d bytes\n", (strlen(s) + 1)););
   if( n ) {
     strcpy(n, s);
@@ -998,10 +998,10 @@ char * DEFUN(strdup, (s), const char * s)
 ---------------------------------------------------------------------------*/
           /* Parameters, sort them by name */
 static sqlora_param_t g_params[] = {
-  {"PREFETCH_ROWS", INTEGER,       (VOID *)&_num_prefetch_rows,    nullptr},
-  {"LONGSIZE",      INTEGER,       (VOID *)&_max_long_size,    nullptr},
-  {"TRACE_FILE",    STRING,        _trace_file,          nullptr},
-  {"TRACE_LEVEL",   INTEGER,       &_trace_level,        nullptr},
+  {const_cast<char*>("PREFETCH_ROWS"), INTEGER,       (VOID *)&_num_prefetch_rows,    nullptr},
+  {const_cast<char*>("LONGSIZE"),      INTEGER,       (VOID *)&_max_long_size,    nullptr},
+  {const_cast<char*>("TRACE_FILE"),    STRING,        _trace_file,          nullptr},
+  {const_cast<char*>("TRACE_LEVEL"),   INTEGER,       &_trace_level,        nullptr},
   {nullptr,            INTEGER,       nullptr,                nullptr}
 };
 
@@ -1881,10 +1881,10 @@ DEFUN(_stmt_init, (stp, dbp, stmt),
     if( MIN_STMT_SIZE > len ) {
       len = MIN_STMT_SIZE;
     }
-    stp->stmt = (char *) hb_xgrabDebug(__LINE__, sizeof(char) * len);
+    stp->stmt = static_cast<char*>(hb_xgrabDebug(__LINE__, sizeof(char) * len));
     stp->stmt_size = len;
   } else if( stp->stmt_size < len ) {
-    stp->stmt = (char *) hb_xreallocDebug(__LINE__, stp->stmt, sizeof(char) * len);
+    stp->stmt = static_cast<char*>(hb_xreallocDebug(__LINE__, stp->stmt, sizeof(char) * len));
     stp->stmt_size = len;
   }
 
@@ -2263,7 +2263,7 @@ DEFUN_VOID(_sqlo_getenv)
 
       case STRING:
         if( g_params[i].value )
-          strcpy((char *) g_params[i].value, ep);
+          strcpy(static_cast<char*>(g_params[i].value), ep);
         break;
 
       default:
@@ -3555,13 +3555,13 @@ DEFUN(_set_ocol_name, (stp, colp, pos),
     if( col_name_len < MIN_COL_NAME_LEN ) {
       col_name_len = MIN_COL_NAME_LEN;
     }
-    colp->col_name = (char *) hb_xgrabDebug(__LINE__, sizeof(char) * (col_name_len + 1));
+    colp->col_name = static_cast<char*>(hb_xgrabDebug(__LINE__, sizeof(char) * (col_name_len + 1)));
     colp->col_name_size = col_name_len;
 
   } else {
     if( col_name_len > colp->col_name_size ) {
       col_name_len = 2 * col_name_len; /* alloc always twice as much we need */
-      colp->col_name = (char *) hb_xreallocDebug(__LINE__, colp->col_name, sizeof(char) * (col_name_len + 1));
+      colp->col_name = static_cast<char*>(hb_xreallocDebug(__LINE__, colp->col_name, sizeof(char) * (col_name_len + 1)));
       colp->col_name_size = col_name_len;
     }
   }
@@ -3682,7 +3682,7 @@ DEFUN(_alloc_ocol_buffer, (stp, pos, buffer_size),
       if( buf_size < MIN_OBUF_SIZE ) {
         buf_size = MIN_OBUF_SIZE;
       }
-      stp->outv[col_idx] = (char *) hb_xgrabDebug(__LINE__, (buf_size) * sizeof(char));
+      stp->outv[col_idx] = static_cast<char*>(hb_xgrabDebug(__LINE__, (buf_size) * sizeof(char)));
       memset(stp->outv[col_idx], 0, (buf_size) * sizeof(char));
       stp->rlenv[col_idx] = buf_size;
     }
@@ -3696,7 +3696,7 @@ DEFUN(_alloc_ocol_buffer, (stp, pos, buffer_size),
       if( buf_size < _max_long_size ) {
         buf_size = 2 * buf_size;
       }
-      stp->outv[col_idx] = (char *) hb_xreallocDebug(__LINE__, stp->outv[col_idx], (buf_size) * sizeof(char));
+      stp->outv[col_idx] = static_cast<char*>(hb_xreallocDebug(__LINE__, stp->outv[col_idx], (buf_size) * sizeof(char)));
       memset(stp->outv[col_idx], 0, (buf_size) * sizeof(char));
       stp->rlenv[col_idx] = buf_size;
     } else {
@@ -4185,7 +4185,7 @@ DEFUN(_prepare, (stp, stmt, stmt_type),
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "_prepare: OCIStmtPrepare: status=%d", dbp->status););
 
-  CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_prepare", (char *) stmt);
+  CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_prepare", const_cast<char*>(stmt));
 
   stp->prepared = TRUE;
 
@@ -4878,7 +4878,7 @@ DEFUN(sqlo_exec, (dbh, stmt,rr),
 
   dbp->status = OCIStmtPrepare(dbp->stmthp, dbp->errhp, (text *) stmt, strlen(stmt), OCI_NTV_SYNTAX, OCI_DEFAULT);
 
-  CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_exec(prepare)", (char *) stmt);
+  CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_exec(prepare)", const_cast<char*>(stmt));
 //  } else {
     /* still executing */
 //    ;
@@ -7647,7 +7647,7 @@ DEFUN(sqlo_register_int_handler, (handle, signal_handler),
 {
 #ifdef HAVE_OSNSUI
   int status;
-  status = osnsui(handle, signal_handler, (char *) nullptr);
+  status = osnsui(handle, signal_handler, static_cast<char*>(nullptr));
   return status;
 #else
   ( void )handle; 

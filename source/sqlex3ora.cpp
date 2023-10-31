@@ -662,7 +662,7 @@ HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT * 
       }
       uiLen = OCI_GetDataLength(*rs, 2);
 
-      hb_xmemcpy(szValue, (char *) OCI_GetString(*rs, 2), uiLen);
+      hb_xmemcpy(szValue, static_cast<char*>(OCI_GetString(*rs, 2)), uiLen);
       if( szValue[0] == 0 ) {
          thiswa->deletedList[0] = ' '; // MySQL driver climps spaces from right side
       } else {

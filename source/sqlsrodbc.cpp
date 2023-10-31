@@ -241,7 +241,7 @@ HB_FUNC( SR_DRIVERC )
       (SQLSMALLINT *) &wLen,
       (SQLUSMALLINT) SQL_DRIVER_COMPLETE);
    #endif
-   hb_storc((char *) bBuffer1, 3);
+   hb_storc(reinterpret_cast<char*>(bBuffer1), 3);
    hb_retni(ret);
 }
 
@@ -329,7 +329,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
    char * cType;
    PHB_ITEM pTemp;
 
-   cType = (char *) hb_arrayGetCPtr(pField, FIELD_TYPE);
+   cType = const_cast<char*>(hb_arrayGetCPtr(pField, FIELD_TYPE));
    lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
    lLen = hb_arrayGetNL(pField, FIELD_LEN);
    lDec = hb_arrayGetNL(pField, FIELD_DEC);
@@ -341,7 +341,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
          case SQL_NVARCHAR:
          case SQL_WCHAR:
          case SQL_GUID: {
-            char * szResult = (char *) hb_xgrab(lLen + 1);
+            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemset(szResult, ' ', lLen);
             hb_itemPutCLPtr(pItem, szResult, lLen);
             break;
@@ -371,7 +371,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
          case SQL_TIMESTAMP:
          case SQL_TYPE_TIMESTAMP: {
             if( ulSystemID == SYSTEMID_IBMDB2 ) {
-               // char * szResult = (char *) hb_xgrab(26 + 1);
+               // char * szResult = static_cast<char*>(hb_xgrab(26 + 1));
                // hb_xmemset(szResult, ' ', lLen);
                // hb_itemPutCLPtr(pItem, szResult, lLen);
                hb_itemPutTDT(pItem, 0, 0);
@@ -433,7 +433,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
          case SQL_WCHAR:
          case SQL_GUID: {
             HB_SIZE lPos;
-            char * szResult = (char *) hb_xgrab(lLen + 1);
+            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemcpy(szResult, bBuffer, ((HB_ISIZ) lLen < lLenBuff ? lLen : lLenBuff));
 
             for( lPos = lLenBuff; lPos < lLen; lPos++ ) {
@@ -735,26 +735,26 @@ HB_FUNC( SR_ODBCGETLINES ) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lT
             do {
                wResult = SQLGetData((SQLHSTMT) hb_parptr(1), (SQLUSMALLINT) lIndex, (SQLSMALLINT) SQL_CHAR, (PTR) bBuffer, (SQLLEN) lLen, (SQLLEN *) &lLenOut);
                if( wResult == SQL_SUCCESS && iReallocs == 0 ) {
-                  odbcFieldGet(hb_arrayGetItemPtr(pFields, i), temp, (char *) bBuffer, lLenOut, 0, ulSystemID, bTranslate);
+                  odbcFieldGet(hb_arrayGetItemPtr(pFields, i), temp, static_cast<char*>(bBuffer), lLenOut, 0, ulSystemID, bTranslate);
                   hb_arraySetForward(pLine, i, temp);
                   break;
                } else if( wResult == SQL_SUCCESS_WITH_INFO && iReallocs == 0 ) {
                   // Perheps a data truncation
                   if( lLenOut >= lInitBuff ) {
                      // data right truncated!
-                     bOut = (char *) hb_xgrab(lLenOut + 1);
+                     bOut = static_cast<char*>(hb_xgrab(lLenOut + 1));
                      lLen = lLenOut + 3;
-                     strcpy((char *) bOut, (char *) bBuffer);
-                     bBuffer = (char *) hb_xrealloc(bBuffer, lLen);
+                     strcpy(static_cast<char*>(bOut), static_cast<char*>(bBuffer));
+                     bBuffer = static_cast<char*>(hb_xrealloc(bBuffer, lLen));
                      iReallocs++;
                   } else {
-                     odbcFieldGet(hb_arrayGetItemPtr(pFields, i), temp, (char *) bBuffer, lLenOut, 0, ulSystemID, bTranslate);
+                     odbcFieldGet(hb_arrayGetItemPtr(pFields, i), temp, static_cast<char*>(bBuffer), lLenOut, 0, ulSystemID, bTranslate);
                      hb_arraySetForward(pLine, i, temp);
                      break;
                   }
                } else if( (wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO ) && iReallocs > 0 ) {
-                  strcat((char*) bOut, (char *) bBuffer);
-                  odbcFieldGet(hb_arrayGetItemPtr(pFields, i), temp, (char *) bOut, lLenOut + lInitBuff - 1, 0, ulSystemID, bTranslate);
+                  strcat((char*) bOut, static_cast<char*>(bBuffer));
+                  odbcFieldGet(hb_arrayGetItemPtr(pFields, i), temp, static_cast<char*>(bOut), lLenOut + lInitBuff - 1, 0, ulSystemID, bTranslate);
                   hb_arraySetForward(pLine, i, temp);
                   hb_xfree((PTR) bOut);
                   break;
@@ -869,7 +869,7 @@ HB_FUNC( SR_DESCRIB )
       lLen = 64;
    }
 
-   bBuffer = (SQLTCHAR *) hb_xgrab(lLen * sizeof(SQLTCHAR));
+   bBuffer = static_cast<SQLTCHAR*>(hb_xgrab(lLen * sizeof(SQLTCHAR)));
    bBuffer[0] = '\0';
 
    wResult = SQLDescribeCol((HSTMT) hb_parptr(1),
@@ -886,7 +886,7 @@ HB_FUNC( SR_DESCRIB )
    }
 
    if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO ) {
-       hb_storclen((LPSTR) bBuffer, (HB_SIZE) wBufLen, 3);
+       hb_storclen((LPSTR) bBuffer, static_cast<HB_SIZE>(wBufLen), 3);
        hb_storni(static_cast<int>(wBufLen), 5);
        hb_storni(static_cast<int>(wDataType), 6);
        hb_stornint(wColSize, 7);
@@ -903,7 +903,7 @@ HB_FUNC( SR_DESCRIB )
 HB_FUNC( SR_COLATTRIBUTE )
 {
    SQLSMALLINT lLen = (SQLSMALLINT) hb_parni(5);
-   char * bBuffer = (char *) hb_xgrab(lLen);
+   char * bBuffer = static_cast<char*>(hb_xgrab(lLen));
    SQLSMALLINT wBufLen = (SQLSMALLINT) hb_parni(6);
    SQLLEN wNumPtr = (SQLLEN) hb_parnint(7);
    RETCODE wResult = SQLColAttribute((SQLHSTMT) hb_parptr(1),
@@ -935,9 +935,9 @@ HB_FUNC( SR_ERROR )
    hb_retni(SQLError((SQLHENV) hb_parptr(1), (SQLHDBC) hb_parptr(2), (SQLHSTMT) hb_parptr(3), (SQLTCHAR *) bBuffer1,
       (SQLINTEGER *) &lError, (SQLTCHAR *) szErrorMsg, (SQLSMALLINT) HB_SIZEOFARRAY(szErrorMsg), (SQLSMALLINT *) &wLen));
 
-   hb_storc((char *) bBuffer1, 4);
+   hb_storc(reinterpret_cast<char*>(bBuffer1), 4);
    hb_stornl(lError, 5);
-   hb_storclen((char *) szErrorMsg,wLen, 6);
+   hb_storclen(reinterpret_cast<char*>(szErrorMsg),wLen, 6);
 }
 
 //-----------------------------------------------------------------------------//
@@ -947,7 +947,7 @@ HB_FUNC( SR_GETINFO )
    char bBuffer[512] = {0};
    SQLSMALLINT wLen;
    RETCODE wResult = SQLGetInfo((SQLHDBC) hb_parptr(1), (SQLUSMALLINT) hb_parnl(2), (SQLPOINTER) bBuffer, (SQLSMALLINT) 512, (SQLSMALLINT *) &wLen);
-   hb_storclen((char *) bBuffer, wLen, 3);
+   hb_storclen(static_cast<char*>(bBuffer), wLen, 3);
    hb_retni(wResult);
 }
 
@@ -1004,12 +1004,12 @@ HB_FUNC( SR_GETCONNECTOPTION )
    SQLINTEGER lLen = 0;
    buffer[0] = '\0';
    hb_retni(SQLGetConnectAttr((SQLHDBC) hb_parptr(1), (SQLINTEGER) hb_parnl(2), (SQLPOINTER) buffer, (SQLINTEGER) sizeof(buffer), (SQLINTEGER *) &lLen));
-   hb_storclen((char *) buffer, lLen, 3);
+   hb_storclen(reinterpret_cast<char*>(buffer), lLen, 3);
 #else
    HB_BYTE bBuffer[512] = {0};
    RETCODE wResult = SQLGetConnectOption((SQLHDBC) hb_parptr(1), (SQLSMALLINT) hb_parni(2), (SQLPOINTER) bBuffer);
    if( wResult == SQL_SUCCESS ) {
-      hb_storclen((char *) bBuffer, 512, 3);
+      hb_storclen(static_cast<char*>(bBuffer), 512, 3);
    }
    hb_retni(wResult);
 #endif
@@ -1139,7 +1139,7 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
    SQLLEN lLenOut;
    SQLRETURN res;
 
-   cType = (char *) hb_arrayGetCPtr(pField, FIELD_TYPE);
+   cType = const_cast<char*>(hb_arrayGetCPtr(pField, FIELD_TYPE));
    lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
    lLen = hb_arrayGetNL(pField, FIELD_LEN);
    lDec = hb_arrayGetNL(pField, FIELD_DEC);
@@ -1164,10 +1164,10 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
             if( static_cast<int>(lLenOut) == SQL_NULL_DATA || lLenOut == 0) {
                odbcFieldGet(pField, pItem, nullptr, -1, bQueryOnly, ulSystemID, bTranslate);
             } else if( lLenOut > 0 ) {
-               char * val = (char *) hb_xgrab(lLenOut + 1);
+               char * val = static_cast<char*>(hb_xgrab(lLenOut + 1));
                res = SQLGetData((HSTMT) hStmt, ui, SQL_CHAR, val, lLenOut + 1, &lLenOut);
                if( SQL_SUCCEEDED(res) ) {
-                  odbcFieldGet(pField, pItem, (char *) val, lLenOut, bQueryOnly, ulSystemID, bTranslate);
+                  odbcFieldGet(pField, pItem, static_cast<char*>(val), lLenOut, bQueryOnly, ulSystemID, bTranslate);
                   // hb_arraySetForward(pRet, i, temp);
                }
                if( val ) {
