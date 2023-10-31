@@ -225,21 +225,21 @@ HB_FUNC( SR_DRIVERC )
       (SQLHDBC) hb_parptr(1),
       GetDesktopWindow(),
       (SQLCHAR *) hb_parcx(2),
-      (SQLSMALLINT) strlen(hb_parcx(2)),
+      static_cast<SQLSMALLINT>(strlen(hb_parcx(2))),
       (SQLCHAR *) bBuffer1,
-      (SQLSMALLINT) 1024,
-      (SQLSMALLINT *) &wLen,
-      (SQLUSMALLINT) SQL_DRIVER_NOPROMPT); // SQL_DRIVER_COMPLETE);
+      static_cast<SQLSMALLINT>(1024),
+      static_cast<SQLSMALLINT*>(&wLen),
+      static_cast<SQLUSMALLINT>(SQL_DRIVER_NOPROMPT)); // SQL_DRIVER_COMPLETE);
    #elif defined(HB_OS_UNIX)
    RETCODE ret = SQLDriverConnect(
       (SQLHDBC) hb_parptr(1),
       0,
       (SQLCHAR *) hb_parcx(2),
-      (SQLSMALLINT) strlen(hb_parcx(2)),
+      static_cast<SQLSMALLINT>(strlen(hb_parcx(2))),
       (SQLCHAR *) bBuffer1,
-      (SQLSMALLINT) 1024,
-      (SQLSMALLINT *) &wLen,
-      (SQLUSMALLINT) SQL_DRIVER_COMPLETE);
+      static_cast<SQLSMALLINT>(1024),
+      static_cast<SQLSMALLINT*>(&wLen),
+      static_cast<SQLUSMALLINT>(SQL_DRIVER_COMPLETE));
    #endif
    hb_storc(reinterpret_cast<char*>(bBuffer1), 3);
    hb_retni(ret);
@@ -733,7 +733,7 @@ HB_FUNC( SR_ODBCGETLINES ) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lT
             hb_arraySetForward(pLine, i, temp);
          } else {
             do {
-               wResult = SQLGetData((SQLHSTMT) hb_parptr(1), (SQLUSMALLINT) lIndex, (SQLSMALLINT) SQL_CHAR, (PTR) bBuffer, (SQLLEN) lLen, (SQLLEN *) &lLenOut);
+               wResult = SQLGetData((SQLHSTMT) hb_parptr(1), static_cast<SQLUSMALLINT>(lIndex), static_cast<SQLSMALLINT>(SQL_CHAR), (PTR) bBuffer, (SQLLEN) lLen, (SQLLEN *) &lLenOut);
                if( wResult == SQL_SUCCESS && iReallocs == 0 ) {
                   odbcFieldGet(hb_arrayGetItemPtr(pFields, i), temp, static_cast<char*>(bBuffer), lLenOut, 0, ulSystemID, bTranslate);
                   hb_arraySetForward(pLine, i, temp);
@@ -853,12 +853,12 @@ void odbcErrorDiagRTE(SQLHSTMT hStmt, const char * routine, const char * szSql, 
 
 HB_FUNC( SR_DESCRIB )
 {
-   SQLSMALLINT lLen = (SQLSMALLINT) hb_parni(4);
-   SQLSMALLINT wBufLen = (SQLSMALLINT) hb_parni(5);
-   SQLSMALLINT wDataType = (SQLSMALLINT) hb_parni(6);
+   SQLSMALLINT lLen = static_cast<SQLSMALLINT>(hb_parni(4));
+   SQLSMALLINT wBufLen = static_cast<SQLSMALLINT>(hb_parni(5));
+   SQLSMALLINT wDataType = static_cast<SQLSMALLINT>(hb_parni(6));
    SQLULEN wColSize = (SQLULEN) hb_parnint(7);
-   SQLSMALLINT wDecimals = (SQLSMALLINT) hb_parni(8);
-   SQLSMALLINT wNullable = (SQLSMALLINT) hb_parni(9);
+   SQLSMALLINT wDecimals = static_cast<SQLSMALLINT>(hb_parni(8));
+   SQLSMALLINT wNullable = static_cast<SQLSMALLINT>(hb_parni(9));
    // SQLTCHAR bBuffer[128] = {0};
 
    SQLTCHAR * bBuffer;
@@ -873,14 +873,14 @@ HB_FUNC( SR_DESCRIB )
    bBuffer[0] = '\0';
 
    wResult = SQLDescribeCol((HSTMT) hb_parptr(1),
-                            (SQLUSMALLINT) hb_parni(2),
+                            static_cast<SQLUSMALLINT>(hb_parni(2)),
                             (SQLTCHAR *) bBuffer,
-                            (SQLSMALLINT) lLen,
-                            (SQLSMALLINT *) &wBufLen,
-                            (SQLSMALLINT *) &wDataType,
+                            static_cast<SQLSMALLINT>(lLen),
+                            static_cast<SQLSMALLINT*>(&wBufLen),
+                            static_cast<SQLSMALLINT*>(&wDataType),
                             (SQLULEN *) &wColSize,
-                            (SQLSMALLINT *) &wDecimals,
-                            (SQLSMALLINT *) &wNullable);
+                            static_cast<SQLSMALLINT*>(&wDecimals),
+                            static_cast<SQLSMALLINT*>(&wNullable));
    if( wDataType == -8 && ulSystemID == SYSTEMID_MYSQL) { // MySQL ODBC Bug
       odbcErrorDiagRTE((SQLHSTMT) hb_parptr(1), "SQLCONNECT", "MySQL Driver version 5 is not compatible with SQLRDD", 0, __LINE__, __FILE__);
    }
@@ -902,16 +902,16 @@ HB_FUNC( SR_DESCRIB )
 
 HB_FUNC( SR_COLATTRIBUTE )
 {
-   SQLSMALLINT lLen = (SQLSMALLINT) hb_parni(5);
+   SQLSMALLINT lLen = static_cast<SQLSMALLINT>(hb_parni(5));
    char * bBuffer = static_cast<char*>(hb_xgrab(lLen));
-   SQLSMALLINT wBufLen = (SQLSMALLINT) hb_parni(6);
+   SQLSMALLINT wBufLen = static_cast<SQLSMALLINT>(hb_parni(6));
    SQLLEN wNumPtr = (SQLLEN) hb_parnint(7);
    RETCODE wResult = SQLColAttribute((SQLHSTMT) hb_parptr(1),
-                                     (SQLUSMALLINT) hb_parni(2),
-                                     (SQLUSMALLINT) hb_parni(3),
+                                     static_cast<SQLUSMALLINT>(hb_parni(2)),
+                                     static_cast<SQLUSMALLINT>(hb_parni(3)),
                                      (SQLPOINTER) bBuffer,
-                                     (SQLSMALLINT) hb_parni(5),
-                                     (SQLSMALLINT *) &wBufLen,
+                                     static_cast<SQLSMALLINT>(hb_parni(5)),
+                                     static_cast<SQLSMALLINT*>(&wBufLen),
                                      (SQLLEN *) &wNumPtr);
 
    if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO ) {
@@ -933,7 +933,7 @@ HB_FUNC( SR_ERROR )
    SQLSMALLINT wLen;
 
    hb_retni(SQLError((SQLHENV) hb_parptr(1), (SQLHDBC) hb_parptr(2), (SQLHSTMT) hb_parptr(3), (SQLTCHAR *) bBuffer1,
-      (SQLINTEGER *) &lError, (SQLTCHAR *) szErrorMsg, (SQLSMALLINT) HB_SIZEOFARRAY(szErrorMsg), (SQLSMALLINT *) &wLen));
+      (SQLINTEGER *) &lError, (SQLTCHAR *) szErrorMsg, static_cast<SQLSMALLINT>(HB_SIZEOFARRAY(szErrorMsg)), static_cast<SQLSMALLINT*>(&wLen)));
 
    hb_storc(reinterpret_cast<char*>(bBuffer1), 4);
    hb_stornl(lError, 5);
@@ -946,7 +946,7 @@ HB_FUNC( SR_GETINFO )
 {
    char bBuffer[512] = {0};
    SQLSMALLINT wLen;
-   RETCODE wResult = SQLGetInfo((SQLHDBC) hb_parptr(1), (SQLUSMALLINT) hb_parnl(2), (SQLPOINTER) bBuffer, (SQLSMALLINT) 512, (SQLSMALLINT *) &wLen);
+   RETCODE wResult = SQLGetInfo((SQLHDBC) hb_parptr(1), static_cast<SQLUSMALLINT>(hb_parnl(2)), (SQLPOINTER) bBuffer, static_cast<SQLSMALLINT>(512), static_cast<SQLSMALLINT*>(&wLen));
    hb_storclen(static_cast<char*>(bBuffer), wLen, 3);
    hb_retni(wResult);
 }
@@ -962,7 +962,7 @@ HB_FUNC( SR_SETCONNECTATTR )
       HB_ISCHAR(3) ? (SQLPOINTER) hb_parc(3) : (SQLPOINTER) (HB_PTRUINT) hb_parnint(3),
       HB_ISCHAR(3) ? (SQLINTEGER) hb_parclen(3) : (SQLINTEGER) SQL_IS_INTEGER));
 #else
-   hb_retni(SQLSetConnectOption((SQLHDBC) hb_parptr(1), (SQLUSMALLINT) hb_parni(2),
+   hb_retni(SQLSetConnectOption((SQLHDBC) hb_parptr(1), static_cast<SQLUSMALLINT>(hb_parni(2)),
       HB_ISCHAR(3) ? (SQLULEN) hb_parc(3) : (SQLULEN) hb_parnl(3)));
 #endif
 }
@@ -1007,7 +1007,7 @@ HB_FUNC( SR_GETCONNECTOPTION )
    hb_storclen(reinterpret_cast<char*>(buffer), lLen, 3);
 #else
    HB_BYTE bBuffer[512] = {0};
-   RETCODE wResult = SQLGetConnectOption((SQLHDBC) hb_parptr(1), (SQLSMALLINT) hb_parni(2), (SQLPOINTER) bBuffer);
+   RETCODE wResult = SQLGetConnectOption((SQLHDBC) hb_parptr(1), static_cast<SQLSMALLINT>(hb_parni(2)), (SQLPOINTER) bBuffer);
    if( wResult == SQL_SUCCESS ) {
       hb_storclen(static_cast<char*>(bBuffer), 512, 3);
    }
@@ -1048,8 +1048,8 @@ void odbcErrorDiag(SQLHSTMT hStmt, const char * routine, const char * szSql, int
    Msg[0] = '\0';
 
    i = 1;
-   while( (SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, (SQLSMALLINT) i, (SQLTCHAR *)SqlState, (SQLINTEGER *) &NativeError,
-      (SQLTCHAR *) Msg, (SQLSMALLINT) sizeof(Msg), (SQLSMALLINT *) &MsgLen)) != SQL_NO_DATA ) {
+   while( (SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, static_cast<SQLSMALLINT>(i), (SQLTCHAR *)SqlState, (SQLINTEGER *) &NativeError,
+      (SQLTCHAR *) Msg, static_cast<SQLSMALLINT>(sizeof(Msg)), static_cast<SQLSMALLINT*>(&MsgLen))) != SQL_NO_DATA ) {
       i++;
    }
 
