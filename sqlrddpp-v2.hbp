@@ -7,9 +7,9 @@
 -inc
 
 -Iinclude
+-Iinclude/mysql
 -Isource
 -Isource/firebird
--Isource/mysql
 -Isource/oci
 -Isource/pgsql
 
