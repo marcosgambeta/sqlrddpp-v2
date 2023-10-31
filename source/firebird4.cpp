@@ -151,7 +151,7 @@ static void fb_log_status4(PFB_SESSION session, const char * from)
 
    while( fb_interpret((ISC_SCHAR *) s, sizeof(s), &pVect) ) {
       //const char * nl = (s[0] ? s[strlen(s) - 1] != '\n' : true) ? "\n" : "";
-      strcat(session->msgerror, (const char *) s);
+      strcat(session->msgerror, reinterpret_cast<const char*>(s));
       strcat(session->msgerror, "\n");
       //util_output("%s%s", s, nl);
    }
@@ -925,11 +925,11 @@ HB_FUNC( FBCREATEDB4 )
       hb_snprintf(create_db, sizeof(create_db), "CREATE DATABASE '%s' USER '%s' PASSWORD '%s'", db_name, username, passwd /*, page, charset*/);
    }
 
-   if( isc_dsql_execute_immediate((ISC_STATUS *)status, &newdb, &trans, 0, create_db, static_cast<unsigned short>(dialect), nullptr) ) {
+   if( isc_dsql_execute_immediate(reinterpret_cast<ISC_STATUS*>(status), &newdb, &trans, 0, create_db, static_cast<unsigned short>(dialect), nullptr) ) {
       hb_retni(SQL_ERROR);
       TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
    } else {
-      if( isc_detach_database ((ISC_STATUS *)status, &newdb) ) {
+      if( isc_detach_database (reinterpret_cast<ISC_STATUS*>(status), &newdb) ) {
          hb_retni(SQL_ERROR);
          return;
       }

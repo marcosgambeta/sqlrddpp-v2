@@ -1061,7 +1061,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
    if( szfor ) {
       if( szfor[0] ) {
          if( bWhere ) {
-            temp = hb_strdup((const char *) thiswa->sWhere);
+            temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
             sprintf(thiswa->sWhere, "%s AND ( %s )", temp, szfor);
             hb_xfree(temp);
          } else {
@@ -1079,7 +1079,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
                hb_xfree(temp);
             } else {
@@ -1094,7 +1094,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
                hb_xfree(temp);
             } else {
@@ -1113,7 +1113,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
       const char * szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
       if( szFilter && szFilter[0] ) {
          if( bWhere ) {
-            temp = hb_strdup((const char *) thiswa->sWhere);
+            temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
             sprintf(thiswa->sWhere, "%s AND ( %s )", temp, szFilter);
             hb_xfree(temp);
          } else {
@@ -1130,7 +1130,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
                hb_xfree(temp);
             } else {
@@ -1147,7 +1147,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
                hb_xfree(temp);
             } else {
@@ -1387,7 +1387,7 @@ static HB_ERRCODE getWhereExpression(SQLEXAREAP thiswa, int iListType)
 
             if( bArgumentIsNull ) { // This is the same to be directly used or prepared
                if( BindStructure->iCType == SQL_C_DOUBLE ) { // If NUMERIC
-                  temp = hb_strdup((const char *) thiswa->sWhere);
+                  temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                   sprintf(thiswa->sWhere,
                      "%s %s ( A.%c%s%c %s %s OR A.%c%s%c IS NULL )",
                      bWhere ? temp : "\nWHERE",
@@ -1408,7 +1408,7 @@ static HB_ERRCODE getWhereExpression(SQLEXAREAP thiswa, int iListType)
                      // Since this is not numeric, EVERYTHING is greater
                      // or equal to NULL, so we do not add any restriction to WHERE clause.
                   } else {
-                     temp = hb_strdup((const char *) thiswa->sWhere);
+                     temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                      sprintf(thiswa->sWhere,
                         "%s %s A.%c%s%c IS NULL",
                         bWhere ? temp : "\nWHERE",
@@ -1421,7 +1421,7 @@ static HB_ERRCODE getWhereExpression(SQLEXAREAP thiswa, int iListType)
                   }
                }
             } else {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere,
                   "%s %s A.%c%s%c %s ?",
                   bWhere ? temp : "\nWHERE",
@@ -1782,7 +1782,7 @@ HB_BOOL getColumnList(SQLEXAREAP thiswa)
                      CLOSE_QUALIFIER(thiswa));
                }
             } else {
-               temp = hb_strdup((const char *) thiswa->sFields);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sFields));
                sprintf(thiswa->sFields,
                   "%s, A.%c%s%c",
                   temp,
@@ -1837,7 +1837,7 @@ HB_BOOL getColumnList(SQLEXAREAP thiswa)
                      CLOSE_QUALIFIER(thiswa));
                }
             } else {
-               temp = hb_strdup((const char *) thiswa->sFields);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sFields));
                sprintf(thiswa->sFields,
                   "%s, A.%c%s%c",
                   temp,
@@ -4142,7 +4142,7 @@ HB_FUNC( SQLEX_GETFUNCTABLE )
       if( uiCount ) {
          *uiCount = RDDFUNCSCOUNT;
       }
-      errCode = hb_rddInherit(pTable, &sqlTable, &sqlExSuper, (const char *) "SQLRDD");
+      errCode = hb_rddInherit(pTable, &sqlTable, &sqlExSuper, static_cast<const char*>("SQLRDD"));
       hb_retni(errCode);
    } else {
       hb_retni(HB_FAILURE);

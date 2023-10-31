@@ -251,7 +251,7 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
       bIsMemo = cType == 'M' || bMultiLang;
 
       if( i != static_cast<int>(thiswa->ulhRecno) ) { // RECNO is never included in INSERT column list
-         temp = hb_strdup((const char *) sFields);
+         temp = hb_strdup(static_cast<const char*>(sFields));
          sprintf(sFields, "%s,%c%s%c", temp, OPEN_QUALIFIER(thiswa), QualifyName(colName, thiswa), CLOSE_QUALIFIER(thiswa));
          sParams[uiPos] = ',';
          sParams[++uiPos] = '?';
@@ -455,7 +455,7 @@ HB_ERRCODE BindInsertColumns(SQLEXAREAP thiswa)
             case SQL_C_BINARY: {
                SQLINTEGER nInd;
                InsertRecord->lIndPtr = SQL_NTS;
-               nInd = strlen((const char *) (InsertRecord->asChar.value));
+               nInd = strlen(reinterpret_cast<const char*>(InsertRecord->asChar.value));
                res = SQLBindParameter(thiswa->hStmtInsert,
                                       static_cast<SQLUSMALLINT>(iBind),
                                       SQL_PARAM_INPUT,
@@ -789,7 +789,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
             case SQL_C_BINARY: {
                SQLINTEGER nInd;
                CurrRecord->lIndPtr = SQL_NTS;
-               nInd = strlen((const char *)(CurrRecord->asChar.value));
+               nInd = strlen(reinterpret_cast<const char*>(CurrRecord->asChar.value));
                res = SQLBindParameter(thiswa->hStmtUpdate,
                                       static_cast<SQLUSMALLINT>(iBind),
                                       SQL_PARAM_INPUT,
@@ -863,7 +863,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
          CurrRecord->iParNum = iBind;
 
          // Create SQL
-         temp = hb_strdup((const char *) thiswa->sSql);
+         temp = hb_strdup(static_cast<const char*>(thiswa->sSql));
          sprintf(thiswa->sSql, "%s%c %c%s%c = ?",
             temp,
             iBind > 1 ? ',' : ' ',
@@ -879,7 +879,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
       }
       CurrRecord++;
    }
-   temp = hb_strdup((const char *) thiswa->sSql);
+   temp = hb_strdup(static_cast<const char*>(thiswa->sSql));
    sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = ?",
       temp,
       OPEN_QUALIFIER(thiswa),

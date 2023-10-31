@@ -222,8 +222,8 @@ void setResultSetLimitOra(SQLEXORAAREAP thiswa, int iRows)
       fmt1 = "";
       fmt2 = "";
    }
-   sprintf(thiswa->sLimit1, (const char *) fmt1, iRows);
-   sprintf(thiswa->sLimit2, (const char *) fmt2, iRows);
+   sprintf(thiswa->sLimit1, static_cast<const char*>(fmt1), iRows);
+   sprintf(thiswa->sLimit2, static_cast<const char*>(fmt2), iRows);
 }
 
 /*------------------------------------------------------------------------*/
@@ -1033,7 +1033,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
                hb_xfree(temp);
             } else {
@@ -1048,7 +1048,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
                hb_xfree(temp);
             } else {
@@ -1067,7 +1067,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
       const char * szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
       if( szFilter && szFilter[0] ) {
          if( bWhere ) {
-            temp = hb_strdup((const char *) thiswa->sWhere);
+            temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
             sprintf(thiswa->sWhere, "%s AND ( %s )", temp, szFilter);
             hb_xfree(temp);
          } else {
@@ -1084,7 +1084,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
                hb_xfree(temp);
             } else {
@@ -1101,7 +1101,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
                hb_xfree(temp);
             } else {
@@ -1328,7 +1328,7 @@ static HB_ERRCODE getWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType)
 
             if( bArgumentIsNull ) { // This is the same to be directly used or prepared
                if( BindStructure->iCType == SQL_C_DOUBLE ) { // If NUMERIC
-                  temp = hb_strdup((const char *) thiswa->sWhere);
+                  temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                   sprintf(thiswa->sWhere, "%s %s ( A.%c%s%c %s %s OR A.%c%s%c IS NULL )",
                      bWhere ? temp : "\nWHERE",
                      bWhere ? "AND" : "",
@@ -1348,7 +1348,7 @@ static HB_ERRCODE getWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType)
                      // Since this is not numeric, EVERYTHING is greater
                      // or equal to NULL, so we do not add any restriction to WHERE clause.
                   } else {
-                     temp = hb_strdup((const char *) thiswa->sWhere);
+                     temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                      sprintf(thiswa->sWhere, "%s %s A.%c%s%c IS NULL",
                         bWhere ? temp : "\nWHERE",
                         bWhere ? "AND" : "",
@@ -1360,7 +1360,7 @@ static HB_ERRCODE getWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType)
                   }
                }
             } else {
-               temp = hb_strdup((const char *) thiswa->sWhere);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
                sprintf(thiswa->sWhere, "%s %s A.%c%s%c %s %s",
                   bWhere ? temp : "\nWHERE",
                   bWhere ? "AND" : "",
@@ -1745,7 +1745,7 @@ HB_BOOL getColumnListOra(SQLEXORAAREAP thiswa)
                      CLOSE_QUALIFIER(thiswa));
                }
             } else {
-               temp = hb_strdup((const char *) thiswa->sFields);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sFields));
                sprintf(thiswa->sFields, "%s, A.%c%s%c", temp, OPEN_QUALIFIER(thiswa), colName, CLOSE_QUALIFIER(thiswa));
                hb_xfree(temp);
             }
@@ -1793,7 +1793,7 @@ HB_BOOL getColumnListOra(SQLEXORAAREAP thiswa)
                      CLOSE_QUALIFIER(thiswa));
                }
             } else {
-               temp = hb_strdup((const char *) thiswa->sFields);
+               temp = hb_strdup(static_cast<const char*>(thiswa->sFields));
                sprintf(thiswa->sFields, "%s, A.%c%s%c", temp, OPEN_QUALIFIER(thiswa), colName, CLOSE_QUALIFIER(thiswa));
                hb_xfree(temp);
             }
@@ -1899,14 +1899,14 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
       // Adjust SQL to 'pageReadSize' params
 
       for( i = 1; i < pageReadSize; i++ ) {
-        char * temp = hb_strdup((const char *) thiswa->sSqlBuffer);
+        char * temp = hb_strdup(static_cast<const char*>(thiswa->sSqlBuffer));
         sprintf(thiswa->sSqlBuffer, "%s,:%i", temp, i + 1);
         iEnd = static_cast<HB_SIZE>(strlen(thiswa->sSqlBuffer));
         // TraceLog("aaa.log", "montando    thiswa->sSqlBuffer %s\n", thiswa->sSqlBuffer);
         hb_xfree(temp);
       }
       // TraceLog("aaa.log", "thiswa->sSqlBuffer %s\n", thiswa->sSqlBuffer);
-      szEnd = hb_strdup((const char *) thiswa->sSqlBuffer);
+      szEnd = hb_strdup(static_cast<const char*>(thiswa->sSqlBuffer));
       sprintf(thiswa->sSqlBuffer,"%s)", szEnd);
       // TraceLog("aaa.log", "thiswa->sSqlBuffer %s %s\n", thiswa->sSqlBuffer, szEnd);
       iEnd = static_cast<HB_SIZE>(strlen(thiswa->sSqlBuffer));
@@ -4148,7 +4148,7 @@ HB_FUNC( SQLEXORA_GETFUNCTABLE )
       if( uiCount ) {
          *uiCount = RDDFUNCSCOUNT;
       }
-      errCode = hb_rddInherit(pTable, &sqlTable, &sqlExOraSuper, (const char *) "SQLRDD");
+      errCode = hb_rddInherit(pTable, &sqlTable, &sqlExOraSuper, static_cast<const char*>("SQLRDD"));
       hb_retni(errCode);
    } else {
       hb_retni(HB_FAILURE);
