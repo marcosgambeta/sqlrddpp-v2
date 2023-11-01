@@ -7,11 +7,11 @@
 -inc
 
 -Iinclude
+-Iinclude/firebird
 -Iinclude/mysql
 -Iinclude/oci
 -Iinclude/pgsql
 -Isource
--Isource/firebird
 
 source/exprobjs.prg
 source/exprparser.prg
