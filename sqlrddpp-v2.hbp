@@ -8,10 +8,10 @@
 
 -Iinclude
 -Iinclude/mysql
+-Iinclude/oci
 -Iinclude/pgsql
 -Isource
 -Isource/firebird
--Isource/oci
 
 source/exprobjs.prg
 source/exprparser.prg
