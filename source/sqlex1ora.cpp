@@ -4271,7 +4271,7 @@ static int sqlKeyCompareEx(SQLEXORAAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
       valbuf = static_cast<char*>(hb_xgrab(9));
       val2 = hb_itemGetDS(pKey, valbuf);
    } else if( HB_IS_NUMBER(pKey) ) {
-      PHB_ITEM pLen = hb_itemPutNL(nullptr, static_cast<HB_LONG>(len1));
+      auto pLen = hb_itemPutNL(nullptr, static_cast<HB_LONG>(len1));
       val2 = valbuf = hb_itemStr(pKey, pLen, nullptr);
       len2 = static_cast<HB_SIZE>(strlen(val2));
       hb_itemRelease(pLen);

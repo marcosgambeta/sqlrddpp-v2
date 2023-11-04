@@ -454,8 +454,6 @@ static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
 
 static HB_ERRCODE sqlGoTo(SQLAREAP thiswa, HB_LONG recno)
 {
-   PHB_ITEM pParam1;
-
    // TraceLog(nullptr, "sqlGoTo %i\n", recno);
 
    /* Reset parent rel struct */
@@ -463,7 +461,7 @@ static HB_ERRCODE sqlGoTo(SQLAREAP thiswa, HB_LONG recno)
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
 
-   pParam1 = hb_itemPutNL(nullptr, recno);
+   auto pParam1 = hb_itemPutNL(nullptr, recno);
    if( hb_arrayGetL(thiswa->aInfo, AINFO_HOT) ) {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_WRITEBUFFER, 0);
    }
@@ -523,7 +521,7 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
    lbof = hb_arrayGetNL(thiswa->aInfo, AINFO_BOF_AT);
 
    if( lbof ) {
-      PHB_ITEM pBOF = hb_itemPutNL(nullptr, lbof);
+      auto pBOF = hb_itemPutNL(nullptr, lbof);
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGOTO, 1, pBOF);
       hb_itemRelease(pBOF);
    } else {
@@ -587,7 +585,7 @@ int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
       valbuf = static_cast<char*>(hb_xgrab(9));
       val2 = hb_itemGetDS(pKey, valbuf);
    } else if( HB_IS_NUMBER(pKey) ) {
-      PHB_ITEM pLen = hb_itemPutNL(nullptr, static_cast<HB_LONG>(len1));
+      auto pLen = hb_itemPutNL(nullptr, static_cast<HB_LONG>(len1));
       val2 = valbuf = hb_itemStr(pKey, pLen, nullptr);
       len2 = static_cast<HB_BYTE>(strlen(val2));
       hb_itemRelease(pLen);
@@ -638,7 +636,7 @@ int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 
 static HB_ERRCODE sqlSeek(SQLAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_BOOL bFindLast)
 {
-   PHB_ITEM pNewKey = nullptr, pItem, pItem2;
+   PHB_ITEM pNewKey = nullptr;
    HB_ERRCODE retvalue = HB_SUCCESS;
 
    // TraceLog(nullptr, "sqlSeek(%p, %d, %p, %d)", thiswa, bSoftSeek, pKey, bFindLast);
@@ -647,8 +645,8 @@ static HB_ERRCODE sqlSeek(SQLAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
 
-   pItem = hb_itemPutL(nullptr, bSoftSeek);
-   pItem2 = hb_itemPutL(nullptr, bFindLast);
+   auto pItem = hb_itemPutL(nullptr, bSoftSeek);
+   auto pItem2 = hb_itemPutL(nullptr, bFindLast);
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( HB_IS_STRING(pKey) ) {
@@ -1020,8 +1018,6 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip)
 
 static HB_ERRCODE sqlAppend(SQLAREAP thiswa)
 {
-   PHB_ITEM pItem;
-
    // TraceLog(nullptr, "sqlAppend\n");
 
    /* Reset parent rel struct */
@@ -1038,7 +1034,7 @@ static HB_ERRCODE sqlAppend(SQLAREAP thiswa)
    thiswa->area.fEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
    thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
 
-   pItem = hb_itemPutL(nullptr, true);
+   auto pItem = hb_itemPutL(nullptr, true);
    hb_arraySet(thiswa->aInfo, AINFO_HOT, pItem);
    hb_arraySet(thiswa->aInfo, AINFO_ISINSERT, pItem);
    hb_itemPutNI(pItem, 0);
@@ -2295,23 +2291,19 @@ HB_ERRCODE sqlOrderCondition(SQLAREAP thiswa, LPDBORDERCONDINFO lpdbOrdCondInfo)
 
 static HB_ERRCODE sqlOrderCreate(SQLAREAP thiswa, LPDBORDERCREATEINFO pOrderInfo)
 {
-   PHB_ITEM pBagName, pAtomBagName;
-
    //TraceLog(nullptr, "sqlOrderCreate\n");
 
    if( SELF_GOCOLD(&thiswa->area) == HB_FAILURE ) {
       return HB_FAILURE;
    }
 
-   pBagName = hb_itemPutC(nullptr, pOrderInfo->abBagName);
-   pAtomBagName = hb_itemPutC(nullptr, pOrderInfo->atomBagName);
+   auto pBagName = hb_itemPutC(nullptr, pOrderInfo->abBagName);
+   auto pAtomBagName = hb_itemPutC(nullptr, pOrderInfo->atomBagName);
 
    if( pOrderInfo->lpdbConstraintInfo ) {
-      PHB_ITEM pConstrName, pTarget, pEnable;
-
-      pConstrName = hb_itemPutC(nullptr, pOrderInfo->lpdbConstraintInfo->abConstrName);
-      pTarget = hb_itemPutC(nullptr, pOrderInfo->lpdbConstraintInfo->abTargetName);
-      pEnable = hb_itemPutL(nullptr, pOrderInfo->lpdbConstraintInfo->fEnabled);
+      auto pConstrName = hb_itemPutC(nullptr, pOrderInfo->lpdbConstraintInfo->abConstrName);
+      auto pTarget = hb_itemPutC(nullptr, pOrderInfo->lpdbConstraintInfo->abTargetName);
+      auto pEnable = hb_itemPutL(nullptr, pOrderInfo->lpdbConstraintInfo->fEnabled);
 
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERCREATE, 7, pBagName, pOrderInfo->abExpr, pAtomBagName, pConstrName, pTarget, pOrderInfo->lpdbConstraintInfo->itmRelationKey, pEnable);
 
@@ -2441,11 +2433,10 @@ PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
 
 static HB_ERRCODE sqlSetServerSideIndexScope(SQLAREAP thiswa, int nScope, PHB_ITEM scopeValue)
 {
-   PHB_ITEM scopetype;
    int res;
 
    auto scopeval = hb_itemNew(scopeValue);
-   scopetype = hb_itemPutNI(nullptr, nScope);
+   auto scopetype = hb_itemPutNI(nullptr, nScope);
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLSETSCOPE, 2, scopetype, scopeval);
    res = hb_itemGetNI(hb_stackReturnItem());
    hb_itemRelease(scopetype);
@@ -2831,12 +2822,11 @@ static HB_ERRCODE sqlSetFilter(SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo)
 
 static HB_ERRCODE sqlSetScope(SQLAREAP thiswa, LPDBORDSCOPEINFO sInfo)
 {
-   PHB_ITEM scopetype;
    int res;
 
    //TraceLog(nullptr, "sqlSetScope\n");
 
-   scopetype = hb_itemPutNI(nullptr, sInfo->nScope);
+   auto scopetype = hb_itemPutNI(nullptr, sInfo->nScope);
    auto scopeval = hb_itemNew(sInfo->scopeValue);
 
 #ifndef HB_CDP_SUPPORT_OFF
@@ -2905,7 +2895,7 @@ static HB_ERRCODE sqlLock(SQLAREAP thiswa, LPDBLOCKINFO pLockInfo)
    }
 
    if( thiswa->shared ) {
-      PHB_ITEM pMethod = hb_itemPutNI(nullptr, pLockInfo->uiMethod);
+      auto pMethod = hb_itemPutNI(nullptr, pLockInfo->uiMethod);
 
       switch( pLockInfo->uiMethod ) {
       case DBLM_EXCLUSIVE:
