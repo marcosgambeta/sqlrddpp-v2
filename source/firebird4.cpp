@@ -1099,7 +1099,7 @@ static void FBFieldGet4(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE
                hb_itemMove(pTemp, hb_stackReturnItem());
 
                if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
-                  PHB_ITEM pLangItem = hb_itemNew(nullptr);
+                  auto pLangItem = hb_itemNew(nullptr);
                   HB_SIZE ulPos;
                   if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
                       || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)

@@ -185,9 +185,8 @@ static HB_ERRCODE ConcludeSkipraw(SQLEXAREAP thiswa)
 static void sqlGetCleanBuffer(SQLEXAREAP thiswa)
 {
    HB_SIZE nPos, nLen;
-   PHB_ITEM pCol;
 
-   pCol = hb_itemNew(nullptr);
+   auto pCol = hb_itemNew(nullptr);
    for( nPos = 1, nLen = hb_arrayLen(thiswa->aEmptyBuff); nPos <= nLen; nPos++) {
       hb_arrayGet(thiswa->aEmptyBuff, nPos, pCol);
       hb_arraySet(thiswa->aOldBuffer, nPos, pCol);
@@ -1869,7 +1868,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
    // char * bBuffer;
    // char * bOut = nullptr;
    HB_USHORT i, iIndex, iEnd, iRow;
-   PHB_ITEM aRecord, pKey;
+   PHB_ITEM aRecord;
    PHB_ITEM temp;
    // HB_ITEM temp;
 
@@ -1878,7 +1877,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
    // First, try to look for record in current buffer pool
 
-   pKey = hb_itemNew(nullptr);
+   auto pKey = hb_itemNew(nullptr);
    hb_itemPutNL(pKey, thiswa->recordList[thiswa->recordListPos]);
 
    if( !bUpdateDeleted ) { // Cache NEVER holds deleted() information
@@ -2591,7 +2590,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
       PHB_ITEM temp;
       // HB_ITEM temp;
       int iComp;
-      PHB_ITEM aRecord = hb_itemNew(nullptr);
+      auto aRecord = hb_itemNew(nullptr);
 
       hb_arrayNew(aRecord, hb_arrayLen(thiswa->aBuffer));
 
@@ -3088,7 +3087,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
          hb_itemMove(pTemp, hb_stackReturnItem());
 
          if( HB_IS_HASH(pTemp) && sr_isMultilang() ) {
-            PHB_ITEM pLangItem = hb_itemNew(nullptr);
+            auto pLangItem = hb_itemNew(nullptr);
             // HB_SIZE ulPos; declared at beginning
             if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
                 || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -3113,7 +3112,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
       LPFIELD pField = thiswa->area.lpFields + fieldNum - 1;
 
       if( pField->uiType == HB_FT_MEMO ) {
-         PHB_ITEM pLangItem = hb_itemNew(nullptr);
+         auto pLangItem = hb_itemNew(nullptr);
 
          if(    hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &ulPos)
              || hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -3125,7 +3124,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
          }
          hb_itemRelease(pLangItem);
       } else {
-         PHB_ITEM pLangItem = hb_itemNew(nullptr);
+         auto pLangItem = hb_itemNew(nullptr);
          HB_SIZE nLen = pField->uiLen, nSrcLen;
          auto empty = static_cast<char*>(hb_xgrab(nLen + 1));
 
@@ -3304,7 +3303,7 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
 
       hb_arraySet(thiswa->aBuffer, fieldindex, value);
    } else if(HB_IS_STRING(value) && HB_IS_HASH(pDest) && sr_isMultilang() ) {
-      PHB_ITEM pLangItem = hb_itemNew(nullptr);
+      auto pLangItem = hb_itemNew(nullptr);
       hb_hashAdd(pDest, sr_getBaseLang(pLangItem), value);
       hb_itemRelease(pLangItem);
    } else if( pField->uiType == HB_FT_MEMO ) { // Memo fields can hold ANY datatype

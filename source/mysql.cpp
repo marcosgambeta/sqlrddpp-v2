@@ -336,7 +336,7 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
                hb_itemMove(pTemp, hb_stackReturnItem());
 
                if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
-                  PHB_ITEM pLangItem = hb_itemNew(nullptr);
+                  auto pLangItem = hb_itemNew(nullptr);
                   HB_SIZE ulPos;
                   if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
                       || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -561,9 +561,9 @@ HB_FUNC( MYSQUERYATTR )
    assert(session->stmt != nullptr);
 
    int rows = session->numcols;
-   PHB_ITEM ret = hb_itemNew(nullptr);
-   PHB_ITEM temp = hb_itemNew(nullptr);
-   PHB_ITEM atemp = hb_itemNew(nullptr);
+   auto ret = hb_itemNew(nullptr);
+   auto temp = hb_itemNew(nullptr);
+   auto atemp = hb_itemNew(nullptr);
 
    hb_arrayNew(ret, rows);
 
@@ -692,9 +692,9 @@ HB_FUNC( MYSTABLEATTR )
       TraceLog(LOGFILE, "Query error : %i - %s\n", mysql_errno(session->dbh), mysql_error(session->dbh));
    }
 
-   PHB_ITEM ret = hb_itemNew(nullptr);
-   PHB_ITEM temp = hb_itemNew(nullptr);
-   PHB_ITEM atemp = hb_itemNew(nullptr);
+   auto ret = hb_itemNew(nullptr);
+   auto temp = hb_itemNew(nullptr);
+   auto atemp = hb_itemNew(nullptr);
 
    int rows = mysql_num_fields(session->stmt);
    hb_arrayNew(ret, rows);

@@ -518,7 +518,7 @@ HB_ERRCODE FeedRecordColsOra(SQLEXORAAREAP thiswa, HB_BOOL bUpdate)
             } else {
                if( InsertRecord->isMultiLang && HB_IS_STRING(pFieldData) ) {
                   // Transform multilang field in HASH
-                  PHB_ITEM pLangItem = hb_itemNew(nullptr);
+                  auto pLangItem = hb_itemNew(nullptr);
                   pTemp = hb_hashNew(nullptr);
                   hb_hashAdd(pTemp, sr_getBaseLang(pLangItem), pFieldData);
                   hb_itemRelease(pLangItem);
@@ -878,7 +878,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
 
 HB_ERRCODE ExecuteUpdateStmtOra(SQLEXORAAREAP thiswa)
 {
-   PHB_ITEM pKey, aRecord;
+   PHB_ITEM aRecord;
    HB_SIZE lPos;
    int res;
 
@@ -911,7 +911,7 @@ HB_ERRCODE ExecuteUpdateStmtOra(SQLEXORAAREAP thiswa)
 
    // Update Buffer Pool if needed
 
-   pKey = hb_itemNew(nullptr);
+   auto pKey = hb_itemNew(nullptr);
    hb_itemPutNLL(pKey, thiswa->recordList[thiswa->recordListPos]);
 
    if( hb_hashScan(thiswa->hBufferPool, pKey, &lPos) ) {

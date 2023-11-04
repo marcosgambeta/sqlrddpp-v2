@@ -588,7 +588,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
                hb_itemMove(pTemp, hb_stackReturnItem());
 
                if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
-                  PHB_ITEM pLangItem = hb_itemNew(nullptr);
+                  auto pLangItem = hb_itemNew(nullptr);
                   HB_SIZE ulPos;
                   if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
                       || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -636,11 +636,11 @@ HB_FUNC( SQLO_LINE )
    POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
    const char ** line;
    const unsigned int * lens;
-   PHB_ITEM ret, temp;
+   PHB_ITEM temp;
    HB_USHORT i;
    sqlo_stmt_handle_t stmtParamRes;
 
-   ret = hb_itemNew(nullptr);
+   auto ret = hb_itemNew(nullptr);
 
    if( session ) {
       stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;

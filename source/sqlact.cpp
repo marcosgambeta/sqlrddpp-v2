@@ -239,9 +239,7 @@ PHB_ITEM SQLpCodeGenArrayIntInt(PHB_ITEM pArray, int code, int code2)
 
 PHB_ITEM SQLpCodeGenIntArray(int code, PHB_ITEM pArray)
 {
-   PHB_ITEM pItem;
-
-   pItem = hb_itemNew(nullptr);
+   auto pItem = hb_itemNew(nullptr);
    hb_arrayAdd(pArray, pItem);
    hb_arrayIns(pArray, 1);
    hb_itemPutNILen(pItem, code, 6);

@@ -227,8 +227,8 @@ HB_LONG searchCacheBWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 
 void readCachePageFWD(SQLAREAP thiswa)
 {
-   PHB_ITEM pOrd = hb_itemNew(nullptr);
-   PHB_ITEM pDel = hb_itemNew(nullptr);
+   auto pOrd = hb_itemNew(nullptr);
+   auto pDel = hb_itemNew(nullptr);
    hb_itemPutNL(pOrd, ORD_DIR_FWD);
    hb_itemPutL(pDel, thiswa->wasdel);
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_READPAGE, 2, pOrd, pDel);
@@ -240,8 +240,8 @@ void readCachePageFWD(SQLAREAP thiswa)
 
 void readCachePageBWD(SQLAREAP thiswa)
 {
-   PHB_ITEM pOrd = hb_itemNew(nullptr);
-   PHB_ITEM pDel = hb_itemNew(nullptr);
+   auto pOrd = hb_itemNew(nullptr);
+   auto pDel = hb_itemNew(nullptr);
    hb_itemPutNL(pOrd, ORD_DIR_BWD);
    hb_itemPutL(pDel, thiswa->wasdel);
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_READPAGE, 2, pOrd, pDel);
@@ -254,13 +254,13 @@ void readCachePageBWD(SQLAREAP thiswa)
 void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 {
    HB_SIZE nPos, nLen;
-   PHB_ITEM pCacheRecord, pCol;
+   PHB_ITEM pCacheRecord;
 
    hb_arraySetNL(thiswa->aInfo, AINFO_NPOSCACHE, lPos);
 
    pCacheRecord = (PHB_ITEM) hb_arrayGetItemPtr(thiswa->aCache, lPos);
 
-   pCol = hb_itemNew(nullptr);
+   auto pCol = hb_itemNew(nullptr);
 
    for( nPos = 1, nLen = hb_arrayLen(pCacheRecord); nPos <= nLen; nPos++ ) {
 
@@ -294,11 +294,11 @@ void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
 {
    HB_SIZE nPos, nLen;
-   PHB_ITEM pCacheRecord, pCol;
+   PHB_ITEM pCacheRecord;
 
    pCacheRecord = (PHB_ITEM) hb_arrayGetItemPtr(thiswa->aCache, lPos);
 
-   pCol = hb_itemNew(nullptr);
+   auto pCol = hb_itemNew(nullptr);
 
    for( nPos = 1, nLen = hb_arrayLen(pCacheRecord); nPos <= nLen; nPos++ ) {
       hb_arrayGet(pCacheRecord, nPos, pCol);
@@ -330,9 +330,8 @@ void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
 static void sqlGetCleanBuffer(SQLAREAP thiswa)
 {
    HB_SIZE nPos, nLen;
-   PHB_ITEM pCol;
 
-   pCol = hb_itemNew(nullptr);
+   auto pCol = hb_itemNew(nullptr);
    for( nPos = 1, nLen = hb_arrayLen(thiswa->aEmptyBuff); nPos <= nLen; nPos++ ) {
       hb_arrayGet(thiswa->aEmptyBuff, nPos, pCol);
       hb_arraySet(thiswa->aOldBuffer, nPos, pCol);
@@ -414,9 +413,8 @@ static HB_ERRCODE sqlFound(SQLAREAP thiswa, HB_BOOL * found)
 static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
 {
    HB_LONG leof;
-   PHB_ITEM eofat;
 
-   eofat = hb_itemNew(nullptr);
+   auto eofat = hb_itemNew(nullptr);
 
    //TraceLog(nullptr, "sqlGoBottom\n");
 
@@ -1165,7 +1163,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
        pField = thiswa->area.lpFields + fieldNum - 1;
 
       if( pField->uiType == HB_FT_MEMO ) {
-         PHB_ITEM pLangItem = hb_itemNew(nullptr);
+         auto pLangItem = hb_itemNew(nullptr);
          if(    hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &nPos)
              || hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &nPos)
              || hb_hashScan(itemTemp, sr_getRootLang(pLangItem), &nPos) ) {
@@ -1175,7 +1173,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
          }
          hb_itemRelease(pLangItem);
       } else {
-         PHB_ITEM pLangItem = hb_itemNew(nullptr);
+         auto pLangItem = hb_itemNew(nullptr);
          HB_SIZE nLen = pField->uiLen, nSrcLen;
          auto empty = static_cast<char*>(hb_xgrab(nLen + 1));
 
@@ -1342,7 +1340,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
 
       hb_arraySet(thiswa->aBuffer, fieldindex, value);
    } else if(HB_IS_STRING(value) && HB_IS_HASH(pDest) && sr_isMultilang() ) {
-      PHB_ITEM pLangItem = hb_itemNew(nullptr);
+      auto pLangItem = hb_itemNew(nullptr);
       hb_hashAdd(pDest, sr_getBaseLang(pLangItem), value);
       hb_itemRelease(pLangItem);
    } else if( pField->uiType == HB_FT_MEMO ) { // Memo fields can hold ANY datatype
@@ -1550,9 +1548,9 @@ static HB_ERRCODE sqlClose(SQLAREAP thiswa)
 
 static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo)
 {
-   PHB_ITEM pTable = hb_itemNew(nullptr);
-   PHB_ITEM pAlias = hb_itemNew(nullptr);
-   PHB_ITEM pArea = hb_itemNew(nullptr);
+   auto pTable = hb_itemNew(nullptr);
+   auto pAlias = hb_itemNew(nullptr);
+   auto pArea = hb_itemNew(nullptr);
    HB_ERRCODE errCode;
 
    //TraceLog(nullptr, "sqlCreate(%p, %p)", thiswa, pCreateInfo);
@@ -1885,12 +1883,12 @@ static HB_ERRCODE sqlNewArea(SQLAREAP thiswa)
 
 static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo)
 {
-   PHB_ITEM pConnection = hb_itemNew(nullptr);
-   PHB_ITEM pTable = hb_itemNew(nullptr);
-   PHB_ITEM pArea = hb_itemNew(nullptr);
-   PHB_ITEM pAlias = hb_itemNew(nullptr);
-   PHB_ITEM pShared = hb_itemNew(nullptr);
-   PHB_ITEM pReadOnly = hb_itemNew(nullptr);
+   auto pConnection = hb_itemNew(nullptr);
+   auto pTable = hb_itemNew(nullptr);
+   auto pArea = hb_itemNew(nullptr);
+   auto pAlias = hb_itemNew(nullptr);
+   auto pShared = hb_itemNew(nullptr);
+   auto pReadOnly = hb_itemNew(nullptr);
    HB_ERRCODE errCode;
 
    char szAlias[HB_RDD_MAX_ALIAS_LEN + 1];
@@ -2234,7 +2232,7 @@ static HB_ERRCODE sqlOrderListFocus(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
    }
 
    if( pOrderInfo->itmOrder ) {
-      PHB_ITEM pBagName = hb_itemNew(pOrderInfo->atomBagName);
+      auto pBagName = hb_itemNew(pOrderInfo->atomBagName);
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTFOCUS, 2, pOrderInfo->itmOrder, pBagName);
       hb_itemRelease(pBagName);
       thiswa->hOrdCurrent = hb_itemGetNL(hb_stackReturnItem());
@@ -2253,16 +2251,13 @@ static HB_ERRCODE sqlOrderListFocus(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
 
 HB_ERRCODE sqlOrderCondition(SQLAREAP thiswa, LPDBORDERCONDINFO lpdbOrdCondInfo)
 {
-   PHB_ITEM pItemFor, pItemWhile, pItemStart, pItemNext, pItemRecno,
-            pItemRest, pItemDesc;
-
-   pItemFor = hb_itemNew(nullptr);
-   pItemWhile = hb_itemNew(nullptr);
-   pItemStart = hb_itemNew(nullptr);
-   pItemNext = hb_itemNew(nullptr);
-   pItemRecno = hb_itemNew(nullptr);
-   pItemRest = hb_itemNew(nullptr);
-   pItemDesc = hb_itemNew(nullptr);
+   auto pItemFor = hb_itemNew(nullptr);
+   auto pItemWhile = hb_itemNew(nullptr);
+   auto pItemStart = hb_itemNew(nullptr);
+   auto pItemNext = hb_itemNew(nullptr);
+   auto pItemRecno = hb_itemNew(nullptr);
+   auto pItemRest = hb_itemNew(nullptr);
+   auto pItemDesc = hb_itemNew(nullptr);
 
    if( lpdbOrdCondInfo ) {
       if( lpdbOrdCondInfo->abFor ) {
@@ -2357,7 +2352,7 @@ static HB_ERRCODE sqlOrderDestroy(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
    }
 
    if( pOrderInfo->itmOrder ) {
-      PHB_ITEM pBagName = hb_itemNew(pOrderInfo->atomBagName);
+      auto pBagName = hb_itemNew(pOrderInfo->atomBagName);
 
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERDESTROY, 2, pOrderInfo->itmOrder, pBagName);
       hb_itemRelease(pBagName);
@@ -2399,7 +2394,7 @@ static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
 
 PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
 {
-   PHB_ITEM pOrder = hb_itemNew(nullptr);
+   auto pOrder = hb_itemNew(nullptr);
    PHB_ITEM pTag = nullptr;
 
 //   Order.type = HB_IT_NIL;
@@ -2447,10 +2442,9 @@ PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
 static HB_ERRCODE sqlSetServerSideIndexScope(SQLAREAP thiswa, int nScope, PHB_ITEM scopeValue)
 {
    PHB_ITEM scopetype;
-   PHB_ITEM scopeval;
    int res;
 
-   scopeval = hb_itemNew(scopeValue);
+   auto scopeval = hb_itemNew(scopeValue);
    scopetype = hb_itemPutNI(nullptr, nScope);
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLSETSCOPE, 2, scopetype, scopeval);
    res = hb_itemGetNI(hb_stackReturnItem());
@@ -2780,7 +2774,7 @@ static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem
 
    if( lIndexes ) { /* Exists opened orders ? */
       if( HB_IS_OBJECT(thiswa->oWorkArea) ) {
-         PHB_ITEM pOrder = hb_itemNew(nullptr);
+         auto pOrder = hb_itemNew(nullptr);
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTNUM, 1, pOrder);
          hb_itemRelease(pOrder);
       } else {
@@ -2803,7 +2797,6 @@ static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem
 
 static HB_ERRCODE sqlSetFilter(SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo)
 {
-   PHB_ITEM filtertext;
    HB_ERRCODE res;
 
    if( thiswa->lpdbPendingRel ) {
@@ -2816,7 +2809,7 @@ static HB_ERRCODE sqlSetFilter(SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo)
 
    SUPER_CLEARFILTER(&thiswa->area);
 
-   filtertext = hb_itemNew(pFilterInfo->abFilterText);
+   auto filtertext = hb_itemNew(pFilterInfo->abFilterText);
 
    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLSETFILTER, 1, filtertext);
    hb_itemRelease(filtertext);
@@ -2839,13 +2832,12 @@ static HB_ERRCODE sqlSetFilter(SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo)
 static HB_ERRCODE sqlSetScope(SQLAREAP thiswa, LPDBORDSCOPEINFO sInfo)
 {
    PHB_ITEM scopetype;
-   PHB_ITEM scopeval;
    int res;
 
    //TraceLog(nullptr, "sqlSetScope\n");
 
    scopetype = hb_itemPutNI(nullptr, sInfo->nScope);
-   scopeval = hb_itemNew(sInfo->scopeValue);
+   auto scopeval = hb_itemNew(sInfo->scopeValue);
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( HB_IS_STRING(scopeval) ) {

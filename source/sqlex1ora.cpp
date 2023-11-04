@@ -163,9 +163,8 @@ static HB_ERRCODE ConcludeSkipraw(SQLEXORAAREAP thiswa)
 static void sqlGetCleanBufferOra(SQLEXORAAREAP thiswa)
 {
    HB_SIZE nPos, nLen;
-   PHB_ITEM pCol;
 
-   pCol = hb_itemNew(nullptr);
+   auto pCol = hb_itemNew(nullptr);
    for( nPos = 1, nLen = hb_arrayLen(thiswa->sqlarea.aEmptyBuff); nPos <= nLen; nPos++ ) {
       hb_arrayGet(thiswa->sqlarea.aEmptyBuff, nPos, pCol);
       hb_arraySet(thiswa->sqlarea.aOldBuffer, nPos, pCol);
@@ -1818,7 +1817,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
    bool bTranslate;
    HB_ISIZ i, iRow;
    HB_SIZE iIndex, iEnd;
-   PHB_ITEM aRecord, pKey;
+   PHB_ITEM aRecord;
    PHB_ITEM temp;
    OCI_Resultset * rs;
    char * szEnd;
@@ -1830,7 +1829,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
 
    // First, try to look for record in current buffer pool
 
-   pKey = hb_itemNew(nullptr);
+   auto pKey = hb_itemNew(nullptr);
    hb_itemPutNLL(pKey, thiswa->recordList[thiswa->recordListPos]);
 
    if( !bUpdateDeleted ) { // Cache NEVER holds deleted() information
@@ -2590,7 +2589,7 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
       int iComp;
       // HB_ITEM temp;
 
-      PHB_ITEM aRecord = hb_itemNew(nullptr);
+      auto aRecord = hb_itemNew(nullptr);
 
       hb_arrayNew(aRecord, hb_arrayLen(thiswa->sqlarea.aBuffer));
 
@@ -3089,7 +3088,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
       LPFIELD pField = thiswa->sqlarea.area.lpFields + fieldNum - 1;
 
       if( pField->uiType == HB_FT_MEMO ) {
-         PHB_ITEM pLangItem = hb_itemNew(nullptr);
+         auto pLangItem = hb_itemNew(nullptr);
 
          if(    hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &ulPos)
              || hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -3101,7 +3100,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
          }
          hb_itemRelease(pLangItem);
       } else {
-         PHB_ITEM pLangItem = hb_itemNew(nullptr);
+         auto pLangItem = hb_itemNew(nullptr);
          HB_SIZE nLen = pField->uiLen, nSrcLen;
          auto empty = static_cast<char*>(hb_xgrab(nLen + 1));
 
@@ -3294,7 +3293,7 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
 
       hb_arraySet(thiswa->sqlarea.aBuffer, fieldindex, value);
    } else if(HB_IS_STRING(value) && HB_IS_HASH(pDest) && sr_isMultilang() ) {
-      PHB_ITEM pLangItem = hb_itemNew(nullptr);
+      auto pLangItem = hb_itemNew(nullptr);
       hb_hashAdd(pDest, sr_getBaseLang(pLangItem), value);
       hb_itemRelease(pLangItem);
    } else if( pField->uiType == HB_FT_MEMO ) { // Memo fields can hold ANY datatype
@@ -4460,7 +4459,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOn
                hb_itemMove(pTemp, hb_stackReturnItem());
 
                if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
-                  PHB_ITEM pLangItem = hb_itemNew(nullptr);
+                  auto pLangItem = hb_itemNew(nullptr);
                   HB_ULONG ulPos;
                   if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
                       || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)
