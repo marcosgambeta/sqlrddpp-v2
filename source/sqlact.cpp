@@ -138,9 +138,7 @@ int SqlParse(sql_stmt * stmt, const char * query, int queryLen)
 
 PHB_ITEM SQLpCodeGenInt(int code)
 {
-   PHB_ITEM pArray;
-
-   pArray = hb_itemArrayNew(1);
+   auto pArray = hb_itemArrayNew(1);
    hb_itemPutNILen(hb_arrayGetItemPtr(pArray, 1), code, 6);
 
    return pArray;
@@ -148,9 +146,7 @@ PHB_ITEM SQLpCodeGenInt(int code)
 
 PHB_ITEM SQLpCodeGenIntItem(int code, PHB_ITEM value)
 {
-   PHB_ITEM pArray;
-
-   pArray = hb_itemArrayNew(2);
+   auto pArray = hb_itemArrayNew(2);
    hb_itemPutNILen(hb_arrayGetItemPtr(pArray, 1), code, 6);
    hb_arraySetForward(pArray, 2, value);
    hb_itemRelease(value);
@@ -160,9 +156,7 @@ PHB_ITEM SQLpCodeGenIntItem(int code, PHB_ITEM value)
 
 PHB_ITEM SQLpCodeGenItemInt(PHB_ITEM value, int code)
 {
-   PHB_ITEM pArray;
-
-   pArray = hb_itemArrayNew(2);
+   auto pArray = hb_itemArrayNew(2);
    hb_arraySetForward(pArray, 1, value);
    hb_itemPutNILen(hb_arrayGetItemPtr(pArray, 2), code, 6);
    // TOCHECK: hb_itemRelease(value);
@@ -172,9 +166,7 @@ PHB_ITEM SQLpCodeGenItemInt(PHB_ITEM value, int code)
 
 PHB_ITEM SQLpCodeGenIntItem2(int code, PHB_ITEM value, int code2, PHB_ITEM value2)
 {
-   PHB_ITEM pArray;
-
-   pArray = hb_itemArrayNew(4);
+   auto pArray = hb_itemArrayNew(4);
 
    hb_itemPutNILen(hb_arrayGetItemPtr(pArray, 1), code, 6);
    hb_arraySetForward(pArray, 2, value);
