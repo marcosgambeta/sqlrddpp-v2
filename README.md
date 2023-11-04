@@ -1,9 +1,10 @@
 # SQLRDD++ v2
 
-SQLRDD++ for Harbour++/Harbour
+SQLRDD++ for Harbour++
 
 ## Requisites
 
+Harbour++
 C++ compiler  
 C++11 or upper  
 
