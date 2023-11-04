@@ -70,8 +70,8 @@ HB_FUNC( SR_SQLPARSE )     /* SqlParse(cCommand, @nError, @nErrorPos) */
    HB_SIZE uLenPhrase = hb_parclen(1);
 
    if( uLenPhrase ) {
-      // sql_stmt * stmt = static_cast<sql_stmt*>(hb_xgrab(sizeof(sql_stmt)));
-      sql_stmt * stmt = (sql_stmt *) hb_xgrabz(sizeof(sql_stmt));
+      // auto stmt = static_cast<sql_stmt*>(hb_xgrab(sizeof(sql_stmt)));
+      auto stmt = (sql_stmt *) hb_xgrabz(sizeof(sql_stmt));
 
       const char * sqlPhrase;
       const char * sqlIniPos;
@@ -253,7 +253,6 @@ PHB_ITEM SQLpCodeGenIntArray(int code, PHB_ITEM pArray)
 
 HB_FUNC( SR_STRTOHEX )
 {
-   char *outbuff;
    const char *cStr;
    char *c;
    HB_USHORT iNum;
@@ -267,7 +266,7 @@ HB_FUNC( SR_STRTOHEX )
 
    cStr = hb_parc(1);
    len = static_cast<int>(hb_parclen(1));
-   outbuff = static_cast<char*>(hb_xgrab((len * 2) + 1));
+   auto outbuff = static_cast<char*>(hb_xgrab((len * 2) + 1));
    c = outbuff;
 
    for( i = 0; i < len; i++ ) {
@@ -302,13 +301,12 @@ HB_FUNC( SR_STRTOHEX )
 
 char * sr_Hex2Str(const char * cStr, int len, int * lenOut)
 {
-   char *outbuff;
    char c;
    int i, nalloc;
    int iCipher, iNum;
 
    nalloc = static_cast<int>(len / 2);
-   outbuff = static_cast<char*>(hb_xgrab(nalloc + 1));
+   auto outbuff = static_cast<char*>(hb_xgrab(nalloc + 1));
 
    for( i = 0; i < nalloc; i++ ) {
       // First byte
@@ -576,9 +574,7 @@ HB_FUNC( SR_ESCAPESTRING )
 
 char * QuoteTrimEscapeString(const char * FromBuffer, HB_SIZE iSize, int idatabase, HB_BOOL bRTrim, HB_SIZE * iSizeOut)
 {
-   char * ToBuffer;
-
-   ToBuffer = static_cast<char*>(hb_xgrab((iSize * 2) + 3));
+   auto ToBuffer = static_cast<char*>(hb_xgrab((iSize * 2) + 3));
 
    ToBuffer[0] = '\'';
    ToBuffer++;
@@ -632,7 +628,6 @@ char * QuoteTrimEscapeString(const char * FromBuffer, HB_SIZE iSize, int idataba
 HB_FUNC( SR_ESCAPENUM )
 {
    const char * FromBuffer;
-   char * ToBuffer;
    char SciNot[5] = {'\0', '\0', '\0', '\0', '\0'};
    HB_SIZE iSize, iPos;
    int iDecPos;
@@ -648,7 +643,7 @@ HB_FUNC( SR_ESCAPENUM )
       return;
    }
 
-   ToBuffer = static_cast<char*>(hb_xgrab((iSize) + 33));
+   auto ToBuffer = static_cast<char*>(hb_xgrab((iSize) + 33));
    memset(ToBuffer, 0, (iSize) + 33);
 
    len = hb_parnl(2);
@@ -746,7 +741,6 @@ HB_FUNC( SR_ESCAPENUM )
 
 PHB_ITEM sr_escapeNumber(char * FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pRet)
 {
-   char * ToBuffer;
    char SciNot[5] = {'\0', '\0', '\0', '\0', '\0'};
    HB_SIZE iSize, iPos;
    int iDecPos;
@@ -754,7 +748,7 @@ PHB_ITEM sr_escapeNumber(char * FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM p
    double dMultpl;
 
    iSize = strlen(FromBuffer);
-   ToBuffer = static_cast<char*>(hb_xgrab((iSize) + 33));
+   auto ToBuffer = static_cast<char*>(hb_xgrab((iSize) + 33));
    memset(ToBuffer, 0, (iSize) + 33);
 
    if( dec > 0 ) {
@@ -854,13 +848,12 @@ HB_FUNC( SR_DBQUALIFY )
    int ulDb = hb_parni(2);
 
    if( pText ) {
-      char * szOut;
       const char * pszBuffer;
       HB_SIZE ulLen, i;
 
       pszBuffer = hb_itemGetCPtr(pText);
       ulLen = hb_itemGetCLen(pText);
-      szOut = static_cast<char*>(hb_xgrab(ulLen + 3));
+      auto szOut = static_cast<char*>(hb_xgrab(ulLen + 3));
 
       // Firebird, DB2, ADABAS and Oracle must be uppercase
       // Postgres, MySQL and Ingres must be lowercase

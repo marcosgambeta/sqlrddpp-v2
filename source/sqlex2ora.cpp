@@ -207,7 +207,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
    int iCols, i;
    PHB_ITEM pFieldStruct, pFieldLen, pFieldDec;
    HB_LONG lFieldPosWA, lType;
-   char * colName, * sFields, * sParams, * temp, * temp1;
+   char * colName, * temp, * temp1;
    char ident[200] = {0};
    char declare[200] = {0};
    char cType;
@@ -222,8 +222,8 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
    }
 
    InsertRecord = thiswa->InsertRecord;
-   sFields = static_cast<char*>(hb_xgrabz(FIELD_LIST_SIZE * sizeof(char)));
-   sParams = static_cast<char*>(hb_xgrabz((FIELD_LIST_SIZE * 2) * sizeof(char)));
+   auto sFields = static_cast<char*>(hb_xgrabz(FIELD_LIST_SIZE * sizeof(char)));
+   auto sParams = static_cast<char*>(hb_xgrabz((FIELD_LIST_SIZE * 2) * sizeof(char)));
 
    sFields[0] = '\0';
 

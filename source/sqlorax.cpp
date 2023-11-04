@@ -113,7 +113,7 @@ static HB_USHORT OCI_initilized = 0;
 
 HB_FUNC( SQLO_CONNECT )
 {
-   POCI_SESSION session = static_cast<POCI_SESSION>(hb_xgrab(sizeof(OCI_SESSION)));
+   auto session = static_cast<POCI_SESSION>(hb_xgrab(sizeof(OCI_SESSION)));
 
    if( !OCI_initilized ) {
 #if defined(ENABLE_PTHREADS) && defined(HAVE_PTHREAD_H)
@@ -482,7 +482,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
    if( lLenBuff <= 0 ) { // database content is NULL
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemset(szResult, ' ', lLen);
             szResult[lLen] = '\0';            
             hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -526,7 +526,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
       switch( lType ) {
          case SQL_CHAR: {
             HB_SIZE lPos;
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
 
             for( lPos = lLenBuff; lPos < lLen; lPos++ ) {

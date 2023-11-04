@@ -84,7 +84,7 @@ static void myNoticeProcessor(void * arg, const char * message)
 
 HB_FUNC( PGSCONNECT ) /* PGSConnect(ConnectionString) => ConnHandle */
 {
-   // PPSQL_SESSION session = static_cast<PPSQL_SESSION>(hb_xgrab(sizeof(PSQL_SESSION)));
+   // auto session = static_cast<PPSQL_SESSION>(hb_xgrab(sizeof(PSQL_SESSION)));
    auto session = static_cast<PPSQL_SESSION>(hb_xgrabz(sizeof(PSQL_SESSION)));
    const char * szConn = hb_parc(1);
 
@@ -639,7 +639,7 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
    if( lLenBuff <= 0 ) { // database content is NULL
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemset(szResult, ' ', lLen);
             szResult[lLen] = '\0';
             hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -685,7 +685,7 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
    } else {
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
 
             for( HB_SIZE lPos = lLenBuff; lPos < lLen; lPos++ ) {

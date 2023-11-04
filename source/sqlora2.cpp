@@ -141,8 +141,8 @@ void err_handler(OCI_Error *err)
 
 HB_FUNC( SQLO2_CONNECT )
 {
-   // POCI_ORASESSION session = static_cast<POCI_ORASESSION>(hb_xgrab(sizeof(OCI_ORASESSION)));
-   POCI_ORASESSION session = (POCI_ORASESSION)hb_xgrabz(sizeof(OCI_ORASESSION));
+   // auto session = static_cast<POCI_ORASESSION>(hb_xgrab(sizeof(OCI_ORASESSION)));
+   auto session = (POCI_ORASESSION)hb_xgrabz(sizeof(OCI_ORASESSION));
 //    int lPool = 0; //  HB_ISLOG(5) ? hb_parl(5) : 0;
 //    char sPool[30] = {0};
 
@@ -670,7 +670,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
    if( OCI_IsNull(rs, iField) ) {
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemset(szResult, ' ', lLen);
             szResult[lLen] = '\0';
             hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -719,7 +719,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
    } else {
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             memset(szResult,' ', lLen);
             uiLen = OCI_GetDataLength(rs,iField);
             hb_xmemcpy(szResult, static_cast<char*>(OCI_GetString(rs, iField)), uiLen);

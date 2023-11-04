@@ -117,7 +117,7 @@ static void fb_log_status(PFB_SESSION session, const char * from)
 {
    const ISC_STATUS * pVect = session->status;
    HB_SCHAR s[1024] = {0};
-   //char * temp = static_cast<char*>(hb_xgrab(8192));
+   //auto temp = static_cast<char*>(hb_xgrab(8192));
    if( session->msgerror ) {
       hb_xfree(session->msgerror);
    }
@@ -154,7 +154,7 @@ HB_FUNC( FBCONNECT ) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv)
    char dpb[256];
    int  i, len;
 
-   // PFB_SESSION session = static_cast<PFB_SESSION>(hb_xgrab(sizeof(FB_SESSION)));
+   // auto session = static_cast<PFB_SESSION>(hb_xgrab(sizeof(FB_SESSION)));
    // memset(session, 0, sizeof(FB_SESSION));
    auto session = static_cast<PFB_SESSION>(hb_xgrabz(sizeof(FB_SESSION)));
    session->db = 0;
@@ -909,7 +909,7 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
    if( lLenBuff <= 0 ) {   // database content is NULL
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemset(szResult, ' ', lLen);
             szResult[lLen] = '\0';
             hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -961,7 +961,7 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
       switch( lType ) {
          case SQL_CHAR: {
             HB_SIZE lPos;
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
 
             for( lPos = lLenBuff; lPos < lLen; lPos++ ) {

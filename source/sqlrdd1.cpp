@@ -1177,7 +1177,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
       } else {
          PHB_ITEM pLangItem = hb_itemNew(nullptr);
          HB_SIZE nLen = pField->uiLen, nSrcLen;
-         char * empty = static_cast<char*>(hb_xgrab(nLen + 1));
+         auto empty = static_cast<char*>(hb_xgrab(nLen + 1));
 
          if(    hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &nPos)
              || hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &nPos)

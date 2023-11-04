@@ -1679,7 +1679,6 @@ HB_BOOL getColumnListOra(SQLEXORAAREAP thiswa)
 {
    HB_USHORT n, uiFlds;
    LPFIELD pField;
-   char * colName;
    char * fName, * temp;
    int len;
 
@@ -1706,7 +1705,7 @@ HB_BOOL getColumnListOra(SQLEXORAAREAP thiswa)
       THIS IS STILL NOT IMPLEMENTED
    */
 
-   colName = static_cast<char*>(hb_xgrabz(HB_SYMBOL_NAME_LEN + 1));
+   auto colName = static_cast<char*>(hb_xgrabz(HB_SYMBOL_NAME_LEN + 1));
 
    if( thiswa->sqlarea.iFieldListStatus == FIELD_LIST_LEARNING ) {
       if( !thiswa->sFields ) {
@@ -3104,7 +3103,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
       } else {
          PHB_ITEM pLangItem = hb_itemNew(nullptr);
          HB_SIZE nLen = pField->uiLen, nSrcLen;
-         char * empty = static_cast<char*>(hb_xgrab(nLen + 1));
+         auto empty = static_cast<char*>(hb_xgrab(nLen + 1));
 
          if(    hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &ulPos)
              || hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &ulPos)
@@ -4511,7 +4510,7 @@ void OraErrorDiagRTE(OCI_Statement * hStmt, char * routine, char * szSql, int re
    PHB_ITEM pArg;
    PHB_ITEM pError = hb_errNew();
 
-   char * ErrMsg = static_cast<char*>(hb_xgrabz(1024 * 2));
+   auto ErrMsg = static_cast<char*>(hb_xgrabz(1024 * 2));
    OCI_Error * err = OCI_GetLastError();
 
    if( sr_isShutdownProcess() ) {

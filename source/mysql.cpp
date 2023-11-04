@@ -94,7 +94,7 @@ using PMYSQL_SESSION = MYSQL_SESSION *;
 
 HB_FUNC( MYSCONNECT )
 {
-   // PMYSQL_SESSION session = static_cast<PMYSQL_SESSION>(hb_xgrab(sizeof(MYSQL_SESSION)));
+   // auto session = static_cast<PMYSQL_SESSION>(hb_xgrab(sizeof(MYSQL_SESSION)));
    auto session = static_cast<PMYSQL_SESSION>(hb_xgrabz(sizeof(MYSQL_SESSION)));
    auto szHost = hb_parc(1);
    auto szUser = hb_parc(2);
@@ -227,7 +227,7 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
    if( lLenBuff <= 0 ) { // database content is NULL
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemset(szResult, ' ', lLen);
             szResult[lLen] = '\0';
             hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -274,7 +274,7 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
    } else {
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = static_cast<char*>(hb_xgrab(lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             memset(szResult, ' ', lLen);
             hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
 
