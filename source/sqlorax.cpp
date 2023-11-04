@@ -207,7 +207,7 @@ HB_FUNC( SQLO_GETERRORCODE )
 HB_FUNC( SQLO_EXECDIRECT )
 {
    POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   const char * stm = hb_parcx(2);
+   auto stm = hb_parcx(2);
 
    if( session ) {
       while( SQLO_STILL_EXECUTING == (session->status = sqlo_exec(session->dbh, stm,&session->uRows)) ) {
@@ -700,9 +700,9 @@ HB_FUNC( SQLO_LINEPROCESSED )
 HB_FUNC( ORACLEWRITEMEMO )
 {
    POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   const char * sTable = hb_parc(2);
+   auto sTable = hb_parc(2);
    HB_ULONG ulRecno = hb_parnl(3);
-   const char * sRecnoName = hb_parcx(4);
+   auto sRecnoName = hb_parcx(4);
    sqlo_lob_desc_t loblp;
    sqlo_stmt_handle_t sth;
    int status;
@@ -992,7 +992,7 @@ usage ORACLEPREPARE(nOracleHandle,cSql) -> nPreparedHandle)
 HB_FUNC(ORACLEPREPARE)
 {
    POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   const char * szSql = hb_parc(2);
+   auto szSql = hb_parc(2);
    bool lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
 
    if( session ) {
@@ -1034,8 +1034,8 @@ HB_FUNC( ORACLE_PROCCURSOR )
 
   int ret = SQL_ERROR;
    
-  const char * stmt = hb_parc(2);
-  const char * parc = hb_parc(3);
+  auto stmt = hb_parc(2);
+  auto parc = hb_parc(3);
   
   if( session ) {
    /* parse the statement */
@@ -1157,8 +1157,8 @@ HB_FUNC( ORACLE_BINDCURSOR )
 
   int ret = SQL_ERROR;
    
-  const char * stmt = hb_parc(2);
-  const char * parc = hb_parc(3);
+  auto stmt = hb_parc(2);
+  auto parc = hb_parc(3);
   
   if( session ) {
    /* parse the statement */

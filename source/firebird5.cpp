@@ -175,10 +175,6 @@ static void fb_log_status5(PFB_SESSION session, const char * from)
 HB_FUNC( FBCONNECT5 ) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv)
 {
    XSQLVAR * var;
-   const char * db_connect;
-   const char * user;
-   const char * passwd;
-   const char * charset;
    char dpb[256];
    int i, len;
 
@@ -198,10 +194,10 @@ HB_FUNC( FBCONNECT5 ) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv
       var->sqldata = nullptr;
    }
 
-   db_connect = hb_parcx(1);
-   user = hb_parcx(2);
-   passwd = hb_parcx(3);
-   charset = hb_parc(4);
+   auto db_connect = hb_parcx(1);
+   auto user = hb_parcx(2);
+   auto passwd = hb_parcx(3);
+   auto charset = hb_parc(4);
 
    i = 0;
    dpb[i++] = isc_dpb_version1;
@@ -370,7 +366,7 @@ HB_FUNC( FBROLLBACKTRANSACTION5 ) // FBRollBackTransaction(hEnv)
 HB_FUNC( FBEXECUTE5 ) // FBExecute(hEnv, cCmd, nDialect)
 {
    PFB_SESSION session = (PFB_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   const char * command = hb_parcx(2);
+   auto command = hb_parcx(2);
    int i, dtype;
    XSQLVAR * var;
 
@@ -497,7 +493,7 @@ HB_FUNC( FBEXECUTE5 ) // FBExecute(hEnv, cCmd, nDialect)
 HB_FUNC( FBEXECUTEIMMEDIATE5 ) // FBExecuteImmediate(hEnv, cCmd, nDialect)
 {
    PFB_SESSION session = (PFB_SESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   const char * command = hb_parcx(2);
+   auto command = hb_parcx(2);
    //ISC_STATUS r;
 
    if( !session->transac ) {
@@ -891,18 +887,14 @@ HB_FUNC( FBCREATEDB5 )
    isc_tr_handle trans = 0;
    long status[20];
    char create_db[1024];
-   const char * db_name;
-   const char * username;
-   const char * passwd;
-   const char * charset;
    int page;
    int dialect;
 
-   db_name = hb_parcx(1);
-   username = hb_parcx(2);
-   passwd = hb_parcx(3);
+   auto db_name = hb_parcx(1);
+   auto username = hb_parcx(2);
+   auto passwd = hb_parcx(3);
    page = hb_parni(4);
-   charset = hb_parc(5);
+   auto charset = hb_parc(5);
    dialect = hb_parni(6);
 
    if( !dialect ) {

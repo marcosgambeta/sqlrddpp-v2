@@ -86,7 +86,7 @@ HB_FUNC( PGSCONNECT ) /* PGSConnect(ConnectionString) => ConnHandle */
 {
    // auto session = static_cast<PPSQL_SESSION>(hb_xgrab(sizeof(PSQL_SESSION)));
    auto session = static_cast<PPSQL_SESSION>(hb_xgrabz(sizeof(PSQL_SESSION)));
-   const char * szConn = hb_parc(1);
+   auto szConn = hb_parc(1);
 
 //    memset(session, 0, sizeof(PSQL_SESSION));
    session->iAffectedRows = 0;

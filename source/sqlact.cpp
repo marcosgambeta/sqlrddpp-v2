@@ -249,7 +249,6 @@ PHB_ITEM SQLpCodeGenIntArray(int code, PHB_ITEM pArray)
 
 HB_FUNC( SR_STRTOHEX )
 {
-   const char *cStr;
    char *c;
    HB_USHORT iNum;
    int i, len;
@@ -260,7 +259,7 @@ HB_FUNC( SR_STRTOHEX )
       return;
    }
 
-   cStr = hb_parc(1);
+   auto cStr = hb_parc(1);
    len = static_cast<int>(hb_parclen(1));
    auto outbuff = static_cast<char*>(hb_xgrab((len * 2) + 1));
    c = outbuff;
@@ -623,7 +622,6 @@ char * QuoteTrimEscapeString(const char * FromBuffer, HB_SIZE iSize, int idataba
 
 HB_FUNC( SR_ESCAPENUM )
 {
-   const char * FromBuffer;
    char SciNot[5] = {'\0', '\0', '\0', '\0', '\0'};
    HB_SIZE iSize, iPos;
    int iDecPos;
@@ -632,7 +630,7 @@ HB_FUNC( SR_ESCAPENUM )
    double dMultpl;
 
    iSize = hb_parclen(1);
-   FromBuffer = hb_parc(1);
+   auto FromBuffer = hb_parc(1);
 
    if( !(HB_ISCHAR(1) && HB_ISNUM(2) && HB_ISNUM(3)) ) {
       hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPENUM", 3, hb_param(1, HB_IT_ANY), hb_param(2, HB_IT_ANY), hb_param(3,HB_IT_ANY));

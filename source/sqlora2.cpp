@@ -304,7 +304,7 @@ HB_FUNC( SQLO2_ROLLBACK )
 HB_FUNC( SQLO2_EXECDIRECT )
 {
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   const char * stm = hb_parcx(2);
+   auto stm = hb_parcx(2);
 
    if( session ) {
       session->stmt = OCI_StatementCreate(session->cn);
@@ -578,7 +578,7 @@ HB_FUNC(ORACLEEXECDIR2)
 HB_FUNC(ORACLEPREPARE2)
 {
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   const char * szSql = hb_parc(2);
+   auto szSql = hb_parc(2);
    bool lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
    int ret = -1;
 
@@ -1066,9 +1066,9 @@ HB_FUNC( SQLO2_CLOSESTMT )
 HB_FUNC( ORACLEWRITEMEMO2 )
 {
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-   const char * sTable = hb_parc(2);
+   auto sTable = hb_parc(2);
    HB_ULONG ulRecno = hb_parnl(3);
-   const char * sRecnoName = hb_parcx(4);
+   auto sRecnoName = hb_parcx(4);
    //SQLO2_lob_desc_t loblp;
    //SQLO2_stmt_handle_t sth;
    OCI_Lob *lob1;
@@ -1140,8 +1140,8 @@ HB_FUNC( ORACLE_PROCCURSOR2 )
 
   int ret = SQL_ERROR;
 
-  const char * stmt = hb_parc(2);
-  const char * parc = hb_parc(3);
+  auto stmt = hb_parc(2);
+  auto parc = hb_parc(3);
 
   if( session ) {
    /* parse the statement */
