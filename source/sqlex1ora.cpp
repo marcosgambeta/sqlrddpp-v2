@@ -3087,7 +3087,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
    } else if( HB_IS_HASH(itemTemp) && sr_isMultilang() ) {
       LPFIELD pField = thiswa->sqlarea.area.lpFields + fieldNum - 1;
 
-      if( pField->uiType == HB_FT_MEMO ) {
+      if( pField->uiType == Harbour::DB::Field::MEMO ) {
          auto pLangItem = hb_itemNew(nullptr);
 
          if(    hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &ulPos)
@@ -3114,7 +3114,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
                memset(empty + nSrcLen, ' ', nLen - nSrcLen);
             }
 #ifndef HB_CDP_SUPPORT_OFF
-            if( pField->uiType == HB_FT_STRING  ) {
+            if( pField->uiType == Harbour::DB::Field::STRING  ) {
                PHB_CODEPAGE cdpDest = thiswa->sqlarea.cdPageCnv ? thiswa->sqlarea.cdPageCnv : hb_vmCDP();
                if( thiswa->sqlarea.area.cdPage && thiswa->sqlarea.area.cdPage != cdpDest ) {
                   char * pszVal = hb_cdpnDup(empty, &nLen, thiswa->sqlarea.area.cdPage, cdpDest);
@@ -3264,7 +3264,7 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
        || (HB_IS_DATE(pDest) && HB_IS_DATE(value))
        || (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value)) ) {
 
-      if( pField->uiType == HB_FT_STRING ) {
+      if( pField->uiType == Harbour::DB::Field::STRING ) {
          HB_SIZE nSize = hb_itemGetCLen(value), nLen = pField->uiLen;
 
          cfield = static_cast<char*>(hb_xgrabz(nLen + 1));
@@ -3281,7 +3281,7 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
          }
          cfield[nLen] = '\0';
          hb_itemPutCLPtr(value, cfield, nLen);
-      } else if( pField->uiType == HB_FT_LONG ) {
+      } else if( pField->uiType == Harbour::DB::Field::LONG ) {
          len = pField->uiLen;
          dec = pField->uiDec;
          if( dec > 0 ) {
@@ -3296,7 +3296,7 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
       auto pLangItem = hb_itemNew(nullptr);
       hb_hashAdd(pDest, sr_getBaseLang(pLangItem), value);
       hb_itemRelease(pLangItem);
-   } else if( pField->uiType == HB_FT_MEMO ) { // Memo fields can hold ANY datatype
+   } else if( pField->uiType == Harbour::DB::Field::MEMO ) { // Memo fields can hold ANY datatype
       hb_arraySet(thiswa->sqlarea.aBuffer, fieldindex, value);
    } else {
 #ifdef SQLRDD_NWG_SPECIFIC

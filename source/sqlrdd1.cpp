@@ -1158,7 +1158,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
    } else if( HB_IS_HASH(itemTemp) && sr_isMultilang() ) {
        pField = thiswa->area.lpFields + fieldNum - 1;
 
-      if( pField->uiType == HB_FT_MEMO ) {
+      if( pField->uiType == Harbour::DB::Field::MEMO ) {
          auto pLangItem = hb_itemNew(nullptr);
          if(    hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &nPos)
              || hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &nPos)
@@ -1183,7 +1183,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
                memset(empty + nSrcLen, ' ', nLen - nSrcLen);
             }
 #ifndef HB_CDP_SUPPORT_OFF
-            if( pField->uiType == HB_FT_STRING ) {
+            if( pField->uiType == Harbour::DB::Field::STRING ) {
                PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
                if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest ) {
                   char * pszVal = hb_cdpnDup(empty, &nLen, thiswa->area.cdPage, cdpDest);
@@ -1207,7 +1207,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
       */
 #ifndef HB_CDP_SUPPORT_OFF
       LPFIELD pField_ = thiswa->area.lpFields + fieldNum - 1;
-      if( pField_->uiType == HB_FT_STRING ) {
+      if( pField_->uiType == Harbour::DB::Field::STRING ) {
          PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
          if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest ) {
             HB_SIZE nLen = hb_itemGetCLen(itemTemp);
@@ -1307,7 +1307,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
        || (HB_IS_TIMESTAMP(pDest) && HB_IS_DATETIME(value))
        || (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value)) ) {
 
-      if( pField->uiType == HB_FT_STRING ) {
+      if( pField->uiType == Harbour::DB::Field::STRING ) {
          HB_SIZE nSize = hb_itemGetCLen(value), nLen = pField->uiLen;
 
          cfield = static_cast<char*>(hb_xgrab(nLen + 1));
@@ -1324,7 +1324,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
          }
          cfield[nLen] = '\0';
          hb_itemPutCLPtr(value, cfield, nLen);
-      } else if( pField->uiType == HB_FT_LONG ) {
+      } else if( pField->uiType == Harbour::DB::Field::LONG ) {
          len = pField->uiLen;
          dec = pField->uiDec;
          if( dec > 0 ) {
@@ -1339,7 +1339,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
       auto pLangItem = hb_itemNew(nullptr);
       hb_hashAdd(pDest, sr_getBaseLang(pLangItem), value);
       hb_itemRelease(pLangItem);
-   } else if( pField->uiType == HB_FT_MEMO ) { // Memo fields can hold ANY datatype
+   } else if( pField->uiType == Harbour::DB::Field::MEMO ) { // Memo fields can hold ANY datatype
       hb_arraySet(thiswa->aBuffer, fieldindex, value);
    } else {
 #ifdef SQLRDD_NWG_SPECIFIC
@@ -3099,36 +3099,36 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
       switch ( *fieldType ) {
       case 'c':
       case 'C':
-         field.uiType = HB_FT_STRING;
+         field.uiType = Harbour::DB::Field::STRING;
          break;
       case 'm':
       case 'M':
-         field.uiType = HB_FT_MEMO;
+         field.uiType = Harbour::DB::Field::MEMO;
          break;
       case 'n':
       case 'N':
-         field.uiType = HB_FT_LONG;
+         field.uiType = Harbour::DB::Field::LONG;
          field.uiDec = (HB_USHORT) hb_arrayGetNI(thisfield, (HB_USHORT) 4);
          break;
       case 'l':
       case 'L':
-         field.uiType =HB_FT_LOGICAL;
+         field.uiType = Harbour::DB::Field::LOGICAL;
          break;
       case 'd':
       case 'D':
-         field.uiType =HB_FT_DATE;
+         field.uiType = Harbour::DB::Field::DATE;
          break;
       case 'v':
       case 'V':
-         field.uiType = HB_FT_ANY;
+         field.uiType = Harbour::DB::Field::ANY;
          break;
       // new field type
       case 't':
       case 'T':
      if( field.uiLen == 4 ) {
-         field.uiType = HB_FT_TIME;
+         field.uiType = Harbour::DB::Field::TIME;
      } else {
-         field.uiType = HB_FT_TIMESTAMP;
+         field.uiType = Harbour::DB::Field::TIMESTAMP;
     }
 
          break;
