@@ -515,7 +515,7 @@ HB_ERRCODE SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hS
       case SQL_C_CHAR: {
          int nTrim, i;
          int size = static_cast<int>(hb_itemGetCLen(pFieldData));
-         const char * pszText = hb_itemGetCPtr(pFieldData);
+         auto pszText = hb_itemGetCPtr(pFieldData);
 
          nTrim = size;
 
@@ -552,7 +552,7 @@ HB_ERRCODE SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hS
       case SQL_C_BINARY: {
          int nTrim, i;
          int size = static_cast<int>(hb_itemGetCLen(pFieldData));
-         const char * pszText = hb_itemGetCPtr(pFieldData);
+         auto pszText = hb_itemGetCPtr(pFieldData);
 
          nTrim = size;
 

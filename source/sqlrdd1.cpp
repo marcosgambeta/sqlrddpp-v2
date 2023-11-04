@@ -272,7 +272,7 @@ void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
       }
 
       if( nPos == thiswa->ulhDeleted ) {
-         const char * deleted = hb_itemGetCPtr(pCol);
+         auto deleted = hb_itemGetCPtr(pCol);
          if( * deleted == 'T' || * deleted == '*' ) {
             hb_arraySetL(thiswa->aInfo, AINFO_DELETED, true);
          } else {
@@ -307,7 +307,7 @@ void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
          hb_arraySet(thiswa->aInfo, AINFO_RECNO, pCol);
       }
       if( nPos == thiswa->ulhDeleted ) {
-         const char * deleted = hb_itemGetCPtr(pCol);
+         auto deleted = hb_itemGetCPtr(pCol);
          if( * deleted == 'T' || * deleted == '*' ) {
             hb_arraySetL(thiswa->aInfo, AINFO_DELETED, true);
          } else {
@@ -3220,11 +3220,9 @@ void commonError(AREAP thiswa, HB_USHORT uiGenCode, HB_USHORT uiSubCode, const c
 HB_FUNC( ITEMCMP ) /* ITEMCMP(cItem1, cItem2, nLenToCompare) ==> 0 == identical, < 0 if cItem1 < cIten2, > 0 == cItem1 > cIten2 */
 {
    int ret;
-   const char * val1;
-   const char * val2;
 
-   val1 = hb_itemGetCPtr(hb_param(1, Harbour::Item::ANY));
-   val2 = hb_itemGetCPtr(hb_param(2, Harbour::Item::ANY));
+   auto val1 = hb_itemGetCPtr(hb_param(1, Harbour::Item::ANY));
+   auto val2 = hb_itemGetCPtr(hb_param(2, Harbour::Item::ANY));
    ret = strncmp(val1, val2, hb_parnl(3));
 
    hb_retni(ret);
