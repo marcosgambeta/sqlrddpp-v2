@@ -53,7 +53,7 @@
 #include "sqlprototypes.h"
 
 //#undef HB_IS_OBJECT
-//#define HB_IS_OBJECT(p)  ( ( p ) && HB_IS_OF_TYPE(p, HB_IT_OBJECT) && ( p )->item.asArray.value->uiClass != 0 )
+//#define HB_IS_OBJECT(p)  ( ( p ) && HB_IS_OF_TYPE(p, Harbour::Item::OBJECT) && ( p )->item.asArray.value->uiClass != 0 )
 
 #include <ctype.h>
 #include <assert.h>
@@ -2217,7 +2217,7 @@ static HB_ERRCODE sqlOrderListFocus(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
 
    //TraceLog(nullptr, "sqlOrderListFocus\n");
 
-   //BagName.type = HB_IT_NIL;
+   //BagName.type = Harbour::Item::NIL;
    pTag = loadTagDefault(thiswa, nullptr, &lorder);
 
    if( pTag ) {
@@ -2389,7 +2389,7 @@ PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
    auto pOrder = hb_itemNew(nullptr);
    PHB_ITEM pTag = nullptr;
 
-//   Order.type = HB_IT_NIL;
+//   Order.type = Harbour::Item::NIL;
 
    if( pInfo ) {
       if( pInfo->itmOrder ) {
@@ -3062,7 +3062,7 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
    HB_USHORT         i;
    PHB_ITEM       thisfield;
 
-   if( hb_itemType(thiswa->aStruct) != HB_IT_ARRAY ) {
+   if( hb_itemType(thiswa->aStruct) != Harbour::Item::ARRAY ) {
       HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Invalid structure array"));
       return false;
    }
@@ -3079,7 +3079,7 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
    for( i = 1; i <= (HB_USHORT) numFields; i++ ) {
       thisfield = hb_itemArrayGet(thiswa->aStruct, i);
 
-      if( hb_itemType(thisfield) != HB_IT_ARRAY ) {
+      if( hb_itemType(thisfield) != Harbour::Item::ARRAY ) {
          HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure field array: %i", i));
          return false;
       }
@@ -3133,11 +3133,11 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
 
          break;
       default:
-         field.uiType =HB_IT_NIL;
+         field.uiType = Harbour::Item::NIL;
          break;
       }
 
-      if( field.uiType == HB_IT_NIL ) {
+      if( field.uiType == Harbour::Item::NIL ) {
          HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Unsuported datatype on field: %i", i));
          return false;
       }
@@ -3161,7 +3161,7 @@ static HB_BOOL SetFields(SQLAREAP thiswa)
    HB_USHORT         i;
    PHB_ITEM       thisfield;
 
-   if( hb_itemType(thiswa->aStruct) != HB_IT_ARRAY ) {
+   if( hb_itemType(thiswa->aStruct) != Harbour::Item::ARRAY ) {
       HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Invalid structure array"));
       return false;
    }
@@ -3176,7 +3176,7 @@ static HB_BOOL SetFields(SQLAREAP thiswa)
    for( i = 1; i <= (HB_USHORT) numFields; i++ ) {
       thisfield = hb_itemArrayGet(thiswa->aStruct, i);
 
-      if( hb_itemType(thisfield) != HB_IT_ARRAY ) {
+      if( hb_itemType(thisfield) != Harbour::Item::ARRAY ) {
          HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure field array: %i", i));
          return false;
       }
@@ -3223,8 +3223,8 @@ HB_FUNC( ITEMCMP ) /* ITEMCMP(cItem1, cItem2, nLenToCompare) ==> 0 == identical,
    const char * val1;
    const char * val2;
 
-   val1 = hb_itemGetCPtr(hb_param(1, HB_IT_ANY));
-   val2 = hb_itemGetCPtr(hb_param(2, HB_IT_ANY));
+   val1 = hb_itemGetCPtr(hb_param(1, Harbour::Item::ANY));
+   val2 = hb_itemGetCPtr(hb_param(2, Harbour::Item::ANY));
    ret = strncmp(val1, val2, hb_parnl(3));
 
    hb_retni(ret);
@@ -3513,7 +3513,7 @@ HB_FUNC( SR_SETFOUND )
    SQLAREAP pArea = (SQLAREAP) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea ) {
-      PHB_ITEM pFound = hb_param(1, HB_IT_LOGICAL);
+      PHB_ITEM pFound = hb_param(1, Harbour::Item::LOGICAL);
       if( pFound ) {
          pArea->area.fFound = hb_itemGetL(pFound);
          hb_arraySetForward(pArea->aInfo, AINFO_FOUND, pFound);

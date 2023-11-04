@@ -2037,7 +2037,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
          // lInitBuff = lLen;
          // lLenOut = 0;
          // iReallocs = 0;
-         // temp.type = HB_IT_NIL; // I know this is not a good practice, but we save tons of allocs.
+         // temp.type = Harbour::Item::NIL; // I know this is not a good practice, but we save tons of allocs.
                                    // please keep as is. ML.
          temp = hb_itemNew(nullptr);
 
@@ -2608,7 +2608,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
          // iReallocs = 0;
 
          temp = hb_itemNew(nullptr);
-         // temp.type = HB_IT_NIL; // I know this is not a good practice, but we save tons of allocs.
+         // temp.type = Harbour::Item::NIL; // I know this is not a good practice, but we save tons of allocs.
                                    // please keep as is. ML.
 
          if( (thiswa->uiFieldList[i - 1] == 0) && thiswa->iColumnListStatus != FIELD_LIST_LEARNING ) {
@@ -4205,14 +4205,14 @@ HB_CALL_ON_STARTUP_END(_hb_sqlEx_rdd_init_)
 HB_FUNC( SR_SETPAGEREADSIZE )
 {
    if( HB_ISNUM(1) ) {
-      pageReadSize = hb_itemGetNL(hb_param(1, HB_IT_NUMERIC));
+      pageReadSize = hb_itemGetNL(hb_param(1, Harbour::Item::NUMERIC));
    }
 }
 
 HB_FUNC( SR_SETBUFFERPOOLSIZE )
 {
    if( HB_ISNUM(1) ) {
-      bufferPoolSize = hb_itemGetNL(hb_param(1, HB_IT_NUMERIC));
+      bufferPoolSize = hb_itemGetNL(hb_param(1, Harbour::Item::NUMERIC));
    }
 }
 
@@ -4278,22 +4278,22 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 #endif
 
    switch( hb_itemType(pKey) ) {
-      case HB_IT_DATE: {
+      case Harbour::Item::DATE: {
          len2 = 8;
          valbuf = static_cast<char*>(hb_xgrab(9));
          val2 = hb_itemGetDS(pKey, valbuf);
          break;
       }
-      case HB_IT_INTEGER:
-      case HB_IT_LONG:
-      case HB_IT_DOUBLE: {
+      case Harbour::Item::INTEGER:
+      case Harbour::Item::LONG:
+      case Harbour::Item::DOUBLE: {
          auto pLen = hb_itemPutNL(nullptr, static_cast<HB_LONG>(len1));
          val2 = valbuf = hb_itemStr(pKey, pLen, nullptr);
          len2 = static_cast<HB_BYTE>(strlen(val2));
          hb_itemRelease(pLen);
          break;
       }
-      case HB_IT_LOGICAL: {
+      case Harbour::Item::LOGICAL: {
          len2 = 1;
          val2 = hb_itemGetL(pKey) ? "T" : "F";
          break;

@@ -129,7 +129,7 @@ HB_FUNC( MYSCONNECT )
 
 HB_FUNC( MYSFINISH )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    assert(session != nullptr);
    assert(session->dbh != nullptr);
    mysql_close(session->dbh);
@@ -146,7 +146,7 @@ HB_FUNC( MYSFINISH )
 
 HB_FUNC( MYSGETCONNID )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    assert(session != nullptr);
    assert(session->dbh != nullptr);
    hb_retnl(mysql_thread_id(session->dbh));
@@ -154,8 +154,8 @@ HB_FUNC( MYSGETCONNID )
 
 HB_FUNC( MYSKILLCONNID )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
-   auto ulThreadID = static_cast<HB_ULONG>(hb_itemGetNL(hb_param(2, HB_IT_LONG)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
+   auto ulThreadID = static_cast<HB_ULONG>(hb_itemGetNL(hb_param(2, Harbour::Item::LONG)));
    assert(session != nullptr);
    assert(session->dbh != nullptr);
    hb_retni(mysql_kill(session->dbh, ulThreadID));
@@ -164,7 +164,7 @@ HB_FUNC( MYSKILLCONNID )
 HB_FUNC( MYSEXEC )
 {
    /* TraceLog(nullptr, "mysqlExec : %s\n", hb_parc(2)); */
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    auto szQuery = hb_parc(2);
    assert(session != nullptr);
    assert(session->dbh != nullptr);
@@ -184,7 +184,7 @@ HB_FUNC( MYSEXEC )
 
 HB_FUNC( MYSFETCH )     /* MYSFetch(ConnHandle, ResultSet) => nStatus */
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    assert(session != nullptr);
    assert(session->dbh != nullptr);
@@ -385,18 +385,18 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
 
 HB_FUNC( MYSLINEPROCESSED )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    int col, cols;
    PHB_ITEM temp;
    MYSQL_ROW thisrow;
    HB_ULONG * lens;
    HB_LONG lIndex;
 
-   PHB_ITEM pFields = hb_param(3, HB_IT_ARRAY);
+   PHB_ITEM pFields = hb_param(3, Harbour::Item::ARRAY);
    bool bQueryOnly = hb_parl(4);
    HB_ULONG ulSystemID = hb_parnl(5);
    bool bTranslate = hb_parl(6);
-   PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
+   PHB_ITEM pRet = hb_param(7, Harbour::Item::ARRAY);
 
    assert(session != nullptr);
    assert(session->dbh != nullptr);
@@ -437,7 +437,7 @@ HB_FUNC( MYSLINEPROCESSED )
 
 HB_FUNC( MYSSTATUS )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    assert(session != nullptr);
    assert(session->dbh != nullptr);
@@ -454,7 +454,7 @@ HB_FUNC( MYSSTATUS )
 
 HB_FUNC( MYSRESULTSTATUS )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    assert(session != nullptr);
    assert(session->dbh != nullptr);
@@ -478,7 +478,7 @@ HB_FUNC( MYSRESULTSTATUS )
 
 HB_FUNC( MYSRESSTATUS )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    assert(session != nullptr);
    assert(session->dbh != nullptr);
    hb_retc(const_cast<char*>(mysql_error(session->dbh)));
@@ -486,7 +486,7 @@ HB_FUNC( MYSRESSTATUS )
 
 HB_FUNC( MYSCLEAR )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    assert(session != nullptr);
    assert(session->dbh != nullptr);
@@ -500,7 +500,7 @@ HB_FUNC( MYSCLEAR )
 
 HB_FUNC( MYSCOLS )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    assert(session != nullptr);
    assert(session->dbh != nullptr);
    hb_retni(session->numcols);
@@ -508,7 +508,7 @@ HB_FUNC( MYSCOLS )
 
 HB_FUNC( MYSVERS ) /* MYSVERS(hConnection) => nVersion */
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    assert(session != nullptr);
    assert(session->dbh != nullptr);
    hb_retnl(static_cast<long>(mysql_get_server_version(session->dbh)));
@@ -516,7 +516,7 @@ HB_FUNC( MYSVERS ) /* MYSVERS(hConnection) => nVersion */
 
 HB_FUNC( MYSERRMSG )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    assert(session != nullptr);
    assert(session->dbh != nullptr);
    hb_retc(const_cast<char*>(mysql_error(session->dbh)));
@@ -524,7 +524,7 @@ HB_FUNC( MYSERRMSG )
 
 HB_FUNC( MYSCOMMIT )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    assert(session != nullptr);
    assert(session->dbh != nullptr);
@@ -538,7 +538,7 @@ HB_FUNC( MYSCOMMIT )
 
 HB_FUNC( MYSROLLBACK )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    assert(session != nullptr);
    assert(session->dbh != nullptr);
@@ -556,7 +556,7 @@ HB_FUNC( MYSQUERYATTR )
       hb_retnl(-2);
    }
 
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    assert(session->dbh != nullptr);
    assert(session->stmt != nullptr);
 
@@ -679,7 +679,7 @@ HB_FUNC( MYSTABLEATTR )
 
    char attcmm[256]={0};
 
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    assert(session->dbh != nullptr);
 
    sprintf(attcmm, "select * from %s where 0 = 1", hb_parc(2));
@@ -813,7 +813,7 @@ HB_FUNC( MYSTABLEATTR )
 
 HB_FUNC( MYSAFFECTEDROWS )
 {
-   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       hb_retnll(session->ulAffected_rows);

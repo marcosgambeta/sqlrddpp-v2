@@ -2598,7 +2598,7 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
       for( i = 1; i <= thiswa->sqlarea.area.uiFieldCount; i++ ) {
          // PHB_ITEM pF = hb_arrayGetItemPtr(thiswa->aFields, thiswa->sqlarea.uiBufferIndex[i - 1]);
          temp = hb_itemNew(nullptr);
-         // temp.type = HB_IT_NIL; // I know this is not a good practice, but we save tons of allocs.
+         // temp.type = Harbour::Item::NIL; // I know this is not a good practice, but we save tons of allocs.
                                    // please keep as is. ML.
 
          // if( (thiswa->sqlarea.uiFieldList[i - 1] == 0) && thiswa->sqlarea.iFieldListStatus != FIELD_LIST_LEARNING ) {
@@ -4211,14 +4211,14 @@ HB_CALL_ON_STARTUP_END(_hb_sqlExOraora_rdd_init_)
 HB_FUNC( SR_SETPAGEREADSIZE2 )
 {
    if( HB_ISNUM(1) ) {
-      pageReadSize = hb_itemGetNS(hb_param(1, HB_IT_NUMERIC));
+      pageReadSize = hb_itemGetNS(hb_param(1, Harbour::Item::NUMERIC));
    }
 }
 
 HB_FUNC( SR_SETBUFFERPOOLSIZE2 )
 {
    if( HB_ISNUM(1) ) {
-      bufferPoolSize = hb_itemGetNS(hb_param(1, HB_IT_NUMERIC));
+      bufferPoolSize = hb_itemGetNS(hb_param(1, Harbour::Item::NUMERIC));
    }
 }
 

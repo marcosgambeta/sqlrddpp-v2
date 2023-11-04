@@ -86,10 +86,10 @@ HB_FUNC( SR_SQLPARSE )     /* SqlParse(cCommand, @nError, @nErrorPos) */
          //printf("Parse ERROR. Retornado array de %i posicoes.\n", stmt->pArray->item.asArray.value->ulLen);
 
          if( HB_ISBYREF(2) ) {
-            hb_itemPutNI((PHB_ITEM) hb_param(2, HB_IT_ANY), stmt->errMsg);
+            hb_itemPutNI((PHB_ITEM) hb_param(2, Harbour::Item::ANY), stmt->errMsg);
          }
          if( HB_ISBYREF(3) ) {
-            hb_itemPutNI((PHB_ITEM) hb_param(3, HB_IT_ANY), static_cast<int>(stmt->queryPtr - sqlIniPos));
+            hb_itemPutNI((PHB_ITEM) hb_param(3, Harbour::Item::ANY), static_cast<int>(stmt->queryPtr - sqlIniPos));
          }
       }
       hb_itemRelease(hb_itemReturnForward(stmt->pArray));
@@ -247,7 +247,7 @@ HB_FUNC( SR_STRTOHEX )
    int iCipher;
 
    if( !HB_ISCHAR(1) ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_STRTOHEX", 1, hb_param(1, HB_IT_ANY));
+      hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_STRTOHEX", 1, hb_param(1, Harbour::Item::ANY));
       return;
    }
 
@@ -346,7 +346,7 @@ HB_FUNC( SR_HEXTOSTR )
    int nalloc;
 
    if( !HB_ISCHAR(1) ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_HEXTOSTR", 1, hb_param(1, HB_IT_ANY));
+      hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_HEXTOSTR", 1, hb_param(1, Harbour::Item::ANY));
       return;
    }
 
@@ -513,7 +513,7 @@ HB_FUNC( SR_ESCAPESTRING )
    idatabase = hb_parni(2);
 
    if( !(HB_ISCHAR(1) && HB_ISNUM(2)) ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPESTRING", 2, hb_param(1, HB_IT_ANY), hb_param(2, HB_IT_ANY));
+      hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPESTRING", 2, hb_param(1, Harbour::Item::ANY), hb_param(2, Harbour::Item::ANY));
       return;
    }
 
@@ -625,7 +625,7 @@ HB_FUNC( SR_ESCAPENUM )
    auto FromBuffer = hb_parc(1);
 
    if( !(HB_ISCHAR(1) && HB_ISNUM(2) && HB_ISNUM(3)) ) {
-      hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPENUM", 3, hb_param(1, HB_IT_ANY), hb_param(2, HB_IT_ANY), hb_param(3,HB_IT_ANY));
+      hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPENUM", 3, hb_param(1, Harbour::Item::ANY), hb_param(2, Harbour::Item::ANY), hb_param(3, Harbour::Item::ANY));
       return;
    }
 
@@ -830,7 +830,7 @@ PHB_ITEM sr_escapeNumber(char * FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM p
 
 HB_FUNC( SR_DBQUALIFY )
 {
-   PHB_ITEM pText = hb_param(1, HB_IT_STRING);
+   PHB_ITEM pText = hb_param(1, Harbour::Item::STRING);
    int ulDb = hb_parni(2);
 
    if( pText ) {
@@ -935,43 +935,43 @@ HB_BOOL hb_arraySetL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_BOOL lVal)
 HB_BOOL SR_itemEmpty(PHB_ITEM pItem)
 {
    switch( hb_itemType(pItem) ) {
-      case HB_IT_ARRAY: {
+      case Harbour::Item::ARRAY: {
          return hb_arrayLen(pItem) == 0;
       }
-      case HB_IT_HASH: {
+      case Harbour::Item::HASH: {
          return hb_hashLen(pItem) == 0;
       }
-      case HB_IT_STRING:
-      case HB_IT_MEMO: {
+      case Harbour::Item::STRING:
+      case Harbour::Item::MEMO: {
          return hb_strEmpty(hb_itemGetCPtr(pItem), hb_itemGetCLen(pItem));
       }
-      case HB_IT_INTEGER: {
+      case Harbour::Item::INTEGER: {
          return hb_itemGetNI(pItem) == 0;
       }
-      case HB_IT_LONG: {
+      case Harbour::Item::LONG: {
          return hb_itemGetNInt(pItem) == 0;
       }
-      case HB_IT_DOUBLE: {
+      case Harbour::Item::DOUBLE: {
          return hb_itemGetND(pItem) == 0.0;
       }
-      case HB_IT_DATE: {
+      case Harbour::Item::DATE: {
          return hb_itemGetDL(pItem) == 0;
       }
-      case HB_IT_TIMESTAMP: {
+      case Harbour::Item::TIMESTAMP: {
          long lDate, lTime;
          hb_itemGetTDT(pItem, &lDate, &lTime);
          return lDate == 0 && lTime == 0;
       }
-      case HB_IT_LOGICAL: {
+      case Harbour::Item::LOGICAL: {
          return !hb_itemGetL(pItem);
       }
-      case HB_IT_BLOCK: {
+      case Harbour::Item::BLOCK: {
          return false;
       }
-      case HB_IT_POINTER: {
+      case Harbour::Item::POINTER: {
          return hb_itemGetPtr(pItem) == nullptr;
       }
-      case HB_IT_SYMBOL: {
+      case Harbour::Item::SYMBOL: {
          PHB_SYMB pSym = hb_itemGetSymbol(pItem);
          if( pSym && (pSym->scope.value & HB_FS_DEFERRED) && pSym->pDynSym ) {
             pSym = hb_dynsymSymbol(pSym->pDynSym);
@@ -1027,8 +1027,8 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
          }
 #endif
          switch( hb_itemType(pFieldData) ) {
-            case HB_IT_STRING:
-            case HB_IT_MEMO: {
+            case Harbour::Item::STRING:
+            case Harbour::Item::MEMO: {
                if( bTCCompat ) {
                   sValue = QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false, &iSizeOut);
                   return sValue;
@@ -1041,9 +1041,9 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
                   return sValue;
                }
             }
-            case HB_IT_INTEGER:
-            case HB_IT_LONG:
-            case HB_IT_DOUBLE: {
+            case Harbour::Item::INTEGER:
+            case Harbour::Item::LONG:
+            case Harbour::Item::DOUBLE: {
                sValue = static_cast<char*>(hb_xgrab(2));
                sValue[0] = '0';
                sValue[1] = '\0';
@@ -1125,14 +1125,14 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
    }
 #endif
    switch( hb_itemType(pFieldData) ) {
-      case HB_IT_STRING:
-      case HB_IT_MEMO: {
+      case Harbour::Item::STRING:
+      case Harbour::Item::MEMO: {
          sValue = QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, !bTCCompat, &iSizeOut);
          break;
       }
-      case HB_IT_INTEGER:
-      case HB_IT_LONG:
-      case HB_IT_DOUBLE: {
+      case Harbour::Item::INTEGER:
+      case Harbour::Item::LONG:
+      case Harbour::Item::DOUBLE: {
          sValue = hb_itemStr(pFieldData, pFieldLen, pFieldDec);
          iTrim = 0;
          iSize = 15;
@@ -1147,7 +1147,7 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
          }
          break;
       }
-      case HB_IT_DATE: {
+      case Harbour::Item::DATE: {
          hb_dateDecStr(sDate, hb_itemGetDL(pFieldData));
          sValue = static_cast<char*>(hb_xgrab(30));
          switch( nSystemID ) {
@@ -1166,7 +1166,7 @@ char * quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, H
          }
          break;
       }
-      case HB_IT_LOGICAL: {
+      case Harbour::Item::LOGICAL: {
          sValue = static_cast<char*>(hb_xgrab(6));
          if( hb_itemGetL(pFieldData) ) {
             switch( nSystemID ) {

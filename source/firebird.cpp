@@ -214,7 +214,7 @@ HB_FUNC( FBCONNECT ) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv)
 
 HB_FUNC( FBCLOSE )   // FBClose(hEnv)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    int i;
    XSQLVAR * var;
 
@@ -248,7 +248,7 @@ HB_FUNC( FBCLOSE )   // FBClose(hEnv)
 
 HB_FUNC( FBBEGINTRANSACTION )  // FBBeginTransaction(hEnv)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( CHECK_ERROR(session) && session->transac ) {
       isc_rollback_transaction(session->status, &(session->transac));
@@ -301,7 +301,7 @@ HB_FUNC( FBBEGINTRANSACTION )  // FBBeginTransaction(hEnv)
 
 HB_FUNC( FBCOMMITTRANSACTION )  // FBBeginTransaction(hEnv)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session->transac ) {
       isc_commit_transaction(session->status, &(session->transac));
@@ -319,7 +319,7 @@ HB_FUNC( FBCOMMITTRANSACTION )  // FBBeginTransaction(hEnv)
 
 HB_FUNC( FBROLLBACKTRANSACTION )  // FBRollBackTransaction(hEnv)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session->transac ) {
       isc_rollback_transaction(session->status, &(session->transac));
@@ -337,7 +337,7 @@ HB_FUNC( FBROLLBACKTRANSACTION )  // FBRollBackTransaction(hEnv)
 
 HB_FUNC( FBEXECUTE ) // FBExecute(hEnv, cCmd, nDialect)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    auto command = hb_parcx(2);
    int i, dtype;
    XSQLVAR * var;
@@ -449,7 +449,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute(hEnv, cCmd, nDialect)
 
 HB_FUNC( FBEXECUTEIMMEDIATE ) // FBExecuteImmediate(hEnv, cCmd, nDialect)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    auto command = hb_parcx(2);
 //    ISC_STATUS r;
 
@@ -480,7 +480,7 @@ HB_FUNC( FBEXECUTEIMMEDIATE ) // FBExecuteImmediate(hEnv, cCmd, nDialect)
 
 HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol(hStmt, nCol, @cName, @nType, @nLen, @nDec, @nNull)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    int icol = hb_parni(2);
    int dtype, rettype, i;
    XSQLVAR * var;
@@ -571,7 +571,7 @@ HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol(hStmt, nCol, @cName, @nType, @nLen, 
 
 HB_FUNC( FBNUMRESULTCOLS ) // FBNumResultCols(hEnv, @nResultSetColumnCount)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       hb_storni(session->sqlda->sqld, 2);
@@ -585,7 +585,7 @@ HB_FUNC( FBNUMRESULTCOLS ) // FBNumResultCols(hEnv, @nResultSetColumnCount)
 
 HB_FUNC( FBERROR )   // FBError(hEnv)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       hb_retc(session->msgerror);
@@ -599,7 +599,7 @@ HB_FUNC( FBERROR )   // FBError(hEnv)
 
 HB_FUNC( FBFETCH )   // FBFetch(hEnv)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       if( isc_dsql_fetch(session->status, &(session->stmt), session->sqlda->version, session->sqlda) ) {
@@ -616,7 +616,7 @@ HB_FUNC( FBFETCH )   // FBFetch(hEnv)
 
 HB_FUNC( FBGETDATA )    // FBGetData(hEnv, nField, @uData)
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    int icol = hb_parni(2);
    int dtype, i;
    char data[MSG_BUFFER_LEN], *p;
@@ -882,7 +882,7 @@ HB_FUNC( FBVERSION )
    ISC_LONG num_version = 0L;
    char tmp[1000];
 
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    *tmp = 0;
 
@@ -1081,7 +1081,7 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
 
 HB_FUNC( FBLINEPROCESSED )
 {
-   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    int icol, cols;
    int dtype, i;
    char data[MSG_BUFFER_LEN] ={0}, *p;
@@ -1100,11 +1100,11 @@ HB_FUNC( FBLINEPROCESSED )
    VARY * vary;
 
    PHB_ITEM temp;
-   PHB_ITEM pFields = hb_param(3, HB_IT_ARRAY);
+   PHB_ITEM pFields = hb_param(3, Harbour::Item::ARRAY);
    bool bQueryOnly = hb_parl(4);
    HB_ULONG ulSystemID = hb_parnl(5);
    bool bTranslate = hb_parl(6);
-   PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
+   PHB_ITEM pRet = hb_param(7, Harbour::Item::ARRAY);
    HB_LONG lIndex;
 
    HB_SIZE lLen, lDec;
