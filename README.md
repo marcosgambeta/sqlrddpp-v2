@@ -1,6 +1,6 @@
-# SQLRDD++
+# SQLRDD++ v2
 
-SQLRDD for Harbour++ and Harbour v2
+SQLRDD++ for Harbour++/Harbour
 
 ## Requisites
 
@@ -11,39 +11,39 @@ C++11 or upper
 
 ### Windows - How to compile
 ```Batch
-cd sqlrddpp
-hbmk2 sqlrddpp.hbp
+cd sqlrddpp-v2
+hbmk2 sqlrddpp-v2.hbp
 ```
 
 ### Ubuntu - How to get and compile
 ```Batch
 sudo apt install unixodbc-dev
-git clone https://github.com/marcosgambeta/sqlrddpp
-cd sqlrddpp
-hbmk2 sqlrddpp.hbp
+git clone https://github.com/marcosgambeta/sqlrddpp-v2
+cd sqlrddpp-v2
+hbmk2 sqlrddpp-v2.hbp
 ```
 
 ### OpenSuse - How to get and compile
 ```Batch
 sudo zypper install unixODBC-devel
-git clone https://github.com/marcosgambeta/sqlrddpp
-cd sqlrddpp
-hbmk2 sqlrddpp.hbp
+git clone https://github.com/marcosgambeta/sqlrddpp-v2
+cd sqlrddpp-v2
+hbmk2 sqlrddpp-v2.hbp
 ```
 
-### Compiling with SQLRDD and MySQL
+### Compiling with SQLRDD++ and MySQL
 ```Batch
-hbmk2 <filename> sqlrddpp.hbc -llibmysql
+hbmk2 <filename> sqlrddpp-v2.hbc -llibmysql
 ```
 
-### Compiling with SQLRDD and PostgreSQL
+### Compiling with SQLRDD++ and PostgreSQL
 ```Batch
-hbmk2 <filename> sqlrddpp.hbc -llibpq
+hbmk2 <filename> sqlrddpp-v2.hbc -llibpq
 ```
 
-### Compiling with SQLRDD and Firebird
+### Compiling with SQLRDD++ and Firebird
 ```Batch
-hbmk2 <filename> sqlrddpp.hbc -lfbclient
+hbmk2 <filename> sqlrddpp-v2.hbc -lfbclient
 ```
 
 ## Links
@@ -66,3 +66,6 @@ https://www.postgresql.org
 
 Firebird  
 https://firebirdsql.org  
+
+Harbour++  
+https://github.com/marcosgambeta/harbourpp-v1
