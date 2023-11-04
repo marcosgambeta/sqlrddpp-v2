@@ -831,11 +831,11 @@ HB_FUNC( PGSLINEPROCESSED )
    PHB_ITEM temp;
    HB_USHORT i;
    char * col;
-   PHB_ITEM pFields = hb_param(3, Harbour::Item::ARRAY);
+   auto pFields = hb_param(3, Harbour::Item::ARRAY);
    bool bQueryOnly = hb_parl(4);
    HB_ULONG ulSystemID = hb_parnl(5);
    bool bTranslate = hb_parl(6);
-   PHB_ITEM pRet = hb_param(7, Harbour::Item::ARRAY);
+   auto pRet = hb_param(7, Harbour::Item::ARRAY);
    HB_LONG lIndex, cols;
 
    assert(session->dbh != nullptr);

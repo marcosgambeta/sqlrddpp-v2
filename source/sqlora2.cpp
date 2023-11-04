@@ -439,7 +439,7 @@ HB_FUNC( ORACLEINBINDPARAM2 )
            Stmt->pLink[iPos].date = OCI_DateCreate(Stmt->cn);
             if( ISDATE(6) ) {
                int iYear, iMonth, iDay;
-               PHB_ITEM pFieldData = hb_param(6, Harbour::Item::DATE);
+               auto pFieldData = hb_param(6, Harbour::Item::DATE);
                hb_dateDecode(hb_itemGetDL(pFieldData), &iYear, &iMonth, &iDay);
 
                OCI_DateSetDate(Stmt->pLink[iPos].date,iYear, iMonth, iDay);
@@ -458,7 +458,7 @@ HB_FUNC( ORACLEINBINDPARAM2 )
                int  iHour, iMin;
                int mSec;
                int iSeconds;
-               PHB_ITEM pFieldData = hb_param(6, Harbour::Item::DATETIME);
+               auto pFieldData = hb_param(6, Harbour::Item::DATETIME);
                long plJulian;
                long plMilliSec;
                hb_itemGetTDT(pFieldData,&plJulian, &plMilliSec);
@@ -511,7 +511,7 @@ HB_FUNC( ORACLEGETBINDDATA2)
    int iPos;
 
 
-   PHB_ITEM p1 = hb_param(2, Harbour::Item::ANY);
+   auto p1 = hb_param(2, Harbour::Item::ANY);
 
    if( HB_IS_NUMBER(p1) &&   p ) {
 
@@ -866,11 +866,11 @@ HB_FUNC( SQLO2_LINEPROCESSED )
    HB_LONG lIndex;
    PHB_ITEM temp;
    HB_SIZE i, cols;
-   PHB_ITEM pFields = hb_param(3, Harbour::Item::ARRAY);
+   auto pFields = hb_param(3, Harbour::Item::ARRAY);
    bool  bQueryOnly = hb_parl(4);
    HB_ULONG ulSystemID = hb_parnl(5);
    bool  bTranslate = hb_parl(6);
-   PHB_ITEM pRet = hb_param(7, Harbour::Item::ARRAY);
+   auto pRet = hb_param(7, Harbour::Item::ARRAY);
 //   SQLO2_stmt_handle_t stmtParamRes;
 
    if( session ) {
@@ -1075,7 +1075,7 @@ HB_FUNC( ORACLEWRITEMEMO2 )
    OCI_Statement *stmt;
    int status;
 
-   PHB_ITEM pArray = hb_param(5, Harbour::Item::ARRAY);
+   auto pArray = hb_param(5, Harbour::Item::ARRAY);
 
    HB_SIZE uiLen, uiSize;
 

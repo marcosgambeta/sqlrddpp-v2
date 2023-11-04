@@ -599,11 +599,11 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
    // int iReallocs;
    PHB_ITEM temp;
    int i, cols;
-   PHB_ITEM pFields = hb_param(3, Harbour::Item::ARRAY);
+   auto pFields = hb_param(3, Harbour::Item::ARRAY);
    bool bQueryOnly = hb_parl(4);
    HB_ULONG ulSystemID = hb_parnl(5);
    bool bTranslate = hb_parl(6);
-   PHB_ITEM pRet = hb_param(7, Harbour::Item::ARRAY);
+   auto pRet = hb_param(7, Harbour::Item::ARRAY);
 
    if( !pFields ) {
       hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
@@ -652,17 +652,17 @@ HB_FUNC( SR_ODBCGETLINES ) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lT
    PHB_ITEM pLine, temp;
    int i, cols, line;
 
-   PHB_ITEM pFields = hb_param(3, Harbour::Item::ARRAY);
-   PHB_ITEM pCache = hb_param(4, Harbour::Item::ARRAY);
+   auto pFields = hb_param(3, Harbour::Item::ARRAY);
+   auto pCache = hb_param(4, Harbour::Item::ARRAY);
    HB_ULONG ulSystemID = hb_parnl(5);
    bool bTranslate = hb_parl(6);
    int iCurrFetch = hb_parni(7);
-   PHB_ITEM pInfo = hb_param(8, Harbour::Item::ARRAY);
+   auto pInfo = hb_param(8, Harbour::Item::ARRAY);
    HB_ULONG ulDirect = hb_parnl(9);
    HB_ULONG ulnRecno = hb_parnl(10);
    bool bFetchAll = hb_parl(11);
-   PHB_ITEM pFetch = hb_param(12, Harbour::Item::ARRAY);
-   PHB_ITEM pRec = hb_param(13, Harbour::Item::ANY);
+   auto pFetch = hb_param(12, Harbour::Item::ARRAY);
+   auto pRec = hb_param(13, Harbour::Item::ANY);
    HB_LONG lPos = hb_parnl(14);
 
    HB_ULONG ulPosCache = hb_arrayGetNL(pInfo, AINFO_NPOSCACHE);
@@ -1077,7 +1077,7 @@ HB_FUNC( SR_ODBCWRITEMEMO )
    SQLRETURN retcode3, retcode2, retcode = 0;
    SQLLEN cbSize = 0;
 
-   PHB_ITEM pArray = hb_param(5, Harbour::Item::ARRAY);
+   auto pArray = hb_param(5, Harbour::Item::ARRAY);
    hDbc = (SQLHDBC) hb_parptr(1);
 
    uiLen = hb_arrayLen(pArray);
