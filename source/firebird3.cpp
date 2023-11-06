@@ -67,6 +67,8 @@
 # endif
 #endif
 
+#include <string>
+
 #define MAX_COLUMNS_IN_QUERY  620
 #define MSG_BUFFER_LEN        1024
 #define LOGFILE               "fb.log"
@@ -861,6 +863,7 @@ HB_FUNC( FBGETDATA3 ) // FBGetData(hEnv, nField, @uData)
 
 /*------------------------------------------------------------------------*/
 
+#if 0 // TODO: old function for reference (to be deleted)
 HB_FUNC( FBCREATEDB3 )
 {
    isc_db_handle newdb = 0;
@@ -896,6 +899,58 @@ HB_FUNC( FBCREATEDB3 )
    }
 
    if( isc_dsql_execute_immediate(reinterpret_cast<ISC_STATUS*>(status), &newdb, &trans, 0, create_db, static_cast<unsigned short>(dialect), nullptr) ) {
+      hb_retni(SQL_ERROR);
+      TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
+   } else {
+      if( isc_detach_database (reinterpret_cast<ISC_STATUS*>(status), &newdb) ) {
+         hb_retni(SQL_ERROR);
+         return;
+      }
+
+      hb_retni(SQL_SUCCESS);
+   }
+}
+#endif
+
+HB_FUNC( FBCREATEDB3 )
+{
+   isc_db_handle newdb = 0;
+   isc_tr_handle trans = 0;
+   long status[20];
+
+   auto db_name = hb_parcx(1);
+   auto username = hb_parcx(2);
+   auto passwd = hb_parcx(3);
+   auto page = hb_parni(4);
+   auto charset = hb_parc(5);
+   auto dialect = static_cast<unsigned short>(hb_parni(6));
+
+   if( !dialect ) {
+      dialect = 3;
+   }
+
+   std::string sql;
+   sql += "CREATE DATABASE '";
+   sql += db_name;
+   sql += "' ";
+   sql += "USER '";
+   sql += username;
+   sql += "' ";
+   sql += "PASSWORD '";
+   sql += passwd;
+   sql += "' ";
+   if( page ) {
+     sql += "PAGE_SIZE = ";
+     sql += page;
+     sql += " ";
+   }
+   if( charset ) {
+     sql += "DEFAULT CHARACTER SET ";
+     sql += charset;
+     sql += " ";
+   }
+
+   if( isc_dsql_execute_immediate(reinterpret_cast<ISC_STATUS*>(status), &newdb, &trans, 0, sql.c_str(), dialect, nullptr) ) {
       hb_retni(SQL_ERROR);
       TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
    } else {
