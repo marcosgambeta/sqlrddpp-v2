@@ -1091,8 +1091,8 @@ HB_FUNC( SR_ODBCWRITEMEMO )
       for( uiSize = 0; uiSize < uiLen; uiSize++ ) {
          PHB_ITEM pFieldDesc = hb_arrayGetItemPtr(pArray, uiSize + 1);
          char szSql[512] = {0};
-         const char * sMemo = hb_arrayGetCPtr(pFieldDesc, 2);
-         const char * sField = hb_arrayGetCPtr(pFieldDesc, 1);
+         auto sMemo = hb_arrayGetCPtr(pFieldDesc, 2);
+         auto sField = hb_arrayGetCPtr(pFieldDesc, 1);
          sprintf(szSql, "UPDATE %s SET %s = ? WHERE %s = %lu", sTable, sField, sRecnoName, ulRecno);
 
          cbSize = strlen(sMemo);

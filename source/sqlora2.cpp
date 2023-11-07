@@ -1089,7 +1089,7 @@ HB_FUNC( ORACLEWRITEMEMO2 )
          PHB_ITEM pFieldDesc = hb_arrayGetItemPtr(pArray, uiSize + 1);
          char szSql[256] = {0};
          char * sMemo = hb_arrayGetCPtr(pFieldDesc, 2);
-         const char * sField = hb_arrayGetCPtr(pFieldDesc, 1);
+         auto sField = hb_arrayGetCPtr(pFieldDesc, 1);
          OCI_Resultset * rs;
          sprintf(szSql, "UPDATE %s SET %s = EMPTY_CLOB() WHERE %s = %lu RETURNING %s INTO :b1", sTable, sField, sRecnoName, ulRecno, sField);
 

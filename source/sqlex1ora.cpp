@@ -1063,7 +1063,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
 
    if( thiswa->sqlarea.hOrdCurrent > 0 ) {
       PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
-      const char * szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
+      auto szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
       if( szFilter && szFilter[0] ) {
          if( bWhere ) {
             temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
