@@ -924,11 +924,10 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
             break;
          }
          case SQL_DATE: {
-               char dt[9] = {' ',' ',' ',' ',' ',' ',' ',' ','\0'};
-               hb_itemPutDS(pItem, dt);
+            char dt[9] = {' ',' ',' ',' ',' ',' ',' ',' ','\0'};
+            hb_itemPutDS(pItem, dt);
             break;
          }
-
          case SQL_LONGVARCHAR: {
             hb_itemPutCL(pItem, bBuffer, 0);
             break;
@@ -938,7 +937,6 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
             hb_itemPutL(pItem, false);
             break;
          }
-
 #ifdef SQLRDD_TOPCONN
          case SQL_FAKE_DATE: {
             hb_itemPutDS(pItem, bBuffer);
@@ -948,28 +946,25 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
          case SQL_TIME: {
             hb_itemPutTDT(pItem, 0, 0);
             break;
-            }
+         }
          case SQL_DATETIME: {
             hb_itemPutTDT(pItem, 0, 0);
             break;
          }
-
-         default:
+         default: {
             TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
+         }
       }
    } else {
       switch( lType ) {
          case SQL_CHAR: {
-            HB_SIZE lPos;
             auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
-
-            for( lPos = lLenBuff; lPos < lLen; lPos++ ) {
+            for( HB_SIZE lPos = lLenBuff; lPos < lLen; lPos++ ) {
                szResult[lPos] = ' ';
             }
             szResult[lLen] = '\0';
             hb_itemPutCLPtr(pItem, szResult, lLen);
-
             break;
          }
          case SQL_DOUBLE:
@@ -1012,7 +1007,6 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
                 */
                hb_itemMove(pItem, pTemp);
                hb_itemRelease(pTemp);
-
             } else if( lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString()) ) {
                if( s_pSym_SR_DESERIALIZE == nullptr ) {
                   s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
@@ -1024,10 +1018,8 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
                hb_vmPushNil();
                hb_vmPushString(bBuffer, lLenBuff);
                hb_vmDo(1);
-
                pTemp = hb_itemNew(nullptr);
                hb_itemMove(pTemp, hb_stackReturnItem());
-
                if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
                   auto pLangItem = hb_itemNew(nullptr);
                   HB_SIZE ulPos;
@@ -1071,8 +1063,9 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE 
             hb_itemPutTDT(pItem, lJulian, lMilliSec);
             break;
          }
-         default:
+         default: {
             TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
+         }
       }
    }
 }
