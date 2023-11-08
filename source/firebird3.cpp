@@ -995,14 +995,14 @@ HB_FUNC( FBVERSION3 )
 
 static void FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBuff, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate)
 {
-   HB_SIZE lLen, lDec;
-   PHB_ITEM pTemp;
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
+   PHB_ITEM pTemp;
+
    auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
-   lLen = hb_arrayGetNL(pField, 3);
-   lDec = hb_arrayGetNL(pField, 4);
+   HB_SIZE lLen = hb_arrayGetNL(pField, 3);
+   HB_SIZE lDec = hb_arrayGetNL(pField, 4);
 
    if( lLenBuff <= 0 ) { // database content is NULL
       switch( lType ) {
@@ -1049,16 +1049,16 @@ static void FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE
             hb_itemPutTDT(pItem, 0, 0);
             break;
          }
-         default:
+         default: {
             TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
+         }
       }
    } else {
       switch( lType ) {
          case SQL_CHAR: {
-            HB_SIZE lPos;
             auto szResult = static_cast<char*>(hb_xgrab(lLen + 1));
             hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
-            for( lPos = lLenBuff; lPos < lLen; lPos++ ) {
+            for( HB_SIZE lPos = lLenBuff; lPos < lLen; lPos++ ) {
                szResult[lPos] = ' ';
             }
             szResult[lLen] = '\0';
@@ -1116,10 +1116,8 @@ static void FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE
                hb_vmPushNil();
                hb_vmPushString(bBuffer, lLenBuff);
                hb_vmDo(1);
-
                pTemp = hb_itemNew(nullptr);
                hb_itemMove(pTemp, hb_stackReturnItem());
-
                if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
                   auto pLangItem = hb_itemNew(nullptr);
                   HB_SIZE ulPos;
@@ -1153,8 +1151,7 @@ static void FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE
          }
 #endif
          case SQL_TIME: {
-            long  lMilliSec;
-            lMilliSec = hb_timeUnformat(bBuffer, nullptr); // TOCHECK:
+            long lMilliSec = hb_timeUnformat(bBuffer, nullptr); // TOCHECK:
             hb_itemPutTDT(pItem, 0, lMilliSec);
             break;
          }
@@ -1164,8 +1161,9 @@ static void FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE
             hb_itemPutTDT(pItem, lJulian, lMilliSec);
             break;
          }
-         default:
+         default: {
             TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
+         }
       }
    }
 }
@@ -1428,18 +1426,18 @@ HB_FUNC( FBLINEPROCESSED3 )
 HB_FUNC( FB_MORERESULTS )
 {
    auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
+
    if( session && session->sqlda->sqld >= 1 ) {
       if( session->queryType == isc_info_sql_stmt_exec_procedure ) {
-         XSQLVAR * var;
-         ISC_INT64 value = 0;
-         var = session->sqlda->sqlvar;
-         value = static_cast<ISC_INT64>(*reinterpret_cast<ISC_INT64 ISC_FAR*>(var->sqldata));
+         XSQLVAR * var = session->sqlda->sqlvar;
+         ISC_INT64 value = static_cast<ISC_INT64>(*reinterpret_cast<ISC_INT64 ISC_FAR*>(var->sqldata));
          hb_stornint(static_cast<ISC_INT64>(value), 2);
          hb_retni(SQL_SUCCESS);
          return;
       }
       hb_retni(SQL_ERROR);
    }
+
    hb_retni(SQL_ERROR);
 }
 
