@@ -467,15 +467,14 @@ HB_FUNC( SQLO_CLOSESTMT )
 
 void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBuff, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate)
 {
-   HB_LONG lType;
    HB_SIZE lLen;
-   HB_SIZE lDec; 
+   HB_SIZE lDec;
    PHB_ITEM pTemp;
 
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
+   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
    lLen = hb_arrayGetNL(pField, 3);
    lDec = hb_arrayGetNL(pField, 4);
 

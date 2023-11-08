@@ -243,7 +243,7 @@ HB_FUNC( SR_STRTOHEX )
 {
    char *c;
    HB_USHORT iNum;
-   int i, len;
+   int i;
    int iCipher;
 
    if( !HB_ISCHAR(1) ) {
@@ -252,7 +252,7 @@ HB_FUNC( SR_STRTOHEX )
    }
 
    auto cStr = hb_parc(1);
-   len = static_cast<int>(hb_parclen(1));
+   auto len = static_cast<int>(hb_parclen(1));
    auto outbuff = static_cast<char*>(hb_xgrab((len * 2) + 1));
    c = outbuff;
 
@@ -289,10 +289,10 @@ HB_FUNC( SR_STRTOHEX )
 char * sr_Hex2Str(const char * cStr, int len, int * lenOut)
 {
    char c;
-   int i, nalloc;
+   int i;
    int iCipher, iNum;
 
-   nalloc = static_cast<int>(len / 2);
+   auto nalloc = static_cast<int>(len / 2);
    auto outbuff = static_cast<char*>(hb_xgrab(nalloc + 1));
 
    for( i = 0; i < nalloc; i++ ) {
@@ -712,7 +712,7 @@ HB_FUNC( SR_ESCAPENUM )
       lValue = hb_strValInt(ToBuffer, &iOverflow);
 
       if( !iOverflow ) {
-         double dValue = static_cast<double>(lValue);
+         auto dValue = static_cast<double>(lValue);
          hb_retnlen(dValue, len, dec);
       } else {
          double dValue = hb_strVal(ToBuffer, iSize);
@@ -814,7 +814,7 @@ PHB_ITEM sr_escapeNumber(char * FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM p
       lValue = hb_strValInt(ToBuffer, &iOverflow);
 
       if( !iOverflow ) {
-         double dValue = static_cast<double>(lValue);
+         auto dValue = static_cast<double>(lValue);
          hb_itemPutNLen(pRet, dValue, len, dec);
       } else {
          double dValue = hb_strVal(ToBuffer, iSize);

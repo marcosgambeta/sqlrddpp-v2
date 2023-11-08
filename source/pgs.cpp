@@ -130,7 +130,7 @@ HB_FUNC( PGSRESULTSTATUS ) /* PGSResultStatus(ResultSet) => nStatus */
 {
    auto res = static_cast<PGresult*>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    assert(res != nullptr);
-   int ret = static_cast<int>(PQresultStatus(res));
+   auto ret = static_cast<int>(PQresultStatus(res));
 
    switch( ret ) {
       case PGRES_EMPTY_QUERY:
@@ -167,7 +167,7 @@ HB_FUNC( PGSEXEC )      /* PGSExec(ConnHandle, cCommand) => ResultSet */
 
    session->ifetch = -1;
    session->numcols = PQnfields(session->stmt);
-   int ret = static_cast<int>(PQresultStatus(session->stmt));
+   auto ret = static_cast<int>(PQresultStatus(session->stmt));
 
    switch( ret ) {
       case PGRES_COMMAND_OK:
@@ -454,7 +454,7 @@ HB_FUNC( PGSTABLEATTR )     /* PGSTableAttr(ConnHandle, cTableName) => aStruct *
    }
 
    char attcmm[512];
-   PPSQL_SESSION session = static_cast<PPSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
+   auto session = static_cast<PPSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    assert(session->dbh != nullptr);
 
@@ -629,7 +629,7 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   HB_LONG lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
+   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
    HB_SIZE lLen = hb_arrayGetNL(pField, 3);
    HB_SIZE lDec = hb_arrayGetNL(pField, 4);
 

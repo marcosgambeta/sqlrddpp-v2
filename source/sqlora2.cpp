@@ -134,7 +134,7 @@ static HB_USHORT OCI_initilized = 0;
 void err_handler(OCI_Error *err)
 {
     int   err_type = OCI_ErrorGetType(err);
-    char *err_msg = static_cast<char*>(OCI_ErrorGetString(err));
+    auto err_msg = static_cast<char*>(OCI_ErrorGetString(err));
 
     printf("%s - %s\n", err_type == OCI_ERR_WARNING ? "warning" : "error", err_msg);
 }
@@ -327,7 +327,7 @@ HB_FUNC( SQLO2_EXECUTE )
    POCI_ORASESSION session = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
    bool lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
    if( session ) {
-      char * stm = static_cast<char*>(hb_parc(2));
+      auto stm = static_cast<char*>(hb_parc(2));
       if( lStmt ) {
          OCI_SetPrefetchSize(session->stmt, 100);
 
@@ -654,7 +654,6 @@ HB_FUNC(ORACLEFREEBIND2)
 
 void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate, OCI_Resultset * rs)
 {
-   HB_LONG lType;
    HB_SIZE lLen, lDec;
    PHB_ITEM pTemp;
    unsigned int uiLen;
@@ -662,7 +661,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
+   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
    lLen = hb_arrayGetNS(pField, 3);
    lDec = hb_arrayGetNS(pField, 4);
 
@@ -745,7 +744,7 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
             break;
          }
          case SQL_LONGVARCHAR: {
-            char * bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
+            auto bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
             HB_SIZE lLenBuff = strlen(bBuffer);
             if( lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2) ) && (sr_lSerializeArrayAsJson()) ) {
                if( s_pSym_SR_FROMJSON == nullptr ) {

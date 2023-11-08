@@ -271,7 +271,7 @@ HB_FUNC( SR_FREEENV )
 HB_FUNC( SR_ALLOCST )
 {
    SQLHSTMT hStmt;
-   SQLHDBC hdbc = static_cast<SQLHDBC>(hb_parptr(1));
+   auto hdbc = static_cast<SQLHDBC>(hb_parptr(1));
 
    // hb_retni(SQLAllocStmt(static_cast<HDBC>(hb_parptr(1)), &hStmt));
    #if ODBCVER >= 0x0300
@@ -287,7 +287,7 @@ HB_FUNC( SR_ALLOCST )
 
 HB_FUNC( SR_FREESTM )
 {
-   SQLHSTMT p = static_cast<SQLHSTMT>(hb_parptr(1));
+   auto p = static_cast<SQLHSTMT>(hb_parptr(1));
 
    if( p ) {
       #if ODBCVER >= 0x0300
@@ -314,7 +314,7 @@ HB_FUNC( SR_EXECDIR )
 
 HB_FUNC( SR_FETCH )
 {
-   SQLHSTMT hstmt = static_cast<SQLHSTMT>(hb_parptr(1));
+   auto hstmt = static_cast<SQLHSTMT>(hb_parptr(1));
    RETCODE wResult;
    wResult = SQLFetch(hstmt);
    hb_retni(wResult);
@@ -324,13 +324,11 @@ HB_FUNC( SR_FETCH )
 
 void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenBuff, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate)
 {
-   HB_LONG lType;
    HB_SIZE lLen, lDec;
-   char * cType;
    PHB_ITEM pTemp;
 
-   cType = const_cast<char*>(hb_arrayGetCPtr(pField, FIELD_TYPE));
-   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
+   auto cType = const_cast<char*>(hb_arrayGetCPtr(pField, FIELD_TYPE));
+   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
    lLen = hb_arrayGetNL(pField, FIELD_LEN);
    lDec = hb_arrayGetNL(pField, FIELD_DEC);
 
@@ -591,7 +589,6 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenB
 HB_FUNC( SR_ODBCLINEPROCESSED )
 {
    // HB_LONG lLen, lInitBuff, lIndex;
-   HB_LONG lLen;
    HB_USHORT lIndex;
    // SQLLEN lLenOut;
    // PTR bBuffer, bOut;
@@ -615,7 +612,7 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
       hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
    }
 
-   lLen = static_cast<HB_LONG>(hb_pcount() > 1 ? hb_parnl(2) : 4096);
+   auto lLen = static_cast<HB_LONG>(hb_pcount() > 1 ? hb_parnl(2) : 4096);
 
    if( lLen <= 0 ) {
       hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3));
@@ -782,7 +779,7 @@ HB_FUNC( SR_ODBCGETLINES ) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lT
 HB_FUNC( SR_NUMRES )
 {
    SQLSMALLINT nCols;
-   SQLHSTMT hstmt = static_cast<SQLHSTMT>(hb_parptr(1));
+   auto hstmt = static_cast<SQLHSTMT>(hb_parptr(1));
 
    RETCODE wResult = SQLNumResultCols(hstmt, &nCols);
    hb_stornl(static_cast<HB_LONG>(nCols), 2);
@@ -853,12 +850,12 @@ void odbcErrorDiagRTE(SQLHSTMT hStmt, const char * routine, const char * szSql, 
 
 HB_FUNC( SR_DESCRIB )
 {
-   SQLSMALLINT lLen = static_cast<SQLSMALLINT>(hb_parni(4));
-   SQLSMALLINT wBufLen = static_cast<SQLSMALLINT>(hb_parni(5));
-   SQLSMALLINT wDataType = static_cast<SQLSMALLINT>(hb_parni(6));
-   SQLULEN wColSize = static_cast<SQLULEN>(hb_parnint(7));
-   SQLSMALLINT wDecimals = static_cast<SQLSMALLINT>(hb_parni(8));
-   SQLSMALLINT wNullable = static_cast<SQLSMALLINT>(hb_parni(9));
+   auto lLen = static_cast<SQLSMALLINT>(hb_parni(4));
+   auto wBufLen = static_cast<SQLSMALLINT>(hb_parni(5));
+   auto wDataType = static_cast<SQLSMALLINT>(hb_parni(6));
+   auto wColSize = static_cast<SQLULEN>(hb_parnint(7));
+   auto wDecimals = static_cast<SQLSMALLINT>(hb_parni(8));
+   auto wNullable = static_cast<SQLSMALLINT>(hb_parni(9));
    // SQLTCHAR bBuffer[128] = {0};
 
    RETCODE wResult;
@@ -901,10 +898,10 @@ HB_FUNC( SR_DESCRIB )
 
 HB_FUNC( SR_COLATTRIBUTE )
 {
-   SQLSMALLINT lLen = static_cast<SQLSMALLINT>(hb_parni(5));
+   auto lLen = static_cast<SQLSMALLINT>(hb_parni(5));
    auto bBuffer = static_cast<char*>(hb_xgrab(lLen));
-   SQLSMALLINT wBufLen = static_cast<SQLSMALLINT>(hb_parni(6));
-   SQLLEN wNumPtr = static_cast<SQLLEN>(hb_parnint(7));
+   auto wBufLen = static_cast<SQLSMALLINT>(hb_parni(6));
+   auto wNumPtr = static_cast<SQLLEN>(hb_parnint(7));
    RETCODE wResult = SQLColAttribute(static_cast<SQLHSTMT>(hb_parptr(1)),
                                      static_cast<SQLUSMALLINT>(hb_parni(2)),
                                      static_cast<SQLUSMALLINT>(hb_parni(3)),
@@ -1068,7 +1065,6 @@ HB_FUNC( SR_TABLES )
 
 HB_FUNC( SR_ODBCWRITEMEMO )
 {
-   SQLHDBC hDbc;
    SQLHSTMT hStmt;
    HB_ULONG uiLen, uiSize;
    auto sTable = hb_parc(2);
@@ -1078,7 +1074,7 @@ HB_FUNC( SR_ODBCWRITEMEMO )
    SQLLEN cbSize = 0;
 
    auto pArray = hb_param(5, Harbour::Item::ARRAY);
-   hDbc = static_cast<SQLHDBC>(hb_parptr(1));
+   auto hDbc = static_cast<SQLHDBC>(hb_parptr(1));
 
    uiLen = hb_arrayLen(pArray);
 
@@ -1130,16 +1126,14 @@ HB_FUNC( SR_ODBCWRITEMEMO )
 
 void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate, HB_USHORT ui)
 {
-   HB_LONG lType;
    HB_SIZE lDec,lLen;
-   char * cType;
    // PHB_ITEM pTemp;
    SQLLEN iLen;
    SQLLEN lLenOut;
    SQLRETURN res;
 
-   cType = const_cast<char*>(hb_arrayGetCPtr(pField, FIELD_TYPE));
-   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
+   auto cType = const_cast<char*>(hb_arrayGetCPtr(pField, FIELD_TYPE));
+   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
    lLen = hb_arrayGetNL(pField, FIELD_LEN);
    lDec = hb_arrayGetNL(pField, FIELD_DEC);
    iLen = SQL_NULL_DATA;

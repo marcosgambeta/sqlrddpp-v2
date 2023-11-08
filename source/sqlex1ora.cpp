@@ -500,7 +500,7 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
    switch( BindStructure->iCType ) {
       case SQL_C_CHAR: {
          int nTrim, i;
-         int size = static_cast<int>(hb_itemGetCLen(pFieldData));
+         auto size = static_cast<int>(hb_itemGetCLen(pFieldData));
          auto pszText = hb_itemGetCPtr(pFieldData);
 
          nTrim = size;
@@ -537,7 +537,7 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
       }
       case SQL_C_BINARY: {
          int nTrim, i;
-         int size = static_cast<int>(hb_itemGetCLen(pFieldData));
+         auto size = static_cast<int>(hb_itemGetCLen(pFieldData));
          auto pszText = hb_itemGetCPtr(pFieldData);
 
          nTrim = size;
@@ -861,7 +861,7 @@ static void BindAllIndexStmts(SQLEXORAAREAP thiswa)
    INDEXBINDORAP IndexBind, IndexBindParam;
    COLUMNBINDORAP BindStructure;
    int iCol, iBind, iLoop;
-   unsigned int  res = static_cast<unsigned int>(SQL_ERROR);
+   auto res = static_cast<unsigned int>(SQL_ERROR);
    char * sSql;
 
    if( thiswa->sqlarea.hOrdCurrent == 0 ) {
@@ -1159,12 +1159,12 @@ void SetIndexBindStructureOra(SQLEXORAAREAP thiswa)
 void SetCurrRecordStructureOra(SQLEXORAAREAP thiswa)
 {
    PHB_ITEM pFieldStruct, pFieldLen, pFieldDec;
-   int i, iCols;
+   int i;
    HB_LONG lType;
    char cType;
    COLUMNBINDORAP BindStructure;
 
-   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
+   auto iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
    thiswa->CurrRecord = (COLUMNBINDORAP) hb_xgrabz(iCols * sizeof(COLUMNBINDORA));
    // memset(thiswa->CurrRecord, 0, iCols * sizeof(COLUMNBIND));
@@ -3753,7 +3753,7 @@ static HB_ERRCODE sqlExOraOrderListFocus(SQLEXORAAREAP thiswa, LPDBORDERINFO pOr
 static HB_ERRCODE sqlExOraOrderCreate(SQLEXORAAREAP thiswa, LPDBORDERCREATEINFO pOrderCreateInfo)
 {
    HB_ERRCODE err;
-   int iLen = static_cast<int>(hb_arrayLen(thiswa->aFields));
+   auto iLen = static_cast<int>(hb_arrayLen(thiswa->aFields));
    thiswa->lBofAt = 0;
    thiswa->lEofAt = 0;
    thiswa->indexLevel = -1;
@@ -4321,23 +4321,21 @@ static int sqlKeyCompareEx(SQLEXORAAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 #if 0
 void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate, OCI_Resultset * rs)
 {
-   HB_LONG lType;
-   HB_LONG lLen, lDec;
    PHB_ITEM pTemp;
    unsigned int uiLen;
 
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
-   lLen = static_cast<HB_LONG>(hb_arrayGetNL(pField, 3));
-   lDec = static_cast<HB_LONG>(hb_arrayGetNL(pField, 4));
+   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
+   auto lLen = static_cast<HB_LONG>(hb_arrayGetNL(pField, 3));
+   auto lDec = static_cast<HB_LONG>(hb_arrayGetNL(pField, 4));
 
    // if( lLenBuff <= 0 ) // database content is NULL
    if( OCI_IsNull(rs, iField) ) {
       switch( lType ) {
          case SQL_CHAR: {
-            char * szResult = static_cast<char*>(hb_xgrabDebug(__LINE__, __FILE__, lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrabDebug(__LINE__, __FILE__, lLen + 1));
             hb_xmemset(szResult, ' ', lLen);
             hb_itemPutCLPtr(pItem, szResult, static_cast<HB_SIZE>(lLen));
             break;
@@ -4382,7 +4380,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOn
       switch( lType ) {
          case SQL_CHAR: {
             HB_SIZE lPos;
-            char * szResult = static_cast<char*>(hb_xgrabDebug(__LINE__, __FILE__, lLen + 1));
+            auto szResult = static_cast<char*>(hb_xgrabDebug(__LINE__, __FILE__, lLen + 1));
             memset(szResult, ' ', lLen);
             uiLen = OCI_GetDataLength(rs, iField);
             hb_xmemcpy(szResult, static_cast<char*>(OCI_GetString(rs, iField)), uiLen);
@@ -4391,13 +4389,13 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOn
             break;
          }
          case SQL_NUMERIC: {
-            char * bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
+            auto bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
             sr_escapeNumber(bBuffer, static_cast<HB_SIZE>(lLen), static_cast<HB_SIZE>(lDec), pItem);
             break;
          }
          case SQL_DATE: {
             char dt[9];
-            char * bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
+            auto bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
 
             dt[0] = bBuffer[0];
             dt[1] = bBuffer[1];
@@ -4424,7 +4422,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOn
             break;
          }
          case SQL_LONGVARCHAR: {
-            char * bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
+            auto bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
             HB_ULONG lLenBuff = strlen(bBuffer);
             if( lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2) ) && (sr_lSerializeArrayAsJson()) ) {
                if( s_pSym_SR_FROMJSON == nullptr ) {
@@ -4489,7 +4487,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOn
          }
 #endif
          case SQL_DATETIME: {
-         char * bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
+            auto bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
             long lJulian, lMilliSec;
             hb_timeStampStrGetDT(bBuffer, &lJulian, &lMilliSec);
             hb_itemPutTDT(pItem, lJulian, lMilliSec);

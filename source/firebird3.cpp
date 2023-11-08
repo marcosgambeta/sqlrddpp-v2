@@ -995,13 +995,12 @@ HB_FUNC( FBVERSION3 )
 
 static void FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBuff, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate)
 {
-   HB_LONG lType;
    HB_SIZE lLen, lDec;
    PHB_ITEM pTemp;
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
+   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
    lLen = hb_arrayGetNL(pField, 3);
    lDec = hb_arrayGetNL(pField, 4);
 
@@ -1328,7 +1327,7 @@ HB_FUNC( FBLINEPROCESSED3 )
                         //sprintf(p, "%*" ISC_INT64_FORMAT "d%", field_width, static_cast<ISC_INT64>(value));
                         //hb_snprintf(data, sizeof(data), "%*" ISC_INT64_FORMAT "d", field_width, static_cast<ISC_INT64>(value));
                         PHB_ITEM pField = hb_arrayGetItemPtr(pFields, icol);
-                        HB_LONG lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
+                        auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
                         if( lType == SQL_BIT || lType == SQL_SMALLINT ) {
                            hb_itemPutL(temp, static_cast<HB_BOOL>(value));
                         } else {

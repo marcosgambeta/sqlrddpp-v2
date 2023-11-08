@@ -731,7 +731,7 @@ HB_ERRCODE ExecuteInsertStmt(SQLEXAREAP thiswa)
 HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
 {
    SQLRETURN res;
-   int iCols, i, iBind;
+   int i, iBind;
    COLUMNBINDP CurrRecord;
    PHB_ITEM pColumns;
    char * temp;
@@ -748,7 +748,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
       odbcErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
    }
 
-   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
+   auto iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
    CurrRecord = thiswa->CurrRecord;
    iBind = 0;
    thiswa->bIndexTouchedInUpdate = false;

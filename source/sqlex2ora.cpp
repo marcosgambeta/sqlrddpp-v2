@@ -660,7 +660,7 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
 HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
 {
    int res;
-   int iCols, i, iBind;
+   int i, iBind;
    COLUMNBINDORAP CurrRecord;
    PHB_ITEM pColumns;
    char * temp;
@@ -679,7 +679,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
       OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, 0, __LINE__, __FILE__);
    }
 
-   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
+   auto iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
    CurrRecord = thiswa->CurrRecord;
    iBind = 0;
    thiswa->bIndexTouchedInUpdate = false;

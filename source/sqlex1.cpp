@@ -514,7 +514,7 @@ HB_ERRCODE SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hS
    switch( BindStructure->iCType ) {
       case SQL_C_CHAR: {
          int nTrim, i;
-         int size = static_cast<int>(hb_itemGetCLen(pFieldData));
+         auto size = static_cast<int>(hb_itemGetCLen(pFieldData));
          auto pszText = hb_itemGetCPtr(pFieldData);
 
          nTrim = size;
@@ -551,7 +551,7 @@ HB_ERRCODE SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hS
       }
       case SQL_C_BINARY: {
          int nTrim, i;
-         int size = static_cast<int>(hb_itemGetCLen(pFieldData));
+         auto size = static_cast<int>(hb_itemGetCLen(pFieldData));
          auto pszText = hb_itemGetCPtr(pFieldData);
 
          nTrim = size;
@@ -1205,14 +1205,14 @@ void SetIndexBindStructure(SQLEXAREAP thiswa)
 void SetCurrRecordStructure(SQLEXAREAP thiswa)
 {
    PHB_ITEM pFieldStruct, pFieldLen, pFieldDec;
-   int i, iCols;
+   int i;
    HB_LONG lType;
    char cType;
    COLUMNBINDP BindStructure;
    // bool bNullable, bMultiLang, bIsMemo;
    bool bMultiLang;
 
-   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
+   auto iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
    thiswa->CurrRecord = static_cast<COLUMNBINDP>(hb_xgrab(iCols * sizeof(COLUMNBIND)));
    memset(thiswa->CurrRecord, 0, iCols * sizeof(COLUMNBIND));
@@ -2045,7 +2045,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
             hb_arraySetForward(aRecord, i, temp); // Field is temporaly NIL since it's have never
                                                   // been needed in current WA. Will be filled on demand
          } else {
-            // HB_LONG lType = static_cast<HB_LONG>(hb_arrayGetNL(hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), FIELD_DOMAIN));
+            // auto lType = static_cast<HB_LONG>(hb_arrayGetNL(hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), FIELD_DOMAIN));
             ++iIndex;
            odbcGetData((HSTMT) thiswa->hStmtBuffer, hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), temp, 0, thiswa->nSystemID, bTranslate,iIndex);
            hb_arraySetForward(aRecord, i, temp);
@@ -2615,7 +2615,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
             hb_arraySetForward(aRecord, i, temp); // Field is temporaly NIL since it's have never
                                                   // been needed in current WA. Will be filled on demand
          } else {
-            // HB_LONG lType = static_cast<HB_LONG>(hb_arrayGetNL(hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), FIELD_DOMAIN));
+            // auto lType = static_cast<HB_LONG>(hb_arrayGetNL(hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), FIELD_DOMAIN));
             ++iIndex;
            odbcGetData((HSTMT) hStmt, hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), temp, 0, thiswa->nSystemID, bTranslate, iIndex);
            hb_arraySetForward(aRecord, i, temp);
@@ -3748,7 +3748,7 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
 static HB_ERRCODE sqlExOrderCreate(SQLEXAREAP thiswa, LPDBORDERCREATEINFO pOrderCreateInfo)
 {
    HB_ERRCODE err;
-   int iLen = static_cast<int>(hb_arrayLen(thiswa->aFields));
+   auto iLen = static_cast<int>(hb_arrayLen(thiswa->aFields));
    thiswa->lBofAt = 0;
    thiswa->lEofAt = 0;
    thiswa->indexLevel = -1;
