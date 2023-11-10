@@ -234,7 +234,7 @@ HB_FUNC( SR_DRIVERC )
    RETCODE ret = SQLDriverConnect(
       static_cast<SQLHDBC>(hb_parptr(1)),
       0,
-      reinterpret_cast<SQLCHAR*>(const_cast<char*>(hb_parcx(2)),
+      reinterpret_cast<SQLCHAR*>(const_cast<char*>(hb_parcx(2))),
       static_cast<SQLSMALLINT>(strlen(hb_parcx(2))),
       static_cast<SQLCHAR*>(bBuffer1),
       static_cast<SQLSMALLINT>(1024),
