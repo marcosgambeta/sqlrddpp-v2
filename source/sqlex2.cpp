@@ -409,17 +409,17 @@ HB_ERRCODE PrepareInsertStmt(SQLEXAREAP thiswa)
 
    if( CHECK_SQL_N_OK(res) ) {
       odbcErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmt/SQLAllocStmt", thiswa->sSql, res, __LINE__, __FILE__);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    res = SQLPrepare(thiswa->hStmtInsert, (SQLCHAR *) (thiswa->sSql), SQL_NTS);
 
    if( CHECK_SQL_N_OK(res) ) {
       odbcErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmt", thiswa->sSql, res, __LINE__, __FILE__);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -530,13 +530,13 @@ HB_ERRCODE BindInsertColumns(SQLEXAREAP thiswa)
 
          if( CHECK_SQL_N_OK(res) ) {
             odbcErrorDiagRTE(thiswa->hStmtInsert, "BindInsertColumns", thiswa->sSql, res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
       }
       InsertRecord++;
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -570,8 +570,8 @@ HB_ERRCODE FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate)
             pFieldData = hb_arrayGetItemPtr(thiswa->aBuffer, i);
 
             if( SR_itemEmpty(pFieldData) && (!InsertRecord->isNullable) ) {
-               if( SetBindEmptylValue(InsertRecord) == HB_FAILURE ) {
-                  return HB_FAILURE;
+               if( SetBindEmptylValue(InsertRecord) == Harbour::FAILURE ) {
+                  return Harbour::FAILURE;
                }
             } else {
                if( InsertRecord->isMultiLang && HB_IS_STRING(pFieldData) ) {
@@ -588,8 +588,8 @@ HB_ERRCODE FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate)
                   SerializeMemo(pFieldData);
                }
 
-               if( SetBindValue(pFieldData, InsertRecord, bUpdate ? thiswa->hStmtUpdate : thiswa->hStmtInsert) == HB_FAILURE ) {
-                  return HB_FAILURE;
+               if( SetBindValue(pFieldData, InsertRecord, bUpdate ? thiswa->hStmtUpdate : thiswa->hStmtInsert) == Harbour::FAILURE ) {
+                  return Harbour::FAILURE;
                }
             }
          }
@@ -597,7 +597,7 @@ HB_ERRCODE FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate)
       InsertRecord++;
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -611,7 +611,7 @@ HB_ERRCODE ExecuteInsertStmt(SQLEXAREAP thiswa)
    if( CHECK_SQL_N_OK(res) ) {
       odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/SQLExecute", thiswa->sSql, res, __LINE__, __FILE__);
       SQLCloseCursor(thiswa->hStmtInsert);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    // Retrieve RECNO
@@ -636,7 +636,7 @@ HB_ERRCODE ExecuteInsertStmt(SQLEXAREAP thiswa)
                if( CHECK_SQL_N_OK(res) ) {
                   odbcErrorDiagRTE(thiswa->hStmtInsert, "SQLMoreResults", thiswa->sSql, res, __LINE__, __FILE__);
                   SQLCloseCursor(thiswa->hStmtInsert);
-                  return HB_FAILURE;
+                  return Harbour::FAILURE;
                }
             }
             // #endif
@@ -644,12 +644,12 @@ HB_ERRCODE ExecuteInsertStmt(SQLEXAREAP thiswa)
          res = SQLFetch(thiswa->hStmtInsert);
          if( CHECK_SQL_N_OK(res) ) {
             odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/Fetch", thiswa->sSql, res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
          res = SQLGetData(thiswa->hStmtInsert, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), nullptr);
          if( CHECK_SQL_N_OK(res) ) {
             odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/GetData", thiswa->sSql, res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
          break;
       }
@@ -678,13 +678,13 @@ HB_ERRCODE ExecuteInsertStmt(SQLEXAREAP thiswa)
             _res = SQLAllocHandle(SQL_HANDLE_STMT, (HDBC) thiswa->hDbc, &(thiswa->hStmtNextval));
             if( CHECK_SQL_N_OK(_res) ) {
                odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLAllocStmt", ident, _res, __LINE__, __FILE__);
-               return HB_FAILURE;
+               return Harbour::FAILURE;
             }
    
             _res = SQLPrepare(thiswa->hStmtNextval, (SQLCHAR *) (ident), SQL_NTS);
             if( CHECK_SQL_N_OK(_res) ) {
                odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLPrepare", ident, _res, __LINE__, __FILE__);
-               return HB_FAILURE;
+               return Harbour::FAILURE;
             }
          } else {
             ident[0] = '\0';
@@ -693,17 +693,17 @@ HB_ERRCODE ExecuteInsertStmt(SQLEXAREAP thiswa)
          _res = SQLExecute(thiswa->hStmtNextval);
          if( CHECK_SQL_N_OK(_res) ) {
             odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLExecute", ident, _res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
          _res = SQLFetch(thiswa->hStmtNextval);
          if( CHECK_SQL_N_OK(_res) ) {
             odbcErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmt/Fetch", ident, _res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
          _res = SQLGetData(thiswa->hStmtNextval, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), nullptr);
          if( CHECK_SQL_N_OK(_res) ) {
             odbcErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmt/GetData", ident, _res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
          SQLFreeStmt(thiswa->hStmtNextval, SQL_CLOSE);
          break;
@@ -723,7 +723,7 @@ HB_ERRCODE ExecuteInsertStmt(SQLEXAREAP thiswa)
 
    SQLCloseCursor(thiswa->hStmtInsert);
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -874,7 +874,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
 
          if( CHECK_SQL_N_OK(res) ) {
             odbcErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
       }
       CurrRecord++;
@@ -898,13 +898,13 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
       nullptr);
    if( CHECK_SQL_N_OK(res) ) {
       odbcErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    res = SQLPrepare(thiswa->hStmtUpdate, (SQLCHAR *) (thiswa->sSql), SQL_NTS);
    if( CHECK_SQL_N_OK(res) ) {
       odbcErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    if( (!thiswa->bIndexTouchedInUpdate) && thiswa->hOrdCurrent ) {
@@ -919,7 +919,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
       }
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -934,8 +934,8 @@ HB_ERRCODE ExecuteUpdateStmt(SQLEXAREAP thiswa)
 
    thiswa->lUpdatedRecord = GetCurrentRecordNum(thiswa);
 
-   if( FeedRecordCols(thiswa, true) == HB_FAILURE ) { // Stmt created and prepared, only need to push data
-      return HB_FAILURE;
+   if( FeedRecordCols(thiswa, true) == Harbour::FAILURE ) { // Stmt created and prepared, only need to push data
+      return Harbour::FAILURE;
    }
 
    // Execute statement
@@ -946,7 +946,7 @@ HB_ERRCODE ExecuteUpdateStmt(SQLEXAREAP thiswa)
       odbcErrorDiagRTE(thiswa->hStmtUpdate, "ExecuteUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
       SQLCloseCursor(thiswa->hStmtUpdate);
       thiswa->hStmtUpdate = nullptr;
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    // If any Index column was touched, SKIP buffer is not valid anymore
@@ -968,7 +968,7 @@ HB_ERRCODE ExecuteUpdateStmt(SQLEXAREAP thiswa)
    }
    hb_itemRelease(pKey);
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/

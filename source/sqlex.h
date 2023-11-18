@@ -80,8 +80,8 @@ static const char * closeQuotes = "\"\"\"]\"\"\"\"\"\"\"\"`\"\"\"`\"\"`\"\"\"";
 #define CHECK_SQL_N_OK(res)      ((res != SQL_SUCCESS) && (res != SQL_SUCCESS_WITH_INFO))
 #define OPEN_QUALIFIER(thiswa)   (openQuotes[thiswa->nSystemID])
 #define CLOSE_QUALIFIER(thiswa)  (closeQuotes[thiswa->nSystemID])
-#define RESULTSET_OK      HB_SUCCESS + 10
-#define RESULTSET_NOK     HB_SUCCESS + 11
+#define RESULTSET_OK      Harbour::SUCCESS + 10
+#define RESULTSET_NOK     Harbour::SUCCESS + 11
 
 #undef HB_TRACE
 #define HB_TRACE(x, y)

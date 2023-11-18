@@ -177,7 +177,7 @@ static HB_ERRCODE getSeekWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType,
 
    SolveFiltersOra(thiswa, bWhere);
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -195,21 +195,21 @@ HB_ERRCODE prepareSeekQueryOra(SQLEXORAAREAP thiswa, INDEXBINDORAP SeekBind)
 
    if( thiswa->recordListDirection == LIST_FORWARD ) {
       if( SeekBind->SeekFwdStmt == nullptr ) {
-         return HB_FAILURE;
+         return Harbour::FAILURE;
       }
    } else {
       if( SeekBind->SeekBwdStmt == nullptr ) {
-         return HB_FAILURE;
+         return Harbour::FAILURE;
       }
    }
 
    // if( hPrep == nullptr ) {
-   //    return HB_FAILURE;
+   //    return Harbour::FAILURE;
    // }
    OCI_AllowRebinding(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt, 1);
 
    if( !OCI_Prepare(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt, thiswa->sSql) ) {
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    if( thiswa->recordListDirection == LIST_FORWARD ) {
@@ -222,7 +222,7 @@ HB_ERRCODE prepareSeekQueryOra(SQLEXORAAREAP thiswa, INDEXBINDORAP SeekBind)
       SeekBind->SeekBwdSql[PREPARED_SQL_LEN - 1] = '\0';
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -492,12 +492,12 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
             BindStructure->asTimestamp.fraction = 0;
          } else {
             // To Do: Raise RT error
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
       } else if( HB_IS_NUMERIC(pKey) ) {
          if( BindStructure->iCType != SQL_C_DOUBLE || BindStructure->iCType != SQL_C_NUMERIC ) { // Check column data type
             // To Do: Raise RT error
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
          if( BindStructure->iCType == SQL_C_NUMERIC ) {
             BindStructure->asNumeric = static_cast<HB_LONG>(hb_itemGetNInt(pKey));
@@ -507,12 +507,12 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * q
       } else if( HB_IS_LOGICAL(pKey) ) {
          if( BindStructure->iCType != SQL_C_BIT ) { // Check column data type
             // To Do: Raise RT error
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
          BindStructure->asLogical = hb_itemGetNInt(pKey);
       }
    }
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -637,19 +637,19 @@ HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT * 
    if( !res  ) {
       OraErrorDiagRTE(*hStmt, "getPreparedSeekora", "", res, __LINE__, __FILE__);
       OCI_StatementFree(*hStmt);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    *rs = OCI_GetResultset(*hStmt);
    if( *rs ==  nullptr ) {
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    OCI_FetchNext(*rs);
    thiswa->recordList[0] = OCI_GetUnsignedBigInt(*rs, 1);
    if( thiswa->recordList[0] == 0 ) {
       // OCI_StatementFree(*hStmt);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    if( thiswa->sqlarea.ulhDeleted > 0 ) {
@@ -658,7 +658,7 @@ HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT * 
 
       if( OCI_GetString(*rs,2 ) == nullptr ) {
          // OCI_StatementFree(*hStmt);
-         return HB_FAILURE;
+         return Harbour::FAILURE;
       }
       uiLen = OCI_GetDataLength(*rs, 2);
 
@@ -678,7 +678,7 @@ HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT * 
    thiswa->recordListSize = 1L;
    thiswa->recordListPos = 0;
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 HB_ERRCODE FeedSeekStmtOra(SQLEXORAAREAP thiswa, int queryLevel)
@@ -707,5 +707,5 @@ HB_ERRCODE FeedSeekStmtOra(SQLEXORAAREAP thiswa, int queryLevel)
      InsertRecord++;
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }

@@ -361,17 +361,17 @@ HB_ERRCODE PrepareInsertStmtOra(SQLEXORAAREAP thiswa)
 
    if( thiswa->hStmtInsert == nullptr ) {
       OraErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmtOra/SQLAllocStmt", thiswa->sSql, 0, __LINE__, __FILE__);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
    OCI_AllowRebinding(thiswa->hStmtInsert, 1);
    // res = SQLPrepare(thiswa->hStmtInsert, static_cast<char*>(thiswa->sSql), SQL_NTS);
 
    if( !OCI_Prepare(thiswa->hStmtInsert, (thiswa->sSql)) ) { // if( CHECK_SQL_N_OK(res) )
       OraErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmtOra", thiswa->sSql, 0, __LINE__, __FILE__);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -476,13 +476,13 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
 
          if( !res ) {
             OraErrorDiagRTE(thiswa->hStmtInsert, "BindInsertColumnsOra", thiswa->sSql, 0, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
       }
       InsertRecord++;
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -512,8 +512,8 @@ HB_ERRCODE FeedRecordColsOra(SQLEXORAAREAP thiswa, HB_BOOL bUpdate)
             pFieldData = hb_arrayGetItemPtr(thiswa->sqlarea.aBuffer, i);
 
             if( SR_itemEmpty2(pFieldData) && (!InsertRecord->isNullable)) {
-               if( SetBindEmptylValue2(InsertRecord) == HB_FAILURE ) {
-                  return HB_FAILURE;
+               if( SetBindEmptylValue2(InsertRecord) == Harbour::FAILURE ) {
+                  return Harbour::FAILURE;
                }
             } else {
                if( InsertRecord->isMultiLang && HB_IS_STRING(pFieldData) ) {
@@ -530,8 +530,8 @@ HB_ERRCODE FeedRecordColsOra(SQLEXORAAREAP thiswa, HB_BOOL bUpdate)
                   SerializeMemo(pFieldData);
                }
 
-               if( SetBindValue2(pFieldData, InsertRecord, bUpdate ? thiswa->hStmtUpdate : thiswa->hStmtInsert) == HB_FAILURE ) {
-                  return HB_FAILURE;
+               if( SetBindValue2(pFieldData, InsertRecord, bUpdate ? thiswa->hStmtUpdate : thiswa->hStmtInsert) == Harbour::FAILURE ) {
+                  return Harbour::FAILURE;
                }
             }
          }
@@ -539,7 +539,7 @@ HB_ERRCODE FeedRecordColsOra(SQLEXORAAREAP thiswa, HB_BOOL bUpdate)
       InsertRecord++;
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -571,7 +571,7 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
    if( !res ) {
       OraErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmtOra/SQLExecute", thiswa->sSql, res, __LINE__, __FILE__);
       // OCI_StatementFree(thiswa->hStmtInsert);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    // manda os blobs
@@ -601,14 +601,14 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
             thiswa->hStmtNextval = OCI_StatementCreate(GetConnection(thiswa->hDbc));
             if( thiswa->hStmtNextval == nullptr ) {
                OraErrorDiagRTE(thiswa->hStmtNextval, "SQLAllocStmt", ident, 0, __LINE__, __FILE__);
-               return HB_FAILURE;
+               return Harbour::FAILURE;
             }
 
             OCI_AllowRebinding(thiswa->hStmtNextval, 1);
             res = OCI_Prepare(thiswa->hStmtNextval, (ident));
             if( !res ) {
                OraErrorDiagRTE(thiswa->hStmtNextval, "SQLPrepare", ident, res, __LINE__, __FILE__);
-               return HB_FAILURE;
+               return Harbour::FAILURE;
             }
          } else {
             ident[0] = '\0';
@@ -618,7 +618,7 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
          res = OCI_Execute(thiswa->hStmtNextval);
          if( !res) {
             OraErrorDiagRTE(thiswa->hStmtNextval, "SQLExecute", ident, res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
          // res = SQLFetch(thiswa->hStmtNextval);
          // if( CHECK_SQL_N_OK(res) )
@@ -626,7 +626,7 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
          if( rs == nullptr ) {
             OraErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmtOra/Fetch", ident, res, __LINE__, __FILE__);
             // thiswa->hStmtNextval = nullptr;
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
 
          res = OCI_FetchNext(rs);
@@ -635,7 +635,7 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
 
          if( thiswa->recordList[0] == 0 ) {
             OraErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmtOra/GetData", ident, res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
          break;
       }
@@ -652,7 +652,7 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
    hb_arraySetNLL(thiswa->sqlarea.aInfo, AINFO_RCOUNT, thiswa->recordList[0]);
    thiswa->lLastRec = thiswa->recordList[0] + 1;
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -726,7 +726,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
    res = OCI_Prepare(thiswa->hStmtUpdate, static_cast<char*>(thiswa->sSql));
    if( !res ) {
       OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, res, __LINE__, __FILE__);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    // Binda os Valores
@@ -835,7 +835,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
 
          if( !res ) {
             OraErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
-            return HB_FAILURE;
+            return Harbour::FAILURE;
          }
       }
       CurrRecord++;
@@ -849,14 +849,14 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
    res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, thiswa->sRecnoName, &thiswa->lUpdatedRecord);
    if( !res  ) {
       OraErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    // res = SQLPrepare(thiswa->hStmtUpdate, static_cast<char*>(thiswa->sSql), SQL_NTS);
    // res = OCI_Prepare(thiswa->hStmtUpdate, static_cast<char*>(thiswa->sSql));
    // if( !res ) {
    //    OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, res, __LINE__, __FILE__);
-   //    return HB_FAILURE;
+   //    return Harbour::FAILURE;
    // }
 
    if( (!thiswa->bIndexTouchedInUpdate) && thiswa->sqlarea.hOrdCurrent ) {
@@ -871,7 +871,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
       }
    }
 
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -886,8 +886,8 @@ HB_ERRCODE ExecuteUpdateStmtOra(SQLEXORAAREAP thiswa)
 
    thiswa->lUpdatedRecord = GetCurrentRecordNumOra(thiswa);
 
-   if( FeedRecordColsOra(thiswa, true) == HB_FAILURE ) { // Stmt created and prepared, only need to push data
-      return HB_FAILURE;
+   if( FeedRecordColsOra(thiswa, true) == Harbour::FAILURE ) { // Stmt created and prepared, only need to push data
+      return Harbour::FAILURE;
    }
 
    // Execute statement
@@ -898,7 +898,7 @@ HB_ERRCODE ExecuteUpdateStmtOra(SQLEXORAAREAP thiswa)
    if( !res ) {
       OraErrorDiagRTE(thiswa->hStmtUpdate, "ExecuteUpdateStmtOra", thiswa->sSql, res, __LINE__, __FILE__);
       // OCI_StatementFree(thiswa->hStmtInsert);
-      return HB_FAILURE;
+      return Harbour::FAILURE;
    }
 
    // If any Index column was touched, SKIP buffer is not valid anymore
@@ -919,7 +919,7 @@ HB_ERRCODE ExecuteUpdateStmtOra(SQLEXORAAREAP thiswa)
       hb_arrayCopy(thiswa->sqlarea.aBuffer, aRecord, nullptr, nullptr, nullptr);
    }
    hb_itemRelease(pKey);
-   return HB_SUCCESS;
+   return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
