@@ -147,7 +147,7 @@ void fixCachePointer(HB_LONG * lPosCache)
 
 HB_FUNC( SR_FIXCACHEPOINTER )
 {
-   HB_LONG lPos = hb_parnl(1);
+   auto lPos = hb_parnl(1);
    fixCachePointer(&lPos);
    hb_retnl(lPos);
 }

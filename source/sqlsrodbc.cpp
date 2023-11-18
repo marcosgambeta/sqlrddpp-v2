@@ -658,7 +658,7 @@ HB_FUNC( SR_ODBCGETLINES ) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lT
    bool bFetchAll = hb_parl(11);
    auto pFetch = hb_param(12, Harbour::Item::ARRAY);
    auto pRec = hb_param(13, Harbour::Item::ANY);
-   HB_LONG lPos = hb_parnl(14);
+   auto lPos = hb_parnl(14);
 
    HB_ULONG ulPosCache = hb_arrayGetNL(pInfo, AINFO_NPOSCACHE);
 
