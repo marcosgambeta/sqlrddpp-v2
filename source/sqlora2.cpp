@@ -371,9 +371,9 @@ HB_FUNC( ORACLEINBINDPARAM2 )
 {
 
    POCI_ORASESSION Stmt = (POCI_ORASESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
-   int iParamNum = hb_parni(2);
-   int iParamType = hb_parni(3);
-   int iFieldSize = hb_parni(4);
+   auto iParamNum = hb_parni(2);
+   auto iParamType = hb_parni(3);
+   auto iFieldSize = hb_parni(4);
    int iPos = iParamNum - 1;
    int ret = SQL_ERROR;
    bool lStmt = HB_ISLOG(7) ? hb_parl(7) : false;
@@ -946,12 +946,12 @@ HB_FUNC( SQLO2_DESCRIBECOL ) // ( hStmt, nCol, @cName, @nDataType, @nColSize, @n
     
    int prec, scale, nullok, type;                                                       
    unsigned int dbsize,dType,ncol;
-   char * name;                                                                                          
-//     SQLO2_stmt_handle_t stmtParamRes;                                                                     
-                                                                                                         
+   char * name;
+//     SQLO2_stmt_handle_t stmtParamRes;
+
    if( session ) {
-      OCI_Column *col;                                                                                  
-      ncol = hb_parni(2);                                                                                
+      OCI_Column *col;
+      ncol = hb_parni(2);
       //stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
       //SQLO2_describecol(stmtParamRes, ncol, &dType, &name, &namelen, &prec, &scale, &dbsize, &nullok);
 

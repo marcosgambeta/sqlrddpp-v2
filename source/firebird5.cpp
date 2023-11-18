@@ -526,7 +526,7 @@ HB_FUNC( FBEXECUTEIMMEDIATE5 ) // FBExecuteImmediate(hEnv, cCmd, nDialect)
 HB_FUNC( FBDESCRIBECOL5 ) // FBDescribeCol(hStmt, nCol, @cName, @nType, @nLen, @nDec, @nNull)
 {
    auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
-   int icol = hb_parni(2);
+   auto icol = hb_parni(2);
    int dtype, rettype, i;
    XSQLVAR * var;
 
@@ -671,7 +671,7 @@ HB_FUNC( FBFETCH5 ) // FBFetch(hEnv)
 HB_FUNC( FBGETDATA5 ) // FBGetData(hEnv, nField, @uData)
 {
    auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
-   int icol = hb_parni(2);
+   auto icol = hb_parni(2);
    int dtype, i;
    char data[MSG_BUFFER_LEN], *p;
    char date_s[30];
@@ -890,15 +890,13 @@ HB_FUNC( FBCREATEDB5 )
    isc_tr_handle trans = 0;
    long status[20];
    char create_db[1024];
-   int page;
-   int dialect;
 
    auto db_name = hb_parcx(1);
    auto username = hb_parcx(2);
    auto passwd = hb_parcx(3);
-   page = hb_parni(4);
+   auto page = hb_parni(4);
    auto charset = hb_parc(5);
-   dialect = hb_parni(6);
+   auto dialect = hb_parni(6);
 
    if( !dialect ) {
       dialect = 3;

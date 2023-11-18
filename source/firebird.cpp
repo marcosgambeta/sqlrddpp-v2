@@ -481,7 +481,7 @@ HB_FUNC( FBEXECUTEIMMEDIATE ) // FBExecuteImmediate(hEnv, cCmd, nDialect)
 HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol(hStmt, nCol, @cName, @nType, @nLen, @nDec, @nNull)
 {
    auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
-   int icol = hb_parni(2);
+   auto icol = hb_parni(2);
    int dtype, rettype, i;
    XSQLVAR * var;
 
@@ -617,7 +617,7 @@ HB_FUNC( FBFETCH )   // FBFetch(hEnv)
 HB_FUNC( FBGETDATA )    // FBGetData(hEnv, nField, @uData)
 {
    auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
-   int icol = hb_parni(2);
+   auto icol = hb_parni(2);
    int dtype, i;
    char data[MSG_BUFFER_LEN], *p;
    char date_s[30];

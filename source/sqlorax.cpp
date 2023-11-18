@@ -790,9 +790,9 @@ HB_FUNC( ORACLEINBINDPARAM )
 {
 
    POCI_SESSION Stmt = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
-   int iParamNum = hb_parni(2);
-   int iParamType = hb_parni(3);
-   int iFieldSize = hb_parni(4);
+   auto iParamNum = hb_parni(2);
+   auto iParamType = hb_parni(3);
+   auto iFieldSize = hb_parni(4);
    int iPos = iParamNum - 1;
    int ret = SQL_ERROR;
    bool lStmt = HB_ISLOG(7) ? hb_parl(7) : false;
@@ -1104,7 +1104,7 @@ HB_FUNC( ORACLE_CLOSE_FCURSOR )
 HB_FUNC( ORACLE_BIND_BY_NAME ) 
 {
    POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
-   int iPos = hb_parni(2);
+   auto iPos = hb_parni(2);
    hb_retni(sqlo_bind_by_name(session->stmtParam, ":c1", SQLOT_FLT, &session->pLink[iPos].dValue, sizeof(session->pLink[iPos].dValue), 0, 0));
 }
 

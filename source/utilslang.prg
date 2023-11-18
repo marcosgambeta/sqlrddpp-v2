@@ -370,7 +370,7 @@ HB_FUNC_STATIC( SR_SETMSGCOUNT )
 
 HB_FUNC( SR_SETBASELANG )
 {
-   int iLang = hb_parni(1);
+   auto iLang = hb_parni(1);
 
    hb_retni(s_iBaseLang);
 
@@ -381,7 +381,7 @@ HB_FUNC( SR_SETBASELANG )
 
 HB_FUNC( SR_SETSECONDLANG )
 {
-   int iLang = hb_parni(1);
+   auto iLang = hb_parni(1);
 
    hb_retni(s_iSecondLang);
 
@@ -392,7 +392,7 @@ HB_FUNC( SR_SETSECONDLANG )
 
 HB_FUNC( SR_SETROOTLANG )
 {
-   int iLang = hb_parni(1);
+   auto iLang = hb_parni(1);
 
    hb_retni(s_iRootLang);
 

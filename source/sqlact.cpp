@@ -506,11 +506,10 @@ HB_FUNC( SR_ESCAPESTRING )
 {
    const char * FromBuffer;
    HB_SIZE iSize;
-   int idatabase;
    char * ToBuffer;
 
    iSize = hb_parclen(1);
-   idatabase = hb_parni(2);
+   auto idatabase = hb_parni(2);
 
    if( !(HB_ISCHAR(1) && HB_ISNUM(2)) ) {
       hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPESTRING", 2, hb_param(1, Harbour::Item::ANY), hb_param(2, Harbour::Item::ANY));
@@ -831,7 +830,7 @@ PHB_ITEM sr_escapeNumber(char * FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM p
 HB_FUNC( SR_DBQUALIFY )
 {
    auto pText = hb_param(1, Harbour::Item::STRING);
-   int ulDb = hb_parni(2);
+   auto ulDb = hb_parni(2);
 
    if( pText ) {
       HB_SIZE ulLen, i;
