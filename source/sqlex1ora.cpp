@@ -1028,7 +1028,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
    char * temp;
 
    if( thiswa->sqlarea.sqlfilter ) {
-      char * sFilter = getMessageC(thiswa->sqlarea.oWorkArea, "CFILTER");
+      auto sFilter = getMessageC(thiswa->sqlarea.oWorkArea, "CFILTER");
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
@@ -1043,7 +1043,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
          }
       }
    } else {
-      char * sFilter = getMessageC(thiswa->sqlarea.oWorkArea, "CFILTER");
+      auto sFilter = getMessageC(thiswa->sqlarea.oWorkArea, "CFILTER");
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
@@ -1079,7 +1079,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
    // Resolve other restrictors - MISSING!!!
 
    {
-      char * sFilter = getMessageC(thiswa->sqlarea.oWorkArea, "CSCOPE");
+      auto sFilter = getMessageC(thiswa->sqlarea.oWorkArea, "CSCOPE");
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
@@ -1096,7 +1096,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
    }
 
    {
-      char * sFilter = getMessageC(thiswa->sqlarea.oWorkArea, "CFLTUSR");
+      auto sFilter = getMessageC(thiswa->sqlarea.oWorkArea, "CFLTUSR");
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {

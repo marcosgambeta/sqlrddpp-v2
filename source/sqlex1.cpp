@@ -1056,7 +1056,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
 
    char * temp;
 
-   char * szfor = getMessageC(thiswa->oWorkArea, "CFOR");
+   auto szfor = getMessageC(thiswa->oWorkArea, "CFOR");
    if( szfor ) {
       if( szfor[0] ) {
          if( bWhere ) {
@@ -1074,7 +1074,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
    /////////////////////////////////////////////////////////////////////////////
 
    if( thiswa->sqlfilter ) {
-      char * sFilter = getMessageC(thiswa->oWorkArea, "CFILTER");
+      auto sFilter = getMessageC(thiswa->oWorkArea, "CFILTER");
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
@@ -1089,7 +1089,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
          }
       }
    } else {
-      char * sFilter = getMessageC(thiswa->oWorkArea, "CFILTER");
+      auto sFilter = getMessageC(thiswa->oWorkArea, "CFILTER");
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
@@ -1125,7 +1125,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
    // Resolve other restrictors - MISSING!!!
 
    {
-      char * sFilter = getMessageC(thiswa->oWorkArea, "CSCOPE");
+      auto sFilter = getMessageC(thiswa->oWorkArea, "CSCOPE");
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
@@ -1142,7 +1142,7 @@ void SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
    }
 
    {
-      char * sFilter = getMessageC(thiswa->oWorkArea, "CFLTUSR");
+      auto sFilter = getMessageC(thiswa->oWorkArea, "CFLTUSR");
       if( sFilter ) {
          if( sFilter[0] ) {
             if( bWhere ) {
