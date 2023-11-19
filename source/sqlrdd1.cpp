@@ -258,7 +258,7 @@ void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 
    hb_arraySetNL(thiswa->aInfo, AINFO_NPOSCACHE, lPos);
 
-   pCacheRecord = (PHB_ITEM) hb_arrayGetItemPtr(thiswa->aCache, lPos);
+   pCacheRecord = static_cast<PHB_ITEM>(hb_arrayGetItemPtr(thiswa->aCache, lPos));
 
    auto pCol = hb_itemNew(nullptr);
 
@@ -296,7 +296,7 @@ void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
    HB_SIZE nPos, nLen;
    PHB_ITEM pCacheRecord;
 
-   pCacheRecord = (PHB_ITEM) hb_arrayGetItemPtr(thiswa->aCache, lPos);
+   pCacheRecord = static_cast<PHB_ITEM>(hb_arrayGetItemPtr(thiswa->aCache, lPos));
 
    auto pCol = hb_itemNew(nullptr);
 
@@ -555,15 +555,15 @@ int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 
    //TraceLog(nullptr, "sqlKeyCompare\n");
 
-   pTag = loadTagDefault((SQLAREAP) thiswa, nullptr, &lorder);
+   pTag = loadTagDefault(reinterpret_cast<SQLAREAP>(thiswa), nullptr, &lorder);
    if( pTag ) {
-      if( ((SQLAREAP)thiswa)->firstinteract ) {
-         SELF_GOTOP((AREAP) thiswa);
-         ((SQLAREAP)thiswa)->firstinteract = 0;
+      if( (reinterpret_cast<SQLAREAP>(thiswa))->firstinteract ) {
+         SELF_GOTOP(static_cast<AREAP>(thiswa));
+         (reinterpret_cast<SQLAREAP>(thiswa))->firstinteract = 0;
       }
       itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
       if( HB_IS_NUMBER(itemTemp) ) {
-         pKeyVal = hb_itemArrayGet(((SQLAREAP) thiswa)->aBuffer, hb_arrayGetNL(pTag, INDEX_KEY_CODEBLOCK));
+         pKeyVal = hb_itemArrayGet((reinterpret_cast<SQLAREAP>(thiswa))->aBuffer, hb_arrayGetNL(pTag, INDEX_KEY_CODEBLOCK));
          len1 = static_cast<HB_BYTE>(hb_strRTrimLen(hb_itemGetCPtr(pKeyVal), hb_itemGetCLen(pKeyVal), false)) - 15;
          val1 = hb_itemGetCPtr(pKeyVal);
       } else {
@@ -1264,7 +1264,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
       SELF_FORCEREL(&thiswa->area);
    }
 
-   fieldindex = (HB_USHORT)thiswa->uiBufferIndex[fieldNum - 1];
+   fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
    pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
 //                if( s_pSym_SR_FROMXML == nullptr ) {
 //                   s_pSym_SR_FROMXML = hb_dynsymFindName("ESCREVE");
@@ -1472,8 +1472,8 @@ static HB_ERRCODE sqlSetFieldExtent(SQLAREAP thiswa, HB_USHORT uiFieldExtent)
    // thiswa->uiFieldList = static_cast<int*>(hb_xgrab(uiFieldExtent * sizeof(int)));
    // memset(thiswa->uiBufferIndex, 0, uiFieldExtent * sizeof(int));
    // memset(thiswa->uiFieldList,  0, uiFieldExtent * sizeof(int));
-   thiswa->uiBufferIndex = (int *) hb_xgrabz(uiFieldExtent * sizeof(int));
-   thiswa->uiFieldList = (int *) hb_xgrabz(uiFieldExtent * sizeof(int));
+   thiswa->uiBufferIndex = static_cast<int*>(hb_xgrabz(uiFieldExtent * sizeof(int)));
+   thiswa->uiFieldList = static_cast<int*>(hb_xgrabz(uiFieldExtent * sizeof(int)));
    return Harbour::SUCCESS;
 }
 
@@ -2589,7 +2589,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
                   hb_itemRelease(pTemp);
                }
                if( pInfo->itmNewVal ) {
-                  sqlSetServerSideIndexScope((SQLAREAP) thiswa, 0, pInfo->itmNewVal);
+                  sqlSetServerSideIndexScope(static_cast<SQLAREAP>(thiswa), 0, pInfo->itmNewVal);
                }
                hb_itemRelease(pTag);
             } else {
@@ -2605,7 +2605,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
                   hb_itemRelease(pTemp);
                }
                if( pInfo->itmNewVal ) {
-                  sqlSetServerSideIndexScope((SQLAREAP) thiswa, 1, pInfo->itmNewVal);
+                  sqlSetServerSideIndexScope(static_cast<SQLAREAP>(thiswa), 1, pInfo->itmNewVal);
                }
                hb_itemRelease(pTag);
             } else {
@@ -2616,13 +2616,13 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
          case DBOI_SCOPETOPCLEAR :
             pTag = loadTagDefault(thiswa, pInfo, &lorder);
             if( pTag ) {
-               sqlSetServerSideIndexScope((SQLAREAP) thiswa, 0, nullptr);
+               sqlSetServerSideIndexScope(static_cast<SQLAREAP>(thiswa), 0, nullptr);
             }
             break;
          case DBOI_SCOPEBOTTOMCLEAR :
             pTag = loadTagDefault(thiswa, pInfo, &lorder);
             if( pTag ) {
-               sqlSetServerSideIndexScope((SQLAREAP) thiswa, 1, nullptr);
+               sqlSetServerSideIndexScope(static_cast<SQLAREAP>(thiswa), 1, nullptr);
             }
             break;
          case DBOI_SCOPESET:
@@ -2634,7 +2634,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
                   hb_itemRelease(pTemp);
                }
                if( pInfo->itmNewVal ) {
-                  sqlSetServerSideIndexScope((SQLAREAP) thiswa, TOP_BOTTOM_SCOPE, pInfo->itmNewVal);
+                  sqlSetServerSideIndexScope(static_cast<SQLAREAP>(thiswa), TOP_BOTTOM_SCOPE, pInfo->itmNewVal);
                }
                hb_itemRelease(pTag);
             } else {
@@ -2904,17 +2904,17 @@ static HB_ERRCODE sqlLock(SQLAREAP thiswa, LPDBLOCKINFO pLockInfo)
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 2, pMethod, pRecord);
          hb_itemRelease(pRecord);
 
-         pLockInfo->fResult = (HB_USHORT) hb_itemGetL(hb_stackReturnItem());
+         pLockInfo->fResult = static_cast<HB_USHORT>(hb_itemGetL(hb_stackReturnItem()));
          break;
 
       case DBLM_MULTIPLE:
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 2, pMethod, pLockInfo->itmRecID);
-         pLockInfo->fResult = (HB_USHORT) hb_itemGetL(hb_stackReturnItem());
+         pLockInfo->fResult = static_cast<HB_USHORT>(hb_itemGetL(hb_stackReturnItem()));
          break;
 
       case DBLM_FILE:
          hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 1, pMethod);
-         pLockInfo->fResult = (HB_USHORT) hb_itemGetL(hb_stackReturnItem());
+         pLockInfo->fResult = static_cast<HB_USHORT>(hb_itemGetL(hb_stackReturnItem()));
          break;
 
       default:
@@ -3074,9 +3074,9 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
       return false;
    }
 
-   SELF_SETFIELDEXTENT(&thiswa->area, (HB_USHORT) numFields);
+   SELF_SETFIELDEXTENT(&thiswa->area, static_cast<HB_USHORT>(numFields));
 
-   for( i = 1; i <= (HB_USHORT) numFields; i++ ) {
+   for( i = 1; i <= static_cast<HB_USHORT>(numFields); i++ ) {
       thisfield = hb_itemArrayGet(thiswa->aStruct, i);
 
       if( hb_itemType(thisfield) != Harbour::Item::ARRAY ) {
@@ -3088,13 +3088,13 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
       memset(&field, 0, sizeof(field));
 
       field.uiTypeExtended = 0;
-      field.atomName = hb_arrayGetC(thisfield, (HB_USHORT) 1);
-      field.uiDec = (HB_USHORT) 0;
-      field.uiLen = (HB_USHORT)hb_arrayGetNI(thisfield, (HB_USHORT) 3);
+      field.atomName = hb_arrayGetC(thisfield, static_cast<HB_USHORT>(1));
+      field.uiDec = static_cast<HB_USHORT>(0);
+      field.uiLen = static_cast<HB_USHORT>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(3)));
 
-      thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, (HB_USHORT) 5));
+      thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(5)));
 
-      fieldType = (unsigned char *) hb_arrayGetCPtr(thisfield, (HB_USHORT) 2);
+      fieldType = reinterpret_cast<unsigned char*>(const_cast<char*>(hb_arrayGetCPtr(thisfield, static_cast<HB_USHORT>(2))));
 
       switch ( *fieldType ) {
       case 'c':
@@ -3108,7 +3108,7 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
       case 'n':
       case 'N':
          field.uiType = Harbour::DB::Field::LONG;
-         field.uiDec = (HB_USHORT) hb_arrayGetNI(thisfield, (HB_USHORT) 4);
+         field.uiDec = static_cast<HB_USHORT>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(4)));
          break;
       case 'l':
       case 'L':
@@ -3173,7 +3173,7 @@ static HB_BOOL SetFields(SQLAREAP thiswa)
       return false;
    }
 
-   for( i = 1; i <= (HB_USHORT) numFields; i++ ) {
+   for( i = 1; i <= static_cast<HB_USHORT>(numFields); i++ ) {
       thisfield = hb_itemArrayGet(thiswa->aStruct, i);
 
       if( hb_itemType(thisfield) != Harbour::Item::ARRAY ) {
@@ -3181,7 +3181,7 @@ static HB_BOOL SetFields(SQLAREAP thiswa)
          return false;
       }
 
-      thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, (HB_USHORT) 5));
+      thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(5)));
       hb_itemRelease(thisfield);
    }
    return true;
@@ -3430,8 +3430,8 @@ HB_FUNC( SQLRDD_GETFUNCTABLE )
 
    startSQLRDDSymbols();
 
-   uiCount = (HB_USHORT *) hb_parptr(1);
-   pTable = (RDDFUNCS *) hb_parptr(2);
+   uiCount = static_cast<HB_USHORT*>(hb_parptr(1));
+   pTable = static_cast<RDDFUNCS*>(hb_parptr(2));
 
    HB_TRACE(HB_TR_DEBUG, ("SQLRDD_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
@@ -3508,7 +3508,7 @@ HB_CALL_ON_STARTUP_END(_hb_sqlrdd_rdd_init_)
 
 HB_FUNC( SR_SETFOUND )
 {
-   SQLAREAP pArea = (SQLAREAP) hb_rddGetCurrentWorkAreaPointer();
+   SQLAREAP pArea = static_cast<SQLAREAP>(hb_rddGetCurrentWorkAreaPointer());
 
    if( pArea ) {
       auto pFound = hb_param(1, Harbour::Item::LOGICAL);
