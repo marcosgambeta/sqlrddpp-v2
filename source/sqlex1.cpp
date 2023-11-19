@@ -430,7 +430,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
    pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB);
 
    if( thiswa->colStmt[lFieldPosDB - 1] == nullptr ) {
-      res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->colStmt[lFieldPosDB - 1]));
+      res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->colStmt[lFieldPosDB - 1]));
 
       if( CHECK_SQL_N_OK(res) ) {
          return Harbour::FAILURE;
@@ -461,7 +461,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
       }
       hb_xfree(colName);
 
-      res = SQLPrepare(thiswa->colStmt[lFieldPosDB - 1], (SQLCHAR *) sSql, SQL_NTS);
+      res = SQLPrepare(thiswa->colStmt[lFieldPosDB - 1], reinterpret_cast<SQLCHAR*>(sSql), SQL_NTS);
 
       if( CHECK_SQL_N_OK(res) ) {
          return Harbour::FAILURE;
@@ -479,7 +479,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
    res = SQLExecute(thiswa->colStmt[lFieldPosDB - 1]);
 
    if( CHECK_SQL_N_OK(res) ) {
-      odbcErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLExecute", sSql, (SQLRETURN) res, __LINE__, __FILE__);
+      odbcErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLExecute", sSql, static_cast<SQLRETURN>(res), __LINE__, __FILE__);
       SQLFreeStmt(thiswa->colStmt[lFieldPosDB - 1], SQL_CLOSE);
       return Harbour::FAILURE;
    }
@@ -489,7 +489,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
    res = SQLFetch(thiswa->colStmt[lFieldPosDB - 1]);
    if( res != SQL_SUCCESS ) {
       if( res == static_cast<unsigned int>(SQL_ERROR) ) {
-         odbcErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLFetch", sSql, (SQLRETURN) res, __LINE__, __FILE__);
+         odbcErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLFetch", sSql, static_cast<SQLRETURN>(res), __LINE__, __FILE__);
          SQLFreeStmt(thiswa->colStmt[lFieldPosDB - 1], SQL_CLOSE);
          return Harbour::FAILURE;
       }
@@ -1486,7 +1486,7 @@ HB_ERRCODE getWorkareaParams(SQLEXAREAP thiswa)
    }
    thiswa->bIsSelect = getMessageL(thiswa->oWorkArea, "LTABLEISSELECT");
    // if( !thiswa->hStmtInsert ) {
-   //    SQLAllocHandle(SQL_HANDLE_STMT, (HDBC) thiswa->hDbc, &(thiswa->hStmtInsert));
+   //    SQLAllocHandle(SQL_HANDLE_STMT, static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmtInsert));
    // }
 
    return Harbour::SUCCESS;
@@ -1609,13 +1609,13 @@ static HB_ERRCODE getRecordList(SQLEXAREAP thiswa, int iMax) // Returns HB_TRUE 
    SQLRETURN res;
    int i, recordListChanged;
 
-   res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmt));
+   res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmt));
 
    if( CHECK_SQL_N_OK(res) ) {
       return Harbour::FAILURE;
    }
 
-   res = SQLExecDirect(thiswa->hStmt, (SQLCHAR *) thiswa->sSql, SQL_NTS);
+   res = SQLExecDirect(thiswa->hStmt, reinterpret_cast<SQLCHAR*>(thiswa->sSql), SQL_NTS);
 
    if( res == SQL_ERROR ) {
       return Harbour::FAILURE; // It means a fault in SQL statement
@@ -1678,13 +1678,13 @@ static HB_ERRCODE getFirstColumnAsLong(SQLEXAREAP thiswa, long * szValue) // Ret
 {
    SQLRETURN res;
 
-   res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmt));
+   res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmt));
 
    if( CHECK_SQL_N_OK(res) ) {
       return Harbour::FAILURE;
    }
 
-   res = SQLExecDirect(thiswa->hStmt, (SQLCHAR *) thiswa->sSql, SQL_NTS);
+   res = SQLExecDirect(thiswa->hStmt, reinterpret_cast<SQLCHAR*>(thiswa->sSql), SQL_NTS);
 
    if( res == SQL_ERROR ) {
       return Harbour::FAILURE; // It means a fault in SQL statement
@@ -1946,12 +1946,12 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
          // thiswa->hStmtBuffer = nullptr;
       }
 
-      res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmtBuffer));
+      res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmtBuffer));
       if( CHECK_SQL_N_OK(res) ) {
          return Harbour::FAILURE;
       }
 
-      res = SQLPrepare(thiswa->hStmtBuffer, (SQLCHAR *) (thiswa->sSqlBuffer), SQL_NTS);
+      res = SQLPrepare(thiswa->hStmtBuffer, reinterpret_cast<SQLCHAR*>(thiswa->sSqlBuffer), SQL_NTS);
       if( CHECK_SQL_N_OK(res) ) {
          return Harbour::FAILURE;
       }
@@ -2146,13 +2146,13 @@ HB_ERRCODE prepareRecordListQuery(SQLEXAREAP thiswa)
    // culik not needed, we we are in the offset
    IndexBind += (thiswa->indexLevel - 1); // Place Offset
 
-   res = SQLAllocStmt((HDBC) thiswa->hDbc, &hPrep);
+   res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &hPrep);
 
    if( CHECK_SQL_N_OK(res) ) {
       return Harbour::FAILURE;
    }
 
-   if( CHECK_SQL_N_OK(SQLPrepare(hPrep, (SQLCHAR *) (thiswa->sSql), SQL_NTS)) ) {
+   if( CHECK_SQL_N_OK(SQLPrepare(hPrep, reinterpret_cast<SQLCHAR*>(thiswa->sSql), SQL_NTS)) ) {
       return Harbour::FAILURE;
    }
 
@@ -2981,12 +2981,12 @@ static HB_ERRCODE sqlExDeleteRec(SQLEXAREAP thiswa)
             static_cast<int>(GetCurrentRecordNum(thiswa)));
       }
 
-      res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmt));
+      res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmt));
       if( CHECK_SQL_N_OK(res) ) {
          return Harbour::FAILURE;
       }
 
-      res = SQLExecDirect(thiswa->hStmt, (SQLCHAR *) thiswa->sSql, SQL_NTS);
+      res = SQLExecDirect(thiswa->hStmt, reinterpret_cast<SQLCHAR*>(thiswa->sSql), SQL_NTS);
       if( res == SQL_ERROR ) {
          return Harbour::FAILURE; // It means a fault in SQL statement
       }
@@ -3356,12 +3356,12 @@ static HB_ERRCODE sqlExRecall(SQLEXAREAP thiswa)
          thiswa->sRecnoName,
          static_cast<int>(GetCurrentRecordNum(thiswa)));
 
-      res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmt));
+      res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmt));
       if( CHECK_SQL_N_OK(res) ) {
          return Harbour::FAILURE;
       }
 
-      res = SQLExecDirect(thiswa->hStmt, (SQLCHAR *) thiswa->sSql, SQL_NTS);
+      res = SQLExecDirect(thiswa->hStmt, reinterpret_cast<SQLCHAR*>(thiswa->sSql), SQL_NTS);
       if( res == SQL_ERROR ) {
          return Harbour::FAILURE; // It means a fault in SQL statement
       }
