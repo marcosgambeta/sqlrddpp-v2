@@ -174,7 +174,7 @@ static HB_ERRCODE ConcludeSkipraw(SQLEXAREAP thiswa)
    // Force relational movement in child WorkAreas
 
    if( thiswa->area.lpdbRelations ) {
-      return SELF_SYNCCHILDREN((AREAP) thiswa);
+      return SELF_SYNCCHILDREN(reinterpret_cast<AREAP>(thiswa));
    } else {
       return Harbour::SUCCESS;
    }
@@ -570,7 +570,7 @@ HB_ERRCODE SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hS
          }
 
          if( nTrim >= BindStructure->asChar.size_alloc ) {
-            BindStructure->asChar.value = (SQLCHAR *) hb_xrealloc(BindStructure->asChar.value, nTrim + 1);
+            BindStructure->asChar.value = static_cast<SQLCHAR*>(hb_xrealloc(BindStructure->asChar.value, nTrim + 1));
             BindStructure->asChar.size_alloc = nTrim + 1;
          }
 
@@ -619,7 +619,7 @@ HB_ERRCODE SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hS
             break;
          }
 
-         BindStructure->asNumeric = (SQLDOUBLE) hb_itemGetND(pFieldData);
+         BindStructure->asNumeric = static_cast<SQLDOUBLE>(hb_itemGetND(pFieldData));
          break;
       }
       case SQL_C_TYPE_DATE: {
@@ -675,7 +675,7 @@ HB_ERRCODE SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hS
          break;
       }
       case SQL_C_BIT: {
-         BindStructure->asLogical = (SQLCHAR) hb_itemGetL(pFieldData);
+         BindStructure->asLogical = static_cast<SQLCHAR>(hb_itemGetL(pFieldData));
          break;
       }
    }
@@ -992,7 +992,7 @@ static void FeedCurrentRecordToBindings(SQLEXAREAP thiswa)
    if( thiswa->hOrdCurrent == 0 ) {
       // Natural order, pretty simple
       BindStructure = GetBindStruct(thiswa, thiswa->IndexBindings[0]);
-      BindStructure->asNumeric = (SQLDOUBLE) GetCurrentRecordNum(thiswa);
+      BindStructure->asNumeric = static_cast<SQLDOUBLE>(GetCurrentRecordNum(thiswa));
    } else {
       IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
 
@@ -1236,7 +1236,7 @@ void SetCurrRecordStructure(SQLEXAREAP thiswa)
       BindStructure->isArgumentNull = false;
       BindStructure->lFieldPosDB = i;
       BindStructure->lFieldPosWA = hb_arrayGetNL(pFieldStruct, FIELD_WAOFFSET);
-      BindStructure->ColumnSize = (SQLUINTEGER) hb_itemGetNI(pFieldLen);
+      BindStructure->ColumnSize = static_cast<SQLUINTEGER>(hb_itemGetNI(pFieldLen));
       BindStructure->DecimalDigits = static_cast<SQLSMALLINT>(hb_itemGetNI(pFieldDec));
       BindStructure->colName = QualifyName(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
       BindStructure->isMemo = cType == 'M';
@@ -1256,7 +1256,7 @@ void SetCurrRecordStructure(SQLEXAREAP thiswa)
 
       switch( cType ) {
          case 'C': {
-            BindStructure->asChar.value = (SQLCHAR *) hb_xgrabz(BindStructure->ColumnSize + 1);
+            BindStructure->asChar.value = static_cast<SQLCHAR*>(hb_xgrabz(BindStructure->ColumnSize + 1));
             // memset(BindStructure->asChar.value, 0, BindStructure->ColumnSize + 1); // Culik Zero all memory
             BindStructure->asChar.size_alloc = BindStructure->ColumnSize + 1;
             BindStructure->iCType = SQL_C_CHAR;
@@ -1265,7 +1265,7 @@ void SetCurrRecordStructure(SQLEXAREAP thiswa)
          }
          case 'M': {
             BindStructure->iCType = SQL_C_BINARY;
-            BindStructure->asChar.value = (SQLCHAR *) hb_xgrabz(INITIAL_MEMO_ALLOC);
+            BindStructure->asChar.value = static_cast<SQLCHAR*>(hb_xgrabz(INITIAL_MEMO_ALLOC));
             // memset(BindStructure->asChar.value, 0, INITIAL_MEMO_ALLOC); // Culik Zero all memory
             BindStructure->asChar.size_alloc = INITIAL_MEMO_ALLOC;
             BindStructure->asChar.size = 0;
@@ -1345,7 +1345,7 @@ static HB_ERRCODE getWhereExpression(SQLEXAREAP thiswa, int iListType)
              CLOSE_QUALIFIER(thiswa),
              bDirectionFWD ? ">=" : "<=");
          BindStructure = GetBindStruct(thiswa, IndexBind);
-         BindStructure->asNumeric = (SQLDOUBLE) GetCurrentRecordNum(thiswa);
+         BindStructure->asNumeric = static_cast<SQLDOUBLE>(GetCurrentRecordNum(thiswa));
          bWhere = true;
       } else {
          for( iCol = 1; iCol <= thiswa->indexLevel; iCol++ ) {
@@ -1462,7 +1462,7 @@ HB_ERRCODE getWorkareaParams(SQLEXAREAP thiswa)
    if( !thiswa->oSql ) {
       thiswa->oSql = getMessageItem(thiswa->oWorkArea, "OSQL");
       thiswa->aFields = getMessageItem(thiswa->oWorkArea, "AFIELDS");
-      thiswa->hDbc = (HDBC) getMessagePtr(thiswa->oSql, "HDBC");
+      thiswa->hDbc = static_cast<HDBC>(getMessagePtr(thiswa->oSql, "HDBC"));
       thiswa->nSystemID = getMessageNL(thiswa->oSql, "NSYSTEMID");
       thiswa->sTable = getMessageC(thiswa->oWorkArea, "CQUALIFIEDTABLENAME");
       thiswa->sOwner = getMessageC(thiswa->oWorkArea, "COWNER");
@@ -1479,7 +1479,7 @@ HB_ERRCODE getWorkareaParams(SQLEXAREAP thiswa)
       lCnnType = getMessageNL(thiswa->oSql, "NCONNECTIONTYPE");
 
       if( !(lCnnType == CONNECT_ODBC || lCnnType == CONNECT_ODBC_QUERY_ONLY) ) {
-         commonError((AREAP) thiswa, EG_OPEN, ESQLRDD_OPEN, "SQLEX supports only ODBC connections.");
+         commonError(reinterpret_cast<AREAP>(thiswa), EG_OPEN, ESQLRDD_OPEN, "SQLEX supports only ODBC connections.");
          return Harbour::FAILURE;
       }
       thiswa->bConnVerified = true;
@@ -1920,7 +1920,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
             CLOSE_QUALIFIER(thiswa));
       }
 
-      iEnd = (HB_USHORT) strlen(thiswa->sSqlBuffer);
+      iEnd = static_cast<HB_USHORT>(strlen(thiswa->sSqlBuffer));
       for( i = 20; i < (MAX_SQL_QUERY_LEN / 5); i++ ) {
          if( thiswa->sSqlBuffer[i] == '?' ) {
             iEnd = i;
@@ -2088,7 +2088,7 @@ static HB_ERRCODE trySkippingOnCache(SQLEXAREAP thiswa, HB_LONG lToSkip)
          if( lSupposedPos >= 0 && lSupposedPos < thiswa->recordListSize ) {
             thiswa->recordListPos = lSupposedPos;
             if( updateRecordBuffer(thiswa, false) == Harbour::FAILURE ) {
-               commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+               commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
                return Harbour::FAILURE;
             }
             return Harbour::SUCCESS;
@@ -2112,7 +2112,7 @@ static HB_ERRCODE trySkippingOnCache(SQLEXAREAP thiswa, HB_LONG lToSkip)
          if( lSupposedPos >= 0 && lSupposedPos < thiswa->recordListSize ) {
             thiswa->recordListPos = lSupposedPos;
             if( updateRecordBuffer(thiswa, false) == Harbour::FAILURE ) {
-               commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+               commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
                return Harbour::FAILURE;
             }
             return Harbour::SUCCESS;
@@ -2248,12 +2248,12 @@ static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa)
 static HB_ERRCODE sqlExBof(SQLEXAREAP thiswa, HB_BOOL * bof)
 {
    if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    }
 
    *bof = thiswa->area.fBof;
@@ -2266,12 +2266,12 @@ static HB_ERRCODE sqlExBof(SQLEXAREAP thiswa, HB_BOOL * bof)
 static HB_ERRCODE sqlExEof(SQLEXAREAP thiswa, HB_BOOL * eof)
 {
    if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    }
 
    if( thiswa->bIsInsert && thiswa->bufferHot ) {
@@ -2288,7 +2288,7 @@ static HB_ERRCODE sqlExEof(SQLEXAREAP thiswa, HB_BOOL * eof)
 static HB_ERRCODE sqlExFound(SQLEXAREAP thiswa, HB_BOOL * found)
 {
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    }
 
    *found = thiswa->area.fFound;
@@ -2305,12 +2305,12 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREAP thiswa)
    thiswa->wasdel = 0;
    thiswa->area.fFound = false;
 
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
    if( thiswa->lEofAt ) {
-      SELF_GOTO((AREAP) thiswa, static_cast<HB_LONG>(thiswa->lEofAt));
+      SELF_GOTO(reinterpret_cast<AREAP>(thiswa), static_cast<HB_LONG>(thiswa->lEofAt));
       if( thiswa->bReverseIndex  !=  bOldReverseIndex ) {
          thiswa->recordListDirection = LIST_BACKWARD;
          getOrderByExpression(thiswa, false);
@@ -2320,7 +2320,7 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREAP thiswa)
 
          if( getRecordList(thiswa, RECORD_LIST_SIZE / 10) == Harbour::FAILURE ) {
             odbcErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
-            commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+            commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
             return Harbour::FAILURE;
          }
       }
@@ -2335,7 +2335,7 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREAP thiswa)
 
       if( getRecordList(thiswa, RECORD_LIST_SIZE / 10) == Harbour::FAILURE ) {
          odbcErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
-         commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+         commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
          return Harbour::FAILURE;
       }
    }
@@ -2353,15 +2353,15 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREAP thiswa)
       thiswa->area.fBof = false;
       thiswa->lEofAt = thiswa->recordList[thiswa->recordListPos];
       if( updateRecordBuffer(thiswa, false) == Harbour::FAILURE ) {
-         commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+         commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
          return Harbour::FAILURE;
       }
    }
 
-   SELF_SKIPFILTER((AREAP) thiswa, -1);
+   SELF_SKIPFILTER(reinterpret_cast<AREAP>(thiswa), -1);
 
    if( thiswa->area.lpdbRelations ) {
-      return SELF_SYNCCHILDREN((AREAP) thiswa);
+      return SELF_SYNCCHILDREN(reinterpret_cast<AREAP>(thiswa));
    } else {
       return Harbour::SUCCESS;
    }
@@ -2373,7 +2373,7 @@ static HB_ERRCODE sqlExGoTo(SQLEXAREAP thiswa, HB_LONG recno)
 {
    int i;
 
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
@@ -2430,14 +2430,14 @@ static HB_ERRCODE sqlExGoToId(SQLEXAREAP thiswa, PHB_ITEM pItem)
    thiswa->firstinteract = 0;
    thiswa->wasdel = 0;
 
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
    if( HB_IS_NUMERIC(pItem) ) {
-      return SELF_GOTO((AREAP) thiswa, static_cast<HB_LONG>(hb_itemGetNL(pItem)));
+      return SELF_GOTO(reinterpret_cast<AREAP>(thiswa), static_cast<HB_LONG>(hb_itemGetNL(pItem)));
    } else {
-      commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+      commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
       return Harbour::FAILURE;
    }
 }
@@ -2455,12 +2455,12 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREAP thiswa)
       return Harbour::FAILURE;
    }
 
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
    if( thiswa->lBofAt ) {
-      SELF_GOTO((AREAP) thiswa, static_cast<HB_LONG>(thiswa->lBofAt));
+      SELF_GOTO(reinterpret_cast<AREAP>(thiswa), static_cast<HB_LONG>(thiswa->lBofAt));
       if( thiswa->bReverseIndex  !=  bOldReverseIndex) {
          thiswa->recordListDirection = LIST_FORWARD;
          getOrderByExpression(thiswa, false);
@@ -2470,7 +2470,7 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREAP thiswa)
 
          if( getRecordList(thiswa, RECORD_LIST_SIZE / 10) == Harbour::FAILURE ) {
             odbcErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
-            commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+            commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
             return Harbour::FAILURE;
          }
       }
@@ -2484,7 +2484,7 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREAP thiswa)
 
       if( getRecordList(thiswa, RECORD_LIST_SIZE / 10) == Harbour::FAILURE ) {
          odbcErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
-         commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+         commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
          return Harbour::FAILURE;
       }
    }
@@ -2502,15 +2502,15 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREAP thiswa)
       thiswa->area.fBof = false;
       thiswa->lBofAt = thiswa->recordList[thiswa->recordListPos];
       if( updateRecordBuffer(thiswa, false) == Harbour::FAILURE ) {
-         commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+         commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
          return Harbour::FAILURE;
       }
    }
 
-   SELF_SKIPFILTER((AREAP) thiswa, 1);
+   SELF_SKIPFILTER(reinterpret_cast<AREAP>(thiswa), 1);
 
    if( thiswa->area.lpdbRelations ) {
-      return SELF_SYNCCHILDREN((AREAP) thiswa);
+      return SELF_SYNCCHILDREN(reinterpret_cast<AREAP>(thiswa));
    } else {
       return Harbour::SUCCESS;
    }
@@ -2534,12 +2534,12 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
    thiswa->area.fEof = false;
    thiswa->area.fFound = false;
 
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
    if( thiswa->hOrdCurrent == 0 ) {
-      commonError((AREAP) thiswa, EG_NOORDER, EDBF_NOTINDEXED, thiswa->sTable);
+      commonError(reinterpret_cast<AREAP>(thiswa), EG_NOORDER, EDBF_NOTINDEXED, thiswa->sTable);
       return Harbour::FAILURE;
    }
 
@@ -2644,7 +2644,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
       }
 
       if(( hb_setGetDeleted() || thiswa->area.dbfi.itmCobExpr != nullptr ) && !thiswa->area.fEof ) {
-         retvalue = SELF_SKIPFILTER((AREAP) thiswa, (bFindLast ? -1 : 1));
+         retvalue = SELF_SKIPFILTER(reinterpret_cast<AREAP>(thiswa), (bFindLast ? -1 : 1));
 
          if( thiswa->area.fEof ) {
             thiswa->area.fFound = false;
@@ -2670,7 +2670,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
    }
 
    if( thiswa->area.lpdbRelations && retvalue == Harbour::SUCCESS ) {
-      return SELF_SYNCCHILDREN((AREAP) thiswa);
+      return SELF_SYNCCHILDREN(reinterpret_cast<AREAP>(thiswa));
    } else {
       return Harbour::SUCCESS;
    }
@@ -2683,17 +2683,17 @@ static HB_ERRCODE sqlExSkip(SQLEXAREAP thiswa, HB_LONG lToSkip)
    HB_LONG lSkip;
 
    if( thiswa->lpdbPendingRel ) {
-      if( SELF_FORCEREL((AREAP) thiswa) != Harbour::SUCCESS) {
+      if( SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa)) != Harbour::SUCCESS) {
          return Harbour::FAILURE;
       }
    } else if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
    // Flush record and exit
    if( lToSkip == 0 ) {
-      return SELF_GOCOLD((AREAP) thiswa);
+      return SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa));
    }
 
    // We need save lCurrentRecord previous to lost fEof flag. To to correct SKIPRAW
@@ -2710,10 +2710,10 @@ static HB_ERRCODE sqlExSkip(SQLEXAREAP thiswa, HB_LONG lToSkip)
       lToSkip *= -1;
    }
    while( --lToSkip >= 0 ) {
-      if( SELF_SKIPRAW((AREAP) thiswa, lSkip) != Harbour::SUCCESS ) {
+      if( SELF_SKIPRAW(reinterpret_cast<AREAP>(thiswa), lSkip) != Harbour::SUCCESS ) {
          return Harbour::FAILURE;
       }
-      if( SELF_SKIPFILTER((AREAP) thiswa, lSkip) != Harbour::SUCCESS ) {
+      if( SELF_SKIPFILTER(reinterpret_cast<AREAP>(thiswa), lSkip) != Harbour::SUCCESS ) {
          return Harbour::FAILURE;
       }
       if( thiswa->area.fBof || thiswa->area.fEof ) {
@@ -2759,11 +2759,11 @@ static HB_ERRCODE sqlExSkipFilter(SQLEXAREAP thiswa, HB_LONG lUpDown)
    while( !thiswa->area.fBof && !thiswa->area.fEof ) {
       // SET DELETED
       if( hb_setGetDeleted() ) {
-         if( SELF_DELETED((AREAP) thiswa, &fDeleted) != Harbour::SUCCESS ) {
+         if( SELF_DELETED(reinterpret_cast<AREAP>(thiswa), &fDeleted) != Harbour::SUCCESS ) {
             return Harbour::FAILURE;
          }
          if( fDeleted ) {
-            if( SELF_SKIPRAW((AREAP) thiswa, lUpDown) != Harbour::SUCCESS ) {
+            if( SELF_SKIPRAW(reinterpret_cast<AREAP>(thiswa), lUpDown) != Harbour::SUCCESS ) {
                return Harbour::FAILURE;
             }
             continue;
@@ -2772,12 +2772,12 @@ static HB_ERRCODE sqlExSkipFilter(SQLEXAREAP thiswa, HB_LONG lUpDown)
 
       // SET FILTER TO
       if( thiswa->area.dbfi.itmCobExpr ) {
-         if( SELF_EVALBLOCK((AREAP) thiswa, thiswa->area.dbfi.itmCobExpr) != Harbour::SUCCESS ) {
+         if( SELF_EVALBLOCK(reinterpret_cast<AREAP>(thiswa), thiswa->area.dbfi.itmCobExpr) != Harbour::SUCCESS ) {
             return Harbour::FAILURE;
          }
 
          if( HB_IS_LOGICAL(thiswa->area.valResult) && !hb_itemGetL(thiswa->area.valResult) ) {
-            if( SELF_SKIPRAW((AREAP) thiswa, lUpDown) != Harbour::SUCCESS ) {
+            if( SELF_SKIPRAW(reinterpret_cast<AREAP>(thiswa), lUpDown) != Harbour::SUCCESS ) {
                return Harbour::FAILURE;
             }
             continue;
@@ -2801,9 +2801,9 @@ static HB_ERRCODE sqlExSkipFilter(SQLEXAREAP thiswa, HB_LONG lUpDown)
          // but it also means second table scan if all records filtered
          // are out of filter so I do not want to do that. I will prefer
          // explicit add SELF_GOEOF() method
-         uiError = SELF_GOTO((AREAP) thiswa, 0);
+         uiError = SELF_GOTO(reinterpret_cast<AREAP>(thiswa), 0);
       } else {
-         uiError = SELF_GOTOP((AREAP) thiswa);
+         uiError = SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
          thiswa->area.fBof = true;
       }
    } else {
@@ -2819,12 +2819,12 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREAP thiswa, HB_LONG lToSkip)
 {
    HB_ERRCODE res;
 
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
    // if we are over phantom record we go bottom.
    if( lToSkip < 0 && thiswa->lCurrentRecord == thiswa->lLastRec ) {
-      return SELF_GOBOTTOM((AREAP) thiswa);
+      return SELF_GOBOTTOM(reinterpret_cast<AREAP>(thiswa));
    }
 
    if( !thiswa->CurrRecord ) {
@@ -2870,14 +2870,14 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREAP thiswa, HB_LONG lToSkip)
          if( res == RESULTSET_OK ) {
             break;
          } else if( res == Harbour::FAILURE ) {
-            commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+            commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
             return Harbour::FAILURE;
          } else if( res == HB_RETRY ) {
             if( lToSkip > 0 ) {
                sqlGetCleanBuffer(thiswa);
                break;
             } else {
-               SELF_GOTOP((AREAP) thiswa);
+               SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
                break;
             }
          }
@@ -2887,7 +2887,7 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREAP thiswa, HB_LONG lToSkip)
 
       if( res == RESULTSET_OK ) {
          if( updateRecordBuffer(thiswa, false) == Harbour::FAILURE ) {
-            commonError((AREAP) thiswa, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+            commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
             return Harbour::FAILURE;
          }
          return ConcludeSkipraw(thiswa);
@@ -2921,7 +2921,7 @@ static HB_ERRCODE sqlExAppend(SQLEXAREAP thiswa)
 
    hb_arraySize(thiswa->aLocked, 0);
 
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
@@ -2944,20 +2944,20 @@ static HB_ERRCODE sqlExDeleteRec(SQLEXAREAP thiswa)
    HB_BOOL isDeleted;
    SQLRETURN res;
 
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
    if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    }
 
-   SELF_DELETED((AREAP) thiswa, &isDeleted);
+   SELF_DELETED(reinterpret_cast<AREAP>(thiswa), &isDeleted);
 
    if( (!isDeleted) && (!thiswa->area.fEof) ) {
       if( thiswa->sSql ) {
@@ -3011,12 +3011,12 @@ static HB_ERRCODE sqlExDeleteRec(SQLEXAREAP thiswa)
 static HB_ERRCODE sqlExDeleted(SQLEXAREAP thiswa, HB_BOOL * isDeleted)
 {
    if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    }
 
    if( thiswa->ulhDeleted == 0 || thiswa->bIsInsert || thiswa->area.fEof ) {
@@ -3039,7 +3039,7 @@ static HB_ERRCODE sqlExDeleted(SQLEXAREAP thiswa, HB_BOOL * isDeleted)
 
 static HB_ERRCODE sqlExFlush(SQLEXAREAP thiswa)
 {
-   return SELF_GOCOLD((AREAP) thiswa);
+   return SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa));
 }
 
 /*------------------------------------------------------------------------*/
@@ -3054,9 +3054,9 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
    HB_SIZE ulPos;
 
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    } else if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
@@ -3176,7 +3176,7 @@ static HB_ERRCODE sqlExGoCold(SQLEXAREAP thiswa)
          if( !thiswa->bIsInsert ) {
             hb_arraySetNL(thiswa->aInfo, AINFO_RECNO, GetCurrentRecordNum(thiswa));
          }
-         return SUPER_GOCOLD((AREAP) thiswa); // Historic workareas are handled by xBase code in sqlrdd2.c as in SQLRDD
+         return SUPER_GOCOLD(reinterpret_cast<AREAP>(thiswa)); // Historic workareas are handled by xBase code in sqlrdd2.c as in SQLRDD
       }
 
       if( thiswa->bIsInsert ) {
@@ -3239,15 +3239,15 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
    HB_USHORT len, dec, fieldindex;
 
    if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    }
 
-   fieldindex = (HB_USHORT) thiswa->uiBufferIndex[fieldNum - 1];
+   fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
    thiswa->editMask[fieldindex - 1] = '1';
    pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
 
@@ -3315,7 +3315,7 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
 #else
       char type_err[128];
       sprintf(type_err, "data type origin: %i - data type target %i", hb_itemType(value), hb_itemType(pDest));
-      commonError((AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, type_err);
+      commonError(reinterpret_cast<AREAP>(thiswa), EG_DATATYPE, ESQLRDD_DATATYPE, type_err);
       return Harbour::FAILURE;
 #endif
    }
@@ -3332,18 +3332,18 @@ static HB_ERRCODE sqlExRecall(SQLEXAREAP thiswa)
    HB_BOOL isDeleted;
    SQLRETURN res;
 
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    } else if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
-   SELF_DELETED((AREAP) thiswa, &isDeleted);
+   SELF_DELETED(reinterpret_cast<AREAP>(thiswa), &isDeleted);
 
    if( isDeleted && thiswa->ulhDeleted > 0 && sr_UseDeleteds() ) {
       memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
@@ -3378,7 +3378,7 @@ static HB_ERRCODE sqlExRecall(SQLEXAREAP thiswa)
 static HB_ERRCODE sqlExRecCount(SQLEXAREAP thiswa, HB_ULONG * recCount)
 {
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    }
 
    if( thiswa->bIsInsert && thiswa->bufferHot ) {
@@ -3402,14 +3402,14 @@ static HB_ERRCODE sqlExRecNo(SQLEXAREAP thiswa, HB_ULONG * recno)
 {
 #ifdef SQLRDD_NWG_SPECIFIC
    if( thiswa->bIsInsert ) {
-      commonError((AREAP) thiswa, EG_ARG, ESQLRDD_NOT_COMMITED_YET, nullptr);
+      commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_NOT_COMMITED_YET, nullptr);
       return Harbour::FAILURE;
    }
 #endif
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    } else if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
@@ -3423,9 +3423,9 @@ static HB_ERRCODE sqlExRecNo(SQLEXAREAP thiswa, HB_ULONG * recno)
 static HB_ERRCODE sqlExRecId(SQLEXAREAP thiswa, PHB_ITEM recno)
 {
    if( thiswa->lpdbPendingRel ) {
-      SELF_FORCEREL((AREAP) thiswa);
+      SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
    } else if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
@@ -3452,10 +3452,10 @@ static HB_ERRCODE sqlExRecId(SQLEXAREAP thiswa, PHB_ITEM recno)
 static HB_ERRCODE sqlExClose(SQLEXAREAP thiswa)
 {
    HB_ERRCODE code;
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
-   code = (SUPER_CLOSE((AREAP) thiswa));
+   code = (SUPER_CLOSE(reinterpret_cast<AREAP>(thiswa)));
    // Reset parent rel struct
    thiswa->lpdbPendingRel = nullptr;
 
@@ -3528,7 +3528,7 @@ static HB_ERRCODE sqlExClose(SQLEXAREAP thiswa)
       hb_xfree(thiswa->IndexBindings);
    }
 
-   return code; // (SUPER_CLOSE((AREAP) thiswa));
+   return code; // (SUPER_CLOSE(reinterpret_cast<AREAP>(thiswa)));
 }
 
 /*------------------------------------------------------------------------*/
@@ -3537,7 +3537,7 @@ static HB_ERRCODE sqlExCreate(SQLEXAREAP thiswa, LPDBOPENINFO OpenInfo)
 {
    HB_ERRCODE err;
 
-   err = SUPER_CREATE((AREAP) thiswa, OpenInfo);
+   err = SUPER_CREATE(reinterpret_cast<AREAP>(thiswa), OpenInfo);
 
    return err;
 
@@ -3556,7 +3556,7 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREAP thiswa)
    HB_ERRCODE errCode;
    // int i;
 
-   errCode = SUPER_NEW((AREAP) thiswa);
+   errCode = SUPER_NEW(reinterpret_cast<AREAP>(thiswa));
 
    thiswa->oSql = nullptr;
    thiswa->hBufferPool = hb_hashNew(nullptr);
@@ -3616,7 +3616,7 @@ static HB_ERRCODE sqlExOpen(SQLEXAREAP thiswa, LPDBOPENINFO OpenInfo)
 {
    HB_ERRCODE errCode;
 
-   errCode = SUPER_OPEN((AREAP) thiswa, OpenInfo);
+   errCode = SUPER_OPEN(reinterpret_cast<AREAP>(thiswa), OpenInfo);
 
    if( errCode != Harbour::SUCCESS ) {
       return errCode;
@@ -3675,7 +3675,7 @@ static HB_ERRCODE sqlExOrderListAdd(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInfo)
    HB_ERRCODE err;
    HB_LONG hOldOrder = thiswa->hOrdCurrent;
 
-   err = SUPER_ORDLSTADD((AREAP) thiswa, pOrderInfo);
+   err = SUPER_ORDLSTADD(reinterpret_cast<AREAP>(thiswa), pOrderInfo);
 
    if( hOldOrder != thiswa->hOrdCurrent ) {
       thiswa->lBofAt = 0;
@@ -3696,7 +3696,7 @@ static HB_ERRCODE sqlExOrderListClear(SQLEXAREAP thiswa)
    thiswa->lEofAt = 0;
    thiswa->indexLevel = -1;
 
-   SUPER_ORDLSTCLEAR((AREAP) thiswa);
+   SUPER_ORDLSTCLEAR(reinterpret_cast<AREAP>(thiswa));
 
    ReleaseIndexBindStructure(thiswa);
    thiswa->hOrdCurrent = 0;
@@ -3715,7 +3715,7 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
    HB_ERRCODE err;
    HB_LONG hOldOrder = thiswa->hOrdCurrent;
 
-   err = SUPER_ORDLSTFOCUS((AREAP) thiswa, pOrderInfo);
+   err = SUPER_ORDLSTFOCUS(reinterpret_cast<AREAP>(thiswa), pOrderInfo);
 
    if( hOldOrder != thiswa->hOrdCurrent ) {
       thiswa->bOrderChanged = true;
@@ -3753,7 +3753,7 @@ static HB_ERRCODE sqlExOrderCreate(SQLEXAREAP thiswa, LPDBORDERCREATEINFO pOrder
    thiswa->lEofAt = 0;
    thiswa->indexLevel = -1;
 
-   err = SUPER_ORDCREATE((AREAP) thiswa, pOrderCreateInfo);
+   err = SUPER_ORDCREATE(reinterpret_cast<AREAP>(thiswa), pOrderCreateInfo);
 
    // Now a big GPF trap: If created index added a new database field
    // (FOR clause or Synthetic Index) all allocated structures for binding
@@ -3788,7 +3788,7 @@ static HB_ERRCODE sqlExOrderDestroy(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInfo)
 
    ReleaseIndexBindStructure(thiswa);
 
-   return SUPER_ORDDESTROY((AREAP) thiswa, pOrderInfo);
+   return SUPER_ORDDESTROY(reinterpret_cast<AREAP>(thiswa), pOrderInfo);
 }
 
 /*------------------------------------------------------------------------*/
@@ -3829,7 +3829,7 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREAP thiswa, HB_USHORT uiIndex, LPDBORDER
          case DBOI_SCOPETOPCLEAR:
          case DBOI_SCOPEBOTTOMCLEAR:
          case DBOI_SCOPESET: {
-            uiError = SUPER_ORDINFO((AREAP) thiswa, uiIndex, pInfo);
+            uiError = SUPER_ORDINFO(reinterpret_cast<AREAP>(thiswa), uiIndex, pInfo);
             thiswa->lBofAt = 0;
             thiswa->lEofAt = 0;
             thiswa->bConditionChanged1 = true;
@@ -3837,13 +3837,13 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREAP thiswa, HB_USHORT uiIndex, LPDBORDER
             break;
          }
          default: {
-            uiError = SUPER_ORDINFO((AREAP) thiswa, uiIndex, pInfo);
+            uiError = SUPER_ORDINFO(reinterpret_cast<AREAP>(thiswa), uiIndex, pInfo);
             bOldReverseIndex = thiswa->bReverseIndex;
             thiswa->bReverseIndex = hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX); // OrderInfo() may change this flag
          }
       }
    } else {
-      uiError = SUPER_ORDINFO((AREAP) thiswa, uiIndex, pInfo);
+      uiError = SUPER_ORDINFO(reinterpret_cast<AREAP>(thiswa), uiIndex, pInfo);
    }
 
    return uiError;
@@ -3858,7 +3858,7 @@ static HB_ERRCODE sqlExClearFilter(SQLEXAREAP thiswa)
    thiswa->bConditionChanged1 = true;
    thiswa->bConditionChanged2 = true;
 
-   return SUPER_CLEARFILTER((AREAP) thiswa);
+   return SUPER_CLEARFILTER(reinterpret_cast<AREAP>(thiswa));
 }
 
 /*------------------------------------------------------------------------*/
@@ -3877,7 +3877,7 @@ static HB_ERRCODE sqlExScopeInfo(SQLEXAREAP thiswa, HB_USHORT nScope, PHB_ITEM p
    thiswa->bConditionChanged1 = true;
    thiswa->bConditionChanged2 = true;
 
-   return SUPER_SCOPEINFO((AREAP) thiswa, nScope, pItem);
+   return SUPER_SCOPEINFO(reinterpret_cast<AREAP>(thiswa), nScope, pItem);
 }
 
 /*------------------------------------------------------------------------*/
@@ -3889,7 +3889,7 @@ static HB_ERRCODE sqlExSetFilter(SQLEXAREAP thiswa, LPDBFILTERINFO pFilterInfo)
 {
    HB_ERRCODE ret;
 
-   ret = SUPER_SETFILTER((AREAP) thiswa, pFilterInfo);
+   ret = SUPER_SETFILTER(reinterpret_cast<AREAP>(thiswa), pFilterInfo);
    if( ret == Harbour::SUCCESS ) {
       thiswa->bConditionChanged1 = true;
       thiswa->bConditionChanged2 = true;
@@ -3909,7 +3909,7 @@ static HB_ERRCODE sqlExSetScope(SQLEXAREAP thiswa, LPDBORDSCOPEINFO sInfo)
    thiswa->bConditionChanged1 = true;
    thiswa->bConditionChanged2 = true;
 
-   return SUPER_SETSCOPE((AREAP) thiswa, sInfo);
+   return SUPER_SETSCOPE(reinterpret_cast<AREAP>(thiswa), sInfo);
 }
 
 /*------------------------------------------------------------------------*/
@@ -3925,12 +3925,12 @@ static HB_ERRCODE sqlExSetScope(SQLEXAREAP thiswa, LPDBORDSCOPEINFO sInfo)
 
 static HB_ERRCODE sqlExLock(SQLEXAREAP thiswa, LPDBLOCKINFO pLockInfo)
 {
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
    if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
@@ -3938,19 +3938,19 @@ static HB_ERRCODE sqlExLock(SQLEXAREAP thiswa, LPDBLOCKINFO pLockInfo)
    hb_arraySetL(thiswa->aInfo, AINFO_EOF, thiswa->area.fEof);
    hb_arraySetNL(thiswa->aInfo, AINFO_RECNO, GetCurrentRecordNum(thiswa));
 
-   return SUPER_LOCK((AREAP) thiswa, pLockInfo);
+   return SUPER_LOCK(reinterpret_cast<AREAP>(thiswa), pLockInfo);
 }
 
 /*------------------------------------------------------------------------*/
 
 static HB_ERRCODE sqlExUnLock(SQLEXAREAP thiswa, PHB_ITEM pRecNo)
 {
-   if( SELF_GOCOLD((AREAP) thiswa) == Harbour::FAILURE ) {
+   if( SELF_GOCOLD(reinterpret_cast<AREAP>(thiswa)) == Harbour::FAILURE ) {
       return Harbour::FAILURE;
    }
 
    if( thiswa->firstinteract ) {
-      SELF_GOTOP((AREAP) thiswa);
+      SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
       thiswa->firstinteract = 0;
    }
 
@@ -3958,7 +3958,7 @@ static HB_ERRCODE sqlExUnLock(SQLEXAREAP thiswa, PHB_ITEM pRecNo)
    hb_arraySetL(thiswa->aInfo, AINFO_EOF, thiswa->area.fEof);
    hb_arraySetNL(thiswa->aInfo, AINFO_RECNO, GetCurrentRecordNum(thiswa));
 
-   return SUPER_UNLOCK((AREAP) thiswa, pRecNo);
+   return SUPER_UNLOCK(reinterpret_cast<AREAP>(thiswa), pRecNo);
 }
 
 /*------------------------------------------------------------------------*/
@@ -4129,8 +4129,8 @@ HB_FUNC( SQLEX_GETFUNCTABLE )
 
    // startSQLEXSymbols();
 
-   uiCount = (HB_USHORT *) hb_parptr(1);
-   pTable = (RDDFUNCS *) hb_parptr(2);
+   uiCount = static_cast<HB_USHORT*>(hb_parptr(1));
+   pTable = static_cast<RDDFUNCS*>(hb_parptr(2));
 
    HB_TRACE(HB_TR_DEBUG, ("SQLEX_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
@@ -4160,7 +4160,7 @@ static void hb_sqlExRddInit(void * cargo)
    HB_SYMBOL_UNUSED(cargo);
 
    if( hb_rddRegister("SQLRDD", RDT_FULL) <= 1 ) {
-      usResult = (HB_USHORT) hb_rddRegister("SQLEX", RDT_FULL);
+      usResult = static_cast<HB_USHORT>(hb_rddRegister("SQLEX", RDT_FULL));
       if( usResult <= 1 ) {
          if( usResult == 0 ) {
             PHB_DYNS pDynSym;
@@ -4228,7 +4228,7 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
    pTag = loadTagDefault(thiswa, nullptr, &lorder);
    if( pTag ) {
       if( thiswa->firstinteract ) {
-         SELF_GOTOP((AREAP) thiswa);
+         SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
          thiswa->firstinteract = 0;
       }
 
