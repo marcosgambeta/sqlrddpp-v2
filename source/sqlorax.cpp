@@ -346,7 +346,7 @@ HB_FUNC( SQLO_DESCRIBECOL ) // ( hStmt, nCol, @cName, @nDataType, @nColSize, @nD
     sqlo_stmt_handle_t stmtParamRes;
 
    if( session ) {
-      ncol = (HB_USHORT)hb_parni(2) - 1;
+      ncol = static_cast<HB_USHORT>(hb_parni(2)) - 1;
       stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
       sqlo_describecol(stmtParamRes, ncol, &dType, &name, &namelen, &prec, &scale, &dbsize, &nullok);
       type = sqlo_sqldtype(dType);

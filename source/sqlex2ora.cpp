@@ -152,8 +152,8 @@ static void ResolveSpecialCols(SQLEXORAAREAP thiswa)
          hb_evalRelease(&info);
 
          // Get field position in ::aLocalBuffer
-         // uiPos = (HB_USHORT) hb_itemGetNI(hb_arrayGetItemPtr(pIndex, INDEXMAN_SYNTH_COLPOS));
-         uiPos = (HB_USHORT) hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_SYNTH_COLPOS));
+         // uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_arrayGetItemPtr(pIndex, INDEXMAN_SYNTH_COLPOS)));
+         uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_SYNTH_COLPOS)));
          thiswa->specialMask[uiPos] = '1';
          hb_arraySetForward(thiswa->sqlarea.aBuffer, uiPos, pKeyVal);
          hb_itemRelease(pKeyVal);
@@ -169,8 +169,8 @@ static void ResolveSpecialCols(SQLEXORAAREAP thiswa)
          hb_evalRelease(&info);
 
          // Get field position in ::aLocalBuffer
-         // uiPos = (HB_USHORT) hb_itemGetNI(hb_arrayGetItemPtr(pIndex, INDEXMAN_FOR_COLPOS));
-         uiPos = (HB_USHORT) hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_FOR_COLPOS));
+         // uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_arrayGetItemPtr(pIndex, INDEXMAN_FOR_COLPOS)));
+         uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_FOR_COLPOS)));
          thiswa->specialMask[uiPos] = '1';
          hb_arraySetForward(thiswa->sqlarea.aBuffer, uiPos, pKeyVal);
          hb_itemRelease(pKeyVal);

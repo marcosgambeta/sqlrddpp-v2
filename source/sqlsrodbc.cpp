@@ -621,7 +621,7 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
 
    for( int i = 1; i <= cols; i++ ) {
       temp = hb_itemNew(nullptr);
-      lIndex = (HB_USHORT) hb_arrayGetNI(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM);
+      lIndex = static_cast<HB_USHORT>(hb_arrayGetNI(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM));
 
       if( lIndex == 0 ) {
          hb_arraySetForward(pRet, i, temp);

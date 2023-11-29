@@ -1870,7 +1870,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
             CLOSE_QUALIFIER(thiswa));
       }
       // // TraceLog("aaa.log", "thiswa->sSqlBuffer %s\n", thiswa->sSqlBuffer);
-      // iEnd = (HB_USHORT) strlen(thiswa->sSqlBuffer);
+      // iEnd = static_cast<HB_USHORT>(strlen(thiswa->sSqlBuffer));
       // for( i = 20; i < (MAX_SQL_QUERY_LEN/5); i++ ) {
       //    if( thiswa->sSqlBuffer[i] == '?' ) {
       //       thiswa->sSqlBuffer[i] = ":";
@@ -1883,7 +1883,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
       //       break;
       //    }
       // }
-      // iEnd = (HB_USHORT) strlen(thiswa->sSqlBuffer);
+      // iEnd = static_cast<HB_USHORT>(strlen(thiswa->sSqlBuffer));
       // for( i = 20; i < (MAX_SQL_QUERY_LEN/5); i++ ) {
       //    if( thiswa->sSqlBuffer[i] == '?' ) {
       //       thiswa->sSqlBuffer[i] = ' ';
@@ -3235,7 +3235,7 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
       SELF_FORCEREL(&thiswa->sqlarea.area);
    }
 
-   fieldindex = (HB_USHORT) thiswa->sqlarea.uiBufferIndex[fieldNum - 1];
+   fieldindex = static_cast<HB_USHORT>(thiswa->sqlarea.uiBufferIndex[fieldNum - 1]);
    thiswa->editMask[fieldindex - 1] = '1';
    pDest = hb_itemArrayGet(thiswa->sqlarea.aBuffer, fieldindex);
 
@@ -4165,7 +4165,7 @@ static void hb_sqlExOraRddInitora(void * cargo)
    HB_SYMBOL_UNUSED(cargo);
 
    if( hb_rddRegister("SQLRDD", RDT_FULL) <= 1 ) {
-      usResult = (HB_USHORT) hb_rddRegister("SQLEXORA", RDT_FULL);
+      usResult = static_cast<HB_USHORT>(hb_rddRegister("SQLEXORA", RDT_FULL));
       if( usResult <= 1 ) {
          if( usResult == 0 ) {
             PHB_DYNS pDynSym;
