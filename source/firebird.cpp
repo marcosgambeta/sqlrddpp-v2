@@ -628,7 +628,9 @@ HB_FUNC( FBGETDATA )    // FBGetData(hEnv, nField, @uData)
    char * resp, item, * read_blob;
    char blob_items[] = {isc_info_blob_total_length, isc_info_blob_num_segments};
    char res_buffer[20];
-   HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
+   auto blob_size = 0L;
+   auto num_segments = 0L;
+   HB_LONG count, residual_size;
    short length;
    bool bEnd = false;
    XSQLVAR * var;
@@ -1086,7 +1088,9 @@ HB_FUNC( FBLINEPROCESSED )
    char * resp, item, * read_blob;
    char blob_items[] = {isc_info_blob_total_length, isc_info_blob_num_segments};
    char res_buffer[20];
-   HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
+   auto blob_size = 0L;
+   auto num_segments = 0L;
+   HB_LONG count, residual_size;
    short length;
    bool bEnd = false;
    XSQLVAR * var;

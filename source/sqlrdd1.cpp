@@ -540,7 +540,7 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
 
 int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 {
-   HB_LONG lorder = 0;
+   auto lorder = 0L;
    PHB_ITEM pTag, pKeyVal, itemTemp;
    int iLimit, iResult = 0;
    HB_BYTE len1, len2;
@@ -2207,7 +2207,7 @@ static HB_ERRCODE sqlOrderListClear(SQLAREAP thiswa)
 static HB_ERRCODE sqlOrderListFocus(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
 {
    PHB_ITEM pTag;
-   HB_LONG lorder = 0;
+   auto lorder = 0L;
 
    //TraceLog(nullptr, "sqlOrderListFocus\n");
 
@@ -2323,7 +2323,7 @@ static HB_ERRCODE sqlOrderCreate(SQLAREAP thiswa, LPDBORDERCREATEINFO pOrderInfo
 static HB_ERRCODE sqlOrderDestroy(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
 {
    PHB_ITEM pTag;
-   HB_LONG lorder = 0;
+   auto lorder = 0L;
 
    //TraceLog(nullptr, "sqlOrderDestroy\n");
 
@@ -2447,7 +2447,8 @@ static HB_ERRCODE sqlSetServerSideIndexScope(SQLAREAP thiswa, int nScope, PHB_IT
 
 static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO pInfo)
 {
-   HB_LONG lIndexes, lorder = 0;
+   HB_LONG lIndexes;
+   auto lorder = 0L;
    PHB_ITEM pTag, pTemp;
    PHB_MACRO pMacro;
 

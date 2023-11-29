@@ -4224,7 +4224,7 @@ HB_FUNC( SR_SETBUFFERPOOLSIZE2 )
 
 static int sqlKeyCompareEx(SQLEXORAAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 {
-   HB_LONG lorder = 0;
+   auto lorder = 0L;
    PHB_ITEM pTag, pKeyVal, itemTemp;
    int iLimit, iResult = 0;
    HB_SIZE len1, len2;
