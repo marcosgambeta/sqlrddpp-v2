@@ -4327,9 +4327,9 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOn
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
-   auto lLen = static_cast<HB_LONG>(hb_arrayGetNL(pField, 3));
-   auto lDec = static_cast<HB_LONG>(hb_arrayGetNL(pField, 4));
+   auto lType = hb_arrayGetNL(pField, 6);
+   auto lLen = hb_arrayGetNL(pField, 3);
+   auto lDec = hb_arrayGetNL(pField, 4);
 
    // if( lLenBuff <= 0 ) // database content is NULL
    if( OCI_IsNull(rs, iField) ) {

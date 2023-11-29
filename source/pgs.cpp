@@ -629,7 +629,7 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
+   auto lType = hb_arrayGetNL(pField, 6);
    HB_SIZE lLen = hb_arrayGetNL(pField, 3);
    HB_SIZE lDec = hb_arrayGetNL(pField, 4);
 

@@ -474,7 +474,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
    HB_SYMBOL_UNUSED(bQueryOnly);
    HB_SYMBOL_UNUSED(ulSystemID);
 
-   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, 6));
+   auto lType = hb_arrayGetNL(pField, 6);
    lLen = hb_arrayGetNL(pField, 3);
    lDec = hb_arrayGetNL(pField, 4);
 

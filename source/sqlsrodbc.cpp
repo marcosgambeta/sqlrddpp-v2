@@ -325,7 +325,7 @@ HB_FUNC( SR_FETCH )
 void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenBuff, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate)
 {
    auto cType = const_cast<char*>(hb_arrayGetCPtr(pField, FIELD_TYPE));
-   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
+   auto lType = hb_arrayGetNL(pField, FIELD_DOMAIN);
    HB_SIZE lLen = hb_arrayGetNL(pField, FIELD_LEN);
    HB_SIZE lDec = hb_arrayGetNL(pField, FIELD_DEC);
 
@@ -1126,7 +1126,7 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
    SQLRETURN res;
 
    auto cType = const_cast<char*>(hb_arrayGetCPtr(pField, FIELD_TYPE));
-   auto lType = static_cast<HB_LONG>(hb_arrayGetNL(pField, FIELD_DOMAIN));
+   auto lType = hb_arrayGetNL(pField, FIELD_DOMAIN);
    HB_SIZE lLen = hb_arrayGetNL(pField, FIELD_LEN);
    HB_SIZE lDec = hb_arrayGetNL(pField, FIELD_DEC);
    SQLLEN iLen = SQL_NULL_DATA;
