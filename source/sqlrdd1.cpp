@@ -252,11 +252,10 @@ void readCachePageBWD(SQLAREAP thiswa)
 void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 {
    HB_SIZE nPos, nLen;
-   PHB_ITEM pCacheRecord;
 
    hb_arraySetNL(thiswa->aInfo, AINFO_NPOSCACHE, lPos);
 
-   pCacheRecord = static_cast<PHB_ITEM>(hb_arrayGetItemPtr(thiswa->aCache, lPos));
+   auto pCacheRecord = hb_arrayGetItemPtr(thiswa->aCache, lPos);
 
    auto pCol = hb_itemNew(nullptr);
 
@@ -292,9 +291,8 @@ void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
 {
    HB_SIZE nPos, nLen;
-   PHB_ITEM pCacheRecord;
 
-   pCacheRecord = static_cast<PHB_ITEM>(hb_arrayGetItemPtr(thiswa->aCache, lPos));
+   auto pCacheRecord = hb_arrayGetItemPtr(thiswa->aCache, lPos);
 
    auto pCol = hb_itemNew(nullptr);
 

@@ -385,14 +385,13 @@ void getOrderByExpressionOra(SQLEXORAAREAP thiswa, HB_BOOL bUseOptimizerHints)
 
 static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB_LONG lFieldPosDB)
 {
-   PHB_ITEM pFieldStruct;
    char * colName;
    char sSql[DEFAULT_INDEX_COLUMN_MAX_LEN];
    bool res;
 
    OCI_Resultset * rs;
 
-   pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, static_cast<HB_SIZE>(lFieldPosDB));
+   auto pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, static_cast<HB_SIZE>(lFieldPosDB));
 
    if( thiswa->colStmt[lFieldPosDB - 1].pStmt == nullptr ) {
       // res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->colStmt[lFieldPosDB - 1]));
@@ -1062,7 +1061,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
    // Resolve SET SCOPE TO
 
    if( thiswa->sqlarea.hOrdCurrent > 0 ) {
-      PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
+      auto pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
       auto szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
       if( szFilter && szFilter[0] ) {
          if( bWhere ) {
@@ -2596,7 +2595,7 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
       bTranslate = false;
 
       for( i = 1; i <= thiswa->sqlarea.area.uiFieldCount; i++ ) {
-         // PHB_ITEM pF = hb_arrayGetItemPtr(thiswa->aFields, thiswa->sqlarea.uiBufferIndex[i - 1]);
+         // auto pF = hb_arrayGetItemPtr(thiswa->aFields, thiswa->sqlarea.uiBufferIndex[i - 1]);
          temp = hb_itemNew(nullptr);
          // temp.type = Harbour::Item::NIL; // I know this is not a good practice, but we save tons of allocs.
                                    // please keep as is. ML.
@@ -2605,7 +2604,7 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
          //    hb_arraySetForward(aRecord, i, temp); // Field is temporaly NIL since it's have never
          //                                          // been needed in current WA. Will be filled on demand
          // } else {
-         // PHB_ITEM pF = hb_arrayGetItemPtr(thiswa->aFields, thiswa->sqlarea.uiBufferIndex[i - 1]);
+         // auto pF = hb_arrayGetItemPtr(thiswa->aFields, thiswa->sqlarea.uiBufferIndex[i - 1]);
          // if( s_pSym_TODATA == nullptr ) {
          //    s_pSym_TODATA = hb_dynsymFindName("TODATA");
          //    if( s_pSym_TODATA == nullptr ) {

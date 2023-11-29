@@ -1029,7 +1029,7 @@ HB_FUNC( ORACLEWRITEMEMO2 )
       return;
    } else {
       for( uiSize = 0; uiSize < uiLen; uiSize++ ) {
-         PHB_ITEM pFieldDesc = hb_arrayGetItemPtr(pArray, uiSize + 1);
+         auto pFieldDesc = hb_arrayGetItemPtr(pArray, uiSize + 1);
          char szSql[256] = {0};
          char * sMemo = hb_arrayGetCPtr(pFieldDesc, 2);
          auto sField = hb_arrayGetCPtr(pFieldDesc, 1);
