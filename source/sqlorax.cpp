@@ -147,7 +147,7 @@ HB_FUNC( SQLO_CONNECT )
 
 HB_FUNC( SQLO_DBMSNAME )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       hb_retc(session->server_version);
@@ -160,7 +160,7 @@ HB_FUNC( SQLO_DBMSNAME )
 
 HB_FUNC( SQLO_DISCONNECT )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       sqlo_finish(session->dbh);
@@ -180,7 +180,7 @@ HB_FUNC( SQLO_DISCONNECT )
 
 HB_FUNC( SQLO_GETERRORDESCR )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       hb_retc(const_cast<char*>(sqlo_geterror(session->dbh)));
@@ -193,7 +193,7 @@ HB_FUNC( SQLO_GETERRORDESCR )
 
 HB_FUNC( SQLO_GETERRORCODE )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       hb_retni(sqlo_geterrcode(session->dbh));
@@ -206,7 +206,7 @@ HB_FUNC( SQLO_GETERRORCODE )
 
 HB_FUNC( SQLO_EXECDIRECT )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    auto stm = hb_parcx(2);
 
    if( session ) {
@@ -231,7 +231,7 @@ HB_FUNC( SQLO_EXECDIRECT )
 
 HB_FUNC( SQLO_EXECUTE )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    bool lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
    if( session ) {
      if( lStmt ) {
@@ -260,7 +260,7 @@ HB_FUNC( SQLO_EXECUTE )
 
 HB_FUNC( SQLO_NUMCOLS )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       hb_retni(session->numcols);
@@ -339,7 +339,7 @@ int sqlo_sqldtype(HB_USHORT type)
 
 HB_FUNC( SQLO_DESCRIBECOL ) // ( hStmt, nCol, @cName, @nDataType, @nColSize, @nDec, @nNull )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    HB_USHORT dType, ncol;
    int prec, scale, nullok, namelen, dbsize, type;
    char * name;
@@ -386,7 +386,7 @@ HB_FUNC( SQLO_DESCRIBECOL ) // ( hStmt, nCol, @cName, @nDataType, @nColSize, @nD
 
 HB_FUNC( SQLO_FETCH )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    sqlo_stmt_handle_t stmtParamRes;
 
    if( session ) {
@@ -411,7 +411,7 @@ HB_FUNC( SQLO_FETCH )
 
 HB_FUNC( SQLO_COMMIT )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session  ) {
       session->status = sqlo_commit(session->dbh);
@@ -429,7 +429,7 @@ HB_FUNC( SQLO_COMMIT )
 
 HB_FUNC( SQLO_ROLLBACK )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       session->status = sqlo_rollback(session->dbh);
@@ -447,7 +447,7 @@ HB_FUNC( SQLO_ROLLBACK )
 
 HB_FUNC( SQLO_CLOSESTMT )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
 
@@ -632,7 +632,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
 
 HB_FUNC( SQLO_LINE )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    const char ** line;
    const unsigned int * lens;
    PHB_ITEM temp;
@@ -661,7 +661,7 @@ HB_FUNC( SQLO_LINE )
 
 HB_FUNC( SQLO_LINEPROCESSED )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    const char ** line;
    const unsigned int * lens;
    HB_LONG lIndex;
@@ -698,7 +698,7 @@ HB_FUNC( SQLO_LINEPROCESSED )
 
 HB_FUNC( ORACLEWRITEMEMO )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    auto sTable = hb_parc(2);
    HB_ULONG ulRecno = hb_parnl(3);
    auto sRecnoName = hb_parcx(4);
@@ -789,7 +789,7 @@ type any->char
 HB_FUNC( ORACLEINBINDPARAM )
 {
 
-   POCI_SESSION Stmt = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto Stmt = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    auto iParamNum = hb_parni(2);
    auto iParamType = hb_parni(3);
    auto iFieldSize = hb_parni(4);
@@ -926,7 +926,7 @@ usage : ORACLEGETBINDDATA(hDbc,nParameterNumber)
 HB_FUNC( ORACLEGETBINDDATA)
 {
 
-   POCI_SESSION p = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto p = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    int iPos;
 
    auto p1 = hb_param(2, Harbour::Item::ANY);
@@ -978,7 +978,7 @@ ORACLEFREEBIND(nOrahandle)
 
 HB_FUNC( ORACLEFREEBIND )
 {
-   POCI_SESSION Stmt = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto Stmt = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    if( Stmt->pLink ) {
       OracleFreeLink(Stmt->ubBindNum, Stmt);
    }
@@ -990,7 +990,7 @@ usage ORACLEPREPARE(nOracleHandle,cSql) -> nPreparedHandle)
 */
 HB_FUNC(ORACLEPREPARE)
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    auto szSql = hb_parc(2);
    bool lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
 
@@ -1015,7 +1015,7 @@ ORACLEEXECDIR(nOraHandle[,nPreparedHandle]) ->nStatus
 */
 HB_FUNC(ORACLEEXECDIR)
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    int ret = SQL_ERROR;
    if( session ) {
       ret = sqlo_execute(session->stmtParam, 1);
@@ -1026,8 +1026,8 @@ HB_FUNC(ORACLEEXECDIR)
 }
 
 HB_FUNC( ORACLE_PROCCURSOR )
-{ 
-  POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+{
+  auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
   sqlo_stmt_handle_t sth = SQLO_STH_INIT;
   sqlo_stmt_handle_t st2h = SQLO_STH_INIT;                     /* handle of the ref cursor */
 
@@ -1077,7 +1077,7 @@ HB_FUNC( ORACLE_PROCCURSOR )
 }       
 HB_FUNC( ORACLE_SAVE_HANDLE_ST )     
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    if( session ) {
       hb_retptr((void *) session->stmtParam);
    }
@@ -1085,7 +1085,7 @@ HB_FUNC( ORACLE_SAVE_HANDLE_ST )
 
 HB_FUNC( ORACLE_CLOSE_FCURSOR )
 { 
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
       
    if( SQLO_SUCCESS != sqlo_close(session->stmtParamRes) ) {
        session->stmtParamRes = SQLO_STH_INIT;
@@ -1103,14 +1103,14 @@ HB_FUNC( ORACLE_CLOSE_FCURSOR )
 
 HB_FUNC( ORACLE_BIND_BY_NAME ) 
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    auto iPos = hb_parni(2);
    hb_retni(sqlo_bind_by_name(session->stmtParam, ":c1", SQLOT_FLT, &session->pLink[iPos].dValue, sizeof(session->pLink[iPos].dValue), 0, 0));
 }
 
 HB_FUNC(ORACLEEXECDIRCURSOR)
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    int ret = SQL_ERROR;
    if( session ) {
       ret = sqlo_execute(session->stmtParam, 1);
@@ -1134,7 +1134,7 @@ ORACLEBINDALLOC(noraHandle,nNumberofParameters)
 */
 HB_FUNC( ORACLEBINDALLOC )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    int iBind;
 
    if( session ) {
@@ -1150,7 +1150,7 @@ HB_FUNC( ORACLEBINDALLOC )
 
 HB_FUNC( ORACLE_BINDCURSOR )
 { 
-  POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+  auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
   sqlo_stmt_handle_t sth = SQLO_STH_INIT;
   sqlo_stmt_handle_t st2h = SQLO_STH_INIT;                     /* handle of the ref cursor */
 
@@ -1182,7 +1182,7 @@ HB_FUNC( ORACLE_BINDCURSOR )
  
 HB_FUNC( ORACLE_EXECCURSOR )      
 {
-  POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+  auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
   int ret = 1; 
    /* execute the PL/SQL block */
    if( SQLO_SUCCESS != sqlo_execute(session->stmtParam, 1) ) {
@@ -1204,7 +1204,7 @@ HB_FUNC( ORACLE_EXECCURSOR )
 }
 HB_FUNC( CLOSECURSOR )
 {
-   POCI_SESSION session = (POCI_SESSION) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
 
    if( session ) {
       //sqlo_close(session->stmt);
@@ -1220,7 +1220,7 @@ HB_FUNC( CLOSECURSOR )
 
 HB_FUNC( GETAFFECTROWS )
 {
-   OCI_SESSION * session = (OCI_SESSION *) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
    if( session ) {
       hb_retnl(session->uRows);
    } else {
@@ -1230,16 +1230,16 @@ HB_FUNC( GETAFFECTROWS )
 
 HB_FUNC( GETORAHANDLE )
 {
-   OCI_SESSION * p = (OCI_SESSION *) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
-   if( p ) {
-      hb_retni(p->stmt);
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
+   if( session ) {
+      hb_retni(session->stmt);
    }
 }
 
 HB_FUNC( SETORAHANDLE )
 {
-   OCI_SESSION * p = (OCI_SESSION *) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
-   if( p ) {
-      p->stmt = hb_parni(2);
+   auto session = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
+   if( session ) {
+      session->stmt = hb_parni(2);
    }
 }
