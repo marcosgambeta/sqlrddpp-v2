@@ -2435,7 +2435,7 @@ static HB_ERRCODE sqlExGoToId(SQLEXAREAP thiswa, PHB_ITEM pItem)
    }
 
    if( HB_IS_NUMERIC(pItem) ) {
-      return SELF_GOTO(reinterpret_cast<AREAP>(thiswa), static_cast<HB_LONG>(hb_itemGetNL(pItem)));
+      return SELF_GOTO(reinterpret_cast<AREAP>(thiswa), hb_itemGetNL(pItem));
    } else {
       commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable);
       return Harbour::FAILURE;
