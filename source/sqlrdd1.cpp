@@ -169,15 +169,14 @@ HB_BOOL isCachePointerInRange(HB_LONG lPosCache, HB_LONG lBegin, HB_LONG lEnd)
 
 HB_LONG searchCacheFWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 {
-   HB_LONG lBegin, lEnd;
-   HB_LONG lPosCache = hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE);
+   auto lPosCache = hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE);
 
    if( !lPosCache ) {
       return 0;
    }
 
-   lBegin = hb_arrayGetNL(thiswa->aInfo, AINFO_NCACHEBEGIN);
-   lEnd = hb_arrayGetNL(thiswa->aInfo, AINFO_NCACHEEND);
+   auto lBegin = hb_arrayGetNL(thiswa->aInfo, AINFO_NCACHEBEGIN);
+   auto lEnd = hb_arrayGetNL(thiswa->aInfo, AINFO_NCACHEEND);
 
    if( lPreviousCacheStatus ) {
       lPosCache++;
@@ -198,15 +197,14 @@ HB_LONG searchCacheFWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 
 HB_LONG searchCacheBWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 {
-   HB_LONG lBegin, lEnd;
-   HB_LONG lPosCache = hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE);
+   auto lPosCache = hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE);
 
    if( !lPosCache ) {
       return 0;
    }
 
-   lBegin = hb_arrayGetNL(thiswa->aInfo, AINFO_NCACHEBEGIN);
-   lEnd = hb_arrayGetNL(thiswa->aInfo, AINFO_NCACHEEND);
+   auto lBegin = hb_arrayGetNL(thiswa->aInfo, AINFO_NCACHEBEGIN);
+   auto lEnd = hb_arrayGetNL(thiswa->aInfo, AINFO_NCACHEEND);
 
    if( lPreviousCacheStatus ) {
       lPosCache--;
@@ -412,8 +410,6 @@ static HB_ERRCODE sqlFound(SQLAREAP thiswa, HB_BOOL * found)
 
 static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
 {
-   HB_LONG leof;
-
    auto eofat = hb_itemNew(nullptr);
 
    //TraceLog(nullptr, "sqlGoBottom\n");
@@ -426,7 +422,7 @@ static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_WRITEBUFFER, 0);
    }
 
-   leof = hb_arrayGetNL(thiswa->aInfo, AINFO_EOF_AT);
+   auto leof = hb_arrayGetNL(thiswa->aInfo, AINFO_EOF_AT);
 
    if( hb_arrayGetNL(thiswa->aInfo, AINFO_EOF_AT) ) {
       hb_itemPutNL(eofat, leof);
@@ -506,8 +502,6 @@ static HB_ERRCODE sqlGoToId(SQLAREAP thiswa, PHB_ITEM pItem)
 
 static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
 {
-   HB_LONG lbof;
-
    // TraceLog(nullptr, "sqlGoTop\n");
 
    thiswa->lpdbPendingRel = nullptr;
@@ -518,7 +512,7 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_WRITEBUFFER, 0);
    }
 
-   lbof = hb_arrayGetNL(thiswa->aInfo, AINFO_BOF_AT);
+   auto lbof = hb_arrayGetNL(thiswa->aInfo, AINFO_BOF_AT);
 
    if( lbof ) {
       auto pBOF = hb_itemPutNL(nullptr, lbof);
@@ -842,10 +836,10 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip)
    hb_arraySetNL(thiswa->aInfo, AINFO_SKIPCOUNT, hb_arrayGetNL(thiswa->aInfo, AINFO_SKIPCOUNT) + lToSkip);
 
    if( thiswa->isam ) {
-      HB_LONG lPosCache, lFound, lPreviousCacheStatus;
+      HB_LONG lFound, lPreviousCacheStatus;
       bool bCurrentDeleted;
 
-      lPosCache = hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE);
+      auto lPosCache = hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE);
       bCurrentDeleted = lPosCache && HB_IS_NIL(hb_arrayGetItemPtr(thiswa->aCache, lPosCache));
 
       if( lToSkip > 0 ) {
