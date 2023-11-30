@@ -263,14 +263,14 @@ struct _SQLAREA
    PHB_CODEPAGE cdPageCnv;     // Area's codepage convert pointer
    char * szDataFileName;      // file name
    HB_LONG hOrdCurrent;        // current index order
-   HB_BOOL shared;
-   HB_BOOL readonly;           // only SELECT allowed
-   HB_BOOL creating;           // TRUE when creating table
-   HB_BOOL firstinteract;      // TRUE when workarea was not used yet
-   HB_BOOL isam;               // ISAM Simulator ?
-   HB_BOOL wasdel;
-   HB_BOOL initialized;        // Workarea Initialization done
-   HB_BOOL sqlfilter;          // SET FILTER converted to SQL
+   bool shared;
+   bool readonly;              // only SELECT allowed
+   bool creating;              // TRUE when creating table
+   bool firstinteract;         // TRUE when workarea was not used yet
+   bool isam;                  // ISAM Simulator ?
+   bool wasdel;
+   bool initialized;           // Workarea Initialization done
+   bool sqlfilter;             // SET FILTER converted to SQL
 
    PHB_ITEM oWorkArea;         // SQL Workarea object
    PHB_ITEM aInfo;             // Status array
@@ -314,14 +314,14 @@ struct _SQLEXORAAREA
    /// PHB_CODEPAGE cdPageCnv;     // Area's codepage convert pointer
    /// char * szDataFileName;      // file name
    /// HB_LONG hOrdCurrent;        // current index order
-   // HB_BOOL shared;
-   // HB_BOOL readonly;            // only SELECT allowed
-   // HB_BOOL creating;            // TRUE when creating table
-   // HB_BOOL firstinteract;       // TRUE when workarea was not used yet
-   /// HB_BOOL isam;               // ISAM Simulator ?
-   /// HB_BOOL wasdel;
-   /// HB_BOOL initialized;        // Workarea Initialization done
-   /// HB_BOOL sqlfilter;          // SET FILTER converted to SQL
+   // bool shared;
+   // bool readonly;               // only SELECT allowed
+   // bool creating;               // TRUE when creating table
+   // bool firstinteract;          // TRUE when workarea was not used yet
+   /// bool isam;                  // ISAM Simulator ?
+   /// bool wasdel;
+   /// bool initialized;           // Workarea Initialization done
+   /// bool sqlfilter;             // SET FILTER converted to SQL
    ///
    /// PHB_ITEM oWorkArea;         // SQL Workarea object
    /// PHB_ITEM aInfo;             // Status array
@@ -389,33 +389,33 @@ struct _SQLEXORAAREA
    char sLimit1[50];                 // String for recordset limit
    char sLimit2[50];                 // String for recordset limit
 
-   HB_BOOL bufferHot;                // Does it have to write buffer down to database ?
-   HB_BOOL bIsInsert;                // TRUE if appending a new record
-   HB_BOOL bConnVerified;            // Already checked for ODBC connection ?
-   HB_BOOL bReverseIndex;            // If current index is in DESCENDING order
+   bool bufferHot;                   // Does it have to write buffer down to database ?
+   bool bIsInsert;                   // TRUE if appending a new record
+   bool bConnVerified;               // Already checked for ODBC connection ?
+   bool bReverseIndex;               // If current index is in DESCENDING order
    // INDEXBINDP IndexBindings[MAX_INDEXES]; // Index column and prepared SQL expression handles for SKIP
    INDEXBINDORAP * IndexBindings;    // Index column and prepared SQL expression handles for SKIP
 
    // OCI_Statement * colStmt;       // Single column retrieving statements
    STATEMENT_DATA * colStmt;
-   HB_BOOL bConditionChanged1;       // If any of conditions like filters, scope, historic, has
+   bool bConditionChanged1;          // If any of conditions like filters, scope, historic, has
                                      // changed, prepared statements handles for Record List
                                      // are no longer valid - USED FOR SKIP / GO TOP / BO BOTTOM
-   HB_BOOL bConditionChanged2;       // If any of conditions like filters, scope, historic, has
+   bool bConditionChanged2;          // If any of conditions like filters, scope, historic, has
                                      // changed, prepared statements handles for Record List
                                      // are no longer valid - USED FOR SEEK
-   HB_BOOL bOrderChanged;            // If order has changed, we should fix column bindings
+   bool bOrderChanged;               // If order has changed, we should fix column bindings
                                      // before use then
-   HB_BOOL bRebuildSeekQuery;        // If query for Seek must be recreated due to NULL interference
-   HB_BOOL bHistoric;                // TRUE if workarea has historic
+   bool bRebuildSeekQuery;           // If query for Seek must be recreated due to NULL interference
+   bool bHistoric;                   // TRUE if workarea has historic
    COLUMNBINDORAP InsertRecord;      // Column bindings to INSERT
    COLUMNBINDORAP CurrRecord;        // Current record bindings for SKIP / UPDATE
    char editMask[MAX_FIELDS];        // Flags if a column was updated - must be cleared on every GO_COLD
    char updatedMask[MAX_FIELDS];     // Copy of updateMask in currently prepared UPDATE stmt
    char specialMask[MAX_FIELDS];     // Same of updateMask but for special cols (INDKEY_xx and FORKEY_xx)
-   HB_BOOL bIndexTouchedInUpdate;    // If any index column is affected by UPDATE
-   HB_BOOL bIsSelect;                // Table open is an select statement
-   HB_BOOL bOracle12;
+   bool bIndexTouchedInUpdate;       // If any index column is affected by UPDATE
+   bool bIsSelect;                   // Table open is an select statement
+   bool bOracle12;
 };
 
 using SQLEXORAAREA = _SQLEXORAAREA;

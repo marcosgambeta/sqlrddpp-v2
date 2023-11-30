@@ -77,14 +77,14 @@ struct _SQLAREA
    PHB_CODEPAGE cdPageCnv; /* Area's codepage convert pointer */
    char * szDataFileName;  /* file name */
    HB_LONG hOrdCurrent;       /* current index order */
-   HB_BOOL shared;
-   HB_BOOL readonly;          /* only SELECT allowed */
-   HB_BOOL creating;          /* HB_TRUE when creating table */
-   HB_BOOL firstinteract;     /* HB_TRUE when workarea was not used yet */
-   HB_BOOL isam;              /* ISAM Simulator ? */
-   HB_BOOL wasdel;
-   HB_BOOL initialized;       /* Workarea Initialization done */
-   HB_BOOL sqlfilter;         /* SET FILTER converted to SQL */
+   bool shared;
+   bool readonly;             /* only SELECT allowed */
+   bool creating;             /* HB_TRUE when creating table */
+   bool firstinteract;        /* HB_TRUE when workarea was not used yet */
+   bool isam;                 /* ISAM Simulator ? */
+   bool wasdel;
+   bool initialized;          /* Workarea Initialization done */
+   bool sqlfilter;            /* SET FILTER converted to SQL */
 
    PHB_ITEM oWorkArea;      /* SQL Workarea object */
    PHB_ITEM aInfo;          /* Status array */
