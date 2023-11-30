@@ -3456,7 +3456,6 @@ static void hb_sqlrddRddInit(void * cargo)
    usResult = hb_rddRegister("SQLRDD", RDT_FULL);
    if( usResult <= 1 ) {
       if( usResult == 0 ) {
-         PHB_DYNS pDynSym;
          if( !s_pSym_SQLINIT ) {
             s_pSym_SQLINIT = hb_dynsymFindName("SR_INIT");
          }
@@ -3464,7 +3463,7 @@ static void hb_sqlrddRddInit(void * cargo)
          hb_vmPushNil();
          hb_vmDo(0);
 
-         pDynSym = hb_dynsymFind("__SR_STARTSQL");
+         auto pDynSym = hb_dynsymFind("__SR_STARTSQL");
 
          if( pDynSym && hb_dynsymIsFunction(pDynSym) ) {
             hb_vmPushDynSym(pDynSym);

@@ -4168,10 +4168,9 @@ static void hb_sqlExOraRddInitora(void * cargo)
       usResult = static_cast<HB_USHORT>(hb_rddRegister("SQLEXORA", RDT_FULL));
       if( usResult <= 1 ) {
          if( usResult == 0 ) {
-            PHB_DYNS pDynSym;
             HB_FUNC_EXEC( SR_INIT );
 
-            pDynSym = hb_dynsymFind("__SR_STARTSQL");
+            auto pDynSym = hb_dynsymFind("__SR_STARTSQL");
 
             if( pDynSym && hb_dynsymIsFunction(pDynSym) ) {
                hb_vmPushDynSym(pDynSym);
