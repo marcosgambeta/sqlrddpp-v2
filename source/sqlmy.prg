@@ -81,7 +81,7 @@ CLASS SR_MYSQL FROM SR_CONNECTION
 
 ENDCLASS
 
-METHOD MoreResults(aArray, lTranslate) CLASS SR_MYSQL
+METHOD SR_MYSQL:MoreResults(aArray, lTranslate)
 
    LOCAL nRet
 
@@ -92,7 +92,7 @@ METHOD MoreResults(aArray, lTranslate) CLASS SR_MYSQL
 
 RETURN nRet
 
-METHOD Getline(aFields, lTranslate, aArray) CLASS SR_MYSQL
+METHOD SR_MYSQL:Getline(aFields, lTranslate, aArray)
 
    LOCAL i
 
@@ -116,7 +116,7 @@ METHOD Getline(aFields, lTranslate, aArray) CLASS SR_MYSQL
 
 RETURN aArray
 
-METHOD FieldGet(nField, aFields, lTranslate) CLASS SR_MYSQL
+METHOD SR_MYSQL:FieldGet(nField, aFields, lTranslate)
 
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
@@ -126,7 +126,7 @@ METHOD FieldGet(nField, aFields, lTranslate) CLASS SR_MYSQL
 
 RETURN ::aCurrLine[nField]
 
-METHOD FetchRaw(lTranslate, aFields) CLASS SR_MYSQL
+METHOD SR_MYSQL:FetchRaw(lTranslate, aFields)
 
    ::nRetCode := SQL_ERROR
 
@@ -142,7 +142,7 @@ METHOD FetchRaw(lTranslate, aFields) CLASS SR_MYSQL
 
 RETURN ::nRetCode
 
-METHOD FreeStatement() CLASS SR_MYSQL
+METHOD SR_MYSQL:FreeStatement()
 
    IF ::hStmt != NIL
       MYSClear(::hDbc)
@@ -151,7 +151,7 @@ METHOD FreeStatement() CLASS SR_MYSQL
 
 RETURN NIL
 
-METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName) CLASS SR_MYSQL
+METHOD SR_MYSQL:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
    LOCAL nType := 0
    LOCAL nLen := 0
@@ -206,7 +206,7 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
 
 RETURN aFields
 
-METHOD LastError() CLASS SR_MYSQL
+METHOD SR_MYSQL:LastError()
 
    IF ::hStmt != NIL
       RETURN "(" + alltrim(str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
@@ -214,7 +214,7 @@ METHOD LastError() CLASS SR_MYSQL
 
 RETURN "(" + alltrim(str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
 
-METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout) CLASS SR_MYSQL
+METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
 
    LOCAL hEnv := 0
    LOCAL hDbc := 0
@@ -272,7 +272,7 @@ METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace
 
 RETURN SELF
 
-METHOD End() CLASS SR_MYSQL
+METHOD SR_MYSQL:End()
 
    ::Commit(.T.)
    ::FreeStatement()
@@ -283,19 +283,19 @@ METHOD End() CLASS SR_MYSQL
 
 RETURN ::Super:End()
 
-METHOD Commit(lNoLog) CLASS SR_MYSQL
+METHOD SR_MYSQL:Commit(lNoLog)
 
    ::Super:Commit(lNoLog)
 
 RETURN (::nRetCode := MYSCommit(::hDbc))
 
-METHOD RollBack() CLASS SR_MYSQL
+METHOD SR_MYSQL:RollBack()
 
    ::Super:RollBack()
 
 RETURN (::nRetCode := MYSRollBack(::hDbc))
 
-METHOD ExecuteRaw(cCommand) CLASS SR_MYSQL
+METHOD SR_MYSQL:ExecuteRaw(cCommand)
 
    IF upper(left(ltrim(cCommand), 6)) == "SELECT" .OR. upper(left(ltrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
@@ -307,5 +307,5 @@ METHOD ExecuteRaw(cCommand) CLASS SR_MYSQL
 
 RETURN MYSResultStatus(::hDbc)
 
-METHOD GetAffectedRows() CLASS SR_MYSQL
+METHOD SR_MYSQL:GetAffectedRows()
 RETURN MYSAFFECTEDROWS(::hDbc)

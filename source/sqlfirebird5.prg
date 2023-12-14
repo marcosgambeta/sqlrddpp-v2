@@ -81,7 +81,7 @@ ENDCLASS
 
 /*------------------------------------------------------------------------*/
 
-METHOD Getline(aFields, lTranslate, aArray) CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:Getline(aFields, lTranslate, aArray)
 
    LOCAL i
 
@@ -107,7 +107,7 @@ RETURN aArray
 
 /*------------------------------------------------------------------------*/
 
-METHOD FieldGet(nField, aFields, lTranslate) CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:FieldGet(nField, aFields, lTranslate)
 
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
@@ -119,7 +119,7 @@ RETURN ::aCurrLine[nField]
 
 /*------------------------------------------------------------------------*/
 
-METHOD FetchRaw(lTranslate, aFields) CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:FetchRaw(lTranslate, aFields)
 
    ::nRetCode := SQL_ERROR
    DEFAULT aFields TO ::aFields
@@ -136,7 +136,7 @@ RETURN ::nRetCode
 
 /*------------------------------------------------------------------------*/
 
-METHOD AllocStatement() CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:AllocStatement()
 
    IF ::lSetNext
       IF ::nSetOpt == SQL_ATTR_QUERY_TIMEOUT
@@ -149,7 +149,7 @@ RETURN SQL_SUCCESS
 
 /*------------------------------------------------------------------------*/
 
-METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName) CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
    LOCAL n
    LOCAL nFields := 0
@@ -235,7 +235,7 @@ RETURN aFields
 
 /*------------------------------------------------------------------------*/
 
-METHOD LastError() CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:LastError()
 
    LOCAL cMsgError
    LOCAL nType := 0
@@ -246,8 +246,8 @@ RETURN alltrim(cMsgError) + " - Native error code " + AllTrim(str(nType))
 
 /*------------------------------------------------------------------------*/
 
-METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
-   cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit) CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
+   cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
 
    LOCAL nRet
    LOCAL hEnv
@@ -298,7 +298,7 @@ RETURN SELF
 
 /*------------------------------------------------------------------------*/
 
-METHOD End() CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:End()
 
    ::Commit()
    FBClose5(::hEnv)
@@ -307,7 +307,7 @@ RETURN ::Super:End()
 
 /*------------------------------------------------------------------------*/
 
-METHOD Commit() CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:Commit()
 
    ::Super:Commit()
    ::nRetCode := FBCOMMITTRANSACTION5(::hEnv)
@@ -316,7 +316,7 @@ RETURN (::nRetCode := FBBeginTransaction5(::hEnv))
 
 /*------------------------------------------------------------------------*/
 
-METHOD RollBack() CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:RollBack()
 
    ::super:RollBack()
 
@@ -324,7 +324,7 @@ RETURN (::nRetCode := FBRollBackTransaction5(::hEnv))
 
 /*------------------------------------------------------------------------*/
 
-METHOD ExecuteRaw(cCommand) CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:ExecuteRaw(cCommand)
 
    LOCAL nRet
 
@@ -340,7 +340,7 @@ RETURN nRet
 
 /*------------------------------------------------------------------------*/
 
-METHOD MoreResults(aArray, lTranslate) CLASS SR_FIREBIRD5
+METHOD SR_FIREBIRD5:MoreResults(aArray, lTranslate)
 
    LOCAL nRet
    LOCAL i

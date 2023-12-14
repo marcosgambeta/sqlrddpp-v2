@@ -224,7 +224,7 @@ CLASS SR_CONNECTION
 
 ENDCLASS
 
-METHOD LogQuery(cCommand, cType, nLogMode, nCost) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:LogQuery(cCommand, cType, nLogMode, nCost)
 
    LOCAL cSql
    LOCAL cMode
@@ -277,7 +277,7 @@ METHOD LogQuery(cCommand, cType, nLogMode, nCost) CLASS SR_CONNECTION
 
 RETURN NIL
 
-METHOD ListCatTables(cOwner) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:ListCatTables(cOwner)
 
    LOCAL aRet := {}
    LOCAL aRet2 := {}
@@ -341,7 +341,7 @@ METHOD ListCatTables(cOwner) CLASS SR_CONNECTION
 
 RETURN aRet2
 
-METHOD Fetch(aLine, lTranslate, aFields) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:Fetch(aLine, lTranslate, aFields)
 
    LOCAL lResults := HB_ISARRAY(aLine)
    LOCAL i
@@ -356,10 +356,10 @@ METHOD Fetch(aLine, lTranslate, aFields) CLASS SR_CONNECTION
 
 RETURN nRet
 
-METHOD GetStruct(cTable) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:GetStruct(cTable)
 RETURN ::oSql:IniFields(.T., cTable, , .F.)
 
-METHOD Getline(aFields, lTranslate, aArray) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:Getline(aFields, lTranslate, aArray)
 
    LOCAL i
 
@@ -375,7 +375,7 @@ METHOD Getline(aFields, lTranslate, aArray) CLASS SR_CONNECTION
 
 RETURN aArray
 
-METHOD SetNextOpt(nSet, nOpt) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:SetNextOpt(nSet, nOpt)
 
    ::lSetNext  := .T.
    ::nSetOpt   := nSet
@@ -383,7 +383,7 @@ METHOD SetNextOpt(nSet, nOpt) CLASS SR_CONNECTION
 
 RETURN NIL
 
-METHOD Exec(cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:Exec(cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType)
 
    LOCAL nRet := 0
    LOCAL i
@@ -647,10 +647,10 @@ METHOD Exec(cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno
 
 RETURN nRet
 
-METHOD AllocStatement() CLASS SR_CONNECTION
+METHOD SR_CONNECTION:AllocStatement()
 RETURN SQL_SUCCESS
 
-METHOD Execute(cCommand, lErrMsg, nLogMode, cType, lNeverLog) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:Execute(cCommand, lErrMsg, nLogMode, cType, lNeverLog)
 
    LOCAL nRet := 0
 
@@ -719,16 +719,16 @@ METHOD Execute(cCommand, lErrMsg, nLogMode, cType, lNeverLog) CLASS SR_CONNECTIO
 
 RETURN nRet
 
-METHOD LastError() CLASS SR_CONNECTION
+METHOD SR_CONNECTION:LastError()
 RETURN ""
 
-METHOD RPCTalk(cSend) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:RPCTalk(cSend)
 
    HB_SYMBOL_UNUSED(cSend)
 
 RETURN ""
 
-METHOD DetectTargetDb() CLASS SR_CONNECTION
+METHOD SR_CONNECTION:DetectTargetDb()
 
    LOCAL cTargetDB := Upper(::cSystemName)
    LOCAL aVers
@@ -817,40 +817,40 @@ METHOD DetectTargetDb() CLASS SR_CONNECTION
 
 RETURN NIL
 
-METHOD End() CLASS SR_CONNECTION
+METHOD SR_CONNECTION:End()
 
    ::hEnv := NIL
    ::hDbc := NIL
 
 RETURN NIL
 
-METHOD GetInfo(nType) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:GetInfo(nType)
 
    HB_SYMBOL_UNUSED(nType)
 
 RETURN ""
 
-METHOD GetOptions(nType) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:GetOptions(nType)
 
    HB_SYMBOL_UNUSED(nType)
 
 RETURN ""
 
-METHOD SetOptions(nType, uBuffer) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:SetOptions(nType, uBuffer)
 
    HB_SYMBOL_UNUSED(nType)
    HB_SYMBOL_UNUSED(uBuffer)
 
 RETURN SQL_SUCCESS
 
-METHOD SetStmtOptions(nType, uBuffer) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:SetStmtOptions(nType, uBuffer)
 
    HB_SYMBOL_UNUSED(nType)
    HB_SYMBOL_UNUSED(uBuffer)
 
 RETURN SQL_SUCCESS
 
-METHOD Commit(lNoLog) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:Commit(lNoLog)
 
    DEFAULT lNoLog TO .F.
 
@@ -892,7 +892,7 @@ METHOD Commit(lNoLog) CLASS SR_CONNECTION
 
 RETURN SQL_SUCCESS
 
-METHOD RollBack() CLASS SR_CONNECTION
+METHOD SR_CONNECTION:RollBack()
 
    IF ::lTraceToDBF
       SR_WriteDbLog("ROLLBACK", SELF)
@@ -932,7 +932,7 @@ METHOD RollBack() CLASS SR_CONNECTION
 
 RETURN SQL_SUCCESS
 
-METHOD RuntimeErr(cOperation, cErr) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:RuntimeErr(cOperation, cErr)
 
    LOCAL oErr := ErrorNew()
    LOCAL cDescr
@@ -994,7 +994,7 @@ FUNCTION SR_AdjustNum(a)
 
 RETURN b
 
-METHOD Connect(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:Connect(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
 
    LOCAL hEnv := NIL
    LOCAL hDbc := NIL
@@ -1175,7 +1175,7 @@ METHOD Connect(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, c
 
 RETURN SELF
 
-METHOD SQLType(nType, cName, nLen) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:SQLType(nType, cName, nLen)
 
    LOCAL cType := "U"
 
@@ -1259,7 +1259,7 @@ METHOD SQLType(nType, cName, nLen) CLASS SR_CONNECTION
 
 RETURN cType
 
-METHOD SQLLen(nType, nLen, nDec) CLASS SR_CONNECTION
+METHOD SR_CONNECTION:SQLLen(nType, nLen, nDec)
 
    LOCAL cType := "U"
 

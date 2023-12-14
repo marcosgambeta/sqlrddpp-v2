@@ -80,7 +80,7 @@ ENDCLASS
 
 /*------------------------------------------------------------------------*/
 
-METHOD MoreResults(aArray, lTranslate) CLASS SR_PGS
+METHOD SR_PGS:MoreResults(aArray, lTranslate)
 
    HB_SYMBOL_UNUSED(aArray)
    HB_SYMBOL_UNUSED(lTranslate)
@@ -89,7 +89,7 @@ RETURN -1
 
 /*------------------------------------------------------------------------*/
 
-METHOD Getline(aFields, lTranslate, aArray) CLASS SR_PGS
+METHOD SR_PGS:Getline(aFields, lTranslate, aArray)
 
    LOCAL i
 
@@ -115,7 +115,7 @@ RETURN aArray
 
 /*------------------------------------------------------------------------*/
 
-METHOD FieldGet(nField, aFields, lTranslate) CLASS SR_PGS
+METHOD SR_PGS:FieldGet(nField, aFields, lTranslate)
 
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
@@ -127,7 +127,7 @@ RETURN ::aCurrLine[nField]
 
 /*------------------------------------------------------------------------*/
 
-METHOD FetchRaw(lTranslate, aFields) CLASS SR_PGS
+METHOD SR_PGS:FetchRaw(lTranslate, aFields)
 
    ::nRetCode := SQL_ERROR
    DEFAULT aFields TO ::aFields
@@ -144,7 +144,7 @@ RETURN ::nRetCode
 
 /*------------------------------------------------------------------------*/
 
-METHOD FreeStatement() CLASS SR_PGS
+METHOD SR_PGS:FreeStatement()
 
    IF ::hStmt != NIL
       PGSClear(::hDbc)
@@ -155,7 +155,7 @@ RETURN NIL
 
 /*------------------------------------------------------------------------*/
 
-METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName) CLASS SR_PGS
+METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
    LOCAL nFields := 0
    LOCAL nType := 0
@@ -217,7 +217,7 @@ RETURN aFields
 
 /*------------------------------------------------------------------------*/
 
-METHOD LastError() CLASS SR_PGS
+METHOD SR_PGS:LastError()
 
    IF ::hStmt != NIL
       RETURN "(" + alltrim(str(::nRetCode)) + ") " + PGSResStatus(::hDbc) + " - " + PGSErrMsg(::hDbc)
@@ -227,8 +227,8 @@ RETURN "(" + alltrim(str(::nRetCode)) + ") " + PGSErrMsg(::hDbc)
 
 /*------------------------------------------------------------------------*/
 
-METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
-   cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit) CLASS SR_PGS
+METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
+   cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
 
    LOCAL hEnv := 0
    LOCAL hDbc := 0
@@ -322,7 +322,7 @@ RETURN Self
 
 /*------------------------------------------------------------------------*/
 
-METHOD End() CLASS SR_PGS
+METHOD SR_PGS:End()
 
    ::Commit(.T.)
 
@@ -339,7 +339,7 @@ RETURN NIL
 
 /*------------------------------------------------------------------------*/
 
-METHOD Commit(lNoLog) CLASS SR_PGS
+METHOD SR_PGS:Commit(lNoLog)
 
    ::Super:Commit(lNoLog)
 
@@ -347,7 +347,7 @@ RETURN (::nRetCode := ::exec("COMMIT;BEGIN", .F.))
 
 /*------------------------------------------------------------------------*/
 
-METHOD RollBack() CLASS SR_PGS
+METHOD SR_PGS:RollBack()
 
    ::Super:RollBack()
    ::nRetCode := PGSRollBack(::hDbc)
@@ -357,7 +357,7 @@ RETURN ::nRetCode
 
 /*------------------------------------------------------------------------*/
 
-METHOD ExecuteRaw(cCommand) CLASS SR_PGS
+METHOD SR_PGS:ExecuteRaw(cCommand)
 
    IF upper(left(ltrim(cCommand), 6)) == "SELECT"
       ::lResultSet := .T.
@@ -371,7 +371,7 @@ RETURN PGSResultStatus(::hStmt)
 
 /*------------------------------------------------------------------------*/
 
-METHOD AllocStatement() CLASS SR_PGS
+METHOD SR_PGS:AllocStatement()
 
    IF ::lSetNext
       IF ::nSetOpt == SQL_ATTR_QUERY_TIMEOUT
@@ -387,7 +387,7 @@ RETURN SQL_SUCCESS
 
 /*------------------------------------------------------------------------*/
 
-METHOD GetAffectedRows()
+METHOD SR_PGS:GetAffectedRows()
 RETURN PGSAFFECTEDROWS(::hDbc)
 
 /*------------------------------------------------------------------------*/

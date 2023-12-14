@@ -188,7 +188,7 @@ CLASS ExpressionTranslator
 
 ENDCLASS
 
-METHOD new(pWorkarea, pFixVariables, pSimplifyCondition, pIndexExpression) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:new(pWorkarea, pFixVariables, pSimplifyCondition, pIndexExpression)
 
    IF HB_ISCHAR(pWorkarea)
       ::_oDefaultContext := oGetWorkarea(pWorkarea)
@@ -205,7 +205,7 @@ METHOD new(pWorkarea, pFixVariables, pSimplifyCondition, pIndexExpression) CLASS
 
 RETURN SELF
 
-METHOD GetTranslation(oCondition) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:GetTranslation(oCondition)
 
    LOCAL item
    LOCAL translation
@@ -250,7 +250,7 @@ METHOD GetTranslation(oCondition) CLASS ExpressionTranslator
 
 RETURN oResult
 
-METHOD Translate(oExpression, x) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:Translate(oExpression, x)
 
    LOCAL result
    LOCAL i
@@ -331,7 +331,7 @@ METHOD Translate(oExpression, x) CLASS ExpressionTranslator
 
 RETURN result
 
-METHOD InternalTranslate(oExpression, x) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:InternalTranslate(oExpression, x)
 
    LOCAL result
 
@@ -349,7 +349,7 @@ METHOD InternalTranslate(oExpression, x) CLASS ExpressionTranslator
 
 RETURN result
 
-METHOD TranslateCondition(oCondition) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:TranslateCondition(oCondition)
 
    LOCAL result
 
@@ -366,7 +366,7 @@ METHOD TranslateCondition(oCondition) CLASS ExpressionTranslator
 
 RETURN result
 
-METHOD TranslateComposition(oSerialComposition) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:TranslateComposition(oSerialComposition)
 
     LOCAL cOperand1 := ::TranslateOperand(oSerialComposition:oOperand1, oSerialComposition:oOperator)
     LOCAL cOperand2 := ::TranslateOperand(oSerialComposition:oOperand2, oSerialComposition:oOperator)
@@ -374,7 +374,7 @@ METHOD TranslateComposition(oSerialComposition) CLASS ExpressionTranslator
 
 RETURN cOperand1 + " " + cOperator + " " + cOperand2
 
-METHOD TranslateOperand(oOperand, oOperator) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:TranslateOperand(oOperand, oOperator)
 
    LOCAL result := ::InternalTranslate(oOperand)
 
@@ -385,13 +385,13 @@ METHOD TranslateOperand(oOperand, oOperator) CLASS ExpressionTranslator
 
 RETURN result
 
-METHOD TranslateComparison(oComparison) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:TranslateComparison(oComparison)
 RETURN ::TranslateExpression(oComparison:oOperand1) + " " + ::GetSQLOperator(oComparison:oOperator):aSymbols[1] + " " + ::TranslateExpression(oComparison:oOperand2)
 
-METHOD TranslateBooleanExpression(oBooleanExpression) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:TranslateBooleanExpression(oBooleanExpression)
 RETURN ::TranslateExpression(oBooleanExpression:oExpression)
 
-METHOD TranslateExpression(oExpression) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:TranslateExpression(oExpression)
 
    LOCAL result
 
@@ -408,7 +408,7 @@ METHOD TranslateExpression(oExpression) CLASS ExpressionTranslator
 
 RETURN result
 
-METHOD TranslateFunctionExpression(oFunctionExpression) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:TranslateFunctionExpression(oFunctionExpression)
 
    LOCAL aParameters
    LOCAL cSQLFunctionName
@@ -426,7 +426,7 @@ METHOD TranslateFunctionExpression(oFunctionExpression) CLASS ExpressionTranslat
 RETURN cSQLFunctionName + "(" + cJoin(aParameters, ",") + ")"
 
 /*
-METHOD CheckParams(oFunctionExpression) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:CheckParams(oFunctionExpression)
 
    IF ascan(oFunctionExpression:aParameters, {|x|x:lIsByRef}) > 0
       Throw(ErrorNew(,,,, "The expression cannot be translated because " + oFunctionExpression:cFunctionName + " contains a parameter passed by reference"))
@@ -435,7 +435,7 @@ METHOD CheckParams(oFunctionExpression) CLASS ExpressionTranslator
 RETURN
 */
 
-METHOD TranslateValueExpression(oValueExpression) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:TranslateValueExpression(oValueExpression)
 
    LOCAL result
    LOCAL aRelations
@@ -475,13 +475,13 @@ METHOD TranslateValueExpression(oValueExpression) CLASS ExpressionTranslator
 
 RETURN result
 
-METHOD GetSQLAlias(oWorkArea) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:GetSQLAlias(oWorkArea)
 RETURN iif(oWorkArea == ::_oDefaultContext, "A", upper(oWorkArea:cAlias))
 
-METHOD FormatField(oWorkArea, cFieldName) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:FormatField(oWorkArea, cFieldName)
 RETURN ::GetSQLAlias(oWorkArea) + "." + upper(alltrim(cFieldName)) // SR_DBQUALIFY
 
-METHOD GetSQLOperator(oOperator) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:GetSQLOperator(oOperator)
 
    LOCAL aSQLOperators
 
@@ -496,10 +496,10 @@ METHOD GetSQLOperator(oOperator) CLASS ExpressionTranslator
 
 RETURN aSQLOperators[ascan(aSQLOperators, {|x|x:cName == oOperator:cName})]
 
-METHOD GetOperatorSymbol(aOperators, cName) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:GetOperatorSymbol(aOperators, cName)
 RETURN xFirst(aOperators, {|x|x:cName == cName}):aSymbols[1]
 
-METHOD TranslateRelationExpression(oDirectRelation) CLASS ExpressionTranslator
+METHOD ExpressionTranslator:TranslateRelationExpression(oDirectRelation)
 
    LOCAL aFields1
    LOCAL aFields2
@@ -592,13 +592,13 @@ CLASS MSSQLExpressionTranslator FROM ExpressionTranslator
 
 ENDCLASS
 
-METHOD new(pWorkarea, pFixVariables, pSimplifyCondition, pIndexExpression) CLASS MSSQLExpressionTranslator
+METHOD MSSQLExpressionTranslator:new(pWorkarea, pFixVariables, pSimplifyCondition, pIndexExpression)
 
    ::aUDF := {"padl", "padr", "padc", "valtype", "transform", "at", "rat", "strtran", "min", "max"}
 
 RETURN ::super:new(pWorkarea, pFixVariables, pSimplifyCondition, pIndexExpression)
 
-METHOD TranslateComparison(oComparison) CLASS MSSQLExpressionTranslator
+METHOD MSSQLExpressionTranslator:TranslateComparison(oComparison)
 
    LOCAL bLike := {|x|iif(hb_regexLike("^\'.*\'$", x), " like '%" + substr(x, 2, len(x) - 2) + "%'", " like '%'+" + x + "+'")}
 
@@ -620,7 +620,7 @@ METHOD TranslateComparison(oComparison) CLASS MSSQLExpressionTranslator
 
 RETURN NIL
 
-METHOD TranslateFunctionExpression(oFunctionExpression) CLASS MSSQLExpressionTranslator
+METHOD MSSQLExpressionTranslator:TranslateFunctionExpression(oFunctionExpression)
 
    LOCAL result
    LOCAL cSavedFormat
@@ -768,10 +768,10 @@ METHOD TranslateFunctionExpression(oFunctionExpression) CLASS MSSQLExpressionTra
 
 RETURN ::super:TranslateFunctionExpression(oFunctionExpression)
 
-METHOD TranslateBooleanExpression(oBooleanExpression) CLASS MSSQLExpressionTranslator
+METHOD MSSQLExpressionTranslator:TranslateBooleanExpression(oBooleanExpression)
 RETURN ::super:TranslateBooleanExpression(oBooleanExpression) + " = 1"
 
-METHOD GetFunctionName(oFunctionExpression) CLASS MSSQLExpressionTranslator
+METHOD MSSQLExpressionTranslator:GetFunctionName(oFunctionExpression)
 
    LOCAL cFunctionName := oFunctionExpression:cFunctionName
 
@@ -790,10 +790,10 @@ METHOD GetFunctionName(oFunctionExpression) CLASS MSSQLExpressionTranslator
 
 RETURN NIL
 
-METHOD GetNewTranslator(pFixVariables, pSimplifyCondition, pIndexExpression)
+METHOD MSSQLExpressionTranslator:GetNewTranslator(pFixVariables, pSimplifyCondition, pIndexExpression)
 RETURN MSSQLExpressionTranslator():new(::_oDefaultContext, pFixVariables, pSimplifyCondition, pIndexExpression)
 
-METHOD GetComparisonOperators() CLASS MSSQLExpressionTranslator
+METHOD MSSQLExpressionTranslator:GetComparisonOperators()
 
    IF ::_aComparisonOperators == NIL
       ::_aComparisonOperators :=                             ;
@@ -810,7 +810,7 @@ METHOD GetComparisonOperators() CLASS MSSQLExpressionTranslator
 
 RETURN ::_aComparisonOperators
 
-METHOD GetLogicalOperators() CLASS MSSQLExpressionTranslator
+METHOD MSSQLExpressionTranslator:GetLogicalOperators()
 
    IF ::_aLogicalOperators == NIL
       ::_aLogicalOperators :=                    ;
@@ -822,7 +822,7 @@ METHOD GetLogicalOperators() CLASS MSSQLExpressionTranslator
 
 RETURN ::_aLogicalOperators
 
-METHOD GetArithmeticOperators() CLASS MSSQLExpressionTranslator
+METHOD MSSQLExpressionTranslator:GetArithmeticOperators()
 
    IF ::_aArithmeticOperators == NIL
       ::_aArithmeticOperators :=                         ;
@@ -897,7 +897,7 @@ CLASS EnchancedDirectRelation FROM DirectRelation
 
 ENDCLASS
 
-METHOD new(pWorkarea1, pWorkarea2, pExpression) CLASS EnchancedDirectRelation
+METHOD EnchancedDirectRelation:new(pWorkarea1, pWorkarea2, pExpression)
 
    LOCAL indexLength
 
@@ -909,7 +909,7 @@ METHOD new(pWorkarea1, pWorkarea2, pExpression) CLASS EnchancedDirectRelation
 
 RETURN SELF
 
-METHOD oExpression(xValue) CLASS EnchancedDirectRelation
+METHOD EnchancedDirectRelation:oExpression(xValue)
 
    LOCAL cRelationExpr
 
@@ -925,7 +925,7 @@ METHOD oExpression(xValue) CLASS EnchancedDirectRelation
 
 RETURN ::_oExpression
 
-METHOD oIndexExpression(xValue) CLASS EnchancedDirectRelation
+METHOD EnchancedDirectRelation:oIndexExpression(xValue)
 
    LOCAL cIndexExpr
 
@@ -941,7 +941,7 @@ METHOD oIndexExpression(xValue) CLASS EnchancedDirectRelation
 
 RETURN ::_oIndexExpression
 
-METHOD aDependingContexts() CLASS EnchancedDirectRelation
+METHOD EnchancedDirectRelation:aDependingContexts()
 
    IF ::_aDependingContexts == NIL
       ::_aDependingContexts := CollectAliases(::oExpression, CollectAliases(::oIndexExpression, {}))
@@ -961,7 +961,7 @@ CLASS EnchancedRelationFactory FROM RelationFactory
 
 ENDCLASS
 
-METHOD new() CLASS EnchancedRelationFactory
+METHOD EnchancedRelationFactory:new()
 
    STATIC instance
 

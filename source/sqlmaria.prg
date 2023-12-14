@@ -84,7 +84,7 @@ ENDCLASS
 
 /*------------------------------------------------------------------------*/
 
-METHOD MoreResults(aArray, lTranslate) CLASS SR_MARIA
+METHOD SR_MARIA:MoreResults(aArray, lTranslate)
 
    LOCAL nRet
 
@@ -97,7 +97,7 @@ RETURN nRet
 
 /*------------------------------------------------------------------------*/
 
-METHOD Getline(aFields, lTranslate, aArray) CLASS SR_MARIA
+METHOD SR_MARIA:Getline(aFields, lTranslate, aArray)
 
    LOCAL i
 
@@ -123,7 +123,7 @@ RETURN aArray
 
 /*------------------------------------------------------------------------*/
 
-METHOD FieldGet(nField, aFields, lTranslate) CLASS SR_MARIA
+METHOD SR_MARIA:FieldGet(nField, aFields, lTranslate)
    If ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
       ::aCurrLine := array(LEN(aFields))
@@ -134,7 +134,7 @@ RETURN ::aCurrLine[nField]
 
 /*------------------------------------------------------------------------*/
 
-METHOD FetchRaw(lTranslate, aFields) CLASS SR_MARIA
+METHOD SR_MARIA:FetchRaw(lTranslate, aFields)
 
    ::nRetCode := SQL_ERROR
    DEFAULT aFields    TO ::aFields
@@ -151,7 +151,7 @@ RETURN ::nRetCode
 
 /*------------------------------------------------------------------------*/
 
-METHOD FreeStatement() CLASS SR_MARIA
+METHOD SR_MARIA:FreeStatement()
    If ::hStmt != NIL
       MYSClear ( ::hDbc )
    EndIf
@@ -160,7 +160,7 @@ RETURN NIL
 
 /*------------------------------------------------------------------------*/
 
-METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName) CLASS SR_MARIA
+METHOD SR_MARIA:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
    LOCAL nType := 0
    LOCAL nLen := 0
@@ -217,7 +217,7 @@ RETURN aFields
 
 /*------------------------------------------------------------------------*/
 
-METHOD LastError() CLASS SR_MARIA
+METHOD SR_MARIA:LastError()
 
    If ::hStmt != NIL
       RETURN "(" + alltrim(str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
@@ -227,8 +227,8 @@ RETURN "(" + alltrim(str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
 
 /*------------------------------------------------------------------------*/
 
-METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
-            cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout) CLASS SR_MARIA
+METHOD SR_MARIA:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
+            cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
 
    LOCAL hEnv := 0
    LOCAL hDbc := 0
@@ -290,7 +290,7 @@ RETURN Self
 
 /*------------------------------------------------------------------------*/
 
-METHOD End() CLASS SR_MARIA
+METHOD SR_MARIA:End()
 
    ::Commit(.T.)
    ::FreeStatement()
@@ -303,19 +303,19 @@ RETURN ::super:End()
 
 /*------------------------------------------------------------------------*/
 
-METHOD Commit(lNoLog) CLASS SR_MARIA
+METHOD SR_MARIA:Commit(lNoLog)
    ::super:Commit(lNoLog)
 RETURN ( ::nRetCode := MYSCommit(::hDbc) )
 
 /*------------------------------------------------------------------------*/
 
-METHOD RollBack() CLASS SR_MARIA
+METHOD SR_MARIA:RollBack()
    ::super:RollBack()
 RETURN ( ::nRetCode := MYSRollBack(::hDbc) )
 
 /*------------------------------------------------------------------------*/
 
-METHOD ExecuteRaw(cCommand) CLASS SR_MARIA
+METHOD SR_MARIA:ExecuteRaw(cCommand)
 
    If upper(left(ltrim(cCommand), 6)) == "SELECT" .OR. upper(left(ltrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
@@ -328,5 +328,5 @@ RETURN MYSResultStatus(::hDbc)
 
 /*------------------------------------------------------------------------*/
 
-METHOD GetAffectedRows() CLASS SR_MARIA
+METHOD SR_MARIA:GetAffectedRows()
 RETURN MYSAFFECTEDROWS(::hDbc)

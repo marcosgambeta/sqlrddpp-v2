@@ -1154,13 +1154,13 @@ ENDCLASS
 
 /*------------------------------------------------------------------------*/
 
-METHOD Haeval(bExpr) CLASS SqlFastHash
+METHOD SqlFastHash:Haeval(bExpr)
 
 RETURN hb_Heval(::hHash, bExpr)
 
 /*------------------------------------------------------------------------*/
 
-METHOD New(nPartSize) CLASS SqlFastHash
+METHOD SqlFastHash:New(nPartSize)
 
    ::nPartSize := nPartSize
    ::hHash := {=>}
@@ -1172,7 +1172,7 @@ RETURN Self
 
 /*------------------------------------------------------------------------*/
 
-METHOD Insert(uHashKey, xValue) CLASS SqlFastHash
+METHOD SqlFastHash:Insert(uHashKey, xValue)
 
    IF len(::hHash) > HASH_TABLE_SIZE
       ::hHash := {=>}          /* Reset hash table */
@@ -1185,7 +1185,7 @@ RETURN .T.
 
 /*------------------------------------------------------------------------*/
 
-METHOD Find(uHashKey, nIndex, nPart) CLASS SqlFastHash
+METHOD SqlFastHash:Find(uHashKey, nIndex, nPart)
 
    LOCAL aData
 
@@ -1201,7 +1201,7 @@ RETURN aData
 
 /*------------------------------------------------------------------------*/
 
-METHOD Delete(uHashKey) CLASS SqlFastHash
+METHOD SqlFastHash:Delete(uHashKey)
 
    LOCAL nIndex := 0
 
@@ -1216,7 +1216,7 @@ RETURN .F.
 
 /*------------------------------------------------------------------------*/
 
-METHOD Update(uHashKey, uValue) CLASS SqlFastHash
+METHOD SqlFastHash:Update(uHashKey, uValue)
 
    LOCAL nIndex := 0
 
@@ -1231,7 +1231,7 @@ RETURN .F.
 
 /*------------------------------------------------------------------------*/
 
-METHOD UpdateIndex(nPos, nPart, uValue) CLASS SqlFastHash
+METHOD SqlFastHash:UpdateIndex(nPos, nPart, uValue)
 
    /* nPart not used - Compatible with old version */
    HB_SYMBOL_UNUSED(nPart)
