@@ -343,11 +343,11 @@ RETURN nRet
 METHOD SR_FIREBIRD5:MoreResults(aArray, lTranslate)
 
    LOCAL nRet
-   LOCAL i
+   //LOCAL i (not used)
    LOCAL n
    LOCAL nvalue := -1
 
-   STATIC aFieldsMore
+   //STATIC aFieldsMore (not used)
 
    DEFAULT lTranslate TO .T.
 
