@@ -8861,6 +8861,7 @@ RETURN cStr1 < cStr2
 
 /*------------------------------------------------------------------------*/
 
+#if 0 // disabled (Warning W0034  STATIC Function 'ASCANINDEXED' defined but never used)
 STATIC FUNCTION aScanIndexed(aVet, nPos, uKey, lSoft, nLen, lFound)
 
    LOCAL nRet := 0
@@ -8943,6 +8944,7 @@ STATIC FUNCTION aScanIndexed(aVet, nPos, uKey, lSoft, nLen, lFound)
    ENDIF
 
 RETURN nRet
+#endif
 
 /*------------------------------------------------------------------------*/
 
