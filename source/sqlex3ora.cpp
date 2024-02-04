@@ -65,647 +65,730 @@ extern HB_ERRCODE FeedSeekStmtOra(SQLEXORAAREAP thiswa, int queryLevel);
 
 static void createSeekQueryOra(SQLEXORAAREAP thiswa, HB_BOOL bUseOptimizerHints)
 {
-   if( getColumnListOra(thiswa) ) {
-      thiswa->bConditionChanged1 = true; // SEKIP statements are no longer valid - column list has changed!
-   }
-   if( thiswa->sSql ) {
-      memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
-   }
-   if( bUseOptimizerHints ) {
-      if( thiswa->bOracle12 ) {
-         sprintf(thiswa->sSql, "SELECT %s \nFROM %s A %s FETCH FIRST 1 ROWS ONLY",
-            thiswa->sFields,
-            thiswa->sTable,
-            thiswa->sWhere);
-      } else {
-         sprintf(thiswa->sSql, "SELECT /*+ INDEX_ASC( A %s ) */ %s %s \nFROM %s A %s AND ROWNUM <= 1",
-            thiswa->sOrderBy, // thiswa->sOrderBy has the index name, not the index column list
-            thiswa->sLimit1,
-            thiswa->sFields,
-            thiswa->sTable,
-            thiswa->sWhere);
-      }
-   } else {
-      sprintf(thiswa->sSql, "SELECT %s %s \nFROM %s A %s %s %s",
-         thiswa->sLimit1,
-         thiswa->sFields,
-         thiswa->sTable,
-         thiswa->sWhere,
-         thiswa->sOrderBy, // thiswa->sOrderBy has the index column list
-         thiswa->sLimit2);
-   }
-   // TraceLog("aaa.log", "query %s\n", thiswa->sSql);
+  if (getColumnListOra(thiswa))
+  {
+    thiswa->bConditionChanged1 = true; // SEKIP statements are no longer valid - column list has changed!
+  }
+  if (thiswa->sSql)
+  {
+    memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
+  }
+  if (bUseOptimizerHints)
+  {
+    if (thiswa->bOracle12)
+    {
+      sprintf(thiswa->sSql, "SELECT %s \nFROM %s A %s FETCH FIRST 1 ROWS ONLY", thiswa->sFields, thiswa->sTable,
+              thiswa->sWhere);
+    }
+    else
+    {
+      sprintf(thiswa->sSql, "SELECT /*+ INDEX_ASC( A %s ) */ %s %s \nFROM %s A %s AND ROWNUM <= 1",
+              thiswa->sOrderBy, // thiswa->sOrderBy has the index name, not the index column list
+              thiswa->sLimit1, thiswa->sFields, thiswa->sTable, thiswa->sWhere);
+    }
+  }
+  else
+  {
+    sprintf(thiswa->sSql, "SELECT %s %s \nFROM %s A %s %s %s", thiswa->sLimit1, thiswa->sFields, thiswa->sTable,
+            thiswa->sWhere,
+            thiswa->sOrderBy, // thiswa->sOrderBy has the index column list
+            thiswa->sLimit2);
+  }
+  // TraceLog("aaa.log", "query %s\n", thiswa->sSql);
 }
 
 /*------------------------------------------------------------------------*/
 
-static HB_ERRCODE getSeekWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType, int queryLevel, HB_BOOL * bUseOptimizerHints)
+static HB_ERRCODE getSeekWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType, int queryLevel,
+                                            HB_BOOL *bUseOptimizerHints)
 {
-   bool bWhere = false;
-   int iCol;
-   INDEXBINDORAP SeekBind;
-   COLUMNBINDORAP BindStructure;
-   bool bDirectionFWD;
-   char * temp;
+  bool bWhere = false;
+  int iCol;
+  INDEXBINDORAP SeekBind;
+  COLUMNBINDORAP BindStructure;
+  bool bDirectionFWD;
+  char *temp;
 
-   thiswa->sWhere[0] = '\0';
+  thiswa->sWhere[0] = '\0';
 
-   SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
-   // Nao necessario esta aqui, fazia com que fosse para o ultimo item da chave
-   // SeekBind += (queryLevel - 1); // place offset
+  SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
+  // Nao necessario esta aqui, fazia com que fosse para o ultimo item da chave
+  // SeekBind += (queryLevel - 1); // place offset
 
-   thiswa->recordListDirection = (iListType == LIST_SKIP_FWD ? LIST_FORWARD : LIST_BACKWARD);
-   bDirectionFWD = iListType == LIST_SKIP_FWD;
+  thiswa->recordListDirection = (iListType == LIST_SKIP_FWD ? LIST_FORWARD : LIST_BACKWARD);
+  bDirectionFWD = iListType == LIST_SKIP_FWD;
 
-   if( thiswa->bReverseIndex ) {
-      bDirectionFWD = !bDirectionFWD;
-   }
+  if (thiswa->bReverseIndex)
+  {
+    bDirectionFWD = !bDirectionFWD;
+  }
 
-   for( iCol = 1; iCol <= queryLevel; iCol++ ) {
-      BindStructure = GetBindStructOra(thiswa, SeekBind);
+  for (iCol = 1; iCol <= queryLevel; iCol++)
+  {
+    BindStructure = GetBindStructOra(thiswa, SeekBind);
 
-      if( BindStructure->isArgumentNull ) {
-         *bUseOptimizerHints = false; // We cannot use this high speed solution
-                                         // because Oracle does not store NULLs in indexes
+    if (BindStructure->isArgumentNull)
+    {
+      *bUseOptimizerHints = false; // We cannot use this high speed solution
+                                   // because Oracle does not store NULLs in indexes
 
-         if( BindStructure->iCType == SQL_C_DOUBLE ) {
-            temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
-            sprintf(thiswa->sWhere, "%s %s ( A.%c%s%c %s %s OR A.%c%s%c IS NULL )",
-               bWhere ? temp : "\nWHERE",
-               bWhere ? "AND" : "",
-               OPEN_QUALIFIER(thiswa),
-               BindStructure->colName,
-               CLOSE_QUALIFIER(thiswa),
-               iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "IS",
-               iCol == queryLevel ? "0" : "NULL",
-               OPEN_QUALIFIER(thiswa),
-               BindStructure->colName,
-               CLOSE_QUALIFIER(thiswa));
-            hb_xfree(temp);
-         } else {
-            if( iCol == queryLevel && iListType == LIST_SKIP_FWD ) {
-               // This condition should create a WHERE clause like "COLUMN >= NULL".
-               // Since this is not numeric, EVERYTHING is greater
-               // or equal to NULL, so we do not add any restriction to WHERE clause.
-            } else {
-               temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
-               sprintf(thiswa->sWhere, "%s %s A.%c%s%c IS NULL",
-                  bWhere ? temp : "\nWHERE",
-                  bWhere ? "AND" : "",
-                  OPEN_QUALIFIER(thiswa),
-                  BindStructure->colName,
-                  CLOSE_QUALIFIER(thiswa));
-               hb_xfree(temp);
-            }
-         }
-      } else {
-         temp = hb_strdup(static_cast<const char*>(thiswa->sWhere));
-         sprintf(thiswa->sWhere, "%s %s A.%c%s%c %s :%s",
-            bWhere ? temp : "\nWHERE",
-            bWhere ? "AND" : "",
-            OPEN_QUALIFIER(thiswa),
-            BindStructure->colName,
-            CLOSE_QUALIFIER(thiswa),
-            iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "=",
-            BindStructure->colName);
-         hb_xfree(temp);
+      if (BindStructure->iCType == SQL_C_DOUBLE)
+      {
+        temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
+        sprintf(thiswa->sWhere, "%s %s ( A.%c%s%c %s %s OR A.%c%s%c IS NULL )", bWhere ? temp : "\nWHERE",
+                bWhere ? "AND" : "", OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa),
+                iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "IS", iCol == queryLevel ? "0" : "NULL",
+                OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa));
+        hb_xfree(temp);
       }
-      bWhere = true;
-      // Culik Movido a posicao do seekbind para essa posicao, onde estava assumuia que o inicio era o ultimo item da chave
-      SeekBind++; // place offset
-   }
+      else
+      {
+        if (iCol == queryLevel && iListType == LIST_SKIP_FWD)
+        {
+          // This condition should create a WHERE clause like "COLUMN >= NULL".
+          // Since this is not numeric, EVERYTHING is greater
+          // or equal to NULL, so we do not add any restriction to WHERE clause.
+        }
+        else
+        {
+          temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
+          sprintf(thiswa->sWhere, "%s %s A.%c%s%c IS NULL", bWhere ? temp : "\nWHERE", bWhere ? "AND" : "",
+                  OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa));
+          hb_xfree(temp);
+        }
+      }
+    }
+    else
+    {
+      temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
+      sprintf(thiswa->sWhere, "%s %s A.%c%s%c %s :%s", bWhere ? temp : "\nWHERE", bWhere ? "AND" : "",
+              OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa),
+              iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "=", BindStructure->colName);
+      hb_xfree(temp);
+    }
+    bWhere = true;
+    // Culik Movido a posicao do seekbind para essa posicao, onde estava assumuia que o inicio era o ultimo item da
+    // chave
+    SeekBind++; // place offset
+  }
 
-   SolveFiltersOra(thiswa, bWhere);
+  SolveFiltersOra(thiswa, bWhere);
 
-   return Harbour::SUCCESS;
+  return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
 
 HB_ERRCODE prepareSeekQueryOra(SQLEXORAAREAP thiswa, INDEXBINDORAP SeekBind)
 {
-   // res = SQLAllocStmt((HDBC) thiswa->hDbc, &hPrep);
-   // hPrep = OCI_StatementCreate(GetConnection(thiswa->hDbc));
+  // res = SQLAllocStmt((HDBC) thiswa->hDbc, &hPrep);
+  // hPrep = OCI_StatementCreate(GetConnection(thiswa->hDbc));
 
-   if( thiswa->recordListDirection == LIST_FORWARD ) {
-      SeekBind->SeekFwdStmt = OCI_StatementCreate(GetConnection(thiswa->hDbc));
-   } else {
-     SeekBind->SeekBwdStmt = OCI_StatementCreate(GetConnection(thiswa->hDbc));
-   }
+  if (thiswa->recordListDirection == LIST_FORWARD)
+  {
+    SeekBind->SeekFwdStmt = OCI_StatementCreate(GetConnection(thiswa->hDbc));
+  }
+  else
+  {
+    SeekBind->SeekBwdStmt = OCI_StatementCreate(GetConnection(thiswa->hDbc));
+  }
 
-   if( thiswa->recordListDirection == LIST_FORWARD ) {
-      if( SeekBind->SeekFwdStmt == nullptr ) {
-         return Harbour::FAILURE;
-      }
-   } else {
-      if( SeekBind->SeekBwdStmt == nullptr ) {
-         return Harbour::FAILURE;
-      }
-   }
-
-   // if( hPrep == nullptr ) {
-   //    return Harbour::FAILURE;
-   // }
-   OCI_AllowRebinding(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt, 1);
-
-   if( !OCI_Prepare(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt, thiswa->sSql) ) {
+  if (thiswa->recordListDirection == LIST_FORWARD)
+  {
+    if (SeekBind->SeekFwdStmt == nullptr)
+    {
       return Harbour::FAILURE;
-   }
+    }
+  }
+  else
+  {
+    if (SeekBind->SeekBwdStmt == nullptr)
+    {
+      return Harbour::FAILURE;
+    }
+  }
 
-   if( thiswa->recordListDirection == LIST_FORWARD ) {
-      memset(&SeekBind->SeekFwdSql, 0, PREPARED_SQL_LEN);
-      hb_xmemcpy(SeekBind->SeekFwdSql, thiswa->sSql, PREPARED_SQL_LEN - 1);
-      SeekBind->SeekFwdSql[PREPARED_SQL_LEN - 1] = '\0';
-   } else {
-      memset(&SeekBind->SeekBwdSql, 0, PREPARED_SQL_LEN);
-      hb_xmemcpy(SeekBind->SeekBwdSql, thiswa->sSql, PREPARED_SQL_LEN - 1);
-      SeekBind->SeekBwdSql[PREPARED_SQL_LEN - 1] = '\0';
-   }
+  // if( hPrep == nullptr ) {
+  //    return Harbour::FAILURE;
+  // }
+  OCI_AllowRebinding(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt, 1);
 
-   return Harbour::SUCCESS;
+  if (!OCI_Prepare(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt,
+                   thiswa->sSql))
+  {
+    return Harbour::FAILURE;
+  }
+
+  if (thiswa->recordListDirection == LIST_FORWARD)
+  {
+    memset(&SeekBind->SeekFwdSql, 0, PREPARED_SQL_LEN);
+    hb_xmemcpy(SeekBind->SeekFwdSql, thiswa->sSql, PREPARED_SQL_LEN - 1);
+    SeekBind->SeekFwdSql[PREPARED_SQL_LEN - 1] = '\0';
+  }
+  else
+  {
+    memset(&SeekBind->SeekBwdSql, 0, PREPARED_SQL_LEN);
+    hb_xmemcpy(SeekBind->SeekBwdSql, thiswa->sSql, PREPARED_SQL_LEN - 1);
+    SeekBind->SeekBwdSql[PREPARED_SQL_LEN - 1] = '\0';
+  }
+
+  return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
 
 HB_BOOL CreateSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
 {
-   PHB_ITEM pColumns, pIndexRef;
-   INDEXBINDORAP SeekBind;
-   bool bUseOptimizerHints;
+  PHB_ITEM pColumns, pIndexRef;
+  INDEXBINDORAP SeekBind;
+  bool bUseOptimizerHints;
 
-   bUseOptimizerHints = thiswa->nSystemID == SYSTEMID_ORACLE;
-   thiswa->bConditionChanged1 = true; // SKIP statements are no longer valid
+  bUseOptimizerHints = thiswa->nSystemID == SYSTEMID_ORACLE;
+  thiswa->bConditionChanged1 = true; // SKIP statements are no longer valid
 
-   // Alloc memory for binding structures, if first time
+  // Alloc memory for binding structures, if first time
 
-   if( !thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent] ) {
-      SetIndexBindStructureOra(thiswa);
-   }
+  if (!thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent])
+  {
+    SetIndexBindStructureOra(thiswa);
+  }
 
-   SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
-   //SeekBind += (queryLevel - 1); // place offset
+  SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
+  // SeekBind += (queryLevel - 1); // place offset
 
-   // Check if stmt must be created or recreated
+  // Check if stmt must be created or recreated
 
-   if(    thiswa->bConditionChanged2
-       || thiswa->bRebuildSeekQuery
-       || (thiswa->recordListDirection == LIST_FORWARD && (!SeekBind->SeekFwdStmt))
-       || (thiswa->recordListDirection == LIST_BACKWARD && (!SeekBind->SeekBwdStmt)) ) {
+  if (thiswa->bConditionChanged2 || thiswa->bRebuildSeekQuery ||
+      (thiswa->recordListDirection == LIST_FORWARD && (!SeekBind->SeekFwdStmt)) ||
+      (thiswa->recordListDirection == LIST_BACKWARD && (!SeekBind->SeekBwdStmt)))
+  {
 
-      pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
-      pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
-      thiswa->indexColumns = hb_arrayLen(pColumns);
+    pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
+    pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
+    thiswa->indexColumns = hb_arrayLen(pColumns);
 
-      // Free the statements we are about to recreate
+    // Free the statements we are about to recreate
 
-      if( SeekBind->SeekFwdStmt ) {
-         OCI_StatementFree(SeekBind->SeekFwdStmt);
-         SeekBind->SeekFwdStmt = nullptr;
-      }
+    if (SeekBind->SeekFwdStmt)
+    {
+      OCI_StatementFree(SeekBind->SeekFwdStmt);
+      SeekBind->SeekFwdStmt = nullptr;
+    }
 
-      if( SeekBind->SeekBwdStmt ) {
-         OCI_StatementFree(SeekBind->SeekBwdStmt);
-         SeekBind->SeekBwdStmt = nullptr;
-      }
+    if (SeekBind->SeekBwdStmt)
+    {
+      OCI_StatementFree(SeekBind->SeekBwdStmt);
+      SeekBind->SeekBwdStmt = nullptr;
+    }
 
-      getSeekWhereExpressionOra(thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD, queryLevel, &bUseOptimizerHints);
-      getOrderByExpressionOra(thiswa, bUseOptimizerHints);
-      setResultSetLimitOra(thiswa, 1);
-      createSeekQueryOra(thiswa, bUseOptimizerHints);
+    getSeekWhereExpressionOra(thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD,
+                              queryLevel, &bUseOptimizerHints);
+    getOrderByExpressionOra(thiswa, bUseOptimizerHints);
+    setResultSetLimitOra(thiswa, 1);
+    createSeekQueryOra(thiswa, bUseOptimizerHints);
 
-      prepareSeekQueryOra(thiswa, SeekBind);
-      thiswa->bOrderChanged = false; // we set to use the new key after enter here, so we disable for next seek
-      return true;
-   } else {
-      return false;
-   }
+    prepareSeekQueryOra(thiswa, SeekBind);
+    thiswa->bOrderChanged = false; // we set to use the new key after enter here, so we disable for next seek
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 /*------------------------------------------------------------------------*/
 
-HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int * queryLevel)
+HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *queryLevel)
 {
-   INDEXBINDORAP SeekBind;
-   COLUMNBINDORAP BindStructure;
-   int i, lenKey, size, iCol;
-   const char * szKey;
+  INDEXBINDORAP SeekBind;
+  COLUMNBINDORAP BindStructure;
+  int i, lenKey, size, iCol;
+  const char *szKey;
 
-   SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
+  SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
 
-   if( thiswa->sqlarea.hOrdCurrent != SeekBind->hIndexOrder ) { // || thiswa->bOrderChanged )
-      // SeekBindings is not constructed based on same index order as
-      // previous SEEK, so we must reconstruct thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent]
-      // based on current index
+  if (thiswa->sqlarea.hOrdCurrent != SeekBind->hIndexOrder)
+  { // || thiswa->bOrderChanged )
+    // SeekBindings is not constructed based on same index order as
+    // previous SEEK, so we must reconstruct thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent]
+    // based on current index
 
-      thiswa->bConditionChanged2 = true;                 // Force SEEK query to be rebuilt
-      SeekBind->hIndexOrder = thiswa->sqlarea.hOrdCurrent;  // Store latest prepared index order query
+    thiswa->bConditionChanged2 = true;                   // Force SEEK query to be rebuilt
+    SeekBind->hIndexOrder = thiswa->sqlarea.hOrdCurrent; // Store latest prepared index order query
 
-      for( iCol = 1; iCol <= thiswa->indexColumns; iCol++ ) {
-         BindStructure = GetBindStructOra(thiswa, SeekBind);
-
-         if( !thiswa->sqlarea.uiFieldList[(BindStructure->lFieldPosDB) - 1] ) {
-            thiswa->sqlarea.uiFieldList[(BindStructure->lFieldPosDB) - 1] = true; // Force index columns to be present in query
-                                                                                     // cos sqlKeyCompare will need it
-            thiswa->sqlarea.iFieldListStatus = FIELD_LIST_CHANGED;
-         }
-
-         SeekBind->iLevel = iCol;
-         SeekBind->iIndexColumns = thiswa->indexColumns;
-         BindStructure->isArgumentNull = false;
-
-         // Free previous statements
-
-         if( SeekBind->SeekFwdStmt ) {
-            OCI_StatementFree(SeekBind->SeekFwdStmt);
-            SeekBind->SeekFwdStmt = nullptr;
-         }
-         if( SeekBind->SeekBwdStmt ) {
-            OCI_StatementFree(SeekBind->SeekBwdStmt);
-            SeekBind->SeekBwdStmt = nullptr;
-         }
-
-         SeekBind++;
-      }
-      SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent]; // Reset position to 1st index column
-   }
-
-   // Push pKey value splitted into SeekBindings structures
-
-   if( HB_IS_STRING(pKey) ) {
-      // parse Key string and split it in index fields
-
-      lenKey = hb_itemGetCLen(pKey);
-      szKey = hb_itemGetCPtr(pKey);
-      *queryLevel = thiswa->indexColumns;
-
-      for( i = 1; i <= thiswa->indexColumns; i++ ) {
-         BindStructure = GetBindStructOra(thiswa, SeekBind);
-         size = 0;
-
-         switch( BindStructure->iCType ) {
-            case SQL_C_CHAR: {
-               int nTrim, i;
-               size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
-               nTrim = size;
-
-               // RTrim() the string value
-
-               for( i = (size - 1); i >= 0; i-- ) {
-                  if( szKey[i] == '\0' || szKey[i] != ' ' ) {
-                     nTrim = i + 1;
-                     break;
-                  }
-               }
-               if( i < 0 ) {
-                  nTrim = 0;
-               }
-
-               if( nTrim == 0 ) {
-                  // We have a NULL argument to SEEK for
-
-                  if( !(BindStructure->isNullable) ) {
-                     // Column cannot be NULL by definition, so
-                     // SQLRDD uses 1 blank space in it
-                     // This is an SQLRDD rule.
-
-                     BindStructure->asChar.value[0] = ' ';
-                     BindStructure->asChar.value[1] = '\0';
-                  } else {
-                     BindStructure->asChar.value[0] = '\0';
-                     if( BindStructure->isArgumentNull == false ) { // Check if NULL status has changed
-                        thiswa->bRebuildSeekQuery = true;
-                     }
-                     BindStructure->isArgumentNull = true;
-                  }
-               } else {
-                  hb_xmemcpy(BindStructure->asChar.value, szKey, nTrim);
-                  BindStructure->asChar.value[nTrim] = '\0';
-                  if( BindStructure->isArgumentNull ) { // Check if NULL status has changed
-                     thiswa->bRebuildSeekQuery = true;
-                     BindStructure->isArgumentNull = false;
-                  }
-               }
-               break;
-            }
-            case SQL_C_NUMERIC: {
-               size = BindStructure->ColumnSize;
-               BindStructure->asNumeric = static_cast<HB_LONG>(hb_strVal(szKey, BindStructure->ColumnSize));
-               break;
-            }
-            case SQL_C_DOUBLE: {
-               size = BindStructure->ColumnSize;
-               BindStructure->asDouble = static_cast<double>(hb_strVal(szKey, BindStructure->ColumnSize));
-               break;
-            }
-            case SQL_C_TYPE_TIMESTAMP: {
-               int iPos;
-               HB_LONG lVal;
-               double dVal;
-
-               char datemask[9] = "10000101";
-               char * mask = datemask;
-
-               size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
-
-               // Must fix partial date seek
-               for( iPos = 0; iPos < size; iPos++ ) {
-                  datemask[iPos] = szKey[iPos];
-               }
-
-               hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asTimestamp.year = static_cast<unsigned int>(lVal);
-               mask += 4;
-               hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asTimestamp.month = static_cast<unsigned int>(lVal);
-               mask += 2;
-               hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asTimestamp.day = static_cast<unsigned int>(lVal);
-               BindStructure->asTimestamp.hour = 0;
-               BindStructure->asTimestamp.minute = 0;
-               BindStructure->asTimestamp.second = 0;
-               BindStructure->asTimestamp.fraction = 0;
-               break;
-            }
-            case SQL_C_TYPE_DATE: {
-               int iPos;
-               HB_MAXINT lVal;
-               double dVal;
-
-               char datemask[9] = "10000101";
-               char * mask = datemask;
-
-               size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
-
-               // Must fix partial date seek
-               for( iPos = 0; iPos < size; iPos++ ) {
-                  datemask[iPos] = szKey[iPos];
-               }
-
-               hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asDate.year = static_cast<unsigned int>(lVal);
-               mask += 4;
-               hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asDate.month = static_cast<unsigned int>(lVal);
-               mask += 2;
-               hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
-               BindStructure->asDate.day = static_cast<unsigned int>(lVal);
-
-               break;
-            }
-         }
-
-         lenKey -= size;
-         szKey  += size;
-
-         if( lenKey <= 0 ) {
-            *queryLevel = i;
-            break;
-         }
-
-         SeekBind++; // Advance to next index column in bind structure
-      }
-   } else {
-      *queryLevel = 1;
+    for (iCol = 1; iCol <= thiswa->indexColumns; iCol++)
+    {
       BindStructure = GetBindStructOra(thiswa, SeekBind);
 
-      if( HB_IS_DATE(pKey) || HB_IS_DATETIME(pKey) ) {
-         int iYear, iMonth, iDay;
-         int iHour, iMinute;
-
-         hb_dateDecode(hb_itemGetDL(pKey), &iYear, &iMonth, &iDay);
-
-         if( BindStructure->iCType == SQL_C_TYPE_DATE ) {
-            BindStructure->asDate.year = static_cast<unsigned int>(iYear);
-            BindStructure->asDate.month = static_cast<unsigned int>(iMonth);
-            BindStructure->asDate.day = static_cast<unsigned int>(iDay);
-         } else if( BindStructure->iCType == SQL_C_TYPE_TIMESTAMP ) {
-            long lJulian, lMilliSec;
-            int seconds, millisec;
-            hb_itemGetTDT(pKey, &lJulian, &lMilliSec);
-            hb_timeDecode(lMilliSec, &iHour, &iMinute, &seconds, &millisec);
-            BindStructure->asTimestamp.year = static_cast<unsigned int>(iYear);
-            BindStructure->asTimestamp.month = static_cast<unsigned int>(iMonth);
-            BindStructure->asTimestamp.day = static_cast<unsigned int>(iDay);
-            BindStructure->asTimestamp.hour = static_cast<unsigned int>(iHour);
-            BindStructure->asTimestamp.minute = static_cast<unsigned int>(iMinute);
-            BindStructure->asTimestamp.second = static_cast<unsigned int>(seconds);
-            BindStructure->asTimestamp.fraction = 0;
-         } else {
-            // To Do: Raise RT error
-            return Harbour::FAILURE;
-         }
-      } else if( HB_IS_NUMERIC(pKey) ) {
-         if( BindStructure->iCType != SQL_C_DOUBLE || BindStructure->iCType != SQL_C_NUMERIC ) { // Check column data type
-            // To Do: Raise RT error
-            return Harbour::FAILURE;
-         }
-         if( BindStructure->iCType == SQL_C_NUMERIC ) {
-            BindStructure->asNumeric = static_cast<HB_LONG>(hb_itemGetNInt(pKey));
-         } else {
-            BindStructure->asDouble = static_cast<double>(hb_itemGetND(pKey));
-         }
-      } else if( HB_IS_LOGICAL(pKey) ) {
-         if( BindStructure->iCType != SQL_C_BIT ) { // Check column data type
-            // To Do: Raise RT error
-            return Harbour::FAILURE;
-         }
-         BindStructure->asLogical = hb_itemGetNInt(pKey);
+      if (!thiswa->sqlarea.uiFieldList[(BindStructure->lFieldPosDB) - 1])
+      {
+        thiswa->sqlarea.uiFieldList[(BindStructure->lFieldPosDB) - 1] = true; // Force index columns to be present in
+                                                                              // query cos sqlKeyCompare will need it
+        thiswa->sqlarea.iFieldListStatus = FIELD_LIST_CHANGED;
       }
-   }
-   return Harbour::SUCCESS;
+
+      SeekBind->iLevel = iCol;
+      SeekBind->iIndexColumns = thiswa->indexColumns;
+      BindStructure->isArgumentNull = false;
+
+      // Free previous statements
+
+      if (SeekBind->SeekFwdStmt)
+      {
+        OCI_StatementFree(SeekBind->SeekFwdStmt);
+        SeekBind->SeekFwdStmt = nullptr;
+      }
+      if (SeekBind->SeekBwdStmt)
+      {
+        OCI_StatementFree(SeekBind->SeekBwdStmt);
+        SeekBind->SeekBwdStmt = nullptr;
+      }
+
+      SeekBind++;
+    }
+    SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent]; // Reset position to 1st index column
+  }
+
+  // Push pKey value splitted into SeekBindings structures
+
+  if (HB_IS_STRING(pKey))
+  {
+    // parse Key string and split it in index fields
+
+    lenKey = hb_itemGetCLen(pKey);
+    szKey = hb_itemGetCPtr(pKey);
+    *queryLevel = thiswa->indexColumns;
+
+    for (i = 1; i <= thiswa->indexColumns; i++)
+    {
+      BindStructure = GetBindStructOra(thiswa, SeekBind);
+      size = 0;
+
+      switch (BindStructure->iCType)
+      {
+      case SQL_C_CHAR: {
+        int nTrim, i;
+        size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize))
+                                                                    : lenKey;
+        nTrim = size;
+
+        // RTrim() the string value
+
+        for (i = (size - 1); i >= 0; i--)
+        {
+          if (szKey[i] == '\0' || szKey[i] != ' ')
+          {
+            nTrim = i + 1;
+            break;
+          }
+        }
+        if (i < 0)
+        {
+          nTrim = 0;
+        }
+
+        if (nTrim == 0)
+        {
+          // We have a NULL argument to SEEK for
+
+          if (!(BindStructure->isNullable))
+          {
+            // Column cannot be NULL by definition, so
+            // SQLRDD uses 1 blank space in it
+            // This is an SQLRDD rule.
+
+            BindStructure->asChar.value[0] = ' ';
+            BindStructure->asChar.value[1] = '\0';
+          }
+          else
+          {
+            BindStructure->asChar.value[0] = '\0';
+            if (BindStructure->isArgumentNull == false)
+            { // Check if NULL status has changed
+              thiswa->bRebuildSeekQuery = true;
+            }
+            BindStructure->isArgumentNull = true;
+          }
+        }
+        else
+        {
+          hb_xmemcpy(BindStructure->asChar.value, szKey, nTrim);
+          BindStructure->asChar.value[nTrim] = '\0';
+          if (BindStructure->isArgumentNull)
+          { // Check if NULL status has changed
+            thiswa->bRebuildSeekQuery = true;
+            BindStructure->isArgumentNull = false;
+          }
+        }
+        break;
+      }
+      case SQL_C_NUMERIC: {
+        size = BindStructure->ColumnSize;
+        BindStructure->asNumeric = static_cast<HB_LONG>(hb_strVal(szKey, BindStructure->ColumnSize));
+        break;
+      }
+      case SQL_C_DOUBLE: {
+        size = BindStructure->ColumnSize;
+        BindStructure->asDouble = static_cast<double>(hb_strVal(szKey, BindStructure->ColumnSize));
+        break;
+      }
+      case SQL_C_TYPE_TIMESTAMP: {
+        int iPos;
+        HB_LONG lVal;
+        double dVal;
+
+        char datemask[9] = "10000101";
+        char *mask = datemask;
+
+        size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize))
+                                                                    : lenKey;
+
+        // Must fix partial date seek
+        for (iPos = 0; iPos < size; iPos++)
+        {
+          datemask[iPos] = szKey[iPos];
+        }
+
+        hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
+        BindStructure->asTimestamp.year = static_cast<unsigned int>(lVal);
+        mask += 4;
+        hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
+        BindStructure->asTimestamp.month = static_cast<unsigned int>(lVal);
+        mask += 2;
+        hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
+        BindStructure->asTimestamp.day = static_cast<unsigned int>(lVal);
+        BindStructure->asTimestamp.hour = 0;
+        BindStructure->asTimestamp.minute = 0;
+        BindStructure->asTimestamp.second = 0;
+        BindStructure->asTimestamp.fraction = 0;
+        break;
+      }
+      case SQL_C_TYPE_DATE: {
+        int iPos;
+        HB_MAXINT lVal;
+        double dVal;
+
+        char datemask[9] = "10000101";
+        char *mask = datemask;
+
+        size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize))
+                                                                    : lenKey;
+
+        // Must fix partial date seek
+        for (iPos = 0; iPos < size; iPos++)
+        {
+          datemask[iPos] = szKey[iPos];
+        }
+
+        hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
+        BindStructure->asDate.year = static_cast<unsigned int>(lVal);
+        mask += 4;
+        hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
+        BindStructure->asDate.month = static_cast<unsigned int>(lVal);
+        mask += 2;
+        hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
+        BindStructure->asDate.day = static_cast<unsigned int>(lVal);
+
+        break;
+      }
+      }
+
+      lenKey -= size;
+      szKey += size;
+
+      if (lenKey <= 0)
+      {
+        *queryLevel = i;
+        break;
+      }
+
+      SeekBind++; // Advance to next index column in bind structure
+    }
+  }
+  else
+  {
+    *queryLevel = 1;
+    BindStructure = GetBindStructOra(thiswa, SeekBind);
+
+    if (HB_IS_DATE(pKey) || HB_IS_DATETIME(pKey))
+    {
+      int iYear, iMonth, iDay;
+      int iHour, iMinute;
+
+      hb_dateDecode(hb_itemGetDL(pKey), &iYear, &iMonth, &iDay);
+
+      if (BindStructure->iCType == SQL_C_TYPE_DATE)
+      {
+        BindStructure->asDate.year = static_cast<unsigned int>(iYear);
+        BindStructure->asDate.month = static_cast<unsigned int>(iMonth);
+        BindStructure->asDate.day = static_cast<unsigned int>(iDay);
+      }
+      else if (BindStructure->iCType == SQL_C_TYPE_TIMESTAMP)
+      {
+        long lJulian, lMilliSec;
+        int seconds, millisec;
+        hb_itemGetTDT(pKey, &lJulian, &lMilliSec);
+        hb_timeDecode(lMilliSec, &iHour, &iMinute, &seconds, &millisec);
+        BindStructure->asTimestamp.year = static_cast<unsigned int>(iYear);
+        BindStructure->asTimestamp.month = static_cast<unsigned int>(iMonth);
+        BindStructure->asTimestamp.day = static_cast<unsigned int>(iDay);
+        BindStructure->asTimestamp.hour = static_cast<unsigned int>(iHour);
+        BindStructure->asTimestamp.minute = static_cast<unsigned int>(iMinute);
+        BindStructure->asTimestamp.second = static_cast<unsigned int>(seconds);
+        BindStructure->asTimestamp.fraction = 0;
+      }
+      else
+      {
+        // To Do: Raise RT error
+        return Harbour::FAILURE;
+      }
+    }
+    else if (HB_IS_NUMERIC(pKey))
+    {
+      if (BindStructure->iCType != SQL_C_DOUBLE || BindStructure->iCType != SQL_C_NUMERIC)
+      { // Check column data type
+        // To Do: Raise RT error
+        return Harbour::FAILURE;
+      }
+      if (BindStructure->iCType == SQL_C_NUMERIC)
+      {
+        BindStructure->asNumeric = static_cast<HB_LONG>(hb_itemGetNInt(pKey));
+      }
+      else
+      {
+        BindStructure->asDouble = static_cast<double>(hb_itemGetND(pKey));
+      }
+    }
+    else if (HB_IS_LOGICAL(pKey))
+    {
+      if (BindStructure->iCType != SQL_C_BIT)
+      { // Check column data type
+        // To Do: Raise RT error
+        return Harbour::FAILURE;
+      }
+      BindStructure->asLogical = hb_itemGetNInt(pKey);
+    }
+  }
+  return Harbour::SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
 
 void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
 {
-   OCI_Statement * hStmt;
-   INDEXBINDORAP SeekBind, SeekBindParam;
-   COLUMNBINDORAP BindStructure;
-   int iBind, iLoop;
-   int res = 0;
-   char * sSql;
+  OCI_Statement *hStmt;
+  INDEXBINDORAP SeekBind, SeekBindParam;
+  COLUMNBINDORAP BindStructure;
+  int iBind, iLoop;
+  int res = 0;
+  char *sSql;
 
-   SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
-   // Culik
-   // removed, this line bellow make the data be the last field name
-   // SeekBind += (queryLevel - 1); // place offset
+  SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
+  // Culik
+  // removed, this line bellow make the data be the last field name
+  // SeekBind += (queryLevel - 1); // place offset
 
-   hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt;
-   sSql = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
-   SeekBindParam = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
-   iBind = 1;
+  hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt;
+  sSql = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
+  SeekBindParam = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
+  iBind = 1;
 
-   for( iLoop = 1; iLoop <= queryLevel; iLoop++ ) {
-      BindStructure = GetBindStructOra(thiswa, SeekBindParam);
-      if( !BindStructure->isArgumentNull ) {
+  for (iLoop = 1; iLoop <= queryLevel; iLoop++)
+  {
+    BindStructure = GetBindStructOra(thiswa, SeekBindParam);
+    if (!BindStructure->isArgumentNull)
+    {
 
-         // if( thiswa->nSystemID = SYSTEMID_ORACLE )
-         //    if( BindStructure->iCType == SQL_C_TYPE_DATE )
-         //       BindStructure->iCType = SQL_C_TYPE_TIMESTAMP; // May be DATE or TIMESTAMP
+      // if( thiswa->nSystemID = SYSTEMID_ORACLE )
+      //    if( BindStructure->iCType == SQL_C_TYPE_DATE )
+      //       BindStructure->iCType = SQL_C_TYPE_TIMESTAMP; // May be DATE or TIMESTAMP
 
-         switch( BindStructure->iCType ) {
-            case SQL_C_CHAR: {
-               // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
-               //                        BindStructure->iCType,
-               //                        BindStructure->iSQLType,
-               //                        BindStructure->ColumnSize,
-               //                        BindStructure->DecimalDigits,
-               //                        BindStructure->asChar.value, 0, nullptr);
-               res = OCI_BindString(hStmt, BindStructure->szBindName, BindStructure->asChar.value, BindStructure->ColumnSize);
-               break;
-            }
-            case SQL_C_NUMERIC: {
-               res = OCI_BindUnsignedBigInt(hStmt, BindStructure->szBindName, &BindStructure->asNumeric);
-               break;
-            }
-            case SQL_C_DOUBLE: {
-               // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
-               //                        BindStructure->iCType,
-               //                        BindStructure->iSQLType,
-               //                        BindStructure->ColumnSize,
-               //                        BindStructure->DecimalDigits,
-               //                        &(BindStructure->asNumeric), 0, nullptr);
-               res = OCI_BindDouble(hStmt, BindStructure->szBindName, &BindStructure->asDouble);
-               break;
-            }
-            case SQL_C_TYPE_TIMESTAMP: {
-               // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
-               //                        SQL_C_TYPE_DATE,
-               //                        SQL_TYPE_DATE,
-               //                        SQL_TIMESTAMP_LEN,
-               //                        0,
-               //                        &(BindStructure->asTimestamp), 0, 0);
-               BindStructure->asDate2 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-               OCI_DateSetDateTime(BindStructure->asDate2,BindStructure->asTimestamp.year, BindStructure->asTimestamp.month, BindStructure->asTimestamp.day,BindStructure->asTimestamp.hour,BindStructure->asTimestamp.minute,BindStructure->asTimestamp.second);
-               res = OCI_BindDate(hStmt, BindStructure->szBindName, BindStructure->asDate2);
-               break;
-            }
-            case SQL_C_TYPE_DATE: {
-               // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
-               //                        SQL_C_TYPE_DATE,
-               //                        SQL_TYPE_DATE,
-               //                        SQL_DATE_LEN,
-               //                        0,
-               //                        &(BindStructure->asDate), 0, nullptr);
-               // TraceLog("sqltrace.log", " %s  %i %i %i \n", sSql, BindStructure->asDate.year, BindStructure->asDate.month, BindStructure->asDate.day);
-               BindStructure->asDate1 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-               OCI_DateSetDate(BindStructure->asDate1, BindStructure->asDate.year, BindStructure->asDate.month, BindStructure->asDate.day);
-               res = OCI_BindDate(hStmt, BindStructure->szBindName, BindStructure->asDate1);
-               break;
-            }
-            case SQL_C_BIT: {
-               res = OCI_BindUnsignedBigInt(hStmt, BindStructure->szBindName, &BindStructure->asLogical);
-               // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
-               //                        BindStructure->iCType,
-               //                        BindStructure->iSQLType,
-               //                        BindStructure->ColumnSize,
-               //                        BindStructure->DecimalDigits,
-               //                        &(BindStructure->asLogical), 0, nullptr);
-               break;
-            }
-         }
-         if( res == 0 ) {
-            OraErrorDiagRTE(hStmt, "BindSeekStmtora", sSql, res, __LINE__, __FILE__);
-         }
-         iBind++;
-         BindStructure->iParNum = iBind;
+      switch (BindStructure->iCType)
+      {
+      case SQL_C_CHAR: {
+        // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
+        //                        BindStructure->iCType,
+        //                        BindStructure->iSQLType,
+        //                        BindStructure->ColumnSize,
+        //                        BindStructure->DecimalDigits,
+        //                        BindStructure->asChar.value, 0, nullptr);
+        res = OCI_BindString(hStmt, BindStructure->szBindName, BindStructure->asChar.value, BindStructure->ColumnSize);
+        break;
       }
-      SeekBindParam++;
-      // Culik Correct place so we can get the data from next field
-      SeekBind ++; // = (queryLevel - 1); // place offset
-   }
+      case SQL_C_NUMERIC: {
+        res = OCI_BindUnsignedBigInt(hStmt, BindStructure->szBindName, &BindStructure->asNumeric);
+        break;
+      }
+      case SQL_C_DOUBLE: {
+        // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
+        //                        BindStructure->iCType,
+        //                        BindStructure->iSQLType,
+        //                        BindStructure->ColumnSize,
+        //                        BindStructure->DecimalDigits,
+        //                        &(BindStructure->asNumeric), 0, nullptr);
+        res = OCI_BindDouble(hStmt, BindStructure->szBindName, &BindStructure->asDouble);
+        break;
+      }
+      case SQL_C_TYPE_TIMESTAMP: {
+        // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
+        //                        SQL_C_TYPE_DATE,
+        //                        SQL_TYPE_DATE,
+        //                        SQL_TIMESTAMP_LEN,
+        //                        0,
+        //                        &(BindStructure->asTimestamp), 0, 0);
+        BindStructure->asDate2 = OCI_DateCreate(GetConnection(thiswa->hDbc));
+        OCI_DateSetDateTime(BindStructure->asDate2, BindStructure->asTimestamp.year, BindStructure->asTimestamp.month,
+                            BindStructure->asTimestamp.day, BindStructure->asTimestamp.hour,
+                            BindStructure->asTimestamp.minute, BindStructure->asTimestamp.second);
+        res = OCI_BindDate(hStmt, BindStructure->szBindName, BindStructure->asDate2);
+        break;
+      }
+      case SQL_C_TYPE_DATE: {
+        // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
+        //                        SQL_C_TYPE_DATE,
+        //                        SQL_TYPE_DATE,
+        //                        SQL_DATE_LEN,
+        //                        0,
+        //                        &(BindStructure->asDate), 0, nullptr);
+        // TraceLog("sqltrace.log", " %s  %i %i %i \n", sSql, BindStructure->asDate.year, BindStructure->asDate.month,
+        // BindStructure->asDate.day);
+        BindStructure->asDate1 = OCI_DateCreate(GetConnection(thiswa->hDbc));
+        OCI_DateSetDate(BindStructure->asDate1, BindStructure->asDate.year, BindStructure->asDate.month,
+                        BindStructure->asDate.day);
+        res = OCI_BindDate(hStmt, BindStructure->szBindName, BindStructure->asDate1);
+        break;
+      }
+      case SQL_C_BIT: {
+        res = OCI_BindUnsignedBigInt(hStmt, BindStructure->szBindName, &BindStructure->asLogical);
+        // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
+        //                        BindStructure->iCType,
+        //                        BindStructure->iSQLType,
+        //                        BindStructure->ColumnSize,
+        //                        BindStructure->DecimalDigits,
+        //                        &(BindStructure->asLogical), 0, nullptr);
+        break;
+      }
+      }
+      if (res == 0)
+      {
+        OraErrorDiagRTE(hStmt, "BindSeekStmtora", sSql, res, __LINE__, __FILE__);
+      }
+      iBind++;
+      BindStructure->iParNum = iBind;
+    }
+    SeekBindParam++;
+    // Culik Correct place so we can get the data from next field
+    SeekBind++; // = (queryLevel - 1); // place offset
+  }
 }
 
 /*------------------------------------------------------------------------*/
 
-HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT * iIndex, OCI_Statement ** hStmt, OCI_Resultset ** rs) // Returns HB_TRUE if any result found
+HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT *iIndex, OCI_Statement **hStmt,
+                              OCI_Resultset **rs) // Returns HB_TRUE if any result found
 {
-   int res;
-   INDEXBINDORAP SeekBind;
-   // OCI_Resultset * rs;
+  int res;
+  INDEXBINDORAP SeekBind;
+  // OCI_Resultset * rs;
 
-   SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
-   // this line bellow make the last field current
-   // SeekBind += (queryLevel - 1); // place offset
-   HB_SYMBOL_UNUSED(queryLevel);
+  SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
+  // this line bellow make the last field current
+  // SeekBind += (queryLevel - 1); // place offset
+  HB_SYMBOL_UNUSED(queryLevel);
 
-   *hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt;
+  *hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt;
 
-   // res = SQLExecute(*hStmt);
-   res = OCI_Execute(*hStmt);
-   if( !res  ) {
-      OraErrorDiagRTE(*hStmt, "getPreparedSeekora", "", res, __LINE__, __FILE__);
-      OCI_StatementFree(*hStmt);
-      return Harbour::FAILURE;
-   }
+  // res = SQLExecute(*hStmt);
+  res = OCI_Execute(*hStmt);
+  if (!res)
+  {
+    OraErrorDiagRTE(*hStmt, "getPreparedSeekora", "", res, __LINE__, __FILE__);
+    OCI_StatementFree(*hStmt);
+    return Harbour::FAILURE;
+  }
 
-   *rs = OCI_GetResultset(*hStmt);
-   if( *rs ==  nullptr ) {
-      return Harbour::FAILURE;
-   }
+  *rs = OCI_GetResultset(*hStmt);
+  if (*rs == nullptr)
+  {
+    return Harbour::FAILURE;
+  }
 
-   OCI_FetchNext(*rs);
-   thiswa->recordList[0] = OCI_GetUnsignedBigInt(*rs, 1);
-   if( thiswa->recordList[0] == 0 ) {
+  OCI_FetchNext(*rs);
+  thiswa->recordList[0] = OCI_GetUnsignedBigInt(*rs, 1);
+  if (thiswa->recordList[0] == 0)
+  {
+    // OCI_StatementFree(*hStmt);
+    return Harbour::FAILURE;
+  }
+
+  if (thiswa->sqlarea.ulhDeleted > 0)
+  {
+    char szValue[2];
+    unsigned int uiLen;
+
+    if (OCI_GetString(*rs, 2) == nullptr)
+    {
       // OCI_StatementFree(*hStmt);
       return Harbour::FAILURE;
-   }
+    }
+    uiLen = OCI_GetDataLength(*rs, 2);
 
-   if( thiswa->sqlarea.ulhDeleted > 0 ) {
-      char szValue[2];
-      unsigned int uiLen;
+    hb_xmemcpy(szValue, static_cast<char *>(OCI_GetString(*rs, 2)), uiLen);
+    if (szValue[0] == 0)
+    {
+      thiswa->deletedList[0] = ' '; // MySQL driver climps spaces from right side
+    }
+    else
+    {
+      thiswa->deletedList[0] = szValue[0];
+    }
 
-      if( OCI_GetString(*rs,2 ) == nullptr ) {
-         // OCI_StatementFree(*hStmt);
-         return Harbour::FAILURE;
-      }
-      uiLen = OCI_GetDataLength(*rs, 2);
+    *iIndex = 2;
+  }
+  else
+  {
+    *iIndex = 1;
+    thiswa->deletedList[0] = ' ';
+  }
 
-      hb_xmemcpy(szValue, static_cast<char*>(OCI_GetString(*rs, 2)), uiLen);
-      if( szValue[0] == 0 ) {
-         thiswa->deletedList[0] = ' '; // MySQL driver climps spaces from right side
-      } else {
-         thiswa->deletedList[0] = szValue[0];
-      }
+  thiswa->recordListSize = 1L;
+  thiswa->recordListPos = 0;
 
-      *iIndex = 2;
-   } else {
-      *iIndex = 1;
-      thiswa->deletedList[0] = ' ';
-   }
-
-   thiswa->recordListSize = 1L;
-   thiswa->recordListPos = 0;
-
-   return Harbour::SUCCESS;
+  return Harbour::SUCCESS;
 }
 
 HB_ERRCODE FeedSeekStmtOra(SQLEXORAAREAP thiswa, int queryLevel)
 {
-   int  i;
+  int i;
 
-   COLUMNBINDORAP InsertRecord;
-   INDEXBINDORAP SeekBind, SeekBindParam;
-   int iLoop;
-   char * sSql;
+  COLUMNBINDORAP InsertRecord;
+  INDEXBINDORAP SeekBind, SeekBindParam;
+  int iLoop;
+  char *sSql;
 
-   SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
+  SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
 
-   sSql = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
+  sSql = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
 
-   SeekBindParam = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
+  SeekBindParam = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
 
-   for( iLoop = 1; iLoop <= queryLevel; iLoop++ ) {
-      InsertRecord = GetBindStructOra(thiswa, SeekBindParam);
-      if( InsertRecord->iCType == SQL_C_TYPE_TIMESTAMP ) {
-        OCI_DateSetDateTime(InsertRecord->asDate2, InsertRecord->asTimestamp.year, InsertRecord->asTimestamp.month, InsertRecord->asTimestamp.day, InsertRecord->asTimestamp.hour, InsertRecord->asTimestamp.minute, InsertRecord->asTimestamp.second);
-      }
-      if( InsertRecord->iCType == SQL_C_TYPE_DATE ) {
-         OCI_DateSetDate(InsertRecord->asDate1, InsertRecord->asDate.year, InsertRecord->asDate.month, InsertRecord->asDate.day);
-      }
-     InsertRecord++;
-   }
+  for (iLoop = 1; iLoop <= queryLevel; iLoop++)
+  {
+    InsertRecord = GetBindStructOra(thiswa, SeekBindParam);
+    if (InsertRecord->iCType == SQL_C_TYPE_TIMESTAMP)
+    {
+      OCI_DateSetDateTime(InsertRecord->asDate2, InsertRecord->asTimestamp.year, InsertRecord->asTimestamp.month,
+                          InsertRecord->asTimestamp.day, InsertRecord->asTimestamp.hour,
+                          InsertRecord->asTimestamp.minute, InsertRecord->asTimestamp.second);
+    }
+    if (InsertRecord->iCType == SQL_C_TYPE_DATE)
+    {
+      OCI_DateSetDate(InsertRecord->asDate1, InsertRecord->asDate.year, InsertRecord->asDate.month,
+                      InsertRecord->asDate.day);
+    }
+    InsertRecord++;
+  }
 
-   return Harbour::SUCCESS;
+  return Harbour::SUCCESS;
 }

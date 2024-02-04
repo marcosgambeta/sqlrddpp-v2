@@ -58,56 +58,55 @@
 #include <hbapiitm.h>
 #include "sqlrdd.ch"
 
-#define SUPERTABLE                  ( &sqlrddSuper )
+#define SUPERTABLE (&sqlrddSuper)
 
 /*
-*  SQL WORKAREA
-*/
+ *  SQL WORKAREA
+ */
 
 struct _SQLAREA
 {
-   AREA area;
+  AREA area;
 
-   /*
+  /*
    *  SQLRDD's additions to the workarea structure
    *
    *  Warning: The above section MUST match WORKAREA exactly!  Any
    *  additions to the structure MUST be added below
    */
-   PHB_CODEPAGE cdPageCnv; /* Area's codepage convert pointer */
-   char * szDataFileName;  /* file name */
-   HB_LONG hOrdCurrent;       /* current index order */
-   bool shared;
-   bool readonly;             /* only SELECT allowed */
-   bool creating;             /* HB_TRUE when creating table */
-   bool firstinteract;        /* HB_TRUE when workarea was not used yet */
-   bool isam;                 /* ISAM Simulator ? */
-   bool wasdel;
-   bool initialized;          /* Workarea Initialization done */
-   bool sqlfilter;            /* SET FILTER converted to SQL */
+  PHB_CODEPAGE cdPageCnv; /* Area's codepage convert pointer */
+  char *szDataFileName;   /* file name */
+  HB_LONG hOrdCurrent;    /* current index order */
+  bool shared;
+  bool readonly;      /* only SELECT allowed */
+  bool creating;      /* HB_TRUE when creating table */
+  bool firstinteract; /* HB_TRUE when workarea was not used yet */
+  bool isam;          /* ISAM Simulator ? */
+  bool wasdel;
+  bool initialized; /* Workarea Initialization done */
+  bool sqlfilter;   /* SET FILTER converted to SQL */
 
-   PHB_ITEM oWorkArea;      /* SQL Workarea object */
-   PHB_ITEM aInfo;          /* Status array */
-   PHB_ITEM aBuffer;        /* Record buffer */
-   PHB_ITEM aOrders;        /* Indexes */
-   PHB_ITEM aStruct;        /* Table xBase structure */
-   PHB_ITEM aLocked;        /* Locked lines */
-   PHB_ITEM aCreate;        /* Structure received by dbCreate() */
-   PHB_ITEM aCache;         /* Workarea recordset cache */
-   PHB_ITEM aOldBuffer;     /* Last workarea buffer */
-   PHB_ITEM aEmptyBuff;     /* Empty buffer to be in eof()+1 */
-   PHB_ITEM aSelectList;
+  PHB_ITEM oWorkArea;  /* SQL Workarea object */
+  PHB_ITEM aInfo;      /* Status array */
+  PHB_ITEM aBuffer;    /* Record buffer */
+  PHB_ITEM aOrders;    /* Indexes */
+  PHB_ITEM aStruct;    /* Table xBase structure */
+  PHB_ITEM aLocked;    /* Locked lines */
+  PHB_ITEM aCreate;    /* Structure received by dbCreate() */
+  PHB_ITEM aCache;     /* Workarea recordset cache */
+  PHB_ITEM aOldBuffer; /* Last workarea buffer */
+  PHB_ITEM aEmptyBuff; /* Empty buffer to be in eof()+1 */
+  PHB_ITEM aSelectList;
 
-   HB_ULONG ulhRecno;          /* Recno position in field list */
-   HB_ULONG ulhDeleted;        /* Deleted position in field list */
+  HB_ULONG ulhRecno;   /* Recno position in field list */
+  HB_ULONG ulhDeleted; /* Deleted position in field list */
 
-   int * uiBufferIndex;     /* Field offset in fields array */
-   int * uiFieldList;       /* Keeps a field list for SELECT statements */
-   int iFieldListStatus;    /* field list status - see sqlprototypes.h */
+  int *uiBufferIndex;   /* Field offset in fields array */
+  int *uiFieldList;     /* Keeps a field list for SELECT statements */
+  int iFieldListStatus; /* field list status - see sqlprototypes.h */
 
-   LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
-   char editMask[MAX_FIELDS];    /* Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD */
-
+  LPDBRELINFO lpdbPendingRel; /* Pointer to parent rel struct */
+  char editMask[MAX_FIELDS];  /* Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD */
 };
 
 using SQLAREA = _SQLAREA;
@@ -119,6 +118,6 @@ using LPSQLAREA = SQLAREA *;
 
 /* prototypes */
 
-void commonError( AREAP ThisDb, HB_USHORT uiGenCode, HB_USHORT uiSubCode, const char * filename );
+void commonError(AREAP ThisDb, HB_USHORT uiGenCode, HB_USHORT uiSubCode, const char *filename);
 
 #endif
