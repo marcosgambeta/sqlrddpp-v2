@@ -162,13 +162,13 @@ RETURN NIL
 
 METHOD SR_MARIA:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
-   LOCAL nType := 0
-   LOCAL nLen := 0
-   LOCAL nNull := 0
-   LOCAL aFields := {}
-   LOCAL nDec := 0
+   //LOCAL nType := 0 (variable not used)
+   //LOCAL nLen := 0 (variable not used)
+   //LOCAL nNull := 0 (variable not used)
+   LOCAL aFields //:= {} (value not used)
+   //LOCAL nDec := 0 (variable not used)
    LOCAL nRet
-   LOCAL cVlr := ""
+   //LOCAL cVlr := "" (variable not used)
    LOCAL aFld
 
    DEFAULT lReSelect    TO .T.
@@ -230,12 +230,12 @@ RETURN "(" + alltrim(str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
 METHOD SR_MARIA:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
             cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
 
-   LOCAL hEnv := 0
-   LOCAL hDbc := 0
+   //LOCAL hEnv := 0 (variable not used)
+   LOCAL hDbc //:= 0 (value not used)
    LOCAL nret
-   LOCAL cVersion := ""
+   //LOCAL cVersion := "" (variable not used)
    LOCAL cSystemVers := ""
-   LOCAL cBuff := ""
+   //LOCAL cBuff := "" (variable not used)
    LOCAL nVersionp
 
    HB_SYMBOL_UNUSED(cDSN)
@@ -259,7 +259,8 @@ METHOD SR_MARIA:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
       ::nRetCode = nRet
       ::nSystemID := 0
       SR_MsgLogFile("Connection Error")
-      nVersionp := 4      
+      //nVersionp := 4 (local variable/value not used)
+      HB_SYMBOL_UNUSED(cSystemVers)
       RETURN Self
    else
       ::cConnect  = cConnect
@@ -267,8 +268,8 @@ METHOD SR_MARIA:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
       ::hDbc      = hDbc
       cTargetDB   = "MARIADB Native"
       cSystemVers = alltrim(str(MYSVERS(hDbc)))
-      nVersionp  := MYSVERS(hDbc)     
-                              
+      nVersionp  := MYSVERS(hDbc)
+
    EndIf
 
    If (!::lQueryOnly) .AND. nVersionp < MINIMAL_MYSQL_SUPPORTED
