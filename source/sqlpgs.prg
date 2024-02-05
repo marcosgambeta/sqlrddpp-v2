@@ -64,7 +64,8 @@ CLASS SR_PGS FROM SR_CONNECTION
    METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
    METHOD End()
    METHOD LastError()
-   METHOD Commit()
+   //METHOD Commit()
+   METHOD Commit(lNoLog)
    METHOD RollBack()
    METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
    METHOD ExecuteRaw(cCommand)
@@ -157,16 +158,18 @@ RETURN NIL
 
 METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
-   LOCAL nFields := 0
-   LOCAL nType := 0
-   LOCAL nLen := 0
-   LOCAL nNull := 0
+   LOCAL nFields //:= 0 (value not used)
+   //LOCAL nType := 0 (variable not used)
+   //LOCAL nLen := 0 (variable not used)
+   //LOCAL nNull := 0 (variable not used)
    LOCAL aFields := {}
-   LOCAL nDec := 0
+   //LOCAL nDec := 0 (variable not used)
    LOCAL nRet
-   LOCAL cVlr := ""
+   //LOCAL cVlr := "" (variable not used)
    LOCAL cTbl
    LOCAL cOwner := "public"
+   
+   HB_SYMBOL_UNUSED(aFields)
 
    DEFAULT lReSelect TO .T.
    DEFAULT lLoadCache TO .F.
@@ -230,12 +233,12 @@ RETURN "(" + alltrim(str(::nRetCode)) + ") " + PGSErrMsg(::hDbc)
 METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
    cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
 
-   LOCAL hEnv := 0
-   LOCAL hDbc := 0
+   //LOCAL hEnv := 0 (variable not used)
+   LOCAL hDbc //:= 0 (value not used)
    LOCAL nret
-   LOCAL cVersion := ""
+   //LOCAL cVersion := "" (variable not used)
    LOCAL cSystemVers := ""
-   LOCAL cBuff := ""
+   //LOCAL cBuff := "" (variable not used)
    LOCAL aRet := {}
    LOCAL aVersion
    LOCAL cmatch
@@ -243,6 +246,8 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
    LOCAL nlen
    LOCAL s_reEnvVar := HB_RegexComp("(\d+\.\d+\.\d+)")
    LOCAL cString
+   
+   HB_SYMBOL_UNUSED(cSystemVers)
 
    HB_SYMBOL_UNUSED(cDSN)
    HB_SYMBOL_UNUSED(cUser)
