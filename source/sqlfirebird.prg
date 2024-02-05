@@ -156,15 +156,15 @@ METHOD SR_FIREBIRD:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cR
    LOCAL nLen := 0
    LOCAL nNull := 0
    LOCAL cName
-   LOCAL _nLen
+   //LOCAL _nLen (variable not used)
    LOCAL _nDec
    LOCAL nPos
    LOCAL cType
    LOCAL nLenField
-   LOCAL aFields := {}
+   LOCAL aFields //:= {} (value not used)
    LOCAL nDec := 0
    LOCAL nRet
-   LOCAL cVlr := ""
+   //LOCAL cVlr := "" (variable not used)
    LOCAL aLocalPrecision := {}
 
    DEFAULT lReSelect TO .T.
@@ -202,7 +202,7 @@ METHOD SR_FIREBIRD:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cR
          ::RunTimeErr("", "FBDescribeCol Error" + SR_CRLF + ::LastError() + SR_CRLF + "Last command sent to database : " + ::cLastComm)
          RETURN NIL
       ELSE
-         _nLen := nLen
+         //_nLen := nLen (variable not used)
          _nDec := nDec
 
          cName := upper(alltrim(cName))
