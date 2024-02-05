@@ -72,21 +72,25 @@ CLASS SR_ORACLE2 FROM SR_CONNECTION
    METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit) CONSTRUCTOR
    METHOD End()
    METHOD LastError()
-   METHOD Commit()
+   //METHOD Commit()
+   METHOD Commit(lNoLog)
    METHOD RollBack()
    METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
    METHOD ExecuteRaw(cCommand)
    METHOD AllocStatement()
    METHOD FreeStatement()
    METHOD FetchRaw(lTranslate, aFields)
-   METHOD FieldGet(nField, aField, lTranslate)
+   //METHOD FieldGet(nField, aField, lTranslate)
+   METHOD FieldGet(nField, aFields, lTranslate)
    METHOD MoreResults(aArray, lTranslate)
-   METHOD BINDPARAM(lStart, lIn, cRet, nLen)
+   //METHOD BINDPARAM(lStart, lIn, cRet, nLen)
+   METHOD BINDPARAM(lStart, lIn, nLen, cRet, nLenRet)
    METHOD ConvertParams(c)
    METHOD WriteMemo(cFileName, nRecno, cRecnoName, aColumnsAndData)
    METHOD Getline(aFields, lTranslate, aArray)
    METHOD ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode)
-   METHOD ExecSP(cComm, aReturn, nParam)
+   //METHOD ExecSP(cComm, aReturn, nParam)
+   METHOD ExecSP(cComm, aReturn, nParam, aType)
 
 ENDCLASS
 
@@ -171,7 +175,7 @@ RETURN NIL
 
 METHOD SR_ORACLE2:AllocStatement()
 
-   LOCAL hStmtLocal := 0
+   //LOCAL hStmtLocal := 0 (variable not used)
    LOCAL nRet := 0
 
    ::FreeStatement()
@@ -187,7 +191,7 @@ METHOD SR_ORACLE2:AllocStatement()
 RETURN nRet
 
 /*------------------------------------------------------------------------*/
-
+                                        
 METHOD SR_ORACLE2:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
    LOCAL n
@@ -196,13 +200,13 @@ METHOD SR_ORACLE2:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRe
    LOCAL nNull := 0
    LOCAL nDec := 0
    LOCAL cName
-   LOCAL _nLen
-   LOCAL _nDec
+   //LOCAL _nLen (variable not used)
+   //LOCAL _nDec (variable not used)
    LOCAL cType
    LOCAL nLenField
-   LOCAL aFields := {}
+   LOCAL aFields //:= {} (value not used)
    LOCAL nRet
-   LOCAL cVlr := ""
+   //LOCAL cVlr := "" (variable not used)
 
    DEFAULT lReSelect    TO .T.
    DEFAULT lLoadCache   TO .F.
@@ -236,8 +240,8 @@ METHOD SR_ORACLE2:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRe
          ::RunTimeErr("", "SQLDescribeCol Error" + SR_CRLF + ::LastError() + SR_CRLF + "Last command sent to database : " + ::cLastComm)
          RETURN NIL
       ELSE
-         _nLen := nLen
-         _nDec := nDec
+         //_nLen := nLen (variable not used)
+         //_nDec := nDec (variable not used)
          cName := Upper(alltrim(cName))
 
          IF (nLen == 2000 .OR. nLen == 4000) .AND. SR_SetNwgCompat()
@@ -280,12 +284,12 @@ RETURN SQLO2_GETERRORDESCR(::hDBC) + " retcode: " + sr_val2Char(::nRetCode) + " 
 
 METHOD SR_ORACLE2:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
 
-   LOCAL hEnv := 0
+   //LOCAL hEnv := 0 (variable not used)
    LOCAL hDbc := 0
    LOCAL nret
-   LOCAL cVersion := ""
+   //LOCAL cVersion := "" (variable not used)
    LOCAL cSystemVers := ""
-   LOCAL cBuff := ""
+   //LOCAL cBuff := "" (variable not used)
    LOCAL aRet := {}
    LOCAL aVersion
    LOCAL cmatch
@@ -319,6 +323,7 @@ METHOD SR_ORACLE2:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxB
       ::nRetCode := nRet
       ::hDbc := hDbc
       SR_MsgLogFile("Connection Error: " + ::lastError() + " - Connection string: " + ::cUser + "/" + Replicate("*", len(::cPassWord)) + "@" + ::cDtb)
+      HB_SYMBOL_UNUSED(cSystemVers)
       RETURN SELF
    ELSE
       ::cConnect  := cConnect
@@ -517,6 +522,8 @@ METHOD SR_ORACLE2:ExecSP(cComm, aReturn, nParam, aType)
    LOCAL i
    LOCAL n
    LOCAL nError := 0
+   
+   HB_SYMBOL_UNUSED(nError)
 
    DEFAULT aReturn TO {}
    DEFAULT aType TO {}
@@ -563,10 +570,10 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
    LOCAL i
    LOCAL n
    LOCAL nAllocated := 0
-   LOCAL nBlocks
+   //LOCAL nBlocks (variable not used)
    LOCAL nError
    LOCAL aFields
-   LOCAL nCols
+   //LOCAL nCols (variable not used)
    LOCAL aDb
    LOCAL nFieldRec
    LOCAL aMemo
@@ -576,11 +583,13 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
    LOCAL nLinesMemo
    LOCAL cCampo
    LOCAL j
-
+   
+   HB_SYMBOL_UNUSED(nAllocated)
+   
    DEFAULT nMaxRecords TO 999999999999 // TODO:
    DEFAULT cVar TO ":c1"
 
-   HB_SYMBOL_UNUSED(ncols)
+   //HB_SYMBOL_UNUSED(ncols) (variable not used)
    HB_SYMBOL_UNUSED(nlogmode)
 
    ::AllocStatement()
@@ -619,6 +628,7 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
    //NEXT i
 
    aFields := ::iniFields(.F.)
+   HB_SYMBOL_UNUSED(aFields)
 
    IF lFetch
       IF !Empty(cFile)
@@ -741,7 +751,7 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
             nAllocated := ARRAY_BLOCK1
          ENDIF
 
-         nBlocks := 1
+         //nBlocks := 1 (variable not used)
          n := 0
          aFields := ::IniFields(.F., , , ,, cRecnoName, cDeletedName)
 
@@ -797,6 +807,8 @@ FUNCTION ExecuteSP2(cComm, aReturn)
    //LOCAL n
    LOCAL nError := 0
    LOCAL oConn := SR_GetConnection()
+   
+   HB_SYMBOL_UNUSED(nError)
 
    DEFAULT aReturn TO {}
 
