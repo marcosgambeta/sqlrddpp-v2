@@ -307,6 +307,7 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
 
       FOR i := 1 TO len(oWA:aFields)
          IF (n := aScan(aNewStruct, {|x|x[1] == oWA:aFields[i, 1]})) == 0
+            HB_SYMBOL_UNUSED(n) // Variable 'N' is assigned but not used
             IF (!oWA:aFields[i, 1] == oWA:cRecnoName) .AND. (!oWA:aFields[i, 1] == oWA:cDeletedName) .AND. oWA:oSql:nSystemID != SYSTEMID_IBMDB2
                aadd(aToDrop, aClone(oWA:aFields[i]))
                SR_LogFile("changestruct.log", {oWA:cFileName, "Will drop:", oWA:aFields[i, 1]})
@@ -491,7 +492,7 @@ Return
 
 FUNCTION SR_SetCreateAsHistoric(l)
 
-   LOCAL lOld := lCreateAsHistoric
+   //LOCAL lOld := lCreateAsHistoric (variable not used)
 
    IF HB_ISLOGICAL(l) 
       lCreateAsHistoric := l
@@ -899,6 +900,7 @@ FUNCTION SR_HistExpression(n, cTable, cPK, CurrDate, nSystem)
    cAlias := "W" + StrZero(++_nCnt, 3)
    cAl1   := "W" + StrZero(++_nCnt, 3)
    cAl2   := "W" + StrZero(++_nCnt, 3)
+   HB_SYMBOL_UNUSED(cAl2)
 
    IF _nCnt >= 995
       _nCnt := 1
@@ -935,6 +937,7 @@ FUNCTION SR_HistExpressionWhere(n, cTable, cPK, CurrDate, nSystem, cAlias)
 
    cAl1   := "W" + StrZero(++_nCnt, 3)
    cAl2   := "W" + StrZero(++_nCnt, 3)
+   HB_SYMBOL_UNUSED(cAl2)
 
    IF _nCnt >= 995
       _nCnt := 1
@@ -1203,7 +1206,7 @@ RETURN aData
 
 METHOD SqlFastHash:Delete(uHashKey)
 
-   LOCAL nIndex := 0
+   LOCAL nIndex //:= 0 (value not used)
 
    nIndex := hb_HPos(::hHash, uHashKey)
 
@@ -1218,7 +1221,7 @@ RETURN .F.
 
 METHOD SqlFastHash:Update(uHashKey, uValue)
 
-   LOCAL nIndex := 0
+   LOCAL nIndex //:= 0 (value not used)
 
    nIndex := hb_HPos(::hHash, uHashKey)
 
@@ -1642,6 +1645,7 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
       FOR EACH xMessage IN aSay
 
          IF (nLen := Len(xMessage)) > 58
+            HB_SYMBOL_UNUSED(nLen) // Variable 'NLEN' is assigned but not used
             FOR nPos := 58 TO 1 STEP -1
                IF xMessage[nPos] $ (" " + Chr(9))
                   EXIT
@@ -1682,6 +1686,10 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
                like Clipper.  2004/Sep/16 - Eduardo Fernandes <modalsist> */
 
       cColor11 := cColor12 := cColor21 := cColor22 := ""
+      HB_SYMBOL_UNUSED(cColor11)
+      HB_SYMBOL_UNUSED(cColor12)
+      HB_SYMBOL_UNUSED(cColor21)
+      HB_SYMBOL_UNUSED(cColor22)
 
       cColorStr := alltrim(StrTran(cColorNorm, " ", ""))
       nCommaSep := At(",", cColorStr)
