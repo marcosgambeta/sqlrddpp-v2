@@ -111,7 +111,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
    LOCAL lLocking := .F.
    LOCAL nLen := len(apCode)
    LOCAL bError := Errorblock()
-   LOCAL aLJoins := {}             /* A, B, Expression */
+   //LOCAL aLJoins := {}             /* A, B, Expression */ (variable not used)
    LOCAL aTables := {}             /* TableName */
    LOCAL aQualifiedTables := {}             /* Owner.TableName */
    LOCAL aAlias := {}
@@ -355,6 +355,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                RECURSIVE_CALL
             ELSE
                SKIPFWD
+               HB_SYMBOL_UNUSED(uData)
                uData := "(" + SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, @nIP, nContext, @nSpaces, lParseTableName)
                aadd(aTables, uData)
                aadd(aQualifiedTables, uData)
@@ -701,7 +702,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
 
             cSql += NEWLINE + IDENTSPACE + " UNION" + NEWLINE + IDENTSPACE + "  "
 
-            aLJoins := {}             /* A, B, Expression */
+            //aLJoins := {}             /* A, B, Expression */ (variable not used)
             aTables := {}             /* TableName */
             aQualifiedTables := {}
             aAlias := {}
@@ -854,7 +855,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
 
             ENDIF
 
-            aLJoins := {}             /* A, B, Expression */
+            //aLJoins := {}             /* A, B, Expression */ (variable not used)
             aTables := {}             /* TableName */
             aQualifiedTables := {}
             aAlias := {}
@@ -1004,6 +1005,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                SKIPFWD
                aOuters[len(aOuters), 3] += SR_DBQUALIFY(aOuters[len(aOuters), 2], nSystemID) + "." + SR_DBQUALIFY(uData, nSystemID)
                SKIPFWD
+               HB_SYMBOL_UNUSED(uData)
             ELSE
                BREAK SQL_SINTAX_ERROR_OUTER_JOIN
             ENDIF
@@ -1042,6 +1044,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                SKIPFWD
                aOuters[len(aOuters), 3] += SR_DBQUALIFY(aOuters[len(aOuters), 2], nSystemID) + "." + SR_DBQUALIFY(uData, nSystemID)
                SKIPFWD
+               HB_SYMBOL_UNUSED(uData)
             ELSE
                BREAK SQL_SINTAX_ERROR_OUTER_JOIN
             ENDIF
@@ -1193,7 +1196,8 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
          NEXT
 
          cSql += cTmp + cTrailler
-         cTrailler := ""
+         cTrailler := "" // (value not used)
+         HB_SYMBOL_UNUSED(cTrailler)
 
       ENDIF
 
@@ -1619,7 +1623,7 @@ FUNCTION SR_TableAttr(cTableName, nSystemID)
    /* Translates "c:\data\accounts\chart.dbf" to "DATA_ACCONTS_CHART" */
 
    LOCAL aRet
-   LOCAL cOwner := ""
+   LOCAL cOwner //:= "" (value not used)
    LOCAL cSlash
 
    IF substr(cTableName, 2, 1) == ":"
