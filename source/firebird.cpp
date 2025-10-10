@@ -200,8 +200,9 @@ HB_FUNC(FBCONNECT) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv)
   }
   if (isc_attach_database(session->status, 0, db_connect, &(session->db), static_cast<short>(i), dpb)) {
     fb_log_status(session, "FBCONNECT");
-    if (session->msgerror)
+    if (session->msgerror) {
       hb_xfree(session->msgerror);
+    }  
 
     hb_xfree(session->sqlda);
     hb_xfree(session);
@@ -238,8 +239,9 @@ HB_FUNC(FBCLOSE) // FBClose(hEnv)
         hb_xfree(var->sqlind);
       }
     }
-    if (session->msgerror)
+    if (session->msgerror) {
       hb_xfree(session->msgerror);
+    }  
 
     hb_xfree(session->sqlda);
     hb_xfree(session);
