@@ -69,8 +69,7 @@ HB_FUNC(SR_SQLPARSE) /* SqlParse(cCommand, @nError, @nErrorPos) */
 {
   HB_SIZE uLenPhrase = hb_parclen(1);
 
-  if (uLenPhrase)
-  {
+  if (uLenPhrase) {
     // auto stmt = static_cast<sql_stmt*>(hb_xgrab(sizeof(sql_stmt)));
     auto stmt = (sql_stmt *)hb_xgrabz(sizeof(sql_stmt));
 
@@ -80,21 +79,16 @@ HB_FUNC(SR_SQLPARSE) /* SqlParse(cCommand, @nError, @nErrorPos) */
     //       memset(stmt, 0, sizeof(sql_stmt));
     sqlIniPos = sqlPhrase = hb_parc(1);
 
-    if (SqlParse(stmt, sqlPhrase, PARSE_ALL_QUERY))
-    {
+    if (SqlParse(stmt, sqlPhrase, PARSE_ALL_QUERY)) {
       // printf("Parse OK. Retornado array de %i posicoes.\n", stmt->pArray->item.asArray.value->ulLen);
-    }
-    else
-    {
+    } else {
       stmt->pArray = hb_itemArrayNew(0);
       // printf("Parse ERROR. Retornado array de %i posicoes.\n", stmt->pArray->item.asArray.value->ulLen);
 
-      if (HB_ISBYREF(2))
-      {
+      if (HB_ISBYREF(2)) {
         hb_itemPutNI((PHB_ITEM)hb_param(2, Harbour::Item::ANY), stmt->errMsg);
       }
-      if (HB_ISBYREF(3))
-      {
+      if (HB_ISBYREF(3)) {
         hb_itemPutNI((PHB_ITEM)hb_param(3, Harbour::Item::ANY), static_cast<int>(stmt->queryPtr - sqlIniPos));
       }
     }
@@ -111,14 +105,12 @@ HB_FUNC(SR_SQLPARSE) /* SqlParse(cCommand, @nError, @nErrorPos) */
 
 int SqlParse(sql_stmt *stmt, const char *query, int queryLen)
 {
-  if (!query)
-  {
+  if (!query) {
     stmt->errMsg = SQL_PARSER_ERROR_PARSE;
     stmt->errPtr = "";
     return 0;
   }
-  if (!queryLen)
-  {
+  if (!queryLen) {
     queryLen = strlen(query) + 1;
   }
 
@@ -127,11 +119,9 @@ int SqlParse(sql_stmt *stmt, const char *query, int queryLen)
   stmt->queryPtr = stmt->errPtr = query;
   stmt->errMsg = 0;
 
-  if (sql_yyparse((void *)stmt) || stmt->errMsg || stmt->command == -1)
-  {
+  if (sql_yyparse((void *)stmt) || stmt->errMsg || stmt->command == -1) {
     // printf("parse error in sql_yyparse\n");
-    if (!stmt->errMsg)
-    {
+    if (!stmt->errMsg) {
       stmt->errMsg = SQL_PARSER_ERROR_PARSE;
     }
     return 0;
@@ -193,19 +183,16 @@ PHB_ITEM SQLpCodeGenArrayJoin(PHB_ITEM pArray1, PHB_ITEM pArray2)
 {
   HB_SIZE nLen, n;
 
-  if (!HB_IS_ARRAY(pArray1))
-  {
+  if (!HB_IS_ARRAY(pArray1)) {
     printf("SQLpCodeGenArrayJoin Invalid param 1\n");
   }
 
-  if (!HB_IS_ARRAY(pArray2))
-  {
+  if (!HB_IS_ARRAY(pArray2)) {
     printf("SQLpCodeGenArrayJoin Invalid param 2\n");
   }
 
   nLen = hb_arrayLen(pArray2);
-  for (n = 1; n <= nLen; n++)
-  {
+  for (n = 1; n <= nLen; n++) {
     hb_arrayAddForward(pArray1, hb_arrayGetItemPtr(pArray2, n));
   }
   hb_itemRelease(pArray2);
@@ -259,8 +246,7 @@ HB_FUNC(SR_STRTOHEX)
   int i;
   int iCipher;
 
-  if (!HB_ISCHAR(1))
-  {
+  if (!HB_ISCHAR(1)) {
     hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_STRTOHEX", 1, hb_param(1, Harbour::Item::ANY));
     return;
   }
@@ -270,8 +256,7 @@ HB_FUNC(SR_STRTOHEX)
   auto outbuff = static_cast<char *>(hb_xgrab((len * 2) + 1));
   c = outbuff;
 
-  for (i = 0; i < len; i++)
-  {
+  for (i = 0; i < len; i++) {
 
     iNum = static_cast<int>(cStr[i]);
     c[0] = '0';
@@ -279,23 +264,17 @@ HB_FUNC(SR_STRTOHEX)
 
     iCipher = static_cast<int>(iNum % 16);
 
-    if (iCipher < 10)
-    {
+    if (iCipher < 10) {
       c[1] = '0' + static_cast<char>(iCipher);
-    }
-    else
-    {
+    } else {
       c[1] = 'A' + static_cast<char>(iCipher - 10);
     }
     iNum >>= 4;
 
     iCipher = iNum % 16;
-    if (iCipher < 10)
-    {
+    if (iCipher < 10) {
       c[0] = '0' + static_cast<char>(iCipher);
-    }
-    else
-    {
+    } else {
       c[0] = 'A' + static_cast<char>(iCipher - 10);
     }
 
@@ -316,8 +295,7 @@ char *sr_Hex2Str(const char *cStr, int len, int *lenOut)
   auto nalloc = static_cast<int>(len / 2);
   auto outbuff = static_cast<char *>(hb_xgrab(nalloc + 1));
 
-  for (i = 0; i < nalloc; i++)
-  {
+  for (i = 0; i < nalloc; i++) {
     // First byte
 
     c = *cStr;
@@ -325,16 +303,11 @@ char *sr_Hex2Str(const char *cStr, int len, int *lenOut)
     iNum <<= 4;
     iCipher = 0;
 
-    if (c >= '0' && c <= '9')
-    {
+    if (c >= '0' && c <= '9') {
       iCipher = static_cast<HB_ULONG>(c - '0');
-    }
-    else if (c >= 'A' && c <= 'F')
-    {
+    } else if (c >= 'A' && c <= 'F') {
       iCipher = static_cast<HB_ULONG>(c - 'A') + 10;
-    }
-    else if (c >= 'a' && c <= 'f')
-    {
+    } else if (c >= 'a' && c <= 'f') {
       iCipher = static_cast<HB_ULONG>(c - 'a') + 10;
     }
 
@@ -347,16 +320,11 @@ char *sr_Hex2Str(const char *cStr, int len, int *lenOut)
     iNum <<= 4;
     iCipher = 0;
 
-    if (c >= '0' && c <= '9')
-    {
+    if (c >= '0' && c <= '9') {
       iCipher = static_cast<HB_ULONG>(c - '0');
-    }
-    else if (c >= 'A' && c <= 'F')
-    {
+    } else if (c >= 'A' && c <= 'F') {
       iCipher = static_cast<HB_ULONG>(c - 'A') + 10;
-    }
-    else if (c >= 'a' && c <= 'f')
-    {
+    } else if (c >= 'a' && c <= 'f') {
       iCipher = static_cast<HB_ULONG>(c - 'a') + 10;
     }
 
@@ -377,8 +345,7 @@ HB_FUNC(SR_HEXTOSTR)
   char *outbuff;
   int nalloc;
 
-  if (!HB_ISCHAR(1))
-  {
+  if (!HB_ISCHAR(1)) {
     hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_HEXTOSTR", 1, hb_param(1, Harbour::Item::ANY));
     return;
   }
@@ -393,10 +360,8 @@ static HB_SIZE escape_mysql(char *to, const char *from, HB_SIZE length)
 {
   const char *to_start = to;
   const char *end;
-  for (end = from + length; from != end; from++)
-  {
-    switch (*from)
-    {
+  for (end = from + length; from != end; from++) {
+    switch (*from) {
     case 0: /* Must be escaped for 'mysql' */
       *to++ = '\\';
       *to++ = '0';
@@ -437,10 +402,8 @@ static HB_SIZE escape_single(char *to, const char *from, HB_SIZE length)
 {
   const char *to_start = to;
   const char *end;
-  for (end = from + length; from != end; from++)
-  {
-    switch (*from)
-    {
+  for (end = from + length; from != end; from++) {
+    switch (*from) {
     case '\'':
       *to++ = '\'';
       *to++ = '\'';
@@ -457,10 +420,8 @@ static HB_SIZE escape_firebird(char *to, const char *from, HB_SIZE length)
 {
   const char *to_start = to;
   const char *end;
-  for (end = from + length; from != end; from++)
-  {
-    switch (*from)
-    {
+  for (end = from + length; from != end; from++) {
+    switch (*from) {
     case '\'':
       *to++ = '\'';
       *to++ = '\'';
@@ -480,10 +441,8 @@ static HB_SIZE escape_db2(char *to, const char *from, HB_SIZE length)
 {
   const char *to_start = to;
   const char *end;
-  for (end = from + length; from != end; from++)
-  {
-    switch (*from)
-    {
+  for (end = from + length; from != end; from++) {
+    switch (*from) {
     case '\'':
       *to++ = '\'';
       *to++ = '\'';
@@ -503,10 +462,8 @@ static HB_SIZE escape_pgs(char *to, const char *from, HB_SIZE length)
 {
   const char *to_start = to;
   const char *end;
-  for (end = from + length; from != end; from++)
-  {
-    switch (*from)
-    {
+  for (end = from + length; from != end; from++) {
+    switch (*from) {
     case '\'':
       *to++ = '\'';
       *to++ = '\'';
@@ -529,10 +486,8 @@ static HB_SIZE escape_oci(char *to, const char *from, HB_SIZE length)
 {
   const char *to_start = to;
   const char *end;
-  for (end = from + length; from != end; from++)
-  {
-    switch (*from)
-    {
+  for (end = from + length; from != end; from++) {
+    switch (*from) {
     case '\'':
       *to++ = '\'';
       *to++ = '\'';
@@ -556,21 +511,17 @@ HB_FUNC(SR_ESCAPESTRING)
   iSize = hb_parclen(1);
   auto idatabase = hb_parni(2);
 
-  if (!(HB_ISCHAR(1) && HB_ISNUM(2)))
-  {
+  if (!(HB_ISCHAR(1) && HB_ISNUM(2))) {
     hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPESTRING", 2, hb_param(1, Harbour::Item::ANY),
                          hb_param(2, Harbour::Item::ANY));
     return;
   }
 
-  if (iSize)
-  {
+  if (iSize) {
     FromBuffer = hb_parc(1);
     ToBuffer = static_cast<char *>(hb_xgrab((iSize * 2) + 1));
-    if (ToBuffer)
-    {
-      switch (idatabase)
-      {
+    if (ToBuffer) {
+      switch (idatabase) {
       case SYSTEMID_MYSQL:
       case SYSTEMID_MARIADB:
         iSize = escape_mysql(ToBuffer, FromBuffer, iSize);
@@ -603,9 +554,7 @@ HB_FUNC(SR_ESCAPESTRING)
       }
     }
     hb_retclen_buffer(static_cast<char *>(ToBuffer), iSize);
-  }
-  else
-  {
+  } else {
     hb_retc("");
   }
 }
@@ -617,8 +566,7 @@ char *QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase
   ToBuffer[0] = '\'';
   ToBuffer++;
 
-  switch (idatabase)
-  {
+  switch (idatabase) {
   case SYSTEMID_MYSQL:
   case SYSTEMID_MARIADB:
     iSize = escape_mysql(ToBuffer, FromBuffer, iSize);
@@ -653,8 +601,7 @@ char *QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase
   iSize++;
   ToBuffer--;
 
-  while (bRTrim && iSize > 1 && ToBuffer[iSize - 1] == ' ')
-  {
+  while (bRTrim && iSize > 1 && ToBuffer[iSize - 1] == ' ') {
     iSize--;
   }
 
@@ -677,8 +624,7 @@ HB_FUNC(SR_ESCAPENUM)
   iSize = hb_parclen(1);
   auto FromBuffer = hb_parc(1);
 
-  if (!(HB_ISCHAR(1) && HB_ISNUM(2) && HB_ISNUM(3)))
-  {
+  if (!(HB_ISCHAR(1) && HB_ISNUM(2) && HB_ISNUM(3))) {
     hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPENUM", 3, hb_param(1, Harbour::Item::ANY),
                          hb_param(2, Harbour::Item::ANY), hb_param(3, Harbour::Item::ANY));
     return;
@@ -690,50 +636,38 @@ HB_FUNC(SR_ESCAPENUM)
   len = hb_parnl(2);
   dec = hb_parnl(3);
 
-  if (dec > 0)
-  {
+  if (dec > 0) {
     len -= (dec + 1);
   }
 
   dMultpl = 0;
   iDecPos = 0;
 
-  for (iPos = 0; iPos < iSize; iPos++)
-  {
-    if (FromBuffer[iPos] == ',')
-    {
+  for (iPos = 0; iPos < iSize; iPos++) {
+    if (FromBuffer[iPos] == ',') {
       ToBuffer[iPos] = '.';
       iDecPos = iPos;
-    }
-    else
-    {
+    } else {
       ToBuffer[iPos] = FromBuffer[iPos];
     }
 
-    if (ToBuffer[iPos] == '.')
-    {
+    if (ToBuffer[iPos] == '.') {
       bInteger = false;
       iDecPos = iPos;
     }
 
-    if (ToBuffer[iPos] == 'E' && (iPos + 2) <= iSize)
-    { // 1928773.3663E+003
+    if (ToBuffer[iPos] == 'E' && (iPos + 2) <= iSize) { // 1928773.3663E+003
       bInteger = false;
-      if (FromBuffer[iPos + 1] == '-')
-      {
+      if (FromBuffer[iPos + 1] == '-') {
         SciNot[0] = FromBuffer[iPos + 1];
-      }
-      else
-      {
+      } else {
         SciNot[0] = '0';
       }
       SciNot[1] = FromBuffer[iPos + 2];
 
-      if ((iPos + 3) <= iSize)
-      {
+      if ((iPos + 3) <= iSize) {
         SciNot[2] = FromBuffer[iPos + 3];
-        if ((iPos + 4) <= iSize)
-        {
+        if ((iPos + 4) <= iSize) {
           SciNot[3] = FromBuffer[iPos + 4];
         }
       }
@@ -749,35 +683,27 @@ HB_FUNC(SR_ESCAPENUM)
 
   ToBuffer[iSize] = '\0';
 
-  if (dMultpl > 0)
-  {
-    for (iPos = iDecPos; iPos < iSize + 32; iPos++)
-    {
-      if (ToBuffer[iPos] == '.' && dMultpl > 0 && (iPos + 1) <= iSize + 32)
-      {
+  if (dMultpl > 0) {
+    for (iPos = iDecPos; iPos < iSize + 32; iPos++) {
+      if (ToBuffer[iPos] == '.' && dMultpl > 0 && (iPos + 1) <= iSize + 32) {
         ToBuffer[iPos] = ToBuffer[iPos + 1];
         ToBuffer[iPos + 1] = '.';
         dMultpl--;
-        if (ToBuffer[iPos] == '\0' || iPos > iSize)
-        {
+        if (ToBuffer[iPos] == '\0' || iPos > iSize) {
           ToBuffer[iPos] = '0';
         }
-        if (dMultpl == 0 && ToBuffer[iPos + 2] == '\0')
-        {
+        if (dMultpl == 0 && ToBuffer[iPos + 2] == '\0') {
           ToBuffer[iPos + 1] = '\0';
           break;
         }
       }
     }
     iSize = strlen(ToBuffer);
-  }
-  else if (dMultpl < 0)
-  {
+  } else if (dMultpl < 0) {
     // Not implemented
   }
 
-  if (bInteger)
-  {
+  if (bInteger) {
 #ifndef HB_LONG_LONG_OFF
     HB_LONGLONG lValue;
 #else
@@ -786,19 +712,14 @@ HB_FUNC(SR_ESCAPENUM)
     int iOverflow;
     lValue = hb_strValInt(ToBuffer, &iOverflow);
 
-    if (!iOverflow)
-    {
+    if (!iOverflow) {
       auto dValue = static_cast<double>(lValue);
       hb_retnlen(dValue, len, dec);
-    }
-    else
-    {
+    } else {
       double dValue = hb_strVal(ToBuffer, iSize);
       hb_retnlen(dValue, len, dec);
     }
-  }
-  else
-  {
+  } else {
     double dValue = hb_strVal(ToBuffer, iSize);
     hb_retnlen(dValue, len, dec);
   }
@@ -817,50 +738,38 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
   auto ToBuffer = static_cast<char *>(hb_xgrab((iSize) + 33));
   memset(ToBuffer, 0, (iSize) + 33);
 
-  if (dec > 0)
-  {
+  if (dec > 0) {
     len -= (dec + 1);
   }
 
   dMultpl = 0;
   iDecPos = 0;
 
-  for (iPos = 0; iPos < iSize; iPos++)
-  {
-    if (FromBuffer[iPos] == ',')
-    {
+  for (iPos = 0; iPos < iSize; iPos++) {
+    if (FromBuffer[iPos] == ',') {
       ToBuffer[iPos] = '.';
       iDecPos = iPos;
-    }
-    else
-    {
+    } else {
       ToBuffer[iPos] = FromBuffer[iPos];
     }
 
-    if (ToBuffer[iPos] == '.')
-    {
+    if (ToBuffer[iPos] == '.') {
       bInteger = false;
       iDecPos = iPos;
     }
 
-    if (ToBuffer[iPos] == 'E' && (iPos + 2) <= iSize)
-    { // 1928773.3663E+003
+    if (ToBuffer[iPos] == 'E' && (iPos + 2) <= iSize) { // 1928773.3663E+003
       bInteger = false;
-      if (FromBuffer[iPos + 1] == '-')
-      {
+      if (FromBuffer[iPos + 1] == '-') {
         SciNot[0] = FromBuffer[iPos + 1];
-      }
-      else
-      {
+      } else {
         SciNot[0] = '0';
       }
       SciNot[1] = FromBuffer[iPos + 2];
 
-      if ((iPos + 3) <= iSize)
-      {
+      if ((iPos + 3) <= iSize) {
         SciNot[2] = FromBuffer[iPos + 3];
-        if ((iPos + 4) <= iSize)
-        {
+        if ((iPos + 4) <= iSize) {
           SciNot[3] = FromBuffer[iPos + 4];
         }
       }
@@ -876,35 +785,27 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
 
   ToBuffer[iSize] = '\0';
 
-  if (dMultpl > 0)
-  {
-    for (iPos = iDecPos; iPos < iSize + 32; iPos++)
-    {
-      if (ToBuffer[iPos] == '.' && dMultpl > 0 && (iPos + 1) <= iSize + 32)
-      {
+  if (dMultpl > 0) {
+    for (iPos = iDecPos; iPos < iSize + 32; iPos++) {
+      if (ToBuffer[iPos] == '.' && dMultpl > 0 && (iPos + 1) <= iSize + 32) {
         ToBuffer[iPos] = ToBuffer[iPos + 1];
         ToBuffer[iPos + 1] = '.';
         dMultpl--;
-        if (ToBuffer[iPos] == '\0' || iPos > iSize)
-        {
+        if (ToBuffer[iPos] == '\0' || iPos > iSize) {
           ToBuffer[iPos] = '0';
         }
-        if (dMultpl == 0 && ToBuffer[iPos + 2] == '\0')
-        {
+        if (dMultpl == 0 && ToBuffer[iPos + 2] == '\0') {
           ToBuffer[iPos + 1] = '\0';
           break;
         }
       }
     }
     iSize = strlen(ToBuffer);
-  }
-  else if (dMultpl < 0)
-  {
+  } else if (dMultpl < 0) {
     // Not implemented
   }
 
-  if (bInteger)
-  {
+  if (bInteger) {
 #ifndef HB_LONG_LONG_OFF
     HB_LONGLONG lValue;
 #else
@@ -913,19 +814,14 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
     int iOverflow;
     lValue = hb_strValInt(ToBuffer, &iOverflow);
 
-    if (!iOverflow)
-    {
+    if (!iOverflow) {
       auto dValue = static_cast<double>(lValue);
       hb_itemPutNLen(pRet, dValue, len, dec);
-    }
-    else
-    {
+    } else {
       double dValue = hb_strVal(ToBuffer, iSize);
       hb_itemPutNLen(pRet, dValue, len, dec);
     }
-  }
-  else
-  {
+  } else {
     double dValue = hb_strVal(ToBuffer, iSize);
     hb_itemPutNLen(pRet, dValue, len, dec);
   }
@@ -938,8 +834,7 @@ HB_FUNC(SR_DBQUALIFY)
   auto pText = hb_param(1, Harbour::Item::STRING);
   auto ulDb = hb_parni(2);
 
-  if (pText)
-  {
+  if (pText) {
     HB_SIZE ulLen, i;
 
     auto pszBuffer = hb_itemGetCPtr(pText);
@@ -950,8 +845,7 @@ HB_FUNC(SR_DBQUALIFY)
     // Postgres, MySQL and Ingres must be lowercase
     // Others, doesn't matter column case
 
-    switch (ulDb)
-    {
+    switch (ulDb) {
     case SYSTEMID_ORACLE:
     case SYSTEMID_FIREBR:
     case SYSTEMID_FIREBR3:
@@ -960,8 +854,7 @@ HB_FUNC(SR_DBQUALIFY)
     case SYSTEMID_IBMDB2:
     case SYSTEMID_ADABAS:
       szOut[0] = '"';
-      for (i = 0; i < ulLen; i++)
-      {
+      for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<char>(toupper(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       szOut[i + 1] = '"';
@@ -969,16 +862,14 @@ HB_FUNC(SR_DBQUALIFY)
     case SYSTEMID_INGRES:
     case SYSTEMID_POSTGR:
       szOut[0] = '"';
-      for (i = 0; i < ulLen; i++)
-      {
+      for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       szOut[i + 1] = '"';
       break;
     case SYSTEMID_MSSQL7:
       szOut[0] = '[';
-      for (i = 0; i < ulLen; i++)
-      {
+      for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<HB_BYTE>(pszBuffer[i]);
       }
       szOut[i + 1] = ']';
@@ -987,31 +878,26 @@ HB_FUNC(SR_DBQUALIFY)
     case SYSTEMID_OTERRO:
     case SYSTEMID_MARIADB:
       szOut[0] = '`';
-      for (i = 0; i < ulLen; i++)
-      {
+      for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       szOut[i + 1] = '`';
       break;
     case SYSTEMID_INFORM:
-      for (i = 0; i < ulLen; i++)
-      {
+      for (i = 0; i < ulLen; i++) {
         szOut[i] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       ulLen -= 2;
       break;
     default:
       szOut[0] = '"';
-      for (i = 0; i < ulLen; i++)
-      {
+      for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<HB_BYTE>(pszBuffer[i]);
       }
       szOut[i + 1] = '"';
     }
     hb_retclen_buffer(szOut, ulLen + 2);
-  }
-  else
-  {
+  } else {
     hb_errRT_BASE_SubstR(EG_ARG, 1102, nullptr, "SR_DBQUALIFY", 1, hb_paramError(1));
   }
 }
@@ -1048,8 +934,7 @@ HB_BOOL hb_arraySetL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_BOOL lVal)
 
 HB_BOOL SR_itemEmpty(PHB_ITEM pItem)
 {
-  switch (hb_itemType(pItem))
-  {
+  switch (hb_itemType(pItem)) {
   case Harbour::Item::ARRAY: {
     return hb_arrayLen(pItem) == 0;
   }
@@ -1088,8 +973,7 @@ HB_BOOL SR_itemEmpty(PHB_ITEM pItem)
   }
   case Harbour::Item::SYMBOL: {
     PHB_SYMB pSym = hb_itemGetSymbol(pItem);
-    if (pSym && (pSym->scope.value & HB_FS_DEFERRED) && pSym->pDynSym)
-    {
+    if (pSym && (pSym->scope.value & HB_FS_DEFERRED) && pSym->pDynSym) {
       pSym = hb_dynsymSymbol(pSym->pDynSym);
     }
     return pSym == nullptr || pSym->value.pFunPtr == nullptr;
@@ -1114,10 +998,8 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
 
   if (SR_itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
       (((nSystemID == SYSTEMID_POSTGR) && HB_IS_DATE(pFieldData)) ||
-       ((nSystemID != SYSTEMID_POSTGR) && (!HB_IS_LOGICAL(pFieldData)))))
-  {
-    if (bNullable || HB_IS_DATE(pFieldData))
-    {
+       ((nSystemID != SYSTEMID_POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
+    if (bNullable || HB_IS_DATE(pFieldData)) {
       sValue = static_cast<char *>(hb_xgrab(5));
       sValue[0] = 'N';
       sValue[1] = 'U';
@@ -1126,9 +1008,7 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
       sValue[4] = '\0';
       *bNullArgument = true;
       return sValue;
-    }
-    else
-    {
+    } else {
 #if 0 // TODO: old code for reference (to be deleted)
          if( HB_IS_STRING(pFieldData) && bTCCompat ) {
             sValue = QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false, &iSizeOut);
@@ -1147,18 +1027,14 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
             return sValue;
          }
 #endif
-      switch (hb_itemType(pFieldData))
-      {
+      switch (hb_itemType(pFieldData)) {
       case Harbour::Item::STRING:
       case Harbour::Item::MEMO: {
-        if (bTCCompat)
-        {
+        if (bTCCompat) {
           sValue = QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false,
                                          &iSizeOut);
           return sValue;
-        }
-        else
-        {
+        } else {
           sValue = static_cast<char *>(hb_xgrab(4));
           sValue[0] = '\'';
           sValue[1] = ' ';
@@ -1250,8 +1126,7 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
       }
    }
 #endif
-  switch (hb_itemType(pFieldData))
-  {
+  switch (hb_itemType(pFieldData)) {
   case Harbour::Item::STRING:
   case Harbour::Item::MEMO: {
     sValue =
@@ -1264,14 +1139,11 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
     sValue = hb_itemStr(pFieldData, pFieldLen, pFieldDec);
     iTrim = 0;
     iSize = 15;
-    while (sValue[iTrim] == ' ')
-    {
+    while (sValue[iTrim] == ' ') {
       iTrim++;
     }
-    if (iTrim > 0)
-    {
-      for (iPos = 0; iPos + iTrim < iSize; iPos++)
-      {
+    if (iTrim > 0) {
+      for (iPos = 0; iPos + iTrim < iSize; iPos++) {
         sValue[iPos] = sValue[iPos + iTrim];
       }
       sValue[iPos] = '\0';
@@ -1281,18 +1153,15 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
   case Harbour::Item::DATE: {
     hb_dateDecStr(sDate, hb_itemGetDL(pFieldData));
     sValue = static_cast<char *>(hb_xgrab(30));
-    switch (nSystemID)
-    {
+    switch (nSystemID) {
     case SYSTEMID_ORACLE: {
-      if (!bMemo)
-      {
+      if (!bMemo) {
         sprintf(sValue, "TO_DATE(\'%s\',\'YYYYMMDD\')", sDate);
         return sValue;
       }
     }
     default: {
-      if (!bMemo)
-      {
+      if (!bMemo) {
         sprintf(sValue, "\'%s\'", sDate);
         return sValue;
       }
@@ -1302,10 +1171,8 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
   }
   case Harbour::Item::LOGICAL: {
     sValue = static_cast<char *>(hb_xgrab(6));
-    if (hb_itemGetL(pFieldData))
-    {
-      switch (nSystemID)
-      {
+    if (hb_itemGetL(pFieldData)) {
+      switch (nSystemID) {
       case SYSTEMID_POSTGR: {
         sValue[0] = 't';
         sValue[1] = 'r';
@@ -1326,11 +1193,8 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
         sValue[1] = '\0';
       }
       }
-    }
-    else
-    {
-      switch (nSystemID)
-      {
+    } else {
+      switch (nSystemID) {
       case SYSTEMID_POSTGR: {
         sValue[0] = 'f';
         sValue[1] = 'a';

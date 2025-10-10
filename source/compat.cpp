@@ -48,11 +48,9 @@
 
 void TraceLog(const char *szFile, const char *szTraceMsg, ...)
 {
-  if (szTraceMsg)
-  {
+  if (szTraceMsg) {
     FILE *hFile = hb_fopen(szFile ? szFile : "trace.log", "a");
-    if (hFile)
-    {
+    if (hFile) {
       va_list ap;
       va_start(ap, szTraceMsg);
       vfprintf(hFile, szTraceMsg, ap);

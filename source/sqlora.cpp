@@ -78,8 +78,7 @@ const char *_sqlo_sqloraID = "$Id$";
 #define FREE(_p)                                                                                                       \
   {                                                                                                                    \
     void **l_p = (void **)&(_p);                                                                                       \
-    if (*l_p != nullptr)                                                                                               \
-    {                                                                                                                  \
+    if (*l_p != nullptr) {                                                                                             \
       g_free(*l_p);                                                                                                    \
       *l_p = nullptr;                                                                                                  \
     }                                                                                                                  \
@@ -90,8 +89,7 @@ const char *_sqlo_sqloraID = "$Id$";
 #define FREE(_p)                                                                                                       \
   {                                                                                                                    \
     void **l_p = (void **)&(_p);                                                                                       \
-    if (*l_p != nullptr)                                                                                               \
-    {                                                                                                                  \
+    if (*l_p != nullptr) {                                                                                             \
       free(*l_p);                                                                                                      \
       *l_p = nullptr;                                                                                                  \
     }                                                                                                                  \
@@ -143,28 +141,20 @@ const char *_sqlo_sqloraID = "$Id$";
 
 #ifdef DEBUG_XGRAB
 #define XFREE(p, i)                                                                                                    \
-  do                                                                                                                   \
-  {                                                                                                                    \
-    if (p)                                                                                                             \
-    {                                                                                                                  \
+  do {                                                                                                                 \
+    if (p) {                                                                                                           \
       TraceLog(LOGFILE, "Pointer %p freed in line %i\n", p, i);                                                        \
       hb_xfree(p);                                                                                                     \
-    }                                                                                                                  \
-    else                                                                                                               \
-    {                                                                                                                  \
+    } else {                                                                                                           \
       TraceLog(LOGFILE, "NULL pointer free at sqlora.c line %i \n", i);                                                \
     }                                                                                                                  \
   } while (0)
 #else
 #define XFREE(p, i)                                                                                                    \
-  do                                                                                                                   \
-  {                                                                                                                    \
-    if (p)                                                                                                             \
-    {                                                                                                                  \
+  do {                                                                                                                 \
+    if (p) {                                                                                                           \
       hb_xfree(p);                                                                                                     \
-    }                                                                                                                  \
-    else                                                                                                               \
-    {                                                                                                                  \
+    } else {                                                                                                           \
       TraceLog(LOGFILE, "NULL pointer free at sqlora.c line %i \n", i);                                                \
     }                                                                                                                  \
   } while (0)
@@ -209,8 +199,7 @@ using sqlo_thread_t = unsigned long; /* dummy */
  * @param _cmd I - The code to execute
  */
 #define EXEC_WHEN_THREADING(_cmd)                                                                                      \
-  if (THREADS_ENABLED && OCI_THREADED == _oci_init_mode)                                                               \
-  {                                                                                                                    \
+  if (THREADS_ENABLED && OCI_THREADED == _oci_init_mode) {                                                             \
     _cmd                                                                                                               \
   }
 
@@ -303,8 +292,7 @@ enum _sqlora_constants
  * TRACE(3, fprintf(g_ftp, "Calling foo()\n"););
  */
 #define TRACE(p_trace_level, p_cmd)                                                                                    \
-  if (TRACE_ENABLED && (nullptr != _trace_fp) && (_trace_level >= p_trace_level))                                      \
-  {                                                                                                                    \
+  if (TRACE_ENABLED && (nullptr != _trace_fp) && (_trace_level >= p_trace_level)) {                                    \
     {p_cmd}(void)fflush(_trace_fp);                                                                                    \
   }
 
@@ -321,8 +309,7 @@ enum _sqlora_constants
   {                                                                                                                    \
     int l_dbh = p_dbh;                                                                                                 \
     CONST char *l_func = p_func;                                                                                       \
-    if (!VALID_DBH_RANGE(l_dbh) || !_dbv[l_dbh] || !_dbv[l_dbh]->used)                                                 \
-    {                                                                                                                  \
+    if (!VALID_DBH_RANGE(l_dbh) || !_dbv[l_dbh] || !_dbv[l_dbh]->used) {                                               \
       TRACE(1, fprintf(_trace_fp, "Invalid Database handle %d in %s\n", l_dbh, l_func););                              \
       /* make sure we release all locks */                                                                             \
       UNLOCK_ALL;                                                                                                      \
@@ -342,8 +329,7 @@ enum _sqlora_constants
  */
 #define CHECK_STHANDLE(p_stp, p_sth, p_func, p_errval)                                                                 \
   {                                                                                                                    \
-    if (nullptr == (p_stp = _sth2stp(p_sth, p_func)) || !p_stp->used)                                                  \
-    {                                                                                                                  \
+    if (nullptr == (p_stp = _sth2stp(p_sth, p_func)) || !p_stp->used) {                                                \
       return p_errval;                                                                                                 \
     }                                                                                                                  \
   }
@@ -365,8 +351,7 @@ enum _sqlora_constants
     int l_stat = p_stat;                                                                                               \
     (l_dbp)->status = p_stat;                                                                                          \
     TRACE(4, fprintf(_get_trace_fp(l_dbp), "CHECK_OCI_STATUS[%u]: %d at %d\n", l_dbp->dbh, l_stat, __LINE__););        \
-    if (OCI_SUCCESS != l_stat && OCI_STILL_EXECUTING != l_stat)                                                        \
-    {                                                                                                                  \
+    if (OCI_SUCCESS != l_stat && OCI_STILL_EXECUTING != l_stat) {                                                      \
       _save_oci_status(l_dbp, p_action, p_object, __LINE__);                                                           \
     }                                                                                                                  \
   }
@@ -387,8 +372,7 @@ enum _sqlora_constants
     sqlo_db_struct_ptr_t l_dbp2 = p_dbp;                                                                               \
     int l_stat2 = p_stat;                                                                                              \
     CHECK_OCI_STATUS(l_dbp2, l_stat2, p_action, p_object);                                                             \
-    if (OCI_SUCCESS != l_stat2)                                                                                        \
-    {                                                                                                                  \
+    if (OCI_SUCCESS != l_stat2) {                                                                                      \
       UNLOCK_ALL;                                                                                                      \
       return l_stat2;                                                                                                  \
     }                                                                                                                  \
@@ -942,8 +926,7 @@ char *DEFUN(strdup, (s), const char *s)
 {
   auto n = static_cast<char *>(MALLOC(sizeof(char) * (strlen(s) + 1)));
   TRACE(4, fprintf(_trace_fp, "strdup: Allocated %d bytes\n", (strlen(s) + 1)););
-  if (n)
-  {
+  if (n) {
     strcpy(n, s);
   }
   return n;
@@ -992,12 +975,9 @@ static inline int DEFUN(_mutex_init, (mutex), sqlo_mutex_t *mutex)
 #else
 #ifdef ENABLE_WINTHREADS
 
-  if ((*mutex = CreateMutex(nullptr, FALSE, nullptr)) != nullptr)
-  {
+  if ((*mutex = CreateMutex(nullptr, FALSE, nullptr)) != nullptr) {
     status = SQLO_SUCCESS;
-  }
-  else
-  {
+  } else {
     status = SQLO_ERROR;
   }
 
@@ -1108,8 +1088,7 @@ static inline int DEFUN_VOID(_init_init_mux)
 
 #ifdef ENABLE_THREADS
 
-  if (_init_mux_initialized)
-  {
+  if (_init_mux_initialized) {
     return status;
   }
 
@@ -1124,20 +1103,16 @@ static inline int DEFUN_VOID(_init_init_mux)
 #else
 #ifdef ENABLE_WINTHREADS
 
-  if ((_init_mux = CreateMutex(nullptr, FALSE, nullptr)) != nullptr)
-  {
+  if ((_init_mux = CreateMutex(nullptr, FALSE, nullptr)) != nullptr) {
     status = SQLO_SUCCESS;
-  }
-  else
-  {
+  } else {
     status = SQLO_ERROR;
   }
 
 #endif
 #endif
 
-  if (status == SQLO_SUCCESS)
-  {
+  if (status == SQLO_SUCCESS) {
     _init_mux_initialized = 1;
   }
 
@@ -1163,19 +1138,13 @@ static inline int DEFUN(_winmutex_lock, (mp), sqlo_mutex_t mp)
   int stat;
   int locked = FALSE;
 
-  do
-  {
+  do {
     stat = WaitForSingleObject(mp, MUTEX_WAIT_TIME);
 
-    if (stat == WAIT_OBJECT_0)
-    {
+    if (stat == WAIT_OBJECT_0) {
       locked = TRUE;
-    }
-    else if (stat == WAIT_ABANDONED)
-    {
-    }
-    else
-    {
+    } else if (stat == WAIT_ABANDONED) {
+    } else {
       locked = FALSE;
     }
 
@@ -1447,16 +1416,12 @@ static int DEFUN(_find_free_dbv_entry, (free_idx), unsigned int *free_idxp)
   first_null_idx = -1; /* -1 marks the variable as not set */
 
   /* Scan the _dbv array until we found an unused slot */
-  for (dbv_idx = 0; dbv_idx < _dbv_size && found_unused == FALSE; ++dbv_idx)
-  {
+  for (dbv_idx = 0; dbv_idx < _dbv_size && found_unused == FALSE; ++dbv_idx) {
 
-    if ((_dbv[dbv_idx]) && (!_dbv[dbv_idx]->used))
-    { /* free slot found */
+    if ((_dbv[dbv_idx]) && (!_dbv[dbv_idx]->used)) { /* free slot found */
       *free_idxp = dbv_idx;
       found_unused = TRUE;
-    }
-    else if (-1 == first_null_idx && !_dbv[dbv_idx])
-    {
+    } else if (-1 == first_null_idx && !_dbv[dbv_idx]) {
       first_null_idx = dbv_idx;
     }
   }
@@ -1465,16 +1430,13 @@ static int DEFUN(_find_free_dbv_entry, (free_idx), unsigned int *free_idxp)
    * we have and empty slot (first_null_idx >= 0) or we found
    * nothing
    */
-  if (found_unused || first_null_idx >= 0)
-  {
+  if (found_unused || first_null_idx >= 0) {
     status = SQLO_SUCCESS;
 
     /* return the index of the first null slot if no unused one was found */
     if (FALSE == found_unused)
       *free_idxp = first_null_idx;
-  }
-  else
-  {
+  } else {
     status = SQLO_ERROR;
   }
 
@@ -1498,8 +1460,7 @@ static int DEFUN(_db_alloc, (dbv_idx), unsigned int dbv_idx)
 
   _dbv[dbv_idx] = (sqlo_db_struct_t *)hb_xgrabDebug(__LINE__, sizeof(sqlo_db_struct_t));
 
-  if (_dbv[dbv_idx])
-  {
+  if (_dbv[dbv_idx]) {
     TRACE(4, fprintf(_trace_fp, "_db_add: Allocated %d bytes\n", static_cast<int>(sizeof(sqlo_db_struct_t))););
 
     /* initialize the db structure */
@@ -1520,8 +1481,7 @@ static int DEFUN(_db_alloc, (dbv_idx), unsigned int dbv_idx)
 static int DEFUN(_stmtv_alloc, (dbv_idx), unsigned int dbv_idx)
 {
   /* allocate the stmtv arrays in the _dbv */
-  if (nullptr == _dbv[dbv_idx]->stmtv)
-  {
+  if (nullptr == _dbv[dbv_idx]->stmtv) {
     TRACE(4, fprintf(_trace_fp, "_stmtv_alloc: Alloc stmtv for %d cursors at %u\n", _max_cursors, dbv_idx););
 
     _dbv[dbv_idx]->stmtv =
@@ -1555,17 +1515,14 @@ static sqlo_db_struct_ptr_t DEFUN_VOID(_db_add)
 
   status = _find_free_dbv_entry(&free_idx);
 
-  if (status != SQLO_SUCCESS)
-  {                                      /* no more slots available? */
+  if (status != SQLO_SUCCESS) {          /* no more slots available? */
     EXEC_WHEN_THREADING(_dbv_unlock();); /* end of critical section */
     return nullptr;
   }
 
   /* If the slot is not allocated yet, we do it first */
-  if (!_dbv[free_idx])
-  {
-    if (SQLO_SUCCESS != _db_alloc(free_idx))
-    {
+  if (!_dbv[free_idx]) {
+    if (SQLO_SUCCESS != _db_alloc(free_idx)) {
       EXEC_WHEN_THREADING(_dbv_unlock();); /* end of critical section */
       return nullptr;
     }
@@ -1582,10 +1539,8 @@ static sqlo_db_struct_ptr_t DEFUN_VOID(_db_add)
   EXEC_WHEN_THREADING(_dbv[free_idx]->thread_id = _get_thread_id(););
 
   /* allocate the stmtv arrays in the _dbv */
-  if (nullptr == _dbv[free_idx]->stmtv)
-  {
-    if (SQLO_SUCCESS != _stmtv_alloc(free_idx))
-    {
+  if (nullptr == _dbv[free_idx]->stmtv) {
+    if (SQLO_SUCCESS != _stmtv_alloc(free_idx)) {
       return nullptr;
     }
   }
@@ -1604,8 +1559,7 @@ static sqlo_db_struct_ptr_t DEFUN_VOID(_db_add)
 static inline void DEFUN(_stmt_release, (stp), sqlo_stmt_struct_ptr_t stp)
 {
 
-  if (stp)
-  {
+  if (stp) {
     stp->used = FALSE;
     stp->opened = FALSE;
     stp->prepared = FALSE;
@@ -1634,33 +1588,27 @@ static void DEFUN(_db_release, (dbp), sqlo_db_struct_ptr_t dbp)
   OCIThreadIdDestroy(dbp->envhp, dbp->errhp, &dbp->thread_id);
 #endif
 
-  if (dbp->srvhp)
-  {
+  if (dbp->srvhp) {
     (void)OCIHandleFree((dvoid *)dbp->srvhp, OCI_HTYPE_SERVER);
   }
 
-  if (dbp->svchp)
-  {
+  if (dbp->svchp) {
     (void)OCIHandleFree((dvoid *)dbp->svchp, OCI_HTYPE_SVCCTX);
   }
 
-  if (dbp->errhp)
-  {
+  if (dbp->errhp) {
     (void)OCIHandleFree((dvoid *)dbp->errhp, OCI_HTYPE_ERROR);
   }
 
-  if (dbp->authp)
-  {
+  if (dbp->authp) {
     (void)OCIHandleFree((dvoid *)dbp->authp, OCI_HTYPE_SESSION);
   }
 
-  if (dbp->envhp)
-  {
+  if (dbp->envhp) {
     (void)OCIHandleFree((dvoid *)dbp->envhp, OCI_HTYPE_ENV);
   }
 
-  if (dbp->tnsname)
-  {
+  if (dbp->tnsname) {
     XFREE(dbp->tnsname, __LINE__);
   }
 
@@ -1681,13 +1629,11 @@ static void DEFUN(_db_release, (dbp), sqlo_db_struct_ptr_t dbp)
   dbp->status = 0;
 
   /* release all sths */
-  for (i = 0; i < dbp->stmtv_size; ++i)
-  {
+  for (i = 0; i < dbp->stmtv_size; ++i) {
     _stmt_release(&(dbp->stmtv[i]));
   }
 
-  if (dbp->stmtv)
-  {
+  if (dbp->stmtv) {
     XFREE(dbp->stmtv, __LINE__);
   }
   dbp->stmtv = nullptr;
@@ -1710,10 +1656,8 @@ static void DEFUN(_bindpv_reset, (stp), sqlo_stmt_struct_ptr_t stp)
 {
   unsigned int bindp_idx;
 
-  if (stp)
-  {
-    for (bindp_idx = 0; bindp_idx < stp->num_bindpv; ++bindp_idx)
-    {
+  if (stp) {
+    for (bindp_idx = 0; bindp_idx < stp->num_bindpv; ++bindp_idx) {
       stp->bindpv[bindp_idx] = nullptr;
     }
 
@@ -1754,19 +1698,16 @@ static sqlo_stmt_struct_ptr_t DEFUN(_get_stmt_ptr, (dbp), const_sqlo_db_struct_p
   TRACE(4, fprintf(_get_trace_fp(dbp), "_get_stmt_ptr: stmtv_size=%d\n", dbp->stmtv_size););
 
   /* check for initialization */
-  if ((!_sqlo_init) || (dbp->stmtv_size <= 0))
-  {
+  if ((!_sqlo_init) || (dbp->stmtv_size <= 0)) {
     return nullptr;
   }
 
   /* we need to check first if there is an unused allocated slot */
   found_free = FALSE;
 
-  for (stmt_idx = 0, stp = dbp->stmtv; stmt_idx < dbp->stmtv_size; ++stmt_idx, ++stp)
-  {
+  for (stmt_idx = 0, stp = dbp->stmtv; stmt_idx < dbp->stmtv_size; ++stmt_idx, ++stp) {
 
-    if (!stp->used)
-    { /* free entry found */
+    if (!stp->used) { /* free entry found */
       found_free = TRUE;
       break;
     }
@@ -1774,14 +1715,11 @@ static sqlo_stmt_struct_ptr_t DEFUN(_get_stmt_ptr, (dbp), const_sqlo_db_struct_p
 
   TRACE(4, fprintf(_get_trace_fp(dbp), "_get_stmt_ptr: found_free=%d, stmt_idx=%d\n", found_free, stmt_idx););
 
-  if (found_free)
-  {
+  if (found_free) {
     TRACE(3, fprintf(_get_trace_fp(dbp), "_get_stmt_ptr: Reusing handle %u\n", stmt_idx););
     stp->sth = stmt_idx;
     stp->used = TRUE;
-  }
-  else
-  {
+  } else {
     stp = nullptr;
   }
 
@@ -1808,22 +1746,17 @@ static int DEFUN(_stmt_init, (stp, dbp, stmt),
   stp->num_executions = 0;
   stp->cursor_type = DEFAULT;
 
-  if (!stp->stmtid)
-  {
+  if (!stp->stmtid) {
     stp->stmtid = stmtidcounter++;
   }
 
-  if (!stp->stmt)
-  {
-    if (MIN_STMT_SIZE > len)
-    {
+  if (!stp->stmt) {
+    if (MIN_STMT_SIZE > len) {
       len = MIN_STMT_SIZE;
     }
     stp->stmt = static_cast<char *>(hb_xgrabDebug(__LINE__, sizeof(char) * len));
     stp->stmt_size = len;
-  }
-  else if (stp->stmt_size < len)
-  {
+  } else if (stp->stmt_size < len) {
     stp->stmt = static_cast<char *>(hb_xreallocDebug(__LINE__, stp->stmt, sizeof(char) * len));
     stp->stmt_size = len;
   }
@@ -1848,16 +1781,14 @@ static int DEFUN(_stmt_new, (dbp, stmt, stpp),
 
   stp = _get_stmt_ptr(dbp);
 
-  if (!stp)
-  {
+  if (!stp) {
     sprintf(dbp->errmsg, "*** FATAL *** : allocation of statement failed");
     dbp->status = SQLO_ERRMALLOC;
     return dbp->status;
   }
 
   /* init the structure */
-  if (SQLO_SUCCESS != (dbp->status = _stmt_init(stp, dbp, stmt)))
-  {
+  if (SQLO_SUCCESS != (dbp->status = _stmt_init(stp, dbp, stmt))) {
     _stmt_release(stp);
     return dbp->status;
   }
@@ -1867,12 +1798,9 @@ static int DEFUN(_stmt_new, (dbp, stmt, stpp),
    */
   dbp->status = OCIHandleAlloc((dvoid *)dbp->envhp, (dvoid **)&stp->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
-  if (dbp->status != OCI_SUCCESS)
-  {
+  if (dbp->status != OCI_SUCCESS) {
     _stmt_release(stp);
-  }
-  else
-  {
+  } else {
     *stpp = stp;
   }
 
@@ -1908,29 +1836,22 @@ static int DEFUN(_alloc_bindp, (stp, size), sqlo_stmt_struct_ptr_t stp AND unsig
   TRACE(4, fprintf(_get_trace_fp(dbp), "_alloc_bindp: alloc sth: %u bindpv_size: %u, req. size: %u\n", stp->sth,
                    stp->bindpv_size, size););
 
-  if (size > stp->bindpv_size)
-  {
+  if (size > stp->bindpv_size) {
 
     /* allocate MIN_BINDP to avoid a lot of reallocations */
-    if (size <= MIN_BINDP)
-    {
+    if (size <= MIN_BINDP) {
       size = MIN_BINDP;
-    }
-    else
-    {
+    } else {
       size = 2 * size;
     }
 
-    if (0 == stp->bindpv_size)
-    { /* complety empty ? */
+    if (0 == stp->bindpv_size) { /* complety empty ? */
 
       TRACE(4, fprintf(_get_trace_fp(dbp), "_alloc_bindp: alloc sth: %u to %u elements\n", stp->sth, size););
 
       stp->bindpv = (OCIBind **)hb_xgrabDebug(__LINE__, sizeof(OCIBind *) * size);
       stp->indpv = (short *)hb_xgrabDebug(__LINE__, sizeof(short) * size);
-    }
-    else
-    {
+    } else {
 
       TRACE(4, fprintf(_get_trace_fp(dbp), "_alloc_bindpv: realloc sth: %u to %u elements\n", stp->sth, size););
 
@@ -1973,8 +1894,7 @@ static void DEFUN(_dealloc_bindp, (stp), sqlo_stmt_struct_ptr_t stp)
   TRACE(4,
         fprintf(_get_trace_fp(dbp), "_dealloc_bindp: dealloc sth: %u bindpv_size: %u\n", stp->sth, stp->bindpv_size););
 
-  if (stp->bindpv_size > 0)
-  {
+  if (stp->bindpv_size > 0) {
     assert(stp->bindpv != nullptr);
     assert(stp->indpv != nullptr);
 
@@ -2012,25 +1932,20 @@ static int DEFUN(_alloc_definep, (stp, size), sqlo_stmt_struct_ptr_t stp AND uns
 
   dbp->status = SQLO_SUCCESS;
 
-  if (size > stp->defnpv_size)
-  { /* not enough space? */
+  if (size > stp->defnpv_size) { /* not enough space? */
 
     /* allocate always a mininum of MIN_DEFNP elements.
      * Beyond this lower bound we take 2*size to avoid lots of reallocation
      * during sqlo_define_by_pos
      */
-    if (size <= MIN_DEFNP)
-    {
+    if (size <= MIN_DEFNP) {
       size = MIN_DEFNP;
-    }
-    else
-    {
+    } else {
       size = 2 * size;
     }
 
     /* complety empty ? --> MALLOC, else REALLOC*/
-    if (0 == stp->defnpv_size)
-    {
+    if (0 == stp->defnpv_size) {
       TRACE(4, fprintf(_get_trace_fp(dbp), "_alloc_definep: alloc sth: %u for %u columns\n", stp->sth, size););
 
       stp->defnpv = (OCIDefine **)hb_xgrabDebug(__LINE__, sizeof(OCIDefine *) * size);
@@ -2041,9 +1956,7 @@ static int DEFUN(_alloc_definep, (stp, size), sqlo_stmt_struct_ptr_t stp AND uns
       stp->rlenv = (ub4 *)hb_xgrabDebug(__LINE__, sizeof(ub4) * size);
       stp->ocol_namev = (char **)hb_xgrabDebug(__LINE__, sizeof(char *) * size);
       stp->ocol_namev_size = (unsigned int *)hb_xgrabDebug(__LINE__, sizeof(ub4) * size);
-    }
-    else
-    {
+    } else {
       TRACE(4, fprintf(_get_trace_fp(dbp), "_alloc_definep: realloc sth: %u to %u elements\n", stp->sth, size););
 
       stp->defnpv = (OCIDefine **)hb_xreallocDebug(__LINE__, stp->defnpv, sizeof(OCIDefine *) * size);
@@ -2098,8 +2011,7 @@ static void DEFUN(_dealloc_definep, (stp), sqlo_stmt_struct_ptr_t stp)
   TRACE(4, fprintf(_get_trace_fp(dbp), "_dealloc_definep: dealloc sth: %u defnpv_size: %u\n", stp->sth,
                    stp->defnpv_size););
 
-  if (stp->defnpv_size > 0)
-  {
+  if (stp->defnpv_size > 0) {
     assert(stp->defnpv != nullptr);
     assert(stp->ocolsv != nullptr);
     assert(stp->outv != nullptr);
@@ -2110,22 +2022,18 @@ static void DEFUN(_dealloc_definep, (stp), sqlo_stmt_struct_ptr_t stp)
     assert(stp->ocol_namev_size != nullptr);
 
     /* free all column names */
-    for (col_idx = 0; col_idx < stp->defnpv_size; ++col_idx)
-    {
-      if (stp->ocolsv[col_idx].col_name)
-      {
+    for (col_idx = 0; col_idx < stp->defnpv_size; ++col_idx) {
+      if (stp->ocolsv[col_idx].col_name) {
         XFREE(stp->ocolsv[col_idx].col_name, __LINE__);
       }
 
-      if (stp->ocolsv[col_idx].loblp)
-      {
+      if (stp->ocolsv[col_idx].loblp) {
         // TraceLog(LOGFILE, "col %i, OCIDescriptorFree 1 %p\n", col_idx, stp->ocolsv[col_idx].loblp);
         OCIDescriptorFree((dvoid **)&(stp->ocolsv[col_idx].loblp), (ub4)OCI_DTYPE_LOB);
         stp->ocolsv[col_idx].loblp = nullptr;
       }
 
-      if (stp->outv[col_idx])
-      {
+      if (stp->outv[col_idx]) {
         XFREE(stp->outv[col_idx], __LINE__);
         stp->outv[col_idx] = nullptr;
         stp->outv_size[col_idx] = 0;
@@ -2175,17 +2083,14 @@ static int DEFUN_VOID(_sqlo_getenv)
   /*
    * Get the parameters from the environment
    */
-  for (i = 0; g_params[i].name; i++)
-  {
+  for (i = 0; g_params[i].name; i++) {
     sprintf(vname, "SQLORA_%s", g_params[i].name);
 
     ep = getenv(vname);
 
-    if (nullptr != ep && strlen(ep))
-    {
+    if (nullptr != ep && strlen(ep)) {
 
-      switch (g_params[i].vtyp)
-      {
+      switch (g_params[i].vtyp) {
 
       case INTEGER:
         if (g_params[i].value)
@@ -2222,8 +2127,7 @@ static int DEFUN_VOID(_open_global_trace_file)
   if (_trace_fp)
     return SQLO_SUCCESS;
 
-  if (nullptr == (_trace_fp = fopen(_trace_file, "w")))
-  {
+  if (nullptr == (_trace_fp = fopen(_trace_file, "w"))) {
     fprintf(stderr, "Cannot open %s (errno=%d)\n", _trace_file, errno);
     return SQLO_ERROR;
   }
@@ -2274,8 +2178,7 @@ static int DEFUN(_open_session_trace_file, (dbp), sqlo_db_struct_ptr_t dbp)
   /* construct the trace filename */
   sprintf(trace_file, "%s%u", _trace_file, _session_count);
 
-  if (nullptr == (dbp->trace_fp = fopen(trace_file, "w")))
-  {
+  if (nullptr == (dbp->trace_fp = fopen(trace_file, "w"))) {
     fprintf(stderr, "Cannot open %s (errno=%d)\n", trace_file, errno);
     return SQLO_ERROR;
   }
@@ -2296,8 +2199,7 @@ static int DEFUN(_close_session_trace_file, (dbp), sqlo_db_struct_ptr_t dbp)
 {
   int stat = SQLO_SUCCESS;
 
-  if (dbp->trace_fp)
-  {
+  if (dbp->trace_fp) {
     stat = fclose(dbp->trace_fp);
     dbp->trace_fp = nullptr;
   }
@@ -2332,11 +2234,9 @@ static int DEFUN(_save_oci_status, (dbp, action, object, lineno),
 
   *errbuf = '\0';
   dbp->errcode = dbp->status; /* preset with something usefull */
-  TRACE(
-      3, if (dbp->status != OCI_SUCCESS) { fprintf(_get_trace_fp(dbp),            "_save_oci_status: %d\n", dbp->status); });
+  TRACE(3, if (dbp->status != OCI_SUCCESS) { fprintf(_get_trace_fp(dbp), "_save_oci_status: %d\n", dbp->status); });
 
-  switch (dbp->status)
-  {
+  switch (dbp->status) {
 
   case OCI_SUCCESS:
     break;
@@ -2430,21 +2330,16 @@ static int DEFUN(_save_oci_status, (dbp, action, object, lineno),
   }
 
 #ifndef NDEBUG
-  if ((len = strlen(dbp->errmsg) + strlen(action) + strlen(object) + 40) > SQLO_MAX_ERRMSG_LEN)
-  {
+  if ((len = strlen(dbp->errmsg) + strlen(action) + strlen(object) + 40) > SQLO_MAX_ERRMSG_LEN) {
     len = SQLO_MAX_ERRMSG_LEN - strlen(dbp->errmsg) - strlen(action) - 40;
-  }
-  else
-  {
+  } else {
     len = static_cast<unsigned int>(strlen(object));
   }
 
-  if (strlen(action))
-  {
+  if (strlen(action)) {
     sprintf(&dbp->errmsg[strlen(dbp->errmsg)], "\nSQL error while doing %s", action);
 
-    if (len)
-    {
+    if (len) {
       sprintf(&dbp->errmsg[strlen(dbp->errmsg)], " on:\n\"%*.*s\"", static_cast<int>(len), static_cast<int>(len),
               object);
     }
@@ -2456,8 +2351,7 @@ static int DEFUN(_save_oci_status, (dbp, action, object, lineno),
   {
     char c = 0;
     len = 0;
-    if (len > 0)
-    {
+    if (len > 0) {
       c = *action;
       c = *object;
     }
@@ -2478,8 +2372,7 @@ static int DEFUN(_save_oci_status, (dbp, action, object, lineno),
  */
 static const char *DEFUN(_get_stmt_type_str, (stype), int stype)
 {
-  switch (stype)
-  {
+  switch (stype) {
 
   case OCI_STMT_SELECT:
     return "SELECT";
@@ -2585,8 +2478,7 @@ static inline int DEFUN(_is_opened, (stp), sqlo_stmt_struct_ptr_t stp)
 static const char *DEFUN(_get_data_type_str, (dtype), int dtype)
 {
   /* the constants are defined in ocidfn.h */
-  switch (dtype)
-  {
+  switch (dtype) {
   case SQLT_CHR:
     return "character string";
   case SQLT_NUM:
@@ -2742,11 +2634,9 @@ static inline int DEFUN(_bind_by_pos, (stp, param_pos, param_type, param_addr, p
 
   dbp = stp->dbp;
 
-  if (_is_prepared(stp))
-  {
+  if (_is_prepared(stp)) {
     /* make sure we have enough memory */
-    if (param_pos > stp->bindpv_size)
-    {
+    if (param_pos > stp->bindpv_size) {
       dbp->status = _alloc_bindp(stp, param_pos);
 
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos. alloc error", "");
@@ -2759,8 +2649,7 @@ static inline int DEFUN(_bind_by_pos, (stp, param_pos, param_type, param_addr, p
                      param_type, (dvoid *)ind_addr, (ub2 *)0, (ub2)0, (ub4)0, (ub4 *)0, OCI_DEFAULT);
 
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos. Cannot bind", nullptr);
-    if (is_array)
-    {
+    if (is_array) {
       dbp->status = OCIBindArrayOfStruct(*bindp_addr, dbp->errhp, param_size, ind_addr ? sizeof(short) : 0, 0, 0);
 
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos. BindArrayOfStruct", "");
@@ -2770,9 +2659,7 @@ static inline int DEFUN(_bind_by_pos, (stp, param_pos, param_type, param_addr, p
       stp->num_bindpv = param_pos;
 
     assert(stp->num_bindpv <= stp->bindpv_size);
-  }
-  else
-  {
+  } else {
     dbp->status = SQLO_STMT_NOT_PARSED;
   }
   return dbp->status;
@@ -2809,11 +2696,9 @@ static inline int DEFUN(
 
   dbp = stp->dbp;
 
-  if (_is_prepared(stp))
-  {
+  if (_is_prepared(stp)) {
     /* make sure we have enough memory */
-    if (param_pos > stp->bindpv_size)
-    {
+    if (param_pos > stp->bindpv_size) {
       dbp->status = _alloc_bindp(stp, param_pos);
 
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos2. alloc error", "");
@@ -2827,8 +2712,7 @@ static inline int DEFUN(
 
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos. Cannot bind", nullptr);
 
-    if (skip_size > 0)
-    {
+    if (skip_size > 0) {
       dbp->status = OCIBindArrayOfStruct(*bindp_addr, dbp->errhp, skip_size, ind_addr ? skip_size : 0, 0,
                                          rcode_addr ? skip_size : 0);
 
@@ -2839,9 +2723,7 @@ static inline int DEFUN(
       stp->num_bindpv = param_pos;
 
     assert(stp->num_bindpv <= stp->bindpv_size);
-  }
-  else
-  {
+  } else {
     dbp->status = SQLO_STMT_NOT_PARSED;
   }
   return dbp->status;
@@ -2874,8 +2756,7 @@ static inline int DEFUN(
 
   dbp = stp->dbp;
 
-  if (_is_prepared(stp))
-  {
+  if (_is_prepared(stp)) {
 
     _alloc_definep(stp, value_pos);
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos2. alloc error", "");
@@ -2889,8 +2770,7 @@ static inline int DEFUN(
 
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos2: Cannot define", nullptr);
 
-    if (skip_size)
-    {
+    if (skip_size) {
       dbp->status = OCIDefineArrayOfStruct(stp->defnpv[value_pos - 1], dbp->errhp, skip_size, ind_addr ? skip_size : 0,
                                            rlen_addr ? skip_size : 0, rcode_addr ? skip_size : 0);
 
@@ -2901,9 +2781,7 @@ static inline int DEFUN(
       stp->num_defnpv = value_pos;
 
     assert(stp->defnpv_size >= stp->num_defnpv);
-  }
-  else
-  {
+  } else {
     dbp->status = SQLO_STMT_NOT_PARSED;
   }
 
@@ -2934,8 +2812,7 @@ static inline int DEFUN(
   assert(stp->dbp != nullptr);
   dbp = stp->dbp;
 
-  if (_is_prepared(stp))
-  {
+  if (_is_prepared(stp)) {
 
     _alloc_definep(stp, static_cast<unsigned int>(value_pos));
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos. alloc error", "");
@@ -2949,8 +2826,7 @@ static inline int DEFUN(
 
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos: Cannot define", nullptr);
 
-    if (is_array)
-    {
+    if (is_array) {
       dbp->status =
           OCIDefineArrayOfStruct(stp->defnpv[value_pos - 1], stp->dbp->errhp, value_size, ind_addr ? sizeof(short) : 0,
                                  rlen_addr ? sizeof(int) : 0, rcode_addr ? sizeof(short) : 0);
@@ -2961,9 +2837,7 @@ static inline int DEFUN(
       stp->num_defnpv = value_pos;
 
     assert(stp->defnpv_size >= stp->num_defnpv);
-  }
-  else
-  {
+  } else {
     dbp->status = SQLO_STMT_NOT_PARSED;
   }
 
@@ -2994,23 +2868,18 @@ static int DEFUN(_bind_argv, (stp, argc, argv), sqlo_stmt_struct_ptr_t stp AND u
   dbp = stp->dbp;
 
   /* allocate the necessary intput bind variables */
-  if (argc > stp->bindpv_size)
-  {
+  if (argc > stp->bindpv_size) {
     dbp->status = _alloc_bindp(stp, argc);
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "Malloc error in _bind_argv", "");
   }
 
   arg = argv;
   ind_ptr = stp->indpv;
-  for (arg_idx = 0; arg_idx < argc; ++arg_idx, ++arg, ++ind_ptr)
-  {
-    if (!*arg || !**arg)
-    { /* treat null pointer or empty string as null */
+  for (arg_idx = 0; arg_idx < argc; ++arg_idx, ++arg, ++ind_ptr) {
+    if (!*arg || !**arg) { /* treat null pointer or empty string as null */
       *ind_ptr = SQLO_NULL_IND;
       size = 0;
-    }
-    else
-    {
+    } else {
       *ind_ptr = SQLO_NOT_NULL_IND;
       size = strlen(*arg) + 1;
     }
@@ -3048,22 +2917,16 @@ static inline int DEFUN(_calc_obuf_size, (bufsizep, data_type, prec, scale, dbsi
 
   assert(bufsizep != nullptr);
 
-  switch (data_type)
-  {
+  switch (data_type) {
 
   case SQLT_NUM:
   case SQLT_INT:
   case SQLT_FLT:
-    if (scale > prec)
-    {
+    if (scale > prec) {
       buffer_size = static_cast<unsigned int>(scale) + 3; /* sign, comma and \0 */
-    }
-    else if (prec > 0)
-    {
+    } else if (prec > 0) {
       buffer_size = static_cast<unsigned int>(prec) + 3;
-    }
-    else
-    {
+    } else {
       buffer_size = static_cast<unsigned int>(2 * dbsize) + 3;
     }
 
@@ -3373,19 +3236,14 @@ static int DEFUN(_set_ocol_name, (stp, colp, pos),
   cur_col_name_len = col_name_len; /* save the real length */
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_set_ocol_name", "OCIAttrGet(column_name)");
 
-  if (!colp->col_name)
-  {
-    if (col_name_len < MIN_COL_NAME_LEN)
-    {
+  if (!colp->col_name) {
+    if (col_name_len < MIN_COL_NAME_LEN) {
       col_name_len = MIN_COL_NAME_LEN;
     }
     colp->col_name = static_cast<char *>(hb_xgrabDebug(__LINE__, sizeof(char) * (col_name_len + 1)));
     colp->col_name_size = col_name_len;
-  }
-  else
-  {
-    if (col_name_len > colp->col_name_size)
-    {
+  } else {
+    if (col_name_len > colp->col_name_size) {
       col_name_len = 2 * col_name_len; /* alloc always twice as much we need */
       colp->col_name =
           static_cast<char *>(hb_xreallocDebug(__LINE__, colp->col_name, sizeof(char) * (col_name_len + 1)));
@@ -3450,8 +3308,7 @@ static int DEFUN(_set_all_ocol_names, (stp), sqlo_stmt_struct_ptr_t stp)
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_set_all_ocol_names", "Memory allocation error");
 
   /* define all columns */
-  for (col_pos = 1, colp = stp->ocolsv; col_pos <= static_cast<unsigned int>(num_cols); ++col_pos, ++colp)
-  {
+  for (col_pos = 1, colp = stp->ocolsv; col_pos <= static_cast<unsigned int>(num_cols); ++col_pos, ++colp) {
 
     dbp->status = _set_ocol_name(stp, colp, col_pos);
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_set_all_ocol_names", "_set_ocol_name");
@@ -3490,13 +3347,10 @@ static int DEFUN(_alloc_ocol_buffer, (stp, pos, buffer_size),
   TRACE(3, fprintf(_get_trace_fp(stp->dbp), "_alloc_ocol_buffer: sth=%d, column pos=%u, buffer_size: %u\n", stp->sth,
                    pos, buffer_size););
 
-  if (!stp->outv[col_idx])
-  {
-    if (buf_size)
-    {
+  if (!stp->outv[col_idx]) {
+    if (buf_size) {
       /* always allocate a minimum buffer */
-      if (buf_size < MIN_OBUF_SIZE)
-      {
+      if (buf_size < MIN_OBUF_SIZE) {
         buf_size = MIN_OBUF_SIZE;
       }
       stp->outv[col_idx] = static_cast<char *>(hb_xgrabDebug(__LINE__, (buf_size) * sizeof(char)));
@@ -3504,26 +3358,20 @@ static int DEFUN(_alloc_ocol_buffer, (stp, pos, buffer_size),
       stp->rlenv[col_idx] = buf_size;
     }
     stp->outv_size[col_idx] = buf_size;
-  }
-  else
-  {
-    if (buf_size > stp->rlenv[col_idx])
-    {
+  } else {
+    if (buf_size > stp->rlenv[col_idx]) {
       /* Alloc always twice as much to avoid lots of reallocs, but don't
        * do this for long columns
        */
       stp->outv_size[col_idx] = buf_size;
-      if (buf_size < _max_long_size)
-      {
+      if (buf_size < _max_long_size) {
         buf_size = 2 * buf_size;
       }
       stp->outv[col_idx] =
           static_cast<char *>(hb_xreallocDebug(__LINE__, stp->outv[col_idx], (buf_size) * sizeof(char)));
       memset(stp->outv[col_idx], 0, (buf_size) * sizeof(char));
       stp->rlenv[col_idx] = buf_size;
-    }
-    else
-    {
+    } else {
       stp->outv_size[col_idx] = buf_size;
     }
   }
@@ -3565,8 +3413,8 @@ static int DEFUN(_define_ocol_by_pos, (stp, colp, pos),
   /* these routines set all dbp->status */
   if (SQLO_SUCCESS == (_get_ocol_db_data_type(stp, pos, &(colp->database_dtype)) || _set_ocol_name(stp, colp, pos) ||
                        _get_ocol_db_size(stp, pos, &(colp->dbsize)) || _get_ocol_db_prec(stp, pos, &(colp->prec)) ||
-                       _get_ocol_db_scale(stp, pos, &(colp->scale)) || _get_ocol_db_is_null(stp, pos, &(colp->nullok))))
-  {
+                       _get_ocol_db_scale(stp, pos, &(colp->scale)) ||
+                       _get_ocol_db_is_null(stp, pos, &(colp->nullok)))) {
 
     /* If we cannot determine the size, it is caused by an
      * unsupported data type
@@ -3574,8 +3422,7 @@ static int DEFUN(_define_ocol_by_pos, (stp, colp, pos),
 
     _calc_obuf_size(&buffer_size, colp->database_dtype, colp->prec, colp->scale, colp->dbsize);
 
-    if (buffer_size)
-    {
+    if (buffer_size) {
       _alloc_ocol_buffer(stp, pos, buffer_size);
 
       // TraceLog(LOGFILE, "_define_by_pos col %i, IN length %i, buffer %i, allocated %u\n", col_idx,
@@ -3586,15 +3433,12 @@ static int DEFUN(_define_ocol_by_pos, (stp, colp, pos),
       stp->outv_size[col_idx] = stp->outv_size[col_idx] - 1;
 
       // TraceLog(LOGFILE, "_define_by_pos col %i, OUT length %i\n", col_idx, stp->outv_size[col_idx]);
-    }
-    else
-    {
+    } else {
       /* Zero buffer means MEMO data type - should alloc LOB descriptor */
 
       _alloc_ocol_buffer(stp, pos, INITIAL_LOB_ALLOC);
 
-      if (!colp->loblp)
-      {
+      if (!colp->loblp) {
         OCIDescriptorAlloc((dvoid *)dbp->envhp, (dvoid **)&(colp->loblp), (ub4)OCI_DTYPE_LOB, (size_t)0, (dvoid **)0);
         // TraceLog(LOGFILE, "col %i, OCIDescriptorAlloc %p\n", col_idx, colp->loblp);
       }
@@ -3632,8 +3476,7 @@ static inline sqlo_stmt_struct_ptr_t DEFUN(_sth2stp, (sth, func_name), int sth A
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "_sth2stp: sth %d -> sth=%u, dbh=%u\n", sth, real_sth, dbh););
 
-  if (real_sth >= dbp->stmtv_size || FALSE == dbp->stmtv[real_sth].used)
-  {
+  if (real_sth >= dbp->stmtv_size || FALSE == dbp->stmtv[real_sth].used) {
 
     sprintf(dbp->errmsg, "Invalid sth %u passed to %s\n", real_sth, func_name);
     TRACE(1, fprintf(_get_trace_fp(dbp), dbp->errmsg););
@@ -3672,17 +3515,13 @@ static int DEFUN(_define_output, (stp), sqlo_stmt_struct_ptr_t stp)
    * REFCURSORs are already exectuted by there parent stmt
    */
 
-  if (0 == stp->num_executions && !(stp->cursor_type == REFCURSOR))
-  {
+  if (0 == stp->num_executions && !(stp->cursor_type == REFCURSOR)) {
     dbp->status = OCIStmtExecute(dbp->svchp, stp->stmthp, dbp->errhp, (ub4)0, (ub4)0, (OCISnapshot *)0,
                                  (OCISnapshot *)0, (ub4)OCI_DEFAULT);
 
-    if (OCI_STILL_EXECUTING == dbp->status)
-    {
+    if (OCI_STILL_EXECUTING == dbp->status) {
       return dbp->status;
-    }
-    else
-    {
+    } else {
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_output", "OCIStmtExecute(DESCRIBE)");
     }
 
@@ -3705,11 +3544,9 @@ static int DEFUN(_define_output, (stp), sqlo_stmt_struct_ptr_t stp)
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_output", "Memory allocation error");
 
   /* define all columns */
-  for (col_pos = 1, colp = stp->ocolsv; col_pos <= static_cast<unsigned int>(num_cols); ++col_pos, ++colp)
-  {
+  for (col_pos = 1, colp = stp->ocolsv; col_pos <= static_cast<unsigned int>(num_cols); ++col_pos, ++colp) {
 
-    if (SQLO_SUCCESS != (dbp->status = _define_ocol_by_pos(stp, colp, col_pos)))
-    {
+    if (SQLO_SUCCESS != (dbp->status = _define_ocol_by_pos(stp, colp, col_pos))) {
       break;
     }
   }
@@ -3728,16 +3565,14 @@ static void DEFUN(_close_all_executing_cursors, (dbp), const_sqlo_db_struct_ptr_
 {
   unsigned int stmt_idx;
 
-  for (stmt_idx = 0; stmt_idx < dbp->stmtv_size; ++stmt_idx)
-  {
+  for (stmt_idx = 0; stmt_idx < dbp->stmtv_size; ++stmt_idx) {
 
     sqlo_stmt_struct_ptr_t stp = &(dbp->stmtv[stmt_idx]);
 
-    if (stp->used && stp->still_executing)
-    {
+    if (stp->used && stp->still_executing) {
       sqlo_close(ENCODE_STH(stp->sth, dbp->dbh));
     } /* endif is valid and executing */
-  }   /* end for stmt_idx */
+  } /* end for stmt_idx */
 }
 
 /*-------------------------------------------------------------------------*/
@@ -3751,14 +3586,12 @@ static void DEFUN(_close_all_db_cursors, (dbp), const_sqlo_db_struct_ptr_t dbp)
 {
   unsigned int stmt_idx;
 
-  for (stmt_idx = 0; stmt_idx < dbp->stmtv_size; ++stmt_idx)
-  {
+  for (stmt_idx = 0; stmt_idx < dbp->stmtv_size; ++stmt_idx) {
 
     sqlo_stmt_struct_ptr_t stp = &(dbp->stmtv[stmt_idx]);
     unsigned int col_idx;
 
-    if (stp->used)
-    {
+    if (stp->used) {
       sqlo_close(ENCODE_STH(stp->sth, dbp->dbh));
 
       /* free all allocated memory for a stmt. We do not do this
@@ -3770,66 +3603,53 @@ static void DEFUN(_close_all_db_cursors, (dbp), const_sqlo_db_struct_ptr_t dbp)
       stp->stmt_size = 0;
     }
 
-    if (stp->dbp)
-    {
+    if (stp->dbp) {
       _dealloc_bindp(stp);
     }
 
-    for (col_idx = 0; col_idx < stp->defnpv_size; ++col_idx)
-    {
+    for (col_idx = 0; col_idx < stp->defnpv_size; ++col_idx) {
       if (stp->ocolsv && stp->ocolsv[col_idx].col_name)
         XFREE(stp->ocolsv[col_idx].col_name, __LINE__);
 
-      if (stp->ocolsv && stp->ocolsv[col_idx].loblp)
-      {
+      if (stp->ocolsv && stp->ocolsv[col_idx].loblp) {
 
         OCIDescriptorFree((dvoid **)&(stp->ocolsv[col_idx].loblp), (ub4)OCI_DTYPE_LOB);
         // TraceLog(LOGFILE, "col %i, OCIDescriptorFree 2 %p\n", col_idx, stp->ocolsv[col_idx].loblp);
 
         stp->ocolsv[col_idx].loblp = nullptr;
       }
-      if (stp->outv && stp->outv[col_idx])
-      {
+      if (stp->outv && stp->outv[col_idx]) {
         XFREE(stp->outv[col_idx], __LINE__);
         stp->outv[col_idx] = nullptr;
         stp->outv_size[col_idx] = 0;
       }
     }
 
-    if (stp->defnpv)
-    {
+    if (stp->defnpv) {
       XFREE(stp->defnpv, __LINE__);
     }
-    if (stp->ocolsv)
-    {
+    if (stp->ocolsv) {
       XFREE(stp->ocolsv, __LINE__);
     }
-    if (stp->outv)
-    {
+    if (stp->outv) {
       XFREE(stp->outv, __LINE__);
     }
-    if (stp->outv_size)
-    {
+    if (stp->outv_size) {
       XFREE(stp->outv_size, __LINE__);
     }
-    if (stp->oindv)
-    {
+    if (stp->oindv) {
       XFREE(stp->oindv, __LINE__);
     }
-    if (stp->rlenv)
-    {
+    if (stp->rlenv) {
       XFREE(stp->rlenv, __LINE__);
     }
-    if (stp->ocol_namev)
-    {
+    if (stp->ocol_namev) {
       XFREE(stp->ocol_namev, __LINE__);
     }
-    if (stp->ocol_namev_size)
-    {
+    if (stp->ocol_namev_size) {
       XFREE(stp->ocol_namev_size, __LINE__);
     }
-    if (stp->stmt_size > 0)
-    {
+    if (stp->stmt_size > 0) {
       XFREE(stp->stmt, __LINE__);
     }
 
@@ -3870,19 +3690,13 @@ static int DEFUN(_get_blocking_mode, (dbp, blocking), sqlo_db_struct_ptr_t dbp A
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "_get_blocking_mode: status=%d, non_blocking=%u\n", dbp->status, non_blocking););
 
-  if (OCI_SUCCESS == dbp->status)
-  {
-    if (non_blocking)
-    {
+  if (OCI_SUCCESS == dbp->status) {
+    if (non_blocking) {
       *blockingp = SQLO_OFF;
-    }
-    else
-    {
+    } else {
       *blockingp = SQLO_ON;
     }
-  }
-  else
-  {
+  } else {
     dbp->status = SQLO_ERROR;
   }
 
@@ -3905,24 +3719,17 @@ static int DEFUN(_get_blocking_mode, (dbp, blocking), sqlo_db_struct_ptr_t dbp A
 static FILE *DEFUN(_get_trace_fp, (dbp), const_sqlo_db_struct_ptr_t dbp)
 {
   FILE *fp;
-  if (!dbp)
-  {
+  if (!dbp) {
     fp = _trace_fp;
-  }
-  else
-  {
-    if (dbp->trace_fp)
-    {
+  } else {
+    if (dbp->trace_fp) {
       fp = dbp->trace_fp;
-    }
-    else
-    {
+    } else {
       fp = _trace_fp;
     }
   }
 
-  if (!fp)
-  {
+  if (!fp) {
     fp = stderr;
   }
 
@@ -3948,15 +3755,13 @@ static int DEFUN(_get_stmt_type, (stp, stmt_typep), sqlo_stmt_struct_ptr_t stp A
 
   dbp = stp->dbp;
 
-  if (!_is_prepared(stp))
-  {
+  if (!_is_prepared(stp)) {
     sprintf(stp->dbp->errmsg, "Cannot get statement type for a non-prepared statement (sth %u)", stp->sth);
     TRACE(1, (void)fputs(stp->dbp->errmsg, _get_trace_fp(stp->dbp)););
     return SQLO_ERROR;
   }
 
-  if (stmt_typep)
-  {
+  if (stmt_typep) {
 
     /* Identify the statement type */
     dbp->status = OCIAttrGet((dvoid *)stp->stmthp, (ub4)OCI_HTYPE_STMT, (dvoid *)stmt_typep, (ub4 *)0,
@@ -3998,8 +3803,7 @@ static int DEFUN(_prepare, (stp, stmt, stmt_type), sqlo_stmt_struct_ptr_t stp AN
 
   stp->prepared = TRUE;
 
-  if (stmt_type)
-  {
+  if (stmt_type) {
     dbp->status = _get_stmt_type(stp, stmt_type);
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_prepare", "_get_stmt_type");
   }
@@ -4036,54 +3840,43 @@ static int DEFUN(_sqlo_reopen, (stp, argc, argv), sqlo_stmt_struct_ptr_t stp AND
 
   dbp = stp->dbp;
 
-  if (argc > 0)
-  {
+  if (argc > 0) {
 
-    if (!stp->still_executing)
-    {
+    if (!stp->still_executing) {
       /* Reset number of bindpv. Don't free them! */
       _bindpv_reset(stp);
 
       dbp->status = _bind_argv(stp, static_cast<unsigned int>(argc), argv);
 
-      if (SQLO_SUCCESS != dbp->status)
-      {
+      if (SQLO_SUCCESS != dbp->status) {
         sqlo_close(ENCODE_STH(stp->sth, dbp->dbh));
         return dbp->status;
       }
 
-      TRACE(
-          2, if (argc) { fprintf(_get_trace_fp(dbp), "sqlo_reopen [%2u] %s\n", stp->sth, _get_stmt_string(stp)); });
+      TRACE(2, if (argc) { fprintf(_get_trace_fp(dbp), "sqlo_reopen [%2u] %s\n", stp->sth, _get_stmt_string(stp)); });
 
       TRACE(3, {
         int z;
-        for (z = 0; z < argc; z++)
-        {
+        for (z = 0; z < argc; z++) {
           fprintf(_get_trace_fp(dbp), "sqlo_reopen[%d]: arg[%02d]: %s\n", stp->sth, z, argv[z] ? argv[z] : "NULL");
         }
       });
     }
   } /* end if argc > 0 */
 
-  if (_is_query(stp))
-  {
+  if (_is_query(stp)) {
 
     TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_reopen[%d] is query == TRUE, num_executions=%d\n", stp->sth,
                      stp->num_executions););
 
-    if (0 == stp->num_executions)
-    {
+    if (0 == stp->num_executions) {
 
       dbp->status = _define_output(stp);
 
-      if (SQLO_SUCCESS != dbp->status)
-      {
-        if (SQLO_STILL_EXECUTING == dbp->status)
-        {
+      if (SQLO_SUCCESS != dbp->status) {
+        if (SQLO_STILL_EXECUTING == dbp->status) {
           stp->still_executing = TRUE;
-        }
-        else
-        {
+        } else {
           int status = dbp->status;
           _save_oci_status(dbp, "sqlo_reopen", "_define_output", __LINE__);
 
@@ -4092,19 +3885,15 @@ static int DEFUN(_sqlo_reopen, (stp, argc, argv), sqlo_stmt_struct_ptr_t stp AND
           return dbp->status;
         }
       }
-    }
-    else
-    {
+    } else {
       /* execute the cursor to open the statement again */
       dbp->status = OCIStmtExecute(dbp->svchp, stp->stmthp, dbp->errhp, (ub4)0, (ub4)0, (OCISnapshot *)0,
                                    (OCISnapshot *)0, dbp->exec_flags);
 
-      if (OCI_STILL_EXECUTING != dbp->status)
-      {
+      if (OCI_STILL_EXECUTING != dbp->status) {
         CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_reopen", "OCIStmtExecute");
 
-        if (OCI_SUCCESS != dbp->status)
-        {
+        if (OCI_SUCCESS != dbp->status) {
           int status = dbp->status;
 
           sqlo_close(ENCODE_STH(stp->sth, dbp->dbh));
@@ -4113,30 +3902,23 @@ static int DEFUN(_sqlo_reopen, (stp, argc, argv), sqlo_stmt_struct_ptr_t stp AND
       }
     }
 
-    if (OCI_SUCCESS != dbp->status)
-    {
+    if (OCI_SUCCESS != dbp->status) {
 
-      if (OCI_STILL_EXECUTING == dbp->status)
-      {
+      if (OCI_STILL_EXECUTING == dbp->status) {
 
         stp->still_executing = TRUE;
-      }
-      else
-      {
+      } else {
         int status = dbp->status;
         _save_oci_status(dbp, "sqlo_reopen", "OCIStmtExecute(query)", __LINE__);
 
         sqlo_close(ENCODE_STH(stp->sth, dbp->dbh));
         dbp->status = status;
       }
-    }
-    else
-    {
+    } else {
       /* OCI_SUCCESS == status */
       stp->still_executing = FALSE;
 
-      if (0 == stp->num_executions)
-      {
+      if (0 == stp->num_executions) {
         stp->num_executions++;
         dbp->status = _define_output(stp);
       }
@@ -4200,32 +3982,26 @@ int DEFUN(sqlo_init, (threaded_mode, max_db, max_cursors),
 
   EXEC_WHEN_THREADING(_init_lock();); /* start of critical section */
 
-  if (_sqlo_init)
-  {
+  if (_sqlo_init) {
     EXEC_WHEN_THREADING(_init_unlock();); /* end of critical section */
     return SQLO_SUCCESS;
   }
 
   *_errmsg = '\0';
 
-  if (threaded_mode)
-  {
+  if (threaded_mode) {
     _oci_init_mode = OCI_THREADED;
-  }
-  else
-  {
+  } else {
     _oci_init_mode = OCI_DEFAULT;
   }
 
   /* get the environement settings */
-  if (_sqlo_getenv())
-  {
+  if (_sqlo_getenv()) {
     EXEC_WHEN_THREADING(_init_unlock();); /* end of critical section */
     return -1;
   }
 
-  if (TRACE_ENABLED && _trace_level > 0)
-  {
+  if (TRACE_ENABLED && _trace_level > 0) {
     _open_global_trace_file();
   }
 
@@ -4235,55 +4011,45 @@ int DEFUN(sqlo_init, (threaded_mode, max_db, max_cursors),
 #ifndef HAVE_OCIENVCREATE
   {
     ub4 mode = (ub4)_oci_init_mode;
-    if (OCI_SUCCESS != (status = OCIInitialize(mode, 0, 0, 0, 0)))
-    {
+    if (OCI_SUCCESS != (status = OCIInitialize(mode, 0, 0, 0, 0))) {
       return status;
     }
   }
 #endif
 
-  if (max_db <= SQLO_MAX_DB)
-  {
+  if (max_db <= SQLO_MAX_DB) {
     _dbv_size = max_db;
-  }
-  else
-  {
+  } else {
     _dbv_size = SQLO_MAX_DB;
   }
 
-  if (max_cursors <= SQLO_MAX_CURSORS)
-  {
+  if (max_cursors <= SQLO_MAX_CURSORS) {
     _max_cursors = max_cursors;
-  }
-  else
-  {
+  } else {
     _max_cursors = SQLO_MAX_CURSORS;
   }
 
-  if (THREADS_ENABLED && OCI_THREADED == _oci_init_mode)
-  {
+  if (THREADS_ENABLED && OCI_THREADED == _oci_init_mode) {
 
 #ifdef ENABLE_ORATHREADS
 
 #ifdef HAVE_OCIENVCREATE
     status = OCIEnvCreate(&_oci_envhp, _oci_init_mode, nullptr, nullptr, nullptr, nullptr, 0, nullptr);
-    if (status)
-    {
+    if (status) {
       EXEC_WHEN_THREADING(_init_unlock();); /* end of critical section */
       return status;
     }
 
 #else
 
-    if ((status = OCIEnvInit((dvoid *)&_oci_envhp, _oci_init_mode, 0, (dvoid **)0)))
-    {
+    if ((status = OCIEnvInit((dvoid *)&_oci_envhp, _oci_init_mode, 0, (dvoid **)0))) {
       EXEC_WHEN_THREADING(_init_unlock();); /* end of critical section */
       return status;
     }
 #endif
     /* Alloc the global handle */
-    if ((status = OCIHandleAlloc((dvoid *)_oci_envhp, (dvoid **)&_oci_errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0)))
-    {
+    if ((status =
+             OCIHandleAlloc((dvoid *)_oci_envhp, (dvoid **)&_oci_errhp, OCI_HTYPE_ERROR, (size_t)0, (dvoid **)0))) {
       EXEC_WHEN_THREADING(_init_unlock();); /* end of critical section */
       return status;
     }
@@ -4298,12 +4064,10 @@ int DEFUN(sqlo_init, (threaded_mode, max_db, max_cursors),
 
   /* Allocate the arrays for the pointers to the db structures */
   /* check if it the first time we are called */
-  if (!_dbv)
-  {
+  if (!_dbv) {
     /* We need to allocate the array of pointers to sqlo_db_struct_t */
     _dbv = (sqlo_db_struct_t **)hb_xgrabDebug(__LINE__, _dbv_size * sizeof(sqlo_db_struct_ptr_t));
-    if (!_dbv)
-    {
+    if (!_dbv) {
       EXEC_WHEN_THREADING(_init_unlock();); /* end of critical section */
       return SQLO_ERRMALLOC;
     }
@@ -4324,12 +4088,9 @@ int DEFUN(sqlo_init, (threaded_mode, max_db, max_cursors),
 int DEFUN(sqlo_trace, (dbh, on), sqlo_db_handle_t dbh AND int on)
 {
   int stat;
-  if (on)
-  {
+  if (on) {
     stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE TRUE", nullptr);
-  }
-  else
-  {
+  } else {
     stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE FALSE", nullptr);
   }
 
@@ -4349,27 +4110,21 @@ CONST char *DEFUN(sqlo_geterror, (dbh), sqlo_db_handle_t dbh)
    * the connect failed. In this case we return
    * the global error message.
    */
-  if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used)
-  {
+  if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used) {
     TRACE(1, fprintf(_get_trace_fp(nullptr), "Invalid Database handle %d in sqlo_geterror.\n", dbh););
-    if (*_errmsg)
-    {
+    if (*_errmsg) {
       TRACE(1, fprintf(_get_trace_fp(nullptr), "Return _errmsg (%s)", _errmsg););
       return _errmsg;
     }
     sprintf(fatal_error, "Invalid dbh %d passed to sqlo_geterror", dbh);
     return fatal_error;
-  }
-  else
-  {
+  } else {
 
     dbp = _dbv[dbh];
 
-    if (!dbp)
-    {
+    if (!dbp) {
       TRACE(1, fprintf(_get_trace_fp(nullptr), "Invalid Database handle %d in sqlo_geterror.\n", dbh););
-      if (*_errmsg)
-      {
+      if (*_errmsg) {
         TRACE(1, fprintf(_get_trace_fp(nullptr), "Return _errmsg (%s)", _errmsg););
         return _errmsg;
       }
@@ -4381,8 +4136,7 @@ CONST char *DEFUN(sqlo_geterror, (dbh), sqlo_db_handle_t dbh)
        we try to get it here
     */
 
-    if ('\0' == *dbp->errmsg)
-    {
+    if ('\0' == *dbp->errmsg) {
       (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)nullptr, &dbp->errcode, (text *)dbp->errmsg,
                         (ub4)SQLO_MAX_ERRMSG_LEN * sizeof(char), OCI_HTYPE_ERROR);
 #ifndef NDEBUG
@@ -4426,8 +4180,7 @@ int DEFUN(sqlo_exists, (dbh, table, colname, colval, where),
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_exists", SQLO_INVALID_DB_HANDLE);
 
-  if (!table || *table == '\0')
-  {
+  if (!table || *table == '\0') {
     sprintf(dbp->errmsg, "No table specified for sqlo_exists\n");
     TRACE(1, (void)fputs(dbp->errmsg, _get_trace_fp(dbp)););
     return SQLO_ERROR;
@@ -4435,22 +4188,17 @@ int DEFUN(sqlo_exists, (dbh, table, colname, colval, where),
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_exists: on %s\n", table););
 
-  if (colval && *colval != '\0')
-  {
+  if (colval && *colval != '\0') {
     argv[0] = colval;
     argc = 1;
     sprintf(stmt, "select 'YES' from %s where %s = :b1", table, colname);
-    if (where && *where != '\0')
-    {
+    if (where && *where != '\0') {
       strcat(stmt, " and ");
       strcat(stmt, where);
     }
-  }
-  else
-  {
+  } else {
     sprintf(stmt, "select 'YES' from %s", table);
-    if (where && *where != '\0')
-    {
+    if (where && *where != '\0') {
       strcat(stmt, " where ");
       strcat(stmt, where);
     }
@@ -4458,32 +4206,24 @@ int DEFUN(sqlo_exists, (dbh, table, colname, colval, where),
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_exists: %s\n", stmt););
 
-  while (SQLO_STILL_EXECUTING == (status = sqlo_open2(&sth, dbh, stmt, argc, argv)))
-  {
+  while (SQLO_STILL_EXECUTING == (status = sqlo_open2(&sth, dbh, stmt, argc, argv))) {
     TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_exists: sqlo_open2 status=%d (still executing) sth=%d\n", status, sth););
     SQLO_USLEEP;
   }
 
-  if (status < 0)
-  {
+  if (status < 0) {
     CHECK_OCI_STATUS_RETURN(dbp, status, "sqlo_exists", "sqlo_open2");
   }
 
-  while (SQLO_STILL_EXECUTING == (status = sqlo_fetch(sth, 1)))
-  {
+  while (SQLO_STILL_EXECUTING == (status = sqlo_fetch(sth, 1))) {
     SQLO_USLEEP;
   }
 
-  if (status < 0)
-  {
+  if (status < 0) {
     CHECK_OCI_STATUS_RETURN(dbp, status, "sqlo_exists", "sqlo_fetch");
-  }
-  else if (status == 0)
-  {
+  } else if (status == 0) {
     retcode = SQLO_SUCCESS; /* exists */
-  }
-  else
-  {
+  } else {
     retcode = SQLO_NO_DATA; /* not exists */
   }
 
@@ -4514,86 +4254,65 @@ int DEFUN(sqlo_count, (dbh, table, colname, colval, where),
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_count", SQLO_INVALID_DB_HANDLE);
 
-  if (!table || *table == '\0')
-  {
+  if (!table || *table == '\0') {
     sprintf(dbp->errmsg, "No table specified for sqlo_count\n");
     TRACE(1, (void)fputs(dbp->errmsg, _get_trace_fp(dbp)););
     return SQLO_ERROR;
   }
 
-  if (colname && *colname != '\0')
-  {
+  if (colname && *colname != '\0') {
     sprintf(stmt, "select count (*) from %s ", table);
-  }
-  else
-  {
+  } else {
     sprintf(stmt, "select count (*) from %s ", table);
   }
 
-  if (colval && *colval != '\0')
-  {
+  if (colval && *colval != '\0') {
     argv[0] = colval;
     argc = 1;
     sprintf(&stmt[strlen(stmt)], "where %s = :b1", colname);
-    if (where && *where != '\0')
-    {
+    if (where && *where != '\0') {
       strcat(stmt, " and ");
       strcat(stmt, where);
     }
-  }
-  else
-  {
-    if (where && *where != '\0')
-    {
+  } else {
+    if (where && *where != '\0') {
       strcat(stmt, " where ");
       strcat(stmt, where);
     }
   }
 
   status = SQLO_SUCCESS;
-  do
-  {
-    if (status == SQLO_SUCCESS)
-    {
+  do {
+    if (status == SQLO_SUCCESS) {
       SQLO_USLEEP;
     }
     status = sqlo_open2(&sth, dbh, stmt, argc, argv);
   } while (SQLO_STILL_EXECUTING == status);
 
-  if (status < 0)
-  {
+  if (status < 0) {
     CHECK_OCI_STATUS_RETURN(dbp, status, "sqlo_count", "sqlo_open2");
   }
 
   status = SQLO_SUCCESS;
-  do
-  {
-    if (status != SQLO_SUCCESS)
-    {
+  do {
+    if (status != SQLO_SUCCESS) {
       SQLO_USLEEP;
     }
     status = sqlo_fetch(sth, 1);
   } while (SQLO_STILL_EXECUTING == status);
 
-  if (status < 0)
-  {
+  if (status < 0) {
     CHECK_OCI_STATUS_RETURN(dbp, status, "sqlo_count", "sqlo_fetch");
-  }
-  else if (status == 0)
-  {
+  } else if (status == 0) {
     v = sqlo_values(sth, nullptr, 1);
     cnt = atoi(*v);
-  }
-  else
-  {
+  } else {
     cnt = 0;
   }
 
   status = SQLO_SUCCESS;
-  do
-  {
-    if (status != SQLO_SUCCESS)
-    {
+  do {
+    if (status != SQLO_SUCCESS) {
       SQLO_USLEEP;
     }
     status = sqlo_close(sth);
@@ -4619,42 +4338,34 @@ int DEFUN(sqlo_run, (dbh, stmt, argc, argv),
 
   TRACE(2, {
     int z;
-    for (z = 0; z < argc; z++)
-    {
+    for (z = 0; z < argc; z++) {
       fprintf(_get_trace_fp(dbp), "arg[%02d]: %s\n", z, argv[z] ? argv[z] : "NULL");
     }
   });
 
   status = SQLO_SUCCESS;
-  do
-  {
-    if (status != SQLO_SUCCESS)
-    {
+  do {
+    if (status != SQLO_SUCCESS) {
       SQLO_USLEEP;
     }
     status = sqlo_open2(&sth, dbh, stmt, argc, argv);
   } while (SQLO_STILL_EXECUTING == status);
 
-  if (status < 0)
-  {
+  if (status < 0) {
     return status;
   }
 
-  while (SQLO_STILL_EXECUTING == (ret = sqlo_fetch(sth, 1)))
-  {
+  while (SQLO_STILL_EXECUTING == (ret = sqlo_fetch(sth, 1))) {
     SQLO_USLEEP;
   }
 
-  if (0 <= ret)
-  {
+  if (0 <= ret) {
     ret = sqlo_prows(sth);
   }
 
   status = SQLO_SUCCESS;
-  do
-  {
-    if (status != SQLO_SUCCESS)
-    {
+  do {
+    if (status != SQLO_SUCCESS) {
       SQLO_USLEEP;
     }
     status = sqlo_close(sth);
@@ -4682,8 +4393,7 @@ int DEFUN(sqlo_exec, (dbh, stmt, rr), sqlo_db_handle_t dbh AND const char *stmt 
    */
   /* Use the stmthp in dbp. */
 
-  if (!(dbp->stmthp == nullptr))
-  {
+  if (!(dbp->stmthp == nullptr)) {
     (void)OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
     dbp->stmthp = nullptr;
   }
@@ -4707,35 +4417,27 @@ int DEFUN(sqlo_exec, (dbh, stmt, rr), sqlo_db_handle_t dbh AND const char *stmt 
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_exec: OCIStmtExecute returns %d\n", dbp->status););
 
-  if (dbp->status == OCI_SUCCESS)
-  {
+  if (dbp->status == OCI_SUCCESS) {
 
     /* finished the call. Get row count */
     dbp->status = OCIAttrGet((dvoid *)dbp->stmthp, (ub4)OCI_HTYPE_STMT, (dvoid *)&prows, (ub4 *)0,
                              (ub4)OCI_ATTR_ROW_COUNT, dbp->errhp);
 
-    if (dbp->status == OCI_SUCCESS)
-    {
+    if (dbp->status == OCI_SUCCESS) {
       /* SUCCESS */
       *rr = prows;
       dbp->status = OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_exec", "OCIHandleFree");
       dbp->stmthp = nullptr;
-    }
-    else
-    {
+    } else {
       /* ERROR */
       (void)OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
       dbp->stmthp = nullptr;
       return dbp->status;
     }
-  }
-  else if (dbp->status == OCI_STILL_EXECUTING)
-  { /* Execute still processing= */
+  } else if (dbp->status == OCI_STILL_EXECUTING) { /* Execute still processing= */
     return SQLO_STILL_EXECUTING;
-  }
-  else
-  {
+  } else {
     /* ERROR IN EXECUTE */
     OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
     dbp->stmthp = nullptr;
@@ -4767,8 +4469,7 @@ int DEFUN(sqlo_open, (dbh, stmt, argc, argv),
   if (status < 0)
     CHECK_OCI_STATUS_RETURN(dbp, status, "sqlo_open", "sqlo_set_blocking_i");
 
-  if (SQLO_OFF == blocking)
-  {
+  if (SQLO_OFF == blocking) {
     status = sqlo_set_blocking(dbh, 1);
     CHECK_OCI_STATUS_RETURN(dbp, status, "sqlo_open", "sqlo_set_blocking(dbh, 1)");
     bmf = TRUE;
@@ -4784,30 +4485,26 @@ int DEFUN(sqlo_open, (dbh, stmt, argc, argv),
   status = _prepare(stp, stmt, &(stp->stype));
   CHECK_OCI_STATUS(dbp, status, "sqlo_open", "_prepare");
 
-  if (OCI_SUCCESS != status)
-  {
+  if (OCI_SUCCESS != status) {
     CHECK_OCI_STATUS(dbp, sqlo_close(ENCODE_STH(stp->sth, dbh)), "sqlo_open", "sqlo_close");
     return status;
   }
 
   /* We cannot handle PL/SQL blocks here */
-  if (_is_plsql(stp))
-  {
+  if (_is_plsql(stp)) {
     status = SQLO_INVALID_STMT_TYPE;
 
     CHECK_OCI_STATUS(dbp, sqlo_close(ENCODE_STH(stp->sth, dbh)), "sqlo_open", "sqlo_close, ERROR: INVALID STMT TYPE");
     return status;
   }
 
-  if (_is_query(stp))
-  {
+  if (_is_query(stp)) {
 
     /* Set the prefetch count to _num_prefetch_rows */
     status = _set_prefetch_rows(stp, _num_prefetch_rows);
     CHECK_OCI_STATUS(dbp, status, "sqlo_open", "_set_prefetch_rows");
 
-    if (OCI_SUCCESS != status)
-    {
+    if (OCI_SUCCESS != status) {
       CHECK_OCI_STATUS(dbp, sqlo_close(ENCODE_STH(stp->sth, dbh)), "sqlo_open", "sqlo_close");
       return status;
     }
@@ -4816,8 +4513,7 @@ int DEFUN(sqlo_open, (dbh, stmt, argc, argv),
   ret = _sqlo_reopen(stp, argc, argv);
 
   /* switch back to non-blocking mode */
-  if (bmf)
-  {
+  if (bmf) {
     status = sqlo_set_blocking(dbh, 0);
     CHECK_OCI_STATUS_RETURN(dbp, status, "sqlo_open", "sqlo_set_blocking(dbh, 0)");
   }
@@ -4842,12 +4538,9 @@ int DEFUN(sqlo_open2, (sthp, dbh, stmt, argc, argv),
   if (!sthp)
     return SQLO_INVALID_STMT_HANDLE;
 
-  if (*sthp == SQLO_STH_INIT)
-  {
+  if (*sthp == SQLO_STH_INIT) {
     real_sth = -1;
-  }
-  else
-  {
+  } else {
     real_sth = static_cast<int>(DECODE_STH(*sthp));
   }
 
@@ -4862,23 +4555,18 @@ int DEFUN(sqlo_open2, (sthp, dbh, stmt, argc, argv),
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_open2: blocking=%d\n", blocking););
 
-  if (SQLO_OFF == blocking)
-  {
+  if (SQLO_OFF == blocking) {
     stp = &(dbp->stmtv[real_sth]);
 
-    if (stp != nullptr)
-    {
+    if (stp != nullptr) {
       TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_open2: sth=%d, used=%d, opened=%d, is_query=%d, still_executing=%d\n",
                        real_sth, stp->used, _is_opened(stp), _is_query(stp), stp->still_executing););
-    }
-    else
-    {
+    } else {
       TRACE(1, fprintf(_get_trace_fp(dbp), "sqlo_open2: NULL pointer exception: stp is NULL"););
     }
 
     if (real_sth >= 0 && real_sth < static_cast<int>(dbp->stmtv_size) && (stp != nullptr) && stp->used &&
-        !_is_opened(stp) && _is_query(stp) && stp->still_executing)
-    {
+        !_is_opened(stp) && _is_query(stp) && stp->still_executing) {
 
       return _sqlo_reopen(stp, argc, argv);
     }
@@ -4894,15 +4582,13 @@ int DEFUN(sqlo_open2, (sthp, dbh, stmt, argc, argv),
   status = _prepare(stp, stmt, &(stp->stype));
   CHECK_OCI_STATUS(dbp, status, "sqlo_open2", "_prepare");
 
-  if (OCI_SUCCESS != status)
-  {
+  if (OCI_SUCCESS != status) {
     CHECK_OCI_STATUS(dbp, sqlo_close(ENCODE_STH(stp->sth, dbh)), "sqlo_open2", "sqlo_close");
     return status;
   }
 
   /* We cannot handle PL/SQL blocks here */
-  if (_is_plsql(stp))
-  {
+  if (_is_plsql(stp)) {
     status = SQLO_INVALID_STMT_TYPE;
 
     CHECK_OCI_STATUS(dbp, sqlo_close(ENCODE_STH(stp->sth, dbh)), "sqlo_open2", "sqlo_close, ERROR: INVALID STMT TYPE");
@@ -4910,15 +4596,13 @@ int DEFUN(sqlo_open2, (sthp, dbh, stmt, argc, argv),
     return status;
   }
 
-  if (_is_query(stp))
-  {
+  if (_is_query(stp)) {
     /* Set the prefetch count to _num_prefetch_rows */
     status = _set_prefetch_rows(stp, _num_prefetch_rows);
 
     CHECK_OCI_STATUS(dbp, status, "sqlo_open2", "_set_prefetch_rows");
 
-    if (OCI_SUCCESS != status)
-    {
+    if (OCI_SUCCESS != status) {
       CHECK_OCI_STATUS(dbp, sqlo_close(ENCODE_STH(stp->sth, dbh)), "sqlo_open2", "sqlo_close");
       return status;
     }
@@ -4926,8 +4610,7 @@ int DEFUN(sqlo_open2, (sthp, dbh, stmt, argc, argv),
 
   ret = _sqlo_reopen(stp, argc, argv);
 
-  if (SQLO_SUCCESS == ret || SQLO_STILL_EXECUTING == ret)
-  {
+  if (SQLO_SUCCESS == ret || SQLO_STILL_EXECUTING == ret) {
     *sthp = ENCODE_STH(stp->sth, dbh);
   }
 
@@ -4967,34 +4650,24 @@ int DEFUN(sqlo_fetch, (sth, nrows), sqlo_stmt_handle_t sth AND unsigned int nrow
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_fetch sth=%u, nrows=%u\n", stp->sth, nrows););
 
-  if (!_is_query(stp))
-  {
-    if (!stp->still_executing)
-    {
+  if (!_is_query(stp)) {
+    if (!stp->still_executing) {
       TRACE(2, fprintf(_get_trace_fp(dbp), "Exec [%2u] %.65s\n", stp->sth, _get_stmt_string(stp)););
     }
 
     dbp->status = OCIStmtExecute(dbp->svchp, stp->stmthp, dbp->errhp, (ub4)1, (ub4)0, (OCISnapshot *)0,
                                  (OCISnapshot *)0, dbp->exec_flags);
 
-    if (OCI_SUCCESS != dbp->status)
-    {
-      if (OCI_STILL_EXECUTING == dbp->status)
-      {
+    if (OCI_SUCCESS != dbp->status) {
+      if (OCI_STILL_EXECUTING == dbp->status) {
         stp->still_executing = TRUE;
-      }
-      else
-      {
+      } else {
         _save_oci_status(dbp, "sqlo_fetch", "OCIStmtExecute(nonquery)", __LINE__);
       }
-    }
-    else
-    {
+    } else {
       stp->still_executing = FALSE;
     }
-  }
-  else
-  {
+  } else {
 #ifdef HAVE_OCISTMTFETCH2
     dbp->status = OCIStmtFetch2(stp->stmthp, dbp->errhp, nrows, OCI_FETCH_NEXT, 0, OCI_DEFAULT);
 #else
@@ -5003,27 +4676,21 @@ int DEFUN(sqlo_fetch, (sth, nrows), sqlo_stmt_handle_t sth AND unsigned int nrow
 #endif
     TRACE(3, fprintf(_get_trace_fp(dbp), "OCIStmtFetch finished with %d\n", dbp->status););
 
-    if (OCI_STILL_EXECUTING != dbp->status)
-    {
+    if (OCI_STILL_EXECUTING != dbp->status) {
       /* Cycle the columns to alloc and retrieve memo fields */
-      for (col_idx = 0; col_idx < stp->num_defnpv; ++col_idx)
-      {
-        if (stp->ocolsv[col_idx].database_dtype == SQLT_CLOB || stp->ocolsv[col_idx].database_dtype == SQLT_BLOB)
-        {
+      for (col_idx = 0; col_idx < stp->num_defnpv; ++col_idx) {
+        if (stp->ocolsv[col_idx].database_dtype == SQLT_CLOB || stp->ocolsv[col_idx].database_dtype == SQLT_BLOB) {
           stp->outv_size[col_idx] = 0;
 
-          if (stp->oindv[col_idx] != SQLO_NULL_IND)
-          {
-            if (dbp->status == OCI_SUCCESS || dbp->status == SQLO_SUCCESS_WITH_INFO)
-            {
+          if (stp->oindv[col_idx] != SQLO_NULL_IND) {
+            if (dbp->status == OCI_SUCCESS || dbp->status == SQLO_SUCCESS_WITH_INFO) {
               localStatus = OCILobGetLength(dbp->svchp, dbp->errhp, (OCILobLocator *)stp->ocolsv[col_idx].loblp,
                                             (ub4 *)&(stp->outv_size[col_idx]));
 
               // TraceLog(LOGFILE, "OCILobGetLength col %i, out length %u, allocated %u\n", col_idx,
               // stp->outv_size[col_idx], stp->rlenv[col_idx]);
 
-              if (localStatus == OCI_SUCCESS && stp->outv_size[col_idx])
-              {
+              if (localStatus == OCI_SUCCESS && stp->outv_size[col_idx]) {
                 _alloc_ocol_buffer(stp, col_idx + 1, (static_cast<unsigned int>(stp->outv_size[col_idx])) + 1);
                 stp->outv_size[col_idx] = stp->outv_size[col_idx] - 1;
 
@@ -5035,34 +4702,27 @@ int DEFUN(sqlo_fetch, (sth, nrows), sqlo_stmt_handle_t sth AND unsigned int nrow
                                                    (void *)(stp->outv[col_idx]),
                                                    static_cast<unsigned int>(stp->outv_size[col_idx]));
 
-                if (localStatus == OCI_ERROR)
-                {
+                if (localStatus == OCI_ERROR) {
                   TraceLog(LOGFILE, "col %i status %i - error reading a %i bytes lob located by %p, dbh %p\n", col_idx,
                            dbp->status, stp->outv_size[col_idx], stp->ocolsv[col_idx].loblp, dbp->dbh);
                 }
-              }
-              else
-              { /* Success in GetLen() */
+              } else { /* Success in GetLen() */
                 // TraceLog(LOGFILE, "col %i status %i - error reading lob length (read %u)\n", col_idx, dbp->status,
                 // stp->outv_size[col_idx]);
               }
             } /* if is there any data */
-          }   /* if lob is null */
-        }     /* if is lob */
-      }       /* for() */
+          } /* if lob is null */
+        } /* if is lob */
+      } /* for() */
     }
 
-    if (dbp->status != OCI_SUCCESS && dbp->status != OCI_NO_DATA && dbp->status != SQLO_SUCCESS_WITH_INFO)
-    {
-      if (OCI_STILL_EXECUTING == dbp->status)
-      {
+    if (dbp->status != OCI_SUCCESS && dbp->status != OCI_NO_DATA && dbp->status != SQLO_SUCCESS_WITH_INFO) {
+      if (OCI_STILL_EXECUTING == dbp->status) {
         stp->still_executing = TRUE;
         return SQLO_STILL_EXECUTING;
       }
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_fetch", "OCIStmtFetch");
-    }
-    else
-    {
+    } else {
       stp->still_executing = FALSE;
     }
   }
@@ -5079,8 +4739,7 @@ CONST char **DEFUN(sqlo_values, (sth, num, do_strip_string),
 
   CHECK_STHANDLE(stp, sth, "sqlo_values", nullptr);
 
-  if (!_is_query(stp) || !_is_opened(stp))
-  {
+  if (!_is_query(stp) || !_is_opened(stp)) {
     sprintf(stp->dbp->errmsg,
             "Cannot get values for a non-select/non-opened statement (sth %u) passed to sqlo_values\n", stp->sth);
     TRACE(1, (void)fputs(stp->dbp->errmsg, _get_trace_fp(stp->dbp)););
@@ -5116,8 +4775,7 @@ int DEFUN(sqlo_prows, (sth), sqlo_stmt_handle_t sth)
 
   dbp = stp->dbp;
 
-  if (!_is_opened(stp))
-  {
+  if (!_is_opened(stp)) {
     sprintf(dbp->errmsg,
             "Cannot get processed rows for a non-executed/fetched statement "
             "(sth %u) passed to sqlo_prows\n",
@@ -5156,19 +4814,14 @@ int DEFUN(sqlo_ncols, (sth, in), sqlo_stmt_handle_t sth AND int in)
 
   TRACE(2, fprintf(_get_trace_fp(stp->dbp), "Get NCols [%2u] for %s desc\n", stp->sth, in ? "in" : "out"););
 
-  if (in)
-  {
+  if (in) {
     ncols = (ub4)stp->num_bindpv;
-  }
-  else
-  {
-    if (0 == stp->num_executions && !(REFCURSOR == stp->cursor_type))
-    {
+  } else {
+    if (0 == stp->num_executions && !(REFCURSOR == stp->cursor_type)) {
       /* execute to describe the output */
       while (OCI_STILL_EXECUTING ==
              (dbp->status = OCIStmtExecute(dbp->svchp, stp->stmthp, dbp->errhp, (ub4)0, (ub4)0, (OCISnapshot *)0,
-                                           (OCISnapshot *)0, (ub4)OCI_DEFAULT)))
-      {
+                                           (OCISnapshot *)0, (ub4)OCI_DEFAULT))) {
         SQLO_USLEEP;
       }
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_ncols", "OCIStmtExecute(DESCRIBE)");
@@ -5219,12 +4872,10 @@ int DEFUN(sqlo_close, (sth), sqlo_stmt_handle_t sth)
 
   _bindpv_reset(stp);
 
-  for (defnp_idx = 0; defnp_idx < stp->num_defnpv; ++defnp_idx)
-  {
+  for (defnp_idx = 0; defnp_idx < stp->num_defnpv; ++defnp_idx) {
 
     /* deallocate memory allocated for LONG columns */
-    if (stp->outv_size[defnp_idx] >= _max_long_size)
-    {
+    if (stp->outv_size[defnp_idx] >= _max_long_size) {
       XFREE(stp->outv[defnp_idx], __LINE__);
       stp->outv[defnp_idx] = nullptr;
       stp->outv_size[defnp_idx] = 0;
@@ -5243,8 +4894,7 @@ int DEFUN(sqlo_close, (sth), sqlo_stmt_handle_t sth)
   memset(stp->defnpv, 0, stp->num_defnpv * sizeof(OCIDefine *));
   stp->num_defnpv = 0;
 
-  if (stp->stmthp)
-  {
+  if (stp->stmthp) {
     dbp->status = OCIHandleFree(stp->stmthp, OCI_HTYPE_STMT);
 
     stp->stmthp = nullptr;
@@ -5280,13 +4930,11 @@ int DEFUN(sqlo_print, (sth), sqlo_stmt_handle_t sth)
   printf("N-Bindpv: %u, (allocated: %u)\n", stp->num_bindpv, stp->bindpv_size);
   printf("prows: %d\n", sqlo_prows(sth));
 
-  if (_is_query(stp))
-  {
+  if (_is_query(stp)) {
 
     _set_all_ocol_names(stp); /* make sure the output column names are set */
 
-    for (col_idx = 0; col_idx < stp->num_defnpv; ++col_idx)
-    {
+    for (col_idx = 0; col_idx < stp->num_defnpv; ++col_idx) {
       printf("Colum Name[%02u]  : %s\n", col_idx, stp->ocolsv[col_idx].col_name);
       printf("Datatype        : %d (%s)\n", static_cast<int>(stp->ocolsv[col_idx].dtype),
              _get_data_type_str(static_cast<int>(stp->ocolsv[col_idx].dtype)));
@@ -5321,8 +4969,7 @@ int DEFUN(sqlo_split_cstring, (cstr, uid, pwd, tnsname, bufsize),
 
   /* copy username part to uid */
   n = 0;
-  while (*c && *c != '/')
-  {
+  while (*c && *c != '/') {
     if (n >= bufsize)
       return SQLO_ERROR;
     *(uid++) = *(c++);
@@ -5332,12 +4979,10 @@ int DEFUN(sqlo_split_cstring, (cstr, uid, pwd, tnsname, bufsize),
   *uid = '\0';
 
   /* copy password part, if present */
-  if (*c == '/')
-  {
+  if (*c == '/') {
     ++c;
     n = 0;
-    while (*c && *c != '@')
-    {
+    while (*c && *c != '@') {
       if (n >= bufsize)
         return SQLO_ERROR;
       *(pwd++) = *(c++);
@@ -5347,23 +4992,18 @@ int DEFUN(sqlo_split_cstring, (cstr, uid, pwd, tnsname, bufsize),
   }
 
   /* copy tnsname if present, otherwise we use oracle sid */
-  if (*c == '@')
-  {
+  if (*c == '@') {
     ++c;
     n = 0;
-    while (*c != '\0')
-    {
+    while (*c != '\0') {
       if (n >= bufsize)
         return SQLO_ERROR;
       *(tnsname++) = *(c++);
       ++n;
     }
     *tnsname = '\0';
-  }
-  else
-  {
-    if ((env_ptr = getenv("ORACLE_SID")) != nullptr)
-    {
+  } else {
+    if ((env_ptr = getenv("ORACLE_SID")) != nullptr) {
       strncpy(tnsname, env_ptr, bufsize - 1);
       tnsname[bufsize - 1] = '\0';
     }
@@ -5383,8 +5023,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
 
   TRACE(2, fprintf(_get_trace_fp(nullptr), "sqlo_server_attach starts\n"););
 
-  if ((dbp = _db_add()) == nullptr)
-  {
+  if ((dbp = _db_add()) == nullptr) {
     TRACE(3, fprintf(_get_trace_fp(nullptr), "sqlo_server_attach: Could not alloacte a dbp\n"););
     return SQLO_ERROR;
   }
@@ -5392,8 +5031,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_server_attach: allocated dbh=%u\n", dbp->dbh););
 
   /* if tnsname contains a connect string we split it */
-  if (strchr(tnsname, '@') || strchr(tnsname, '/'))
-  {
+  if (strchr(tnsname, '@') || strchr(tnsname, '/')) {
     enum
     {
       MAX_BUFLEN = 1023
@@ -5405,9 +5043,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
     if (SQLO_SUCCESS != sqlo_split_cstring(tnsname, uid, pwd, dbname, MAX_BUFLEN))
       return SQLO_ERROR;
     dbp->tnsname = strdupx(dbname);
-  }
-  else
-  {
+  } else {
     dbp->tnsname = strdupx(tnsname);
   }
 
@@ -5447,8 +5083,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   EXEC_WHEN_THREADING(_env_unlock(););
 
   /* release allocated resources */
-  if (OCI_SUCCESS != dbp->status)
-  {
+  if (OCI_SUCCESS != dbp->status) {
     _db_release(dbp);
     return dbp->status;
   }
@@ -5459,8 +5094,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_server_attach", "OCIEnvHandleAlloc(svchp)");
 
   /* release allocated resources */
-  if (OCI_SUCCESS != dbp->status)
-  {
+  if (OCI_SUCCESS != dbp->status) {
     _db_release(dbp);
     return dbp->status;
   }
@@ -5471,8 +5105,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_server_attach", "OCIHandleAlloc(errhp)");
 
   /* release allocated resources */
-  if (OCI_SUCCESS != dbp->status)
-  {
+  if (OCI_SUCCESS != dbp->status) {
     _db_release(dbp);
     return dbp->status;
   }
@@ -5483,8 +5116,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_server_attach", "OCIHandleAlloc(srvhp)");
 
   /* release allocated resources */
-  if (OCI_SUCCESS != dbp->status)
-  {
+  if (OCI_SUCCESS != dbp->status) {
     _db_release(dbp);
     return dbp->status;
   }
@@ -5494,8 +5126,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_server_attach", "OCISeverAttach(tnsname)");
 
   /* release allocated resources */
-  if (OCI_SUCCESS != dbp->status)
-  {
+  if (OCI_SUCCESS != dbp->status) {
     _db_release(dbp);
     return dbp->status;
   }
@@ -5507,8 +5138,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_server_attach", "OCIAttrSet(server->service)");
 
   /* release allocated resources */
-  if (OCI_SUCCESS != dbp->status)
-  {
+  if (OCI_SUCCESS != dbp->status) {
     _db_release(dbp);
     return dbp->status;
   }
@@ -5518,12 +5148,9 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
 
   CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_server_attach", "OCIHandleAlloc(authp)");
 
-  if (SQLO_SUCCESS == dbp->status)
-  {
+  if (SQLO_SUCCESS == dbp->status) {
     TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_server_attach[%d]: attached\n", *dbhp););
-  }
-  else
-  {
+  } else {
     /* release allocated resources */
     TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_server_attach[%d]: failed\n", *dbhp););
     _db_release(dbp);
@@ -5551,8 +5178,7 @@ int DEFUN(sqlo_session_begin, (dbh, username, password),
   char pwd[MAX_BUFLEN + 1];
   char tnsname[MAX_BUFLEN + 1];
 
-  if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used || !_dbv[dbh]->attached || _dbv[dbh]->session_created)
-  {
+  if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used || !_dbv[dbh]->attached || _dbv[dbh]->session_created) {
     TRACE(1, fprintf(_trace_fp, "Invalid Database handle %d in sqlo_session_begin\n", dbh););
     return SQLO_INVALID_DB_HANDLE;
   }
@@ -5562,21 +5188,16 @@ int DEFUN(sqlo_session_begin, (dbh, username, password),
 
   assert(dbp != nullptr);
 
-  if (!username || !password)
-  {
+  if (!username || !password) {
     strcpy(dbp->errmsg, "sqlo_sesson_begin: No username or password specified");
     return SQLO_ERROR;
   }
 
-  if (strchr(username, '/'))
-  {
-    if (SQLO_SUCCESS != sqlo_split_cstring(username, uid, pwd, tnsname, MAX_BUFLEN))
-    {
+  if (strchr(username, '/')) {
+    if (SQLO_SUCCESS != sqlo_split_cstring(username, uid, pwd, tnsname, MAX_BUFLEN)) {
       return SQLO_ERROR;
     }
-  }
-  else
-  {
+  } else {
     strncpy(uid, username, (size_t)MAX_BUFLEN - 1);
     uid[MAX_BUFLEN] = '\0';
     strncpy(pwd, password, (size_t)MAX_BUFLEN - 1);
@@ -5604,8 +5225,7 @@ int DEFUN(sqlo_session_begin, (dbh, username, password),
    */
   while (OCI_STILL_EXECUTING == (dbp->status = OCISessionBegin((OCISvcCtx *)((dvoid *)dbp->svchp), dbp->errhp,
                                                                dbp->authp, OCI_CRED_RDBMS, OCI_DEFAULT)) ||
-         (dbp->status == OCI_ERROR && _get_errcode(dbp) == ((-1) * OCI_STILL_EXECUTING)))
-  {
+         (dbp->status == OCI_ERROR && _get_errcode(dbp) == ((-1) * OCI_STILL_EXECUTING))) {
     TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_session_begin: "
                                          "Still executing OCISessionBegin\n"););
     SQLO_USLEEP;
@@ -5615,8 +5235,7 @@ int DEFUN(sqlo_session_begin, (dbh, username, password),
 
   /* Set the authentication handle in the service context */
   while (OCI_STILL_EXECUTING == (dbp->status = OCIAttrSet((dvoid *)dbp->svchp, OCI_HTYPE_SVCCTX, (dvoid *)dbp->authp,
-                                                          (ub4)0, OCI_ATTR_SESSION, dbp->errhp)))
-  {
+                                                          (ub4)0, OCI_ATTR_SESSION, dbp->errhp))) {
     TRACE(2, fprintf(_get_trace_fp(dbp), "Still executing OCIAttrSet (authp -> svchp)\n"););
     SQLO_USLEEP;
   }
@@ -5645,8 +5264,7 @@ int DEFUN(sqlo_server_detach, (dbh), sqlo_db_handle_t dbh)
 
   TRACE(2, fprintf(_get_trace_fp(nullptr), "sqlo_server_detach starts dbh=%d\n", dbh););
 
-  if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used || !_dbv[dbh]->attached)
-  {
+  if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used || !_dbv[dbh]->attached) {
     TRACE(1, fprintf(_trace_fp, "Invalid Database handle %d in sqlo_server_detach\n", dbh););
     return SQLO_INVALID_DB_HANDLE;
   }
@@ -5656,18 +5274,15 @@ int DEFUN(sqlo_server_detach, (dbh), sqlo_db_handle_t dbh)
   assert(dbp != nullptr);
 
   /* forgot to call sqlo_session_end ? */
-  if (dbp->session_created)
-  {
-    if (SQLO_SUCCESS != sqlo_session_end(dbh))
-    {
+  if (dbp->session_created) {
+    if (SQLO_SUCCESS != sqlo_session_end(dbh)) {
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_server_detach", "sqlo_session_end");
     }
   }
 
   dbp->status = OCIServerDetach(dbp->srvhp, dbp->errhp, OCI_DEFAULT);
 
-  if (OCI_SUCCESS != dbp->status)
-  {
+  if (OCI_SUCCESS != dbp->status) {
     CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_server_detach", "OCIServerDetach");
     _db_release(dbp);
     return dbp->status;
@@ -5694,8 +5309,7 @@ int DEFUN(sqlo_server_free, (dbh), sqlo_db_handle_t dbh)
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_server_free[%d] starts\n", dbh););
   assert(dbp != nullptr);
 
-  if (dbp->attached)
-  {
+  if (dbp->attached) {
     dbp->status = OCIServerDetach(dbp->srvhp, dbp->errhp, OCI_DEFAULT);
   }
 
@@ -5713,8 +5327,7 @@ int DEFUN(sqlo_session_end, (dbh), sqlo_db_handle_t dbh)
 {
   sqlo_db_struct_ptr_t dbp;
 
-  if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used || !_dbv[dbh]->session_created)
-  {
+  if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used || !_dbv[dbh]->session_created) {
     TRACE(1, fprintf(_trace_fp, "Invalid Database handle %d in sqlo_session_end\n", dbh););
     return SQLO_INVALID_DB_HANDLE;
   }
@@ -5727,14 +5340,12 @@ int DEFUN(sqlo_session_end, (dbh), sqlo_db_handle_t dbh)
   /* close all open cursors  on this database connection */
   _close_all_db_cursors(dbp);
 
-  while (OCI_STILL_EXECUTING == (dbp->status = OCISessionEnd(dbp->svchp, dbp->errhp, dbp->authp, 0)))
-  {
+  while (OCI_STILL_EXECUTING == (dbp->status = OCISessionEnd(dbp->svchp, dbp->errhp, dbp->authp, 0))) {
     TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_session_end: Still executing OCISessionEnd\n"););
     SQLO_USLEEP;
   }
 
-  if (OCI_SUCCESS != dbp->status)
-  {
+  if (OCI_SUCCESS != dbp->status) {
     dbp->session_created = FALSE; /* mark it as finished */
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_session_end", "OCISessionEnd");
   }
@@ -5760,8 +5371,7 @@ int DEFUN(sqlo_connect, (dbhp, cstr), sqlo_db_handle_t *dbhp AND const char *cst
   char pwd[MAX_BUFLEN + 1];
   char tnsname[MAX_BUFLEN + 1];
 
-  if (!dbhp)
-  {
+  if (!dbhp) {
     return SQLO_ERROR;
   }
 
@@ -5772,8 +5382,7 @@ int DEFUN(sqlo_connect, (dbhp, cstr), sqlo_db_handle_t *dbhp AND const char *cst
 
   TRACE(3, fprintf(_get_trace_fp(nullptr), "sqlo_connect: uid=%s, pwd=%s, tnsname=%s\n", uid, pwd, tnsname););
 
-  if (SQLO_SUCCESS != (status = sqlo_server_attach(dbhp, tnsname)))
-  {
+  if (SQLO_SUCCESS != (status = sqlo_server_attach(dbhp, tnsname))) {
     /* save the error message, because the db will be released */
     strcpy(_errmsg, sqlo_geterror(*dbhp));
 
@@ -5782,8 +5391,7 @@ int DEFUN(sqlo_connect, (dbhp, cstr), sqlo_db_handle_t *dbhp AND const char *cst
     return status;
   }
 
-  if (SQLO_SUCCESS != (status = sqlo_session_begin(*dbhp, uid, pwd)))
-  {
+  if (SQLO_SUCCESS != (status = sqlo_session_begin(*dbhp, uid, pwd))) {
     /* save the error message, because the db will be released */
     strcpy(_errmsg, sqlo_geterror(*dbhp));
 
@@ -5808,11 +5416,9 @@ int DEFUN(sqlo_finish, (dbh), sqlo_db_handle_t dbh)
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_finish[%d] starts\n", dbh););
 
-  if (dbp->session_created)
-  {
+  if (dbp->session_created) {
 
-    if ((status = sqlo_session_end(dbh)) != 0 || (status = sqlo_server_detach(dbh)) != 0)
-    { // TODO: 0 -> OCI_SUCCESS
+    if ((status = sqlo_session_end(dbh)) != 0 || (status = sqlo_server_detach(dbh)) != 0) { // TODO: 0 -> OCI_SUCCESS
       TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_finish[%d] failed\n", dbh););
       /* Save the error message in the global variable, otherwise
        * sqlo_geterror(dbh) cannot return one when sqlo_server_free
@@ -5856,16 +5462,12 @@ int DEFUN(sqlo_finish, (dbh), sqlo_db_handle_t dbh)
  *-------------------------------------------------------------------------*/
 void DEFUN(sqlo_freeall, (), )
 {
-  if (_dbv)
-  {
+  if (_dbv) {
     /* register */ unsigned int dbv_idx;
 
-    for (dbv_idx = 0; dbv_idx < _dbv_size; ++dbv_idx)
-    {
-      if (_dbv[dbv_idx])
-      { //&& ( _dbv[dbv_idx]->used) )
-        if (_dbv[dbv_idx]->stmtv)
-        {
+    for (dbv_idx = 0; dbv_idx < _dbv_size; ++dbv_idx) {
+      if (_dbv[dbv_idx]) { //&& ( _dbv[dbv_idx]->used) )
+        if (_dbv[dbv_idx]->stmtv) {
           XFREE(_dbv[dbv_idx]->stmtv, __LINE__);
         }
         _db_release(_dbv[dbv_idx]);
@@ -5891,8 +5493,7 @@ CONST char *DEFUN(sqlo_getdatabase, (dbh), sqlo_db_handle_t dbh)
   if (!dbp)
     return nullptr;
 
-  if (!dbp->tnsname)
-  {
+  if (!dbp->tnsname) {
     sprintf(dbp->errmsg, "No tnsname in db structure\n");
     TRACE(2, (void)fputs(dbp->errmsg, _get_trace_fp(dbp)););
   }
@@ -5968,8 +5569,7 @@ int DEFUN(sqlo_prepare, (dbh, stmt), sqlo_db_handle_t dbh AND const char *stmt)
 
   _bindpv_reset(stp);
 
-  if (_is_query(stp))
-  {
+  if (_is_query(stp)) {
 
     /* Set the prefetch count to _num_prefetch_rows */
     _set_prefetch_rows(stp, _num_prefetch_rows);
@@ -6001,20 +5601,15 @@ int DEFUN(sqlo_bind_by_name, (sth, param_name, param_type, param_addr, param_siz
                    "name: %s type: %d (%s), size: %u\n",
                    sth, param_name, param_type, _get_data_type_str(param_type), param_size););
 
-  if (_is_prepared(stp))
-  {
+  if (_is_prepared(stp)) {
 
     /* check for a refcursor */
-    if (SQLOT_RSET == param_type)
-    {
+    if (SQLOT_RSET == param_type) {
       dbp->status = sqlo_bind_ref_cursor(sth, param_name, (int *)param_addr);
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_bind_by_name", "sqlo_bind_refcursor");
-    }
-    else
-    {
+    } else {
 
-      if (stp->num_bindpv >= stp->bindpv_size)
-      {
+      if (stp->num_bindpv >= stp->bindpv_size) {
         _alloc_bindp(stp, stp->num_bindpv + 1);
 
         CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_bind_by_name. alloc error for", param_name);
@@ -6028,16 +5623,13 @@ int DEFUN(sqlo_bind_by_name, (sth, param_name, param_type, param_addr, param_siz
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_bind_by_name. Cannot bind", param_name);
 
       /* In case of arrays, we setup the skip parameters. */
-      if (is_array)
-      {
+      if (is_array) {
         dbp->status = OCIBindArrayOfStruct(*bindp_addr, dbp->errhp, param_size, ind_addr ? sizeof(short) : 0, 0, 0);
         CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_bind_by_name. BindArrayOfStruct", param_name);
       }
       stp->num_bindpv++;
     }
-  }
-  else
-  {
+  } else {
     dbp->status = SQLO_STMT_NOT_PARSED;
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_bind_by_name", param_name);
   }
@@ -6060,11 +5652,9 @@ int DEFUN(sqlo_bind_ref_cursor, (sth, cursor_name, sth2p),
 
   TRACE(3, fprintf(_get_trace_fp(stp->dbp), "sqlo_bind_ref_cursor [%2d]: name: %s\n", sth, cursor_name);)
 
-  if (_is_prepared(stp))
-  {
+  if (_is_prepared(stp)) {
 
-    if (stp->num_bindpv >= stp->bindpv_size)
-    {
+    if (stp->num_bindpv >= stp->bindpv_size) {
       status = _alloc_bindp(stp, stp->num_bindpv + 1);
 
       CHECK_OCI_STATUS_RETURN(stp->dbp, status, "sqlo_bind_ref_cursor. alloc error for", cursor_name);
@@ -6085,9 +5675,7 @@ int DEFUN(sqlo_bind_ref_cursor, (sth, cursor_name, sth2p),
 
     st2p->cursor_type = REFCURSOR;
     st2p->prepared = TRUE;
-  }
-  else
-  {
+  } else {
     CHECK_OCI_STATUS_RETURN(stp->dbp, SQLO_STMT_NOT_PARSED, "sqlo_bind_ref_cursor", cursor_name);
   }
 
@@ -6112,8 +5700,7 @@ int DEFUN(sqlo_define_ntable, (sth, pos, sth2p),
   TRACE(3,
         fprintf(_get_trace_fp(dbp), "sqlo_define_ntable [%2d]: pos: %u, num_defnpv=%d\n", sth, pos, stp->num_defnpv););
 
-  if (_is_prepared(stp))
-  {
+  if (_is_prepared(stp)) {
 
     _alloc_definep(stp, pos);
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_define_ntable. alloc error", "");
@@ -6132,9 +5719,7 @@ int DEFUN(sqlo_define_ntable, (sth, pos, sth2p),
 
     st2p->cursor_type = NTABLE;
     st2p->prepared = TRUE;
-  }
-  else
-  {
+  } else {
     dbp->status = SQLO_STMT_NOT_PARSED;
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_define_ntable", "");
   }
@@ -6196,12 +5781,9 @@ int DEFUN(sqlo_define_by_pos, (sth, value_pos, value_type, value_addr, value_siz
                    sth, value_pos, value_type, _get_data_type_str(value_type), value_size, is_array););
 
   /* check for a nested table */
-  if (SQLOT_RSET == value_type)
-  {
+  if (SQLOT_RSET == value_type) {
     return sqlo_define_ntable(sth, static_cast<unsigned int>(value_pos), (int *)value_addr);
-  }
-  else
-  {
+  } else {
     return _define_by_pos(stp, static_cast<unsigned int>(value_pos), value_type, value_addr, value_size, ind_addr,
                           (ub4 *)rlen_addr, (ub2 *)0, is_array);
   }
@@ -6248,8 +5830,7 @@ int DEFUN(sqlo_execute, (sth, iterations), sqlo_stmt_handle_t sth AND unsigned i
   /* For REF CURSORS and NESTED TABLES, we determine the statement type and
    * define the output here
    */
-  if (DEFAULT != stp->cursor_type && 0 == stp->num_executions)
-  {
+  if (DEFAULT != stp->cursor_type && 0 == stp->num_executions) {
     /* REF CURSOR or NESTED TABLE */
     dbp->status = OCIAttrGet((dvoid *)stp->stmthp, (ub4)OCI_HTYPE_STMT, (dvoid *)&(stp->stype), (ub4 *)0,
                              (ub4)OCI_ATTR_STMT_TYPE, (OCIError *)dbp->errhp);
@@ -6257,28 +5838,20 @@ int DEFUN(sqlo_execute, (sth, iterations), sqlo_stmt_handle_t sth AND unsigned i
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_execute", "GetStmtType");
     dbp->status = _define_output(stp);
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_execute", "_define_output");
-  }
-  else if (_is_prepared(stp))
-  {
+  } else if (_is_prepared(stp)) {
 
     dbp->status = OCIStmtExecute(dbp->svchp, stp->stmthp, dbp->errhp, (ub4)iterations, (ub4)0, (OCISnapshot *)0,
                                  (OCISnapshot *)0, dbp->exec_flags);
 
-    if (OCI_SUCCESS != dbp->status && OCI_NO_DATA != dbp->status)
-    {
-      if (OCI_STILL_EXECUTING == dbp->status)
-      {
+    if (OCI_SUCCESS != dbp->status && OCI_NO_DATA != dbp->status) {
+      if (OCI_STILL_EXECUTING == dbp->status) {
         stp->still_executing = TRUE;
         stp->opened = TRUE;
-      }
-      else
-      {
+      } else {
 
         _save_oci_status(dbp, "sqlo_execute", _get_stmt_string(stp), __LINE__);
       }
-    }
-    else
-    {
+    } else {
       stp->opened = TRUE;
       stp->still_executing = FALSE;
 
@@ -6286,10 +5859,8 @@ int DEFUN(sqlo_execute, (sth, iterations), sqlo_stmt_handle_t sth AND unsigned i
                            * The next sqlo_bind_by_name will not have to
                            * to allocate again memory
                            */
-    }                     /* end if OCI_SUCCESS != status  */
-  }
-  else
-  {
+    } /* end if OCI_SUCCESS != status  */
+  } else {
     dbp->status = SQLO_STMT_NOT_PARSED;
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_execute", "");
   }
@@ -6315,8 +5886,7 @@ int DEFUN(sqlo_executeselect, (sth, iterations), sqlo_stmt_handle_t sth AND unsi
   /* For REF CURSORS and NESTED TABLES, we determine the statement type and
    * define the output here
    */
-  if (DEFAULT != stp->cursor_type && 0 == stp->num_executions)
-  {
+  if (DEFAULT != stp->cursor_type && 0 == stp->num_executions) {
     /* REF CURSOR or NESTED TABLE */
     dbp->status = OCIAttrGet((dvoid *)stp->stmthp, (ub4)OCI_HTYPE_STMT, (dvoid *)&(stp->stype), (ub4 *)0,
                              (ub4)OCI_ATTR_STMT_TYPE, (OCIError *)dbp->errhp);
@@ -6324,28 +5894,20 @@ int DEFUN(sqlo_executeselect, (sth, iterations), sqlo_stmt_handle_t sth AND unsi
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_execute", "GetStmtType");
     dbp->status = _define_output(stp);
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_execute", "_define_output");
-  }
-  else if (_is_prepared(stp))
-  {
+  } else if (_is_prepared(stp)) {
     // dbp->status = OCIStmtExecute(dbp->svchp, stp->stmthp, dbp->errhp, (ub4) iterations, (ub4) 0, (OCISnapshot *) 0,
     // (OCISnapshot *) 0, dbp->exec_flags);
     dbp->status = _define_output(stp);
     // CHECK_OCI_STATUS_RETURN(dbp, Ret, "sqlo_execute", "_define_output");
-    if (OCI_SUCCESS != dbp->status && OCI_NO_DATA != dbp->status)
-    {
-      if (OCI_STILL_EXECUTING == dbp->status)
-      {
+    if (OCI_SUCCESS != dbp->status && OCI_NO_DATA != dbp->status) {
+      if (OCI_STILL_EXECUTING == dbp->status) {
         stp->still_executing = TRUE;
         stp->opened = TRUE;
-      }
-      else
-      {
+      } else {
 
         _save_oci_status(dbp, "sqlo_execute", _get_stmt_string(stp), __LINE__);
       }
-    }
-    else
-    {
+    } else {
       stp->opened = TRUE;
       stp->still_executing = FALSE;
 
@@ -6353,10 +5915,8 @@ int DEFUN(sqlo_executeselect, (sth, iterations), sqlo_stmt_handle_t sth AND unsi
                            * The next sqlo_bind_by_name will not have to
                            * to allocate again memory
                            */
-    }                     /* end if OCI_SUCCESS != status  */
-  }
-  else
-  {
+    } /* end if OCI_SUCCESS != status  */
+  } else {
     dbp->status = SQLO_STMT_NOT_PARSED;
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_execute", "");
   }
@@ -6379,8 +5939,7 @@ CONST char **DEFUN(sqlo_ocol_names, (sth, num), sqlo_stmt_handle_t sth AND int *
   assert(stp->dbp);
   dbp = stp->dbp;
 
-  if (!_is_query(stp) || !_is_opened(stp))
-  {
+  if (!_is_query(stp) || !_is_opened(stp)) {
     sprintf(dbp->errmsg,
             "Cannot get values for a non-select/non-opened statement "
             "(sth %d) passed to sqlo_ocol_names stype=%u opened=%d\n",
@@ -6416,8 +5975,7 @@ int DEFUN(sqlo_ocol_names2, (sth, num, ocol_names), sqlo_stmt_handle_t sth AND i
   assert(stp->dbp != nullptr);
   dbp = stp->dbp;
 
-  if (!_is_query(stp) || !_is_opened(stp))
-  {
+  if (!_is_query(stp) || !_is_opened(stp)) {
     sprintf(dbp->errmsg,
             "Cannot get values for a non-select/non-opened statement "
             "(sth %d) passed to sqlo_ocol_names2 stype=%u opened=%d\n",
@@ -6455,8 +6013,7 @@ CONST int *DEFUN(sqlo_ocol_name_lens, (sth, num), sqlo_stmt_handle_t sth AND int
   assert(stp->dbp != nullptr);
   dbp = stp->dbp;
 
-  if (!_is_query(stp) || !_is_opened(stp))
-  {
+  if (!_is_query(stp) || !_is_opened(stp)) {
     sprintf(dbp->errmsg,
             "Cannot get values for a non-select/non-opened statement "
             "(sth %d) passed to sqlo_ocol_name_lens\n",
@@ -6488,8 +6045,7 @@ CONST unsigned int *DEFUN(sqlo_value_lens, (sth, num), sqlo_stmt_handle_t sth AN
   assert(stp->dbp != nullptr);
   dbp = stp->dbp;
 
-  if (!_is_query(stp) || !_is_opened(stp))
-  {
+  if (!_is_query(stp) || !_is_opened(stp)) {
     sprintf(dbp->errmsg,
             "Cannot get value len for a non-select/non-opened statement "
             "(sth %d) passed to sqlo_value_lens\n",
@@ -6516,8 +6072,7 @@ int DEFUN(sqlo_get_oci_handle, (sqloh, ocihp, type), int sqloh AND void *ocihp A
   sqlo_db_struct_ptr_t dbp;
   sqlo_stmt_struct_ptr_t stp;
 
-  switch (type)
-  {
+  switch (type) {
     /* global handles */
   case SQLO_OCI_HTYPE_ENV:
     CHECK_DBHANDLE(dbp, sqloh, "sqlo_get_oci_handle", SQLO_INVALID_DB_HANDLE);
@@ -6569,8 +6124,7 @@ int DEFUN(sqlo_get_db_handle, (sth), sqlo_stmt_handle_t sth)
 
   CHECK_STHANDLE(stp, sth, "sqlo_get_db_handle", SQLO_INVALID_STMT_HANDLE);
 
-  if (!stp->used || nullptr == stp->dbp)
-  {
+  if (!stp->used || nullptr == stp->dbp) {
     sprintf(errmsg, "Invalid sth %d passed to sqlo_get_db_handle.\n", sth);
 
     if (stp->dbp)
@@ -6599,13 +6153,11 @@ int DEFUN(sqlo_version, (version_str), const char *version_str)
   strncpy(tmp_version, version_str, TMP_VERSION_LEN);
   tmp_version[TMP_VERSION_LEN] = '\0';
 
-  if (sscanf(tmp_version, "%u.%u.%u", &major, &minor, &micro) != 3)
-  {
+  if (sscanf(tmp_version, "%u.%u.%u", &major, &minor, &micro) != 3) {
     return SQLO_MALFORMED_VERSION_STR;
   }
 
-  if (sqlo_major_version == major && sqlo_minor_version == minor && sqlo_micro_version >= micro)
-  {
+  if (sqlo_major_version == major && sqlo_minor_version == minor && sqlo_micro_version >= micro) {
     return SQLO_SUCCESS;
   }
   return SQLO_WRONG_VERSION;
@@ -6630,12 +6182,10 @@ int DEFUN(sqlo_set_blocking, (dbh, on), sqlo_db_handle_t dbh AND unsigned int on
 
   new_mode = on > 0 ? SQLO_ON : SQLO_OFF;
 
-  if (blocking != new_mode)
-  {
+  if (blocking != new_mode) {
     /* toggle the mode */
     if (OCI_SUCCESS != (dbp->status = OCIAttrSet((dvoid *)dbp->srvhp, (ub4)OCI_HTYPE_SERVER, (dvoid *)0, (ub4)0,
-                                                 (ub4)OCI_ATTR_NONBLOCKING_MODE, dbp->errhp)))
-    {
+                                                 (ub4)OCI_ATTR_NONBLOCKING_MODE, dbp->errhp))) {
       TRACE(2, fprintf(_get_trace_fp(dbp), "Unable to toggle blocking mode"););
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_set_blocking", "");
       return dbp->status;
@@ -6683,8 +6233,7 @@ int DEFUN(sqlo_break, (dbh), sqlo_db_handle_t dbh)
   _get_blocking_mode(dbp, &blocking);
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_break", "_get_blocking_mode");
 
-  if (SQLO_OFF == blocking)
-  {
+  if (SQLO_OFF == blocking) {
     dbp->status = OCIBreak(dbp->srvhp, dbp->errhp);
     TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_break OCIBreak returned %d\n", dbp->status););
 
@@ -6700,15 +6249,12 @@ int DEFUN(sqlo_break, (dbh), sqlo_db_handle_t dbh)
     _close_all_executing_cursors(dbp);
 
     /* Did sqlo_exec open a cursor */
-    if (dbp->stmthp)
-    {
+    if (dbp->stmthp) {
       dbp->status = OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
       dbp->stmthp = 0;
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_break", "OCIHandleFree(dbp->stmthp)");
     }
-  }
-  else
-  {
+  } else {
     dbp->status = SQLO_SUCCESS;
   }
 
@@ -6744,8 +6290,7 @@ int DEFUN(sqlo_free_lob_desc, (dbh, loblpp), sqlo_db_handle_t dbh AND sqlo_lob_d
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_free_lob_desc", SQLO_INVALID_DB_HANDLE);
 
-  if (!loblpp || !*loblpp)
-  {
+  if (!loblpp || !*loblpp) {
     strcpy(dbp->errmsg, "Invalid lob locator passed to sqlo_free_lob_desc");
     dbp->status = SQLO_ERROR;
     return dbp->status;
@@ -6784,12 +6329,9 @@ int DEFUN(sqlo_lob_write_buffer, (dbh, loblp, loblen, bufp, bufl, piece),
 
   nbytes = (loblen < bufl ? loblen : bufl);
 
-  if (loblen <= bufl && SQLO_FIRST_PIECE == piece)
-  {
+  if (loblen <= bufl && SQLO_FIRST_PIECE == piece) {
     p = OCI_ONE_PIECE;
-  }
-  else
-  {
+  } else {
     p = (ub1)piece;
   }
 
@@ -6824,12 +6366,9 @@ int DEFUN(sqlo_lob_append_buffer, (dbh, loblp, loblen, bufp, bufl, piece),
 
   nbytes = (loblen < bufl ? loblen : bufl);
 
-  if (loblen <= bufl && SQLO_FIRST_PIECE == piece)
-  {
+  if (loblen <= bufl && SQLO_FIRST_PIECE == piece) {
     p = OCI_ONE_PIECE;
-  }
-  else
-  {
+  } else {
     p = (ub1)piece;
   }
 
@@ -6869,18 +6408,14 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
   CHECK_DBHANDLE(dbp, dbh, "sqlo_lob_write_stream", SQLO_INVALID_DB_HANDLE);
   TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_lob_write_stream: filelen=%u\n", filelen););
 
-  if (filelen > MAX_LONG_SIZE)
-  {
+  if (filelen > MAX_LONG_SIZE) {
     nbytes = MAX_LONG_SIZE;
-  }
-  else
-  {
+  } else {
     nbytes = filelen;
   }
 
   /* get a chunk of data */
-  if (fread(buf, (size_t)nbytes, 1, fp) != 1)
-  {
+  if (fread(buf, (size_t)nbytes, 1, fp) != 1) {
     strcpy(dbp->errmsg, "sqlo_lob_write_stream: I/O error. Could not get data from stream");
     dbp->status = SQLO_ERROR;
     return dbp->status;
@@ -6888,16 +6423,13 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
 
   remainder -= nbytes;
 
-  if (0 == remainder)
-  { /* excatly one piece in the file */
+  if (0 == remainder) { /* excatly one piece in the file */
     TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_lob_write_stream: nbytes=%u remain=%u ONE piece\n", nbytes, remainder););
     dbp->status = SQLO_SUCCESS;
     piece = SQLO_ONE_PIECE;
-    do
-    {
+    do {
 
-      if (SQLO_STILL_EXECUTING == dbp->status)
-      {
+      if (SQLO_STILL_EXECUTING == dbp->status) {
         SQLO_USLEEP;
       }
 
@@ -6905,9 +6437,7 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
     } while (SQLO_STILL_EXECUTING == dbp->status);
 
     return dbp->status;
-  }
-  else
-  {
+  } else {
 
 #ifdef HAVE_OCILOBOPEN
     /* wrap this by an OCILobOpen()/OCILobClose() pair to make sure
@@ -6915,8 +6445,7 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
      */
     dbp->status = OCILobOpen(dbp->svchp, dbp->errhp, loblp, OCI_LOB_READWRITE);
 
-    if (0 > dbp->status)
-    {
+    if (0 > dbp->status) {
       if (_get_errcode(dbp) != ((-1) * SQLO_STILL_EXECUTING))
         CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "slqo_lob_write_stream", "OCILobOpen");
     }
@@ -6930,11 +6459,9 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
 
     piece = SQLO_FIRST_PIECE;
     /* wait until non-blocking call finished */
-    do
-    {
+    do {
 
-      if (SQLO_STILL_EXECUTING == dbp->status)
-      {
+      if (SQLO_STILL_EXECUTING == dbp->status) {
         SQLO_USLEEP;
       }
 
@@ -6942,14 +6469,10 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
 
     } while (SQLO_STILL_EXECUTING == dbp->status);
 
-    if (SQLO_NEED_DATA != dbp->status)
-    {
-      if (0 > dbp->status)
-      {
+    if (SQLO_NEED_DATA != dbp->status) {
+      if (0 > dbp->status) {
         CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_lob_write_stream", "sqlo_lob_write_buffer(FIRST)");
-      }
-      else
-      {
+      } else {
         sprintf(dbp->errmsg,
                 "sqlo_lob_write_buffer returned %d, expected %d "
                 "(SQLO_NEED_DATA)",
@@ -6960,20 +6483,15 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
 
     /* insert remaining pieces */
     piece = SQLO_NEXT_PIECE;
-    do
-    {
-      if (remainder > MAX_LONG_SIZE)
-      {
+    do {
+      if (remainder > MAX_LONG_SIZE) {
         nbytes = MAX_LONG_SIZE;
-      }
-      else
-      {
+      } else {
         nbytes = remainder;
         piece = SQLO_LAST_PIECE;
       }
 
-      if (fread((void *)buf, (size_t)nbytes, 1, fp) != 1)
-      {
+      if (fread((void *)buf, (size_t)nbytes, 1, fp) != 1) {
         strcpy(dbp->errmsg, "sqlo_lob_write_stream: I/O error. Could not get data from stream");
         TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_lob_write_stream: "
                                              "Error during fread(). Setting piece to SQLO_LAST_PIECE\n"););
@@ -6991,11 +6509,9 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
                        : (piece == SQLO_LAST_PIECE)  ? "LAST"
                                                      : "???"););
       /* wait until non-blocking call finished */
-      do
-      {
+      do {
 
-        if (SQLO_STILL_EXECUTING == dbp->status)
-        {
+        if (SQLO_STILL_EXECUTING == dbp->status) {
           SQLO_USLEEP;
         }
 
@@ -7003,8 +6519,7 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
 
       } while (SQLO_STILL_EXECUTING == dbp->status);
 
-      if (0 > dbp->status)
-      {
+      if (0 > dbp->status) {
         CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_lob_write_stream", "sqlo_lob_write_buffer(NEXT/LAST)");
       }
 
@@ -7012,8 +6527,7 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
     } while (dbp->status == SQLO_NEED_DATA && !feof(fp));
 
 #ifdef HAVE_OCILOBOPEN
-    while (SQLO_STILL_EXECUTING == (dbp->status = OCILobClose(dbp->svchp, dbp->errhp, loblp)))
-    {
+    while (SQLO_STILL_EXECUTING == (dbp->status = OCILobClose(dbp->svchp, dbp->errhp, loblp))) {
       SQLO_USLEEP;
     }
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "slqo_lob_write_stream", "OCILobClose");
@@ -7036,8 +6550,7 @@ DEFUN(sqlo_lob_get_length, (dbh, loblp, loblenp),
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_lob_get_length", SQLO_INVALID_DB_HANDLE);
 
-  if (!loblenp)
-  {
+  if (!loblenp) {
     strcpy(dbp->errmsg, "sqlo_lob_get_length: NULL pointer passed in loblen");
     return SQLO_ERROR;
   }
@@ -7089,30 +6602,24 @@ DEFUN(sqlo_lob_read_stream, (dbh, loblp, loblen, fp),
   CHECK_DBHANDLE(dbp, dbh, "sqlo_lob_read_stream", SQLO_INVALID_DB_HANDLE);
   TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_lob_read_stream: loblen=%u\n", loblen););
 
-  if (loblen > MAX_LONG_SIZE)
-  {
+  if (loblen > MAX_LONG_SIZE) {
     nbytes = MAX_LONG_SIZE;
-  }
-  else
-  {
+  } else {
     nbytes = loblen;
   }
 
   dbp->status = SQLO_SUCCESS;
 
   /* get a chunk of data out of the lob */
-  do
-  {
-    if (SQLO_STILL_EXECUTING == dbp->status)
-    {
+  do {
+    if (SQLO_STILL_EXECUTING == dbp->status) {
       SQLO_USLEEP;
     }
     sqlo_lob_read_buffer(dbh, loblp, loblen, (void *)buf, nbytes);
 
   } while (SQLO_STILL_EXECUTING == dbp->status);
 
-  switch (dbp->status)
-  {
+  switch (dbp->status) {
 
   case SQLO_SUCCESS:
     /* got all in one piece */
@@ -7135,18 +6642,15 @@ DEFUN(sqlo_lob_read_stream, (dbh, loblp, loblen, fp),
     /* write this buffer */
     (void)fwrite((void *)buf, (size_t)nbytes, 1, fp);
 
-    do
-    {
+    do {
       memset(buf, '\0', MAX_LONG_SIZE);
       /*      loblen = 0;*/
 
       remainder -= nbytes;
 
       /* get a chunk of data out of the lob */
-      do
-      {
-        if (SQLO_STILL_EXECUTING == dbp->status)
-        {
+      do {
+        if (SQLO_STILL_EXECUTING == dbp->status) {
           SQLO_USLEEP;
         }
 
@@ -7155,17 +6659,14 @@ DEFUN(sqlo_lob_read_stream, (dbh, loblp, loblen, fp),
       } while (SQLO_STILL_EXECUTING == dbp->status);
 
       /* write the data to the file */
-      if (remainder < nbytes)
-      {
+      if (remainder < nbytes) {
         TRACE(3, fprintf(_get_trace_fp(dbp),
                          "sqlo_lob_read_stream: "
                          "got last piece (%u bytes)\n",
                          remainder););
 
         (void)fwrite((void *)buf, (size_t)remainder, 1, fp);
-      }
-      else
-      {
+      } else {
 
         TRACE(3, fprintf(_get_trace_fp(dbp),
                          "sqlo_lob_read_stream: "
@@ -7234,12 +6735,11 @@ int DEFUN(sqlo_get_ocol_dtype, (sth, pos), sqlo_stmt_handle_t sth AND unsigned i
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_get_ocol_dtype: Getting datatype of col: %u\n", pos););
 
-  if (0 == stp->num_executions && !(REFCURSOR == stp->cursor_type))
-  {
+  if (0 == stp->num_executions && !(REFCURSOR == stp->cursor_type)) {
     /* execute to describe the output */
-    while (OCI_STILL_EXECUTING == (dbp->status = OCIStmtExecute(dbp->svchp, stp->stmthp, dbp->errhp, (ub4)0, (ub4)0,
-                                                                (OCISnapshot *)0, (OCISnapshot *)0, (ub4)OCI_DEFAULT)))
-    {
+    while (OCI_STILL_EXECUTING ==
+           (dbp->status = OCIStmtExecute(dbp->svchp, stp->stmthp, dbp->errhp, (ub4)0, (ub4)0, (OCISnapshot *)0,
+                                         (OCISnapshot *)0, (ub4)OCI_DEFAULT))) {
       SQLO_USLEEP;
     }
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_nget_ocol_dtype", "OCIStmtExecute(DESCRIBE)");
@@ -7251,8 +6751,7 @@ int DEFUN(sqlo_get_ocol_dtype, (sth, pos), sqlo_stmt_handle_t sth AND unsigned i
 
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_get_ocol_dtype", "OCIAttrGet(NumberOfColumns)");
 
-  if (pos > static_cast<unsigned int>(num_cols))
-  {
+  if (pos > static_cast<unsigned int>(num_cols)) {
     dbp->status = SQLO_INVALID_COLPOS;
     return dbp->status;
   }
@@ -7266,8 +6765,7 @@ int DEFUN(sqlo_get_ocol_dtype, (sth, pos), sqlo_stmt_handle_t sth AND unsigned i
   dbp->status = OCIAttrGet((dvoid *)paramd, (ub4)OCI_DTYPE_PARAM, (dvoid *)&dtype, (ub4 *)0, (ub4)OCI_ATTR_DATA_TYPE,
                            (OCIError *)dbp->errhp);
 
-  if (OCI_SUCCESS != dbp->status)
-  {
+  if (OCI_SUCCESS != dbp->status) {
     (void)OCIDescriptorFree(paramd, OCI_DTYPE_PARAM);
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_get_ocol_dtype", "OCIAttrGet(datatype)");
   }
@@ -7332,59 +6830,46 @@ static void DEFUN(_terminate_ocols, (stp, do_strip_string), sqlo_stmt_struct_ptr
   assert(indp != nullptr);
 
   /* scan thru all output columns and terminate and optionally strip them */
-  for (col_idx = 0; col_idx < stp->num_defnpv; ++col_idx, ++colp, ++outpp, ++lenp, ++indp)
-  {
+  for (col_idx = 0; col_idx < stp->num_defnpv; ++col_idx, ++colp, ++outpp, ++lenp, ++indp) {
     /*
      * *indp: 0 indicates 'not null' -1 (!= 0 because its ub2))
      * indicates 'null'
      */
 
-    if (*indp != 0)
-    {
+    if (*indp != 0) {
       /* NULL */
-      if ((*outpp) && lenp)
-      {
+      if ((*outpp) && lenp) {
         **outpp = '\0';
         *lenp = 0;
-      }
-      else if (lenp)
-      {
+      } else if (lenp) {
         *lenp = 0;
       }
-    }
-    else
-    {
+    } else {
       /* NOT NULL terminate the output */
 
       // TraceLog(LOGFILE, "Terminating col %i, *lenp %i, *outpp %p\n", col_idx, *lenp, *outpp);
 
       (*outpp)[*lenp] = '\0';
 
-      if (do_strip_string)
-      {
-        if (colp->dtype != SQLT_NUM && colp->dtype != SQLT_LNG)
-        {
+      if (do_strip_string) {
+        if (colp->dtype != SQLT_NUM && colp->dtype != SQLT_LNG) {
           /* string type */
           _strip_string(*outpp, *lenp);
-        }
-        else
-        {
+        } else {
           /* Strip leading blanks for numbers */
           /* register */ char *p;
           unsigned int l;
           l = *lenp + 1;
-          for (p = *outpp; *p == ' '; ++p)
-          {
+          for (p = *outpp; *p == ' '; ++p) {
           }
 
-          if (p != *outpp)
-          {
+          if (p != *outpp) {
             memmove(*outpp, p, l);
           }
         } /* end if dtype != SQLT_NUM */
-      }   /* end if do_strip_string */
-    }     /* end if NULL */
-  }       /* end for */
+      } /* end if do_strip_string */
+    } /* end if NULL */
+  } /* end for */
 }
 
 /*---------------------------------------------------------------------------
@@ -7408,8 +6893,7 @@ int DEFUN(sqlo_query_result, (sth, ncols, values, value_lens, colnames, colname_
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_query_result sth=%u\n", stp->sth););
 
-  if (!_is_query(stp))
-  {
+  if (!_is_query(stp)) {
     dbp->status = SQLO_INVALID_STMT_TYPE;
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_query_result", "Assertion");
   }
@@ -7423,8 +6907,7 @@ int DEFUN(sqlo_query_result, (sth, ncols, values, value_lens, colnames, colname_
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_query_result[%d]: OCIStmtFetch finished with %d\n", sth, dbp->status););
 
-  if (dbp->status == OCI_SUCCESS)
-  {
+  if (dbp->status == OCI_SUCCESS) {
     stp->still_executing = FALSE;
 
     _terminate_ocols(stp, 1); /* terminate and strip */
@@ -7438,27 +6921,19 @@ int DEFUN(sqlo_query_result, (sth, ncols, values, value_lens, colnames, colname_
     if (value_lens != nullptr)
       *value_lens = stp->outv_size;
 
-    if (colnames != nullptr)
-    {
+    if (colnames != nullptr) {
       *colnames = stp->ocol_namev;
     }
 
-    if (colname_lens != nullptr)
-    {
+    if (colname_lens != nullptr) {
       *colname_lens = stp->ocol_namev_size;
     }
-  }
-  else if (dbp->status == OCI_STILL_EXECUTING)
-  {
+  } else if (dbp->status == OCI_STILL_EXECUTING) {
     stp->still_executing = TRUE;
     return SQLO_STILL_EXECUTING;
-  }
-  else if (dbp->status == OCI_NO_DATA)
-  {
+  } else if (dbp->status == OCI_NO_DATA) {
     return SQLO_NO_DATA;
-  }
-  else
-  {
+  } else {
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_query_result", "");
   }
   return dbp->status;
@@ -7475,12 +6950,9 @@ int DEFUN(sqlo_set_autocommit, (dbh), sqlo_db_handle_t dbh AND int on)
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_set_autocommit: dbh=%d on=%d\n", dbh, on););
 
-  if (SQLO_ON == on)
-  {
+  if (SQLO_ON == on) {
     dbp->exec_flags |= OCI_COMMIT_ON_SUCCESS;
-  }
-  else
-  {
+  } else {
     dbp->exec_flags ^= OCI_COMMIT_ON_SUCCESS;
   }
 
@@ -7497,12 +6969,9 @@ int DEFUN(sqlo_autocommit, (dbh), sqlo_db_handle_t dbh)
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_autocommit", SQLO_INVALID_DB_HANDLE);
 
-  if (dbp->exec_flags & OCI_COMMIT_ON_SUCCESS)
-  {
+  if (dbp->exec_flags & OCI_COMMIT_ON_SUCCESS) {
     retval = SQLO_ON;
-  }
-  else
-  {
+  } else {
     retval = SQLO_OFF;
   }
 

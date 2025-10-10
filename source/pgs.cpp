@@ -111,12 +111,9 @@ HB_FUNC(PGSSTATUS) /* PGSStatus(ConnHandle) => nStatus */
   auto session = static_cast<PPSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
   assert(session->dbh != nullptr);
 
-  if (PQstatus(session->dbh) == CONNECTION_OK)
-  {
+  if (PQstatus(session->dbh) == CONNECTION_OK) {
     hb_retni(SQL_SUCCESS);
-  }
-  else
-  {
+  } else {
     hb_retni(SQL_ERROR);
   }
 }
@@ -134,8 +131,7 @@ HB_FUNC(PGSRESULTSTATUS) /* PGSResultStatus(ResultSet) => nStatus */
   assert(res != nullptr);
   auto ret = static_cast<int>(PQresultStatus(res));
 
-  switch (ret)
-  {
+  switch (ret) {
   case PGRES_EMPTY_QUERY:
     ret = SQL_ERROR;
     break;
@@ -172,8 +168,7 @@ HB_FUNC(PGSEXEC) /* PGSExec(ConnHandle, cCommand) => ResultSet */
   session->numcols = PQnfields(session->stmt);
   auto ret = static_cast<int>(PQresultStatus(session->stmt));
 
-  switch (ret)
-  {
+  switch (ret) {
   case PGRES_COMMAND_OK:
     session->iAffectedRows = static_cast<int>(atoi(PQcmdTuples(session->stmt)));
     break;
@@ -190,28 +185,19 @@ HB_FUNC(PGSFETCH) /* PGSFetch(ResultSet) => nStatus */
 
   int iTpl = PQresultStatus(session->stmt);
   session->iAffectedRows = 0;
-  if (iTpl != PGRES_TUPLES_OK)
-  {
+  if (iTpl != PGRES_TUPLES_OK) {
     hb_retni(SQL_INVALID_HANDLE);
-  }
-  else
-  {
-    if (session->ifetch >= -1)
-    {
+  } else {
+    if (session->ifetch >= -1) {
       session->ifetch++;
       iTpl = PQntuples(session->stmt) - 1;
-      if (session->ifetch > iTpl)
-      {
+      if (session->ifetch > iTpl) {
         hb_retni(SQL_NO_DATA_FOUND);
-      }
-      else
-      {
+      } else {
         session->iAffectedRows = static_cast<int>(iTpl);
         hb_retni(SQL_SUCCESS);
       }
-    }
-    else
-    {
+    } else {
       hb_retni(SQL_INVALID_HANDLE);
     }
   }
@@ -229,8 +215,7 @@ HB_FUNC(PGSCLEAR) /* PGSClear(ResultSet) */
 {
   auto session = static_cast<PPSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
   assert(session->dbh != nullptr);
-  if (session->stmt)
-  {
+  if (session->stmt) {
     PQclear(session->stmt);
     session->stmt = nullptr;
     session->ifetch = -2;
@@ -264,12 +249,9 @@ HB_FUNC(PGSCOMMIT) /* PGSCommit(ConnHandle) => nError */
   auto session = static_cast<PPSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
   assert(session->dbh != nullptr);
   PGresult *res = PQexec(session->dbh, "COMMIT");
-  if (PQresultStatus(res) == PGRES_COMMAND_OK)
-  {
+  if (PQresultStatus(res) == PGRES_COMMAND_OK) {
     hb_retni(SQL_SUCCESS);
-  }
-  else
-  {
+  } else {
     hb_retni(SQL_ERROR);
   }
 }
@@ -279,20 +261,16 @@ HB_FUNC(PGSROLLBACK) /* PGSRollBack(ConnHandle) => nError */
   auto session = static_cast<PPSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
   assert(session->dbh != nullptr);
   PGresult *res = PQexec(session->dbh, "ROLLBACK");
-  if (PQresultStatus(res) == PGRES_COMMAND_OK)
-  {
+  if (PQresultStatus(res) == PGRES_COMMAND_OK) {
     hb_retni(SQL_SUCCESS);
-  }
-  else
-  {
+  } else {
     hb_retni(SQL_ERROR);
   }
 }
 
 HB_FUNC(PGSQUERYATTR) /* PGSQueryAttr(ResultSet) => aStruct */
 {
-  if (hb_pcount() != 1)
-  {
+  if (hb_pcount() != 1) {
     hb_retnl(-2);
     return;
   }
@@ -312,8 +290,7 @@ HB_FUNC(PGSQUERYATTR) /* PGSQueryAttr(ResultSet) => aStruct */
   int type;
   HB_LONG typmod;
 
-  for (int row = 0; row < rows; row++)
-  {
+  for (int row = 0; row < rows; row++) {
     // long nullable;
     /* Column name */
     hb_arrayNew(atemp, 11);
@@ -327,8 +304,7 @@ HB_FUNC(PGSQUERYATTR) /* PGSQueryAttr(ResultSet) => aStruct */
 
     // nullable = PQgetisnull(session->stmt, row,PQfnumber(session->stmt, PQfname(session->stmt, row)));
 
-    if (typmod < 0L)
-    {
+    if (typmod < 0L) {
       typmod = static_cast<HB_LONG>(PQfsize(session->stmt, row));
     }
     /*
@@ -336,8 +312,7 @@ HB_FUNC(PGSQUERYATTR) /* PGSQueryAttr(ResultSet) => aStruct */
              typmod = 20L;
           }
     */
-    switch (type)
-    {
+    switch (type) {
     case CHAROID:
     case NAMEOID:
     case BPCHAROID:
@@ -369,13 +344,10 @@ HB_FUNC(PGSQUERYATTR) /* PGSQueryAttr(ResultSet) => aStruct */
     case NUMERICOID:
       hb_itemPutC(temp, "N");
       hb_arraySetForward(atemp, FIELD_TYPE, temp);
-      if (typmod > 0)
-      {
+      if (typmod > 0) {
         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, ((typmod - 4L) >> 16L)));
         hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, ((typmod - 4L) & 0xffff)));
-      }
-      else
-      {
+      } else {
         hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, 18));
         hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 6));
       }
@@ -474,8 +446,7 @@ HB_FUNC(PGSQUERYATTR) /* PGSQueryAttr(ResultSet) => aStruct */
 
 HB_FUNC(PGSTABLEATTR) /* PGSTableAttr(ConnHandle, cTableName) => aStruct */
 {
-  if (hb_pcount() < 3)
-  {
+  if (hb_pcount() < 3) {
     hb_retnl(-2);
     return;
   }
@@ -493,8 +464,7 @@ HB_FUNC(PGSTABLEATTR) /* PGSTableAttr(ConnHandle, cTableName) => aStruct */
 
   PGresult *stmtTemp = PQexec(session->dbh, attcmm);
 
-  if (PQresultStatus(stmtTemp) != PGRES_TUPLES_OK)
-  {
+  if (PQresultStatus(stmtTemp) != PGRES_TUPLES_OK) {
     TraceLog(LOGFILE, "Query error : %i - %s\n", PQresultStatus(stmtTemp), PQresStatus(PQresultStatus(stmtTemp)));
     PQclear(stmtTemp);
   }
@@ -506,8 +476,7 @@ HB_FUNC(PGSTABLEATTR) /* PGSTableAttr(ConnHandle, cTableName) => aStruct */
 
   hb_arrayNew(ret, rows);
 
-  for (int row = 0; row < rows; row++)
-  {
+  for (int row = 0; row < rows; row++) {
     /* Column name */
     hb_arrayNew(atemp, 11);
     hb_itemPutC(temp, hb_strupr(PQgetvalue(stmtTemp, row, 0)));
@@ -520,24 +489,17 @@ HB_FUNC(PGSTABLEATTR) /* PGSTableAttr(ConnHandle, cTableName) => aStruct */
     long typmod = atol(PQgetvalue(stmtTemp, row, 2));
     long nullable;
 
-    if (sr_iOldPgsBehavior())
-    {
+    if (sr_iOldPgsBehavior()) {
       nullable = 0;
-    }
-    else
-    {
-      if (strcmp(PQgetvalue(stmtTemp, row, 3), "f") == 0)
-      {
+    } else {
+      if (strcmp(PQgetvalue(stmtTemp, row, 3), "f") == 0) {
         nullable = 1;
-      }
-      else
-      {
+      } else {
         nullable = 0;
       }
     }
 
-    switch (type)
-    {
+    switch (type) {
     case CHAROID:
     case NAMEOID:
     case BPCHAROID:
@@ -677,10 +639,8 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
   PHB_ITEM pTemp;
   PHB_ITEM pTemp1;
 
-  if (lLenBuff <= 0)
-  { // database content is NULL
-    switch (lType)
-    {
+  if (lLenBuff <= 0) { // database content is NULL
+    switch (lType) {
     case SQL_CHAR: {
       auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
@@ -725,17 +685,13 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
     default:
       TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
     }
-  }
-  else
-  {
-    switch (lType)
-    {
+  } else {
+    switch (lType) {
     case SQL_CHAR: {
       auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
 
-      for (HB_SIZE lPos = lLenBuff; lPos < lLen; lPos++)
-      {
+      for (HB_SIZE lPos = lLenBuff; lPos < lLen; lPos++) {
         szResult[lPos] = ' ';
       }
       szResult[lLen] = '\0';
@@ -763,13 +719,11 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
 
     case SQL_LONGVARCHAR: {
 
-      if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) && (sr_lSerializeArrayAsJson()))
-      {
-        if (s_pSym_SR_FROMJSON == nullptr)
-        {
+      if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
+          (sr_lSerializeArrayAsJson())) {
+        if (s_pSym_SR_FROMJSON == nullptr) {
           s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-          if (s_pSym_SR_FROMJSON == nullptr)
-          {
+          if (s_pSym_SR_FROMJSON == nullptr) {
             printf("Could not find Symbol HB_JSONDECODE\n");
           }
         }
@@ -782,14 +736,10 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
         /* TOFIX: */
         hb_itemMove(pItem, pTemp);
         hb_itemRelease(pTemp);
-      }
-      else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString()))
-      {
-        if (s_pSym_SR_DESERIALIZE == nullptr)
-        {
+      } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
+        if (s_pSym_SR_DESERIALIZE == nullptr) {
           s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-          if (s_pSym_SR_DESERIALIZE == nullptr)
-          {
+          if (s_pSym_SR_DESERIALIZE == nullptr) {
             printf("Could not find Symbol SR_DESERIALIZE\n");
           }
         }
@@ -802,26 +752,20 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
         pTemp = hb_itemNew(nullptr);
         hb_itemMove(pTemp, hb_stackReturnItem());
 
-        if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate)
-        {
+        if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
           auto pLangItem = hb_itemNew(nullptr);
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos) ||
-              hb_hashScan(pTemp, sr_getRootLang(pLangItem), &ulPos))
-          {
+              hb_hashScan(pTemp, sr_getRootLang(pLangItem), &ulPos)) {
             hb_itemCopy(pItem, hb_hashGetValueAt(pTemp, ulPos));
           }
           hb_itemRelease(pLangItem);
-        }
-        else
-        {
+        } else {
           hb_itemMove(pItem, pTemp);
         }
         hb_itemRelease(pTemp);
-      }
-      else
-      {
+      } else {
         hb_itemPutCL(pItem, bBuffer, lLenBuff);
       }
       break;
@@ -829,11 +773,9 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
     // xmltoarray
     case SQL_LONGVARCHARXML: {
 
-      if (s_pSym_SR_FROMXML == nullptr)
-      {
+      if (s_pSym_SR_FROMXML == nullptr) {
         s_pSym_SR_FROMXML = hb_dynsymFindName("SR_FROMXML");
-        if (s_pSym_SR_FROMXML == nullptr)
-        {
+        if (s_pSym_SR_FROMXML == nullptr) {
           printf("Could not find Symbol SR_DESERIALIZE\n");
         }
       }
@@ -901,17 +843,14 @@ HB_FUNC(PGSLINEPROCESSED)
   assert(session->dbh != nullptr);
   assert(session->stmt != nullptr);
 
-  if (session)
-  {
+  if (session) {
     cols = hb_arrayLen(pFields);
 
-    for (i = 0; i < cols; i++)
-    {
+    for (i = 0; i < cols; i++) {
       temp = hb_itemNew(nullptr);
       lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i + 1), FIELD_ENUM);
 
-      if (lIndex != 0)
-      {
+      if (lIndex != 0) {
         col = PQgetvalue(session->stmt, session->ifetch, lIndex - 1);
         PGSFieldGet(hb_arrayGetItemPtr(pFields, i + 1), temp, static_cast<char *>(col), strlen(col), bQueryOnly,
                     ulSystemID, bTranslate);
@@ -925,8 +864,7 @@ HB_FUNC(PGSLINEPROCESSED)
 HB_FUNC(PGSAFFECTEDROWS)
 {
   auto session = static_cast<PPSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
-  if (session)
-  {
+  if (session) {
     hb_retni(session->iAffectedRows);
     return;
   }
