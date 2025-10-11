@@ -8,13 +8,56 @@ Harbour++
 C++ compiler  
 C++11 or upper  
 
-## Notes
+## Supported database systems
+
+| SGBD               | Status         |
+| ------------------ | -------------- |
+| SYSTEMID_ACCESS    |                |
+| SYSTEMID_ADABAS    |                |
+| SYSTEMID_AZURE     |                |
+| SYSTEMID_CACHE     |                |
+| SYSTEMID_FIREBR    |                |
+| SYSTEMID_FIREBR3   |                |
+| SYSTEMID_FIREBR4   |                |
+| SYSTEMID_FIREBR5   |                |
+| SYSTEMID_IBMDB2    |                |
+| SYSTEMID_INFORM    |                |
+| SYSTEMID_INGRES    |                |
+| SYSTEMID_MARIADB   |                |
+| SYSTEMID_MSSQL6    |                |
+| SYSTEMID_MSSQL7    |                |
+| SYSTEMID_MYSQL     |                |
+| SYSTEMID_ORACLE    |                |
+| SYSTEMID_OTERRO    |                |
+| SYSTEMID_PERVASIVE |                |
+| SYSTEMID_POSTGR    |                |
+| SYSTEMID_SQLANY    |                |
+| SYSTEMID_SQLBAS    |                |
+| SYSTEMID_SYBASE    |                |
+
+## C++ Compilers Compatibility
+
+| Project   | C/C++ compiler   | 32/64-bit | Status                  | Extra parameters    |
+| --------- | ---------------- | --------- | ----------------------- | ------------------- |
+| Harbour++ | MinGW            | 32-bit    | ...                     | ...                 |
+| Harbour++ | MinGW            | 64-bit    | ...                     | ...                 |
+| Harbour++ | MSVC             | 32-bit    | ...                     | ...                 |
+| Harbour++ | MSVC             | 64-bit    | ...                     | ...                 |
+| Harbour++ | Clang            | 32-bit    | ...                     | ...                 |
+| Harbour++ | Clang            | 64-bit    | ...                     | ...                 |
+| Harbour++ | BCC 7.3          | 32-bit    | ...                     | ...                 |
+| Harbour++ | BCC 7.3          | 64-bit    | ...                     | ...                 |
+
+## Building
 
 ### Windows - How to compile
 ```Batch
+git clone https://github.com/marcosgambeta/sqlrddpp-v2
 cd sqlrddpp-v2
 hbmk2 sqlrddpp-v2.hbp
 ```
+
+See the extra parameters in the table above.
 
 ### Ubuntu - How to get and compile
 ```Batch
@@ -31,6 +74,8 @@ git clone https://github.com/marcosgambeta/sqlrddpp-v2
 cd sqlrddpp-v2
 hbmk2 sqlrddpp-v2.hbp
 ```
+
+## Using
 
 ### Compiling with SQLRDD++ and MySQL
 ```Batch
@@ -53,6 +98,10 @@ SQLRDD for xHarbour and Harbour
 https://github.com/xHarbour-org/xharbour  
 https://github.com/xHarbour-org/xharbour/tree/main/xHarbourBuilder/xHarbour-SQLRDD  
 
+SQLRDD++ v1  
+https://github.com/marcosgambeta/sqlrddpp  
+C version for Harbour and Harbour++
+
 Bison  
 https://gnuwin32.sourceforge.net/packages/bison.htm  
 
@@ -69,4 +118,4 @@ Firebird
 https://firebirdsql.org  
 
 Harbour++  
-https://github.com/marcosgambeta/harbourpp-v1
+https://github.com/marcosgambeta/harbourpp-v1  
