@@ -1506,7 +1506,7 @@ Alert() copied as SQLBINDBYVAL() -> DEMO banner protection
 //#include "hbsetup.ch"
 #include "box.ch"
 #include <common.ch>
-#include "inkey.ch"
+#include <inkey.ch>
 #include "setcurs.ch"
 
 /* TOFIX: Clipper defines a clipped window for Alert() [vszakats] */
