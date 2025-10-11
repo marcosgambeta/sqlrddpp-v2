@@ -39,12 +39,12 @@ C++11 or upper
 
 | Project   | C/C++ compiler   | 32/64-bit | Status                  | Extra parameters    |
 | --------- | ---------------- | --------- | ----------------------- | ------------------- |
-| Harbour++ | MinGW            | 32-bit    | ...                     | ...                 |
-| Harbour++ | MinGW            | 64-bit    | ...                     | ...                 |
+| Harbour++ | MinGW            | 32-bit    | Compiling with warnings | ...                 |
+| Harbour++ | MinGW            | 64-bit    | Compiling with warnings | ...                 |
 | Harbour++ | MSVC             | 32-bit    | ...                     | ...                 |
 | Harbour++ | MSVC             | 64-bit    | ...                     | ...                 |
-| Harbour++ | Clang            | 32-bit    | ...                     | ...                 |
-| Harbour++ | Clang            | 64-bit    | ...                     | ...                 |
+| Harbour++ | Clang            | 32-bit    | Compiling with warnings | ...                 |
+| Harbour++ | Clang            | 64-bit    | Compiling with warnings | ...                 |
 | Harbour++ | BCC 7.3          | 32-bit    | ...                     | ...                 |
 | Harbour++ | BCC 7.3          | 64-bit    | ...                     | ...                 |
 
@@ -56,8 +56,6 @@ git clone https://github.com/marcosgambeta/sqlrddpp-v2
 cd sqlrddpp-v2
 hbmk2 sqlrddpp-v2.hbp
 ```
-
-See the extra parameters in the table above.
 
 ### Ubuntu - How to get and compile
 ```Batch
