@@ -96,7 +96,7 @@ STATIC TRACE_STRUCT := { ;
 #include <setcurs.ch>
 #include <hbsetup.ch>
 #include <common.ch>
-#include "tbrowse.ch"
+#include <tbrowse.ch>
 
 /* E.F. 2006/04/22 - The #define DE_APPEND is for Append mode in dbEdit.
  * I have used tbrowse "cargo" to assign true/false for that.
