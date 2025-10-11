@@ -451,7 +451,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBu
     case SQL_TYPE_TIMESTAMP:
     case SQL_TYPE_DATE: {
       char dt[9];
-      if ((ulSystemID == SYSTEMID_OTERRO)) { // TODO: switch ?
+      if (ulSystemID == SYSTEMID_OTERRO) { // TODO: switch ?
         dt[0] = bBuffer[6];
         dt[1] = bBuffer[7];
         dt[2] = bBuffer[8];
