@@ -1503,7 +1503,7 @@ Alert() copied as SQLBINDBYVAL() -> DEMO banner protection
 
 */
 
-//#include "hbsetup.ch"
+//#include <hbsetup.ch>
 #include "box.ch"
 #include <common.ch>
 #include <inkey.ch>
