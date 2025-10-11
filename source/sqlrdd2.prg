@@ -50,7 +50,7 @@
 #include "sqlrdd.ch"
 #include "sqlodbc.ch"
 #include <error.ch>
-#include "ord.ch"
+#include <ord.ch>
 #include "msg.ch"
 #include "set.ch"
 #include <dbinfo.ch>
