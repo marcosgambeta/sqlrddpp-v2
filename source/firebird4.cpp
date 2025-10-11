@@ -882,7 +882,7 @@ HB_FUNC(FBGETDATA4) // FBGetData(hEnv, nField, @uData)
         break;
 
       default:
-        TraceLog(LOGFILE, "Unsupported data type returned in query: %i\n", dtype);
+        sr_TraceLog(LOGFILE, "Unsupported data type returned in query: %i\n", dtype);
         break;
       }
     }
@@ -931,7 +931,7 @@ HB_FUNC( FBCREATEDB4 )
 
    if( isc_dsql_execute_immediate(reinterpret_cast<ISC_STATUS*>(status), &newdb, &trans, 0, create_db, static_cast<unsigned short>(dialect), nullptr) ) {
       hb_retni(SQL_ERROR);
-      TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
+      sr_TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
    } else {
       if( isc_detach_database (reinterpret_cast<ISC_STATUS*>(status), &newdb) ) {
          hb_retni(SQL_ERROR);
@@ -984,7 +984,7 @@ HB_FUNC(FBCREATEDB4)
   if (isc_dsql_execute_immediate(reinterpret_cast<ISC_STATUS *>(status), &newdb, &trans, 0, sql.c_str(), dialect,
                                  nullptr)) {
     hb_retni(SQL_ERROR);
-    TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
+    sr_TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
   } else {
     if (isc_detach_database(reinterpret_cast<ISC_STATUS *>(status), &newdb)) {
       hb_retni(SQL_ERROR);
@@ -1083,7 +1083,7 @@ static void FBFieldGet4(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE 
       break;
     }
     default: {
-      TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
+      sr_TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
     }
     }
   } else {
@@ -1199,7 +1199,7 @@ static void FBFieldGet4(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE 
       break;
     }
     default: {
-      TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
+      sr_TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
     }
     }
   }
@@ -1373,7 +1373,7 @@ HB_FUNC(FBLINEPROCESSED4)
           }
           case IB_SQL_FLOAT:
             // hb_snprintf(data, sizeof(data), "%15g ", *static_cast<float ISC_FAR*>(var->sqldata));
-            // TraceLog("fb.log","valor float = %lf data %s\n",*static_cast<float ISC_FAR*>(var->sqldata),data);
+            // sr_TraceLog("fb.log","valor float = %lf data %s\n",*static_cast<float ISC_FAR*>(var->sqldata),data);
             // FBFieldGet(hb_arrayGetItemPtr(pFields, icol), temp, static_cast<char*>(data), strlen(data), bQueryOnly,
             // ulSystemID, bTranslate);
             hb_itemPutNDLen(temp, *reinterpret_cast<float ISC_FAR *>(var->sqldata), lLen, lDec);
@@ -1381,7 +1381,7 @@ HB_FUNC(FBLINEPROCESSED4)
             break;
           case IB_SQL_DOUBLE:
             // hb_snprintf(data, sizeof(data), "%24f ", *static_cast<double ISC_FAR*>(var->sqldata));
-            // TraceLog("fb.log","valor double = %lf data %s\n",*static_cast<float ISC_FAR*>(var->sqldata),data);
+            // sr_TraceLog("fb.log","valor double = %lf data %s\n",*static_cast<float ISC_FAR*>(var->sqldata),data);
             // FBFieldGet(hb_arrayGetItemPtr(pFields, icol), temp, static_cast<char*>(data), strlen(data), bQueryOnly,
             // ulSystemID, bTranslate);
             hb_itemPutNDLen(temp, *reinterpret_cast<double ISC_FAR *>(var->sqldata), lLen, lDec);
@@ -1456,7 +1456,7 @@ HB_FUNC(FBLINEPROCESSED4)
             hb_arraySetForward(pRet, icol, temp);
             break;
           default:
-            TraceLog(LOGFILE, "Unsupported data type returned in query: %i\n", dtype);
+            sr_TraceLog(LOGFILE, "Unsupported data type returned in query: %i\n", dtype);
             break;
           }
         }

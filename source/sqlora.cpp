@@ -143,10 +143,10 @@ const char *_sqlo_sqloraID = "$Id$";
 #define XFREE(p, i)                                                                                                    \
   do {                                                                                                                 \
     if (p) {                                                                                                           \
-      TraceLog(LOGFILE, "Pointer %p freed in line %i\n", p, i);                                                        \
+      sr_TraceLog(LOGFILE, "Pointer %p freed in line %i\n", p, i);                                                        \
       hb_xfree(p);                                                                                                     \
     } else {                                                                                                           \
-      TraceLog(LOGFILE, "NULL pointer free at sqlora.c line %i \n", i);                                                \
+      sr_TraceLog(LOGFILE, "NULL pointer free at sqlora.c line %i \n", i);                                                \
     }                                                                                                                  \
   } while (0)
 #else
@@ -155,7 +155,7 @@ const char *_sqlo_sqloraID = "$Id$";
     if (p) {                                                                                                           \
       hb_xfree(p);                                                                                                     \
     } else {                                                                                                           \
-      TraceLog(LOGFILE, "NULL pointer free at sqlora.c line %i \n", i);                                                \
+      sr_TraceLog(LOGFILE, "NULL pointer free at sqlora.c line %i \n", i);                                                \
     }                                                                                                                  \
   } while (0)
 #endif
@@ -880,7 +880,7 @@ void *hb_xgrabDebug(int iline, HB_SIZE ulSize)
 #endif
   pmem = hb_xgrab(ulSize);
 #ifdef DEBUG_XGRAB
-  TraceLog(LOGFILE, "Pointer %p allocating %" HB_PFS "u bytes in line %i\n", pmem, ulSize, iline);
+  sr_TraceLog(LOGFILE, "Pointer %p allocating %" HB_PFS "u bytes in line %i\n", pmem, ulSize, iline);
 #endif
   return pmem;
 }
@@ -893,11 +893,11 @@ void *hb_xreallocDebug(int iline, void *p, HB_SIZE ulSize)
 #endif
 
 #ifdef DEBUG_XGRAB
-  TraceLog(LOGFILE, "Pointer %p realloc %" HB_PFS "u bytes in line %i\n", p, ulSize, iline);
+  sr_TraceLog(LOGFILE, "Pointer %p realloc %" HB_PFS "u bytes in line %i\n", p, ulSize, iline);
 #endif
   pmem = hb_xrealloc(p, ulSize);
 #ifdef DEBUG_XGRAB
-  TraceLog(LOGFILE, "   Pointer %p realloc ok - %i bytes to pointer %p in line %i\n", p, ulSize, pmem, iline);
+  sr_TraceLog(LOGFILE, "   Pointer %p realloc ok - %i bytes to pointer %p in line %i\n", p, ulSize, pmem, iline);
 #endif
   return pmem;
 }
@@ -2028,7 +2028,7 @@ static void DEFUN(_dealloc_definep, (stp), sqlo_stmt_struct_ptr_t stp)
       }
 
       if (stp->ocolsv[col_idx].loblp) {
-        // TraceLog(LOGFILE, "col %i, OCIDescriptorFree 1 %p\n", col_idx, stp->ocolsv[col_idx].loblp);
+        // sr_TraceLog(LOGFILE, "col %i, OCIDescriptorFree 1 %p\n", col_idx, stp->ocolsv[col_idx].loblp);
         OCIDescriptorFree((dvoid **)&(stp->ocolsv[col_idx].loblp), (ub4)OCI_DTYPE_LOB);
         stp->ocolsv[col_idx].loblp = nullptr;
       }
@@ -3341,7 +3341,7 @@ static int DEFUN(_alloc_ocol_buffer, (stp, pos, buffer_size),
 
   col_idx = pos - 1;
 
-  // TraceLog(LOGFILE, "col %i, previously allocated %u, needed buffer_size: %u\n", col_idx, stp->rlenv[col_idx],
+  // sr_TraceLog(LOGFILE, "col %i, previously allocated %u, needed buffer_size: %u\n", col_idx, stp->rlenv[col_idx],
   // buffer_size);
 
   TRACE(3, fprintf(_get_trace_fp(stp->dbp), "_alloc_ocol_buffer: sth=%d, column pos=%u, buffer_size: %u\n", stp->sth,
@@ -3425,14 +3425,14 @@ static int DEFUN(_define_ocol_by_pos, (stp, colp, pos),
     if (buffer_size) {
       _alloc_ocol_buffer(stp, pos, buffer_size);
 
-      // TraceLog(LOGFILE, "_define_by_pos col %i, IN length %i, buffer %i, allocated %u\n", col_idx,
+      // sr_TraceLog(LOGFILE, "_define_by_pos col %i, IN length %i, buffer %i, allocated %u\n", col_idx,
       // stp->outv_size[col_idx], buffer_size, stp->rlenv[col_idx]);
 
       dbp->status = _define_by_pos(stp, pos, SQLT_STR, stp->outv[col_idx], stp->outv_size[col_idx],
                                    (short *)&stp->oindv[col_idx], (ub4 *)&stp->outv_size[col_idx], nullptr, 0);
       stp->outv_size[col_idx] = stp->outv_size[col_idx] - 1;
 
-      // TraceLog(LOGFILE, "_define_by_pos col %i, OUT length %i\n", col_idx, stp->outv_size[col_idx]);
+      // sr_TraceLog(LOGFILE, "_define_by_pos col %i, OUT length %i\n", col_idx, stp->outv_size[col_idx]);
     } else {
       /* Zero buffer means MEMO data type - should alloc LOB descriptor */
 
@@ -3440,7 +3440,7 @@ static int DEFUN(_define_ocol_by_pos, (stp, colp, pos),
 
       if (!colp->loblp) {
         OCIDescriptorAlloc((dvoid *)dbp->envhp, (dvoid **)&(colp->loblp), (ub4)OCI_DTYPE_LOB, (size_t)0, (dvoid **)0);
-        // TraceLog(LOGFILE, "col %i, OCIDescriptorAlloc %p\n", col_idx, colp->loblp);
+        // sr_TraceLog(LOGFILE, "col %i, OCIDescriptorAlloc %p\n", col_idx, colp->loblp);
       }
 
       dbp->status =
@@ -3614,7 +3614,7 @@ static void DEFUN(_close_all_db_cursors, (dbp), const_sqlo_db_struct_ptr_t dbp)
       if (stp->ocolsv && stp->ocolsv[col_idx].loblp) {
 
         OCIDescriptorFree((dvoid **)&(stp->ocolsv[col_idx].loblp), (ub4)OCI_DTYPE_LOB);
-        // TraceLog(LOGFILE, "col %i, OCIDescriptorFree 2 %p\n", col_idx, stp->ocolsv[col_idx].loblp);
+        // sr_TraceLog(LOGFILE, "col %i, OCIDescriptorFree 2 %p\n", col_idx, stp->ocolsv[col_idx].loblp);
 
         stp->ocolsv[col_idx].loblp = nullptr;
       }
@@ -4687,14 +4687,14 @@ int DEFUN(sqlo_fetch, (sth, nrows), sqlo_stmt_handle_t sth AND unsigned int nrow
               localStatus = OCILobGetLength(dbp->svchp, dbp->errhp, (OCILobLocator *)stp->ocolsv[col_idx].loblp,
                                             (ub4 *)&(stp->outv_size[col_idx]));
 
-              // TraceLog(LOGFILE, "OCILobGetLength col %i, out length %u, allocated %u\n", col_idx,
+              // sr_TraceLog(LOGFILE, "OCILobGetLength col %i, out length %u, allocated %u\n", col_idx,
               // stp->outv_size[col_idx], stp->rlenv[col_idx]);
 
               if (localStatus == OCI_SUCCESS && stp->outv_size[col_idx]) {
                 _alloc_ocol_buffer(stp, col_idx + 1, (static_cast<unsigned int>(stp->outv_size[col_idx])) + 1);
                 stp->outv_size[col_idx] = stp->outv_size[col_idx] - 1;
 
-                // TraceLog(LOGFILE, "col lob %i allocated %i, used %i at %p\n", col_idx, stp->rlenv[col_idx],
+                // sr_TraceLog(LOGFILE, "col lob %i allocated %i, used %i at %p\n", col_idx, stp->rlenv[col_idx],
                 // stp->outv_size[col_idx], stp->outv[col_idx]);
 
                 localStatus = sqlo_lob_read_buffer(dbp->dbh, (OCILobLocator *)stp->ocolsv[col_idx].loblp,
@@ -4703,11 +4703,11 @@ int DEFUN(sqlo_fetch, (sth, nrows), sqlo_stmt_handle_t sth AND unsigned int nrow
                                                    static_cast<unsigned int>(stp->outv_size[col_idx]));
 
                 if (localStatus == OCI_ERROR) {
-                  TraceLog(LOGFILE, "col %i status %i - error reading a %i bytes lob located by %p, dbh %p\n", col_idx,
+                  sr_TraceLog(LOGFILE, "col %i status %i - error reading a %i bytes lob located by %p, dbh %p\n", col_idx,
                            dbp->status, stp->outv_size[col_idx], stp->ocolsv[col_idx].loblp, dbp->dbh);
                 }
               } else { /* Success in GetLen() */
-                // TraceLog(LOGFILE, "col %i status %i - error reading lob length (read %u)\n", col_idx, dbp->status,
+                // sr_TraceLog(LOGFILE, "col %i status %i - error reading lob length (read %u)\n", col_idx, dbp->status,
                 // stp->outv_size[col_idx]);
               }
             } /* if is there any data */
@@ -4885,7 +4885,7 @@ int DEFUN(sqlo_close, (sth), sqlo_stmt_handle_t sth)
 
         if( stp->ocolsv[defnp_idx].loblp ) {
           OCIDescriptorFree((dvoid **) &(stp->ocolsv[defnp_idx].loblp), (ub4) OCI_DTYPE_LOB);
-          //TraceLog(LOGFILE, "col %i, OCIDescriptorFree 3 %p\n", defnp_idx, stp->ocolsv[defnp_idx].loblp);
+          //sr_TraceLog(LOGFILE, "col %i, OCIDescriptorFree 3 %p\n", defnp_idx, stp->ocolsv[defnp_idx].loblp);
           stp->ocolsv[defnp_idx].loblp = nullptr;
         }
     */
@@ -6273,7 +6273,7 @@ int DEFUN(sqlo_alloc_lob_desc, (dbh, loblpp), sqlo_db_handle_t dbh AND sqlo_lob_
 
   dbp->status = OCIDescriptorAlloc((dvoid *)dbp->envhp, (dvoid **)loblpp, (ub4)OCI_DTYPE_LOB, (size_t)0, (dvoid **)0);
 
-  // TraceLog(LOGFILE, "col ?, OCIDescriptorAlloc 2 %p\n", loblpp);
+  // sr_TraceLog(LOGFILE, "col ?, OCIDescriptorAlloc 2 %p\n", loblpp);
 
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_alloc_lob_desc", "OCIDescriptorAlloc");
 
@@ -6298,7 +6298,7 @@ int DEFUN(sqlo_free_lob_desc, (dbh, loblpp), sqlo_db_handle_t dbh AND sqlo_lob_d
 
   dbp->status = OCIDescriptorFree((dvoid **)*loblpp, (ub4)OCI_DTYPE_LOB);
 
-  // TraceLog(LOGFILE, "col ?, OCIDescriptorFree 4 %p\n", loblpp);
+  // sr_TraceLog(LOGFILE, "col ?, OCIDescriptorFree 4 %p\n", loblpp);
 
   *loblpp = nullptr;
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_free_lob_desc", "OCIDescriptorAlloc");
@@ -6847,7 +6847,7 @@ static void DEFUN(_terminate_ocols, (stp, do_strip_string), sqlo_stmt_struct_ptr
     } else {
       /* NOT NULL terminate the output */
 
-      // TraceLog(LOGFILE, "Terminating col %i, *lenp %i, *outpp %p\n", col_idx, *lenp, *outpp);
+      // sr_TraceLog(LOGFILE, "Terminating col %i, *lenp %i, *outpp %p\n", col_idx, *lenp, *outpp);
 
       (*outpp)[*lenp] = '\0';
 

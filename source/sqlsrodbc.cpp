@@ -410,7 +410,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBu
     }
 #endif
     default: {
-      TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
+      sr_TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
     }
     }
   } else {
@@ -566,7 +566,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBu
     }
 #endif
     default: {
-      TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
+      sr_TraceLog(LOGFILE, "Invalid data type detected: %i\n", lType);
     }
     }
   }
@@ -1060,7 +1060,7 @@ void odbcErrorDiag(SQLHSTMT hStmt, const char *routine, const char *szSql, int l
     i++;
   }
 
-  TraceLog(LOGFILE, "Error at %s, local %i: State: %s - Message: %s\r\nOriginal SQL code:\n%s\n", routine, line,
+  sr_TraceLog(LOGFILE, "Error at %s, local %i: State: %s - Message: %s\r\nOriginal SQL code:\n%s\n", routine, line,
            SqlState, Msg, szSql);
 }
 
