@@ -93,7 +93,7 @@ STATIC TRACE_STRUCT := { ;
 
 #include <dbedit.ch>
 #include <inkey.ch>
-#include "setcurs.ch"
+#include <setcurs.ch>
 #include "hbsetup.ch"
 #include <common.ch>
 #include "tbrowse.ch"
