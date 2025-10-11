@@ -2,6 +2,9 @@
  * SQLEX Auxiliar File for SEEK routines
  * Copyright (c) 2009 - Marcelo Lombardo  <lombardo@uol.com.br>
  *
+ */
+
+/*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)

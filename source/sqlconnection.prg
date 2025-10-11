@@ -2,6 +2,9 @@
  * Main Connection Class
  * Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
  *
+ */
+
+/*
  * This class does not work alone. It should be superclass of
  * database-specific connection class
  *
