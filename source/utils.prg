@@ -45,7 +45,7 @@
 // $END_LICENSE$
 
 #include <hbclass.ch>
-#include "common.ch"
+#include <common.ch>
 // #include "compat.ch"
 #include "sqlodbc.ch"
 #include "sqlrdd.ch"
@@ -1505,7 +1505,7 @@ Alert() copied as SQLBINDBYVAL() -> DEMO banner protection
 
 //#include "hbsetup.ch"
 #include "box.ch"
-#include "common.ch"
+#include <common.ch>
 #include "inkey.ch"
 #include "setcurs.ch"
 
