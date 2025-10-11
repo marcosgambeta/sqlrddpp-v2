@@ -1005,7 +1005,7 @@ HB_FUNC(SR_GETCONNECTOPTION)
 #if ODBCVER >= 0x0300
   SQLPOINTER buffer[512];
   SQLINTEGER lLen = 0;
-  buffer[0] = '\0';
+  buffer[0] = nullptr;
   hb_retni(SQLGetConnectAttr(static_cast<SQLHDBC>(hb_parptr(1)), static_cast<SQLINTEGER>(hb_parnl(2)),
                              static_cast<SQLPOINTER>(buffer), static_cast<SQLINTEGER>(sizeof(buffer)),
                              static_cast<SQLINTEGER *>(&lLen)));
