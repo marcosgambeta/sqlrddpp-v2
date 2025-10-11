@@ -38,7 +38,7 @@ source/utils.prg
 source/utilslang.prg
 
 #source/sql.y
-source/sqly.c
+{c}source/sqly.c
 
 source/compat.cpp
 source/firebird.cpp
