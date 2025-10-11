@@ -91,7 +91,7 @@ STATIC TRACE_STRUCT := { ;
  *
  */
 
-#include "dbedit.ch"
+#include <dbedit.ch>
 #include <inkey.ch>
 #include "setcurs.ch"
 #include "hbsetup.ch"
