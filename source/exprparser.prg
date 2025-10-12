@@ -105,13 +105,13 @@ RETURN SELF
 METHOD ParserBase:SortedOperators
 
    IF ::_SortedOperators == NIL
-      ::_SortedOperators := asort(::GetOperators(), , , {|x, y|x:nPriority < y:nPriority})
+      ::_SortedOperators := ASort(::GetOperators(), , , {|x, y|x:nPriority < y:nPriority})
    ENDIF
 
 RETURN ::_SortedOperators
 
 METHOD ParserBase:Parse(cExpression)
-RETURN ::InternParse("?" + AtRepl(chr(34), cExpression, "'") + "?", ::_cDefaultContext)
+RETURN ::InternParse("?" + AtRepl(Chr(34), cExpression, "'") + "?", ::_cDefaultContext)
 
 METHOD ParserBase:InternParse(cExpression, cAlias)
 
@@ -135,13 +135,13 @@ METHOD ParserBase:GetOperands(cExpression, cAlias, oOperand1, oConnector, oOpera
    LOCAL cNewAlias
    LOCAL cRegO
 
-   cExpression := alltrim(cExpression)
+   cExpression := AllTrim(cExpression)
 
-   cAlias := iif((cNewAlias := ::ExtractAlias1(@cExpression)) != NIL, cNewAlias, cAlias)
+   cAlias := IIf((cNewAlias := ::ExtractAlias1(@cExpression)) != NIL, cNewAlias, cAlias)
 
    DO WHILE hb_regexLike("^\?(?:[^\'\?]*?(?:\'[^\']*\'))*[^\'\?]*\?$", cExpression)
-      cExpression := alltrim(substr(cExpression, 2, len(cExpression) - 2))
-      cAlias := iif((cNewAlias := ::ExtractAlias2(@cExpression)) != NIL, cNewAlias, cAlias)
+      cExpression := AllTrim(substr(cExpression, 2, len(cExpression) - 2))
+      cAlias := IIf((cNewAlias := ::ExtractAlias2(@cExpression)) != NIL, cNewAlias, cAlias)
       ::ResolveParenthesis(@cExpression)
    ENDDO
 
@@ -157,7 +157,7 @@ METHOD ParserBase:GetOperands(cExpression, cAlias, oOperand1, oConnector, oOpera
       ENDIF
    NEXT i
 
-   cAlias := iif((cNewAlias := ::ExtractAlias3(@cExpression)) != NIL, cNewAlias, cAlias)
+   cAlias := IIf((cNewAlias := ::ExtractAlias3(@cExpression)) != NIL, cNewAlias, cAlias)
 
 RETURN NIL
 
@@ -199,7 +199,7 @@ METHOD ParserBase:RestoreParenthesis(cExpression)
          ENDDO
       ELSEIF cExpression[i] == "?"
          cExpression[i] := cParenthesis
-         cParenthesis := iif(cParenthesis == "(", ")", "(")
+         cParenthesis := IIf(cParenthesis == "(", ")", "(")
       ENDIF
    NEXT i
 
@@ -295,11 +295,11 @@ METHOD ExpressionParser:GetOperands(cExpression, cAlias, oOperand1, oConnector, 
          ::ResolveParenthesis(@cParameters)
          DO WHILE HB_RegExMatch(cRegParams, cParameters, .F.)
             aParamGroups := HB_RegExAtX(cRegParams, cParameters)
-            aadd(aParameters, ::GetParameter(aParamGroups[2, 1], cAlias))
+            AAdd(aParameters, ::GetParameter(aParamGroups[2, 1], cAlias))
             cParameters := aParamGroups[3, 1]
          ENDDO
          IF !cParameters == ""
-            aadd(aParameters, ::GetParameter(cParameters, cAlias))
+            AAdd(aParameters, ::GetParameter(cParameters, cAlias))
          ENDIF
          oOperand1 := FunctionExpression():new(cAlias, ::RestoreParenthesis(cExpression), cFunctionName, aParameters)
       ELSEIF HB_RegExMatch(cRegMacro, cExpression, .F.)
@@ -417,7 +417,7 @@ METHOD ConditionParser:GetOperands(cExpression, cAlias, oOperand1, oConnector, o
          oOperand1 := ::InternParse(aGroups[3, 1], cAlias)
          oOperand1:lDenied := .T.
       ELSE
-         cAlias := iif((cNewAlias := ::ExtractAlias3(@cExpression)) != NIL, cNewAlias, cAlias)
+         cAlias := IIf((cNewAlias := ::ExtractAlias3(@cExpression)) != NIL, cNewAlias, cAlias)
 
          oExpressionParser := ExpressionParser():new(cAlias)
 

@@ -80,7 +80,7 @@ FUNCTION aWhere(aArray, bPredicate)
 
    FOR EACH item IN aArray
       IF eval(bPredicate, item)
-         aadd(newArray, item)
+         AAdd(newArray, item)
       ENDIF
    NEXT
 
@@ -88,7 +88,7 @@ RETURN newArray
 
 FUNCTION xFirst(aArray, bPredicate)
 
-   LOCAL i := ascan(aArray, bPredicate)
+   LOCAL i := AScan(aArray, bPredicate)
 
    IF i == 0
       RETURN NIL
@@ -113,9 +113,9 @@ FUNCTION aDistinct(aArray, bSelector)
 
    FOR EACH item IN aArray
       id := eval(bSelector, item)
-      IF !(ascan(ids, id) > 0)
-         aadd(ids, id)
-         aadd(newArray, item)
+      IF !(AScan(ids, id) > 0)
+         AAdd(ids, id)
+         AAdd(newArray, item)
       ENDIF
    NEXT
 
@@ -126,7 +126,7 @@ PROCEDURE aAddRange(aArray1, aArray2)
    LOCAL item
 
    FOR EACH item IN aArray2
-      aadd(aArray1, item)
+      AAdd(aArray1, item)
    NEXT
 
 RETURN
@@ -139,8 +139,8 @@ PROCEDURE aAddDistinct(aArray1, xValue, bSelector)
       bSelector = {|x|x}
    ENDIF
    id := eval(bSelector, xValue)
-   IF ascan(aArray1, {|x|id == eval(bSelector, x)}) == 0
-      aadd(aArray1, xValue)
+   IF AScan(aArray1, {|x|id == eval(bSelector, x)}) == 0
+      AAdd(aArray1, xValue)
    ENDIF
 
 RETURN
@@ -169,7 +169,7 @@ PROCEDURE RemoveAll(aArray, bPredicate)
 RETURN
 
 FUNCTION aReplaceNilBy(aArray, xValue)
-RETURN aeval(aArray, {|x, n|iif(x == NIL, aArray[n] := xValue, NIL)})
+RETURN aeval(aArray, {|x, n|IIf(x == NIL, aArray[n] := xValue, NIL)})
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -218,12 +218,12 @@ METHOD Dictionary:aAdd(xKey, xValue, nMode)
 
    LOCAL lContainsKey := ::lContainsKey(xKey)
 
-   IF !(ascan({1, 2, 3}, nMode) > 0)
+   IF !(AScan({1, 2, 3}, nMode) > 0)
       nMode := 1
    ENDIF
    DO CASE
    CASE !lContainsKey
-      aadd(::aInternArray, KeyValuePair():new(xKey, xValue))
+      AAdd(::aInternArray, KeyValuePair():new(xKey, xValue))
    CASE nMode == 1 .AND. lContainsKey
       Throw(ErrorNew(, , , , "The given key already exists in the dictionary"))
    CASE nMode == 3 .AND. lContainsKey
@@ -255,7 +255,7 @@ METHOD Dictionary:SetValue(xKey, xValue)
 RETURN NIL
 
 METHOD Dictionary:nIndexOfKey(xKey)
-RETURN ascan(::aInternArray, {|x|x:xKey == xKey})
+RETURN AScan(::aInternArray, {|x|x:xKey == xKey})
 
 METHOD Dictionary:Remove(xKey)
 

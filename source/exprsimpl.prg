@@ -85,7 +85,7 @@ METHOD ExpressionSimplifierBase:new(pFixVariables, pIgnoreRelations, pContext)
    IF pIgnoreRelations != NIL
       ::lIgnoreRelations := pIgnoreRelations
    ENDIF
-   ::cContext := upper(pContext)
+   ::cContext := Upper(pContext)
 
 RETURN SELF
 
@@ -102,9 +102,9 @@ METHOD ExpressionSimplifierBase:SimplifyComposition(oExpression)
       IF newOperands[i]:lIsSimple
          //oSimpleExpression := newOperands[i]:oExpression (not used)
          oAlgebraSet := AlgebraSet():new(oExpression:oOperator, oExpression:GetType())
-         IF oAlgebraSet:cIdentityElement == upper(newOperands[i]:Value)
-            RETURN iif(i == 1, ::Simplify(newOperands[2]), newOperands[1])
-         ELSEIF oAlgebraSet:cAbsorbentElement != NIL .AND. oAlgebraSet:cAbsorbentElement == upper(newOperands[i]:Value)
+         IF oAlgebraSet:cIdentityElement == Upper(newOperands[i]:Value)
+            RETURN IIf(i == 1, ::Simplify(newOperands[2]), newOperands[1])
+         ELSEIF oAlgebraSet:cAbsorbentElement != NIL .AND. oAlgebraSet:cAbsorbentElement == Upper(newOperands[i]:Value)
             RETURN ::NewSimpleExpression(oExpression:cContext, oAlgebraSet:cAbsorbentElement)
          ENDIF
       ENDIF
@@ -130,7 +130,7 @@ CLASS ExpressionSimplifier FROM ExpressionSimplifierBase
    DATA _oConditionSimplifier
 
    HIDDEN:
-   ACCESS oConditionSimplifier INLINE iif(::_oConditionSimplifier == NIL, (::_oConditionSimplifier := ConditionSimplifier():new(::lFixVariables, ::lIgnoreRelations, ::cContext)), ::_oConditionSimplifier)
+   ACCESS oConditionSimplifier INLINE IIf(::_oConditionSimplifier == NIL, (::_oConditionSimplifier := ConditionSimplifier():new(::lFixVariables, ::lIgnoreRelations, ::cContext)), ::_oConditionSimplifier)
 
    EXPORTED:
    METHOD Simplify(oExpression)
@@ -214,16 +214,16 @@ METHOD ExpressionSimplifier:Simplify(oExpression)
                simplifier := SELF
             ENDIF
             IF oParameter:lIsByRef .OR. (oSimplifiedExpression := simplifier:Simplify(oParameter:oExpression)) == oParameter:oExpression
-               aadd(newParams, oParameter)
+               AAdd(newParams, oParameter)
             ELSE
-               aadd(newParams, Parameter():new(oSimplifiedExpression, .F.))
+               AAdd(newParams, Parameter():new(oSimplifiedExpression, .F.))
                lAtLeastOneParamSimplified := .T.
             ENDIF
          NEXT i
          IF lAtLeastOneParamSimplified
             newClipperString := oExpression:cFunctionName + "("
             FOR i := 1 TO len(newParams)
-               newClipperString += newParams[i]:oExpression:oClipperExpression:cValue + iif(i == len(newParams), ")", ",")
+               newClipperString += newParams[i]:oExpression:oClipperExpression:cValue + IIf(i == len(newParams), ")", ",")
             NEXT i
             result := FunctionExpression():new(oExpression:cContext, newClipperString, oExpression:cFunctionName, newParams)
          ENDIF

@@ -260,7 +260,7 @@ ENDCLASS
 METHOD ExpressionBase:new(pContext, pClipperString)
 
    ::oClipperExpression := ClipperExpression():new(pContext, pClipperString)
-   ::cContext := upper(pContext)
+   ::cContext := Upper(pContext)
 
 RETURN SELF
 
@@ -317,7 +317,7 @@ CLASS BooleanExpression FROM ConditionBase
    DATA oExpression
 
    EXPORTED:
-   ACCESS Value INLINE iif(::lDenied_, iif(upper(::oExpression:Value) == ".T.", ".F.", ".T."), ::oExpression:Value)
+   ACCESS Value INLINE IIf(::lDenied_, IIf(Upper(::oExpression:Value) == ".T.", ".F.", ".T."), ::oExpression:Value)
 
    EXPORTED:
    ACCESS lDenied
@@ -376,7 +376,7 @@ ENDCLASS
 
 METHOD ComposedConditionBase:new2(pContext, pClipperString, pDenied, pOperand1, pOperator, pOperand2)
 
-   ::lDenied_ = pDenied
+   ::lDenied_ := pDenied
 
 RETURN ::new(pContext, pClipperString, /*pExpr,*/ pOperand1, pOperator, pOperand2)
 
@@ -440,11 +440,11 @@ ENDCLASS
 
 METHOD ValueExpression:new(pContext, pValue)
 
-   ::super:new(pContext, alltrim(pValue))
+   ::super:new(pContext, AllTrim(pValue))
 
-   IF aScan(::oWorkArea:aNames, {|x|x == upper(pValue)}) > 0
+   IF AScan(::oWorkArea:aNames, {|x|x == Upper(pValue)}) > 0
       ::ValueType := "field"
-   ELSEIF hb_regexLike("\w+", pValue) .AND. hb_regexLike("\d+", !pValue) .AND. !lower(pValue) == "nil"
+   ELSEIF hb_regexLike("\w+", pValue) .AND. hb_regexLike("\d+", !pValue) .AND. !Lower(pValue) == "nil"
       ::ValueType := "variable"
    ELSE
       ::ValueType := "value"
@@ -472,12 +472,12 @@ METHOD ValueExpression:GetType()
             ::cType := "N"
          ELSEIF hb_regexLike("'.*'", ::Value)
             ::cType := "C"
-         ELSEIF ascan({".T.", ".F."}, upper(::Value)) > 0
+         ELSEIF AScan({".T.", ".F."}, Upper(::Value)) > 0
             ::cType := "L"
          ENDIF
          EXIT
       OTHERWISE
-         ::cType = "U"
+         ::cType := "U"
       ENDSWITCH
    ENDIF
 
@@ -499,7 +499,7 @@ ENDCLASS
 METHOD FunctionExpression:new(pContext, pClipperString, pFunctionName, aParameters)
 
    ::super:new(pContext, pClipperString)
-   ::cFunctionName := lower(pFunctionName)
+   ::cFunctionName := Lower(pFunctionName)
    ::aParameters := aParameters
 
 RETURN SELF
@@ -559,7 +559,7 @@ METHOD ComposedExpression:GetType()
 
    IF ::cType == NIL
       cOperand1Type := ::oOperand1:GetType()
-      IF ascan({"plus", "minus"}, ::oOperator:cName) > 0 .AND. cOperand1Type == "N" // date + numeric
+      IF AScan({"plus", "minus"}, ::oOperator:cName) > 0 .AND. cOperand1Type == "N" // date + numeric
          ::cType := ::oOperand2:GetType()
       ELSE
          ::cType := cOperand1Type
@@ -590,7 +590,7 @@ PROCEDURE Visualize(oExpression) // for debuging
       alert(oExpression:Value)
    ELSEIF oExpression:isKindOf("FunctionExpression")
       alert(oExpression:cFunctionName)
-      alert(cstr(len(oExpression:aParameters)) + " parameter(s) :")
+      alert(cstr(Len(oExpression:aParameters)) + " parameter(s) :")
       FOR EACH item IN oExpression:aParameters
          Visualize(item:oExpression)
       NEXT
@@ -602,7 +602,7 @@ FUNCTION CollectAliases(oExpression, aAliases)
 
    LOCAL item
 
-   aAddDistinct(aAliases, oExpression:cContext, {|x|lower(x)})
+   aAddDistinct(aAliases, oExpression:cContext, {|x|Lower(x)})
    IF oExpression:isKindOf("BooleanExpression")
       CollectAliases(oExpression:oExpression, aAliases)
    ELSEIF oExpression:isKindOf("Comparison") .OR. oExpression:isKindOf("ComposedCondition") .OR. oExpression:isKindOf("ComposedExpression")

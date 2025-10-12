@@ -195,7 +195,7 @@ METHOD SR_ODBC:MoreResults(aArray, lTranslate)
       ENDIF
 
       DO WHILE (::nRetCode := ::FetchRaw(lTranslate, aFieldsMore)) = SQL_SUCCESS
-         AADD(aArray, Array(len(aFieldsMore)))
+         AAdd(aArray, Array(len(aFieldsMore)))
          FOR i := 1 TO len(aFieldsMore)
             aArray[n, i] := ::FieldGet(i, aFieldsMore, lTranslate)
          NEXT i
@@ -263,7 +263,7 @@ METHOD SR_ODBC:AllocStatement()
       ::lSetNext := .F.
       nRet := ::SetStmtOptions(::nSetOpt, ::nSetValue)
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
-         SR_MsgLogFile(SR_Msg(23) + " (" + alltrim(str(nRet)) + ") : " + ::LastError())
+         SR_MsgLogFile(SR_Msg(23) + " (" + AllTrim(str(nRet)) + ") : " + ::LastError())
       ENDIF
    ENDIF
 
@@ -298,9 +298,9 @@ METHOD SR_ODBC:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecno
 
    IF lReSelect
       IF !Empty(cCommand)
-         nRet := ::Execute(cCommand + iif(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
+         nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       ELSE
-         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + iif(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + iif(::lComments, " /* Open Workarea */", ""), .F.)
+         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
       ENDIF
 
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
@@ -350,7 +350,7 @@ METHOD SR_ODBC:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecno
             ENDIF
          ENDIF
 
-         cName := upper(alltrim(cName))
+         cName := Upper(allTrim(cName))
          cType := ::SQLType(nType, cName, nLen)
          nLenField := ::SQLLen(nType, nLen, @nDec) + nSoma
          IF ::nSystemID == SYSTEMID_ORACLE .AND. (!::lQueryOnly) .AND. cType == "N" .AND. nLenField == 38 .AND. nDec == 0
@@ -366,7 +366,7 @@ METHOD SR_ODBC:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecno
          IF cType == "U"
             ::RuntimeErr("", SR_Msg(21) + cName + " : " + str(nType))
          ELSE
-            aFields[n] := {cName, cType, nLenField, iif(cType == "D", 0, nDec), nNull >= 1, nType, nLen, n, _nDec}
+            aFields[n] := {cName, cType, nLenField, IIf(cType == "D", 0, nDec), nNull >= 1, nType, nLen, n, _nDec}
          ENDIF
       ENDIF
 
@@ -437,7 +437,7 @@ METHOD SR_ODBC:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff
       SR_SetCOnnectAttr(hDbc, SQL_ATTR_CURRENT_CATALOG, ::cDTB, len(::cDTB))
    ENDIF
 
-   cConnect := alltrim(cConnect)
+   cConnect := AllTrim(cConnect)
    nRet := SR_DriverC(hDbc, @cConnect)
 
    IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO

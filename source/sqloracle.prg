@@ -186,7 +186,7 @@ METHOD SR_ORACLE:AllocStatement()
       ::lSetNext := .F.
       nRet := ::SetStmtOptions(::nSetOpt, ::nSetValue)
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
-         SR_MsgLogFile(SR_Msg(23) + " (" + alltrim(str(nRet)) + ") : " + ::LastError())
+         SR_MsgLogFile(SR_Msg(23) + " (" + AllTrim(str(nRet)) + ") : " + ::LastError())
       ENDIF
    ENDIF
 
@@ -218,9 +218,9 @@ METHOD SR_ORACLE:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRec
 
    IF lReSelect
       IF !Empty(cCommand)
-         nRet := ::Execute(cCommand + iif(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
+         nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       ELSE
-         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + iif(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + iif(::lComments, " /* Open Workarea */", ""), .F.)
+         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
       ENDIF
 
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
@@ -245,7 +245,7 @@ METHOD SR_ORACLE:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRec
       ELSE
          //_nLen := nLen (variable not used)
          //_nDec := nDec (variable not used)
-         cName := Upper(alltrim(cName))
+         cName := Upper(allTrim(cName))
 
          IF (nLen == 2000 .OR. nLen == 4000) .AND. SR_SetNwgCompat()
             nType := SQL_FAKE_LOB
@@ -376,7 +376,7 @@ METHOD SR_ORACLE:ExecuteRaw(cCommand)
 
    LOCAL nRet
 
-   IF upper(left(ltrim(cCommand), 6)) == "SELECT"
+   IF Upper(left(LTrim(cCommand), 6)) == "SELECT"
       ::hStmt := ::hDBC
       nRet := SQLO_EXECUTE(::hDBC, cCommand)
       ::lResultSet := .T.
@@ -406,7 +406,7 @@ STATIC FUNCTION ProcessParams(cSql, nBound)
 
    FOR EACH xParam IN aItens
       nPos := xParam:__enumIndex()
-      cOriginal += alltrim(":P" + StrZero(nPos, 3)) + " "
+      cOriginal += AllTrim(":P" + StrZero(nPos, 3)) + " "
       nParamBound ++
    NEXT
 
@@ -498,7 +498,7 @@ METHOD SR_ORACLE:ExecSP(cComm, aReturn, nParam, aType)
    ELSE
    //IF nError >= 0
       FOR i := 1 TO nParam
-         AADD(aReturn, ORACLEGETBINDDATA(::hdbc, i))
+         AAdd(aReturn, ORACLEGETBINDDATA(::hdbc, i))
       NEXT i
    ENDIF
 
@@ -585,7 +585,7 @@ METHOD SR_ORACLE:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMax
             IF lNoRecno
                FOR i := 1 TO len(aFields)
                   IF aFields[i, 1] != cRecnoName
-                     AADD(aDb, aFields[i])
+                     AAdd(aDb, aFields[i])
                   ELSE
                      nFieldRec := i
                   ENDIF
@@ -636,7 +636,7 @@ METHOD SR_ORACLE:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMax
          aFields := ::IniFields(.F., , , , , cRecnoName, cDeletedName, .T.)
 
          FOR i := 1 TO len(aFields)
-            ::cResult += PadR(aFields[i, 1], IIf(aFields[i, 2] == "M", Max(len(aFields[i, 1]), iif(::lShowTxtMemo, 79, 30)), Max(len(aFields[i, 1]), aFields[i, 3])), "-") + " "
+            ::cResult += PadR(aFields[i, 1], IIf(aFields[i, 2] == "M", Max(len(aFields[i, 1]), IIf(::lShowTxtMemo, 79, 30)), Max(len(aFields[i, 1]), aFields[i, 3])), "-") + " "
          NEXT i
 
          ::cResult += SR_CRLF
@@ -651,7 +651,7 @@ METHOD SR_ORACLE:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMax
             FOR i := 1 TO len(aFields)
                cCampo := ::FieldGet(i, aFields, lTranslate)
                IF aFields[i, 2] == "M"
-                  nLenMemo := Max(len(aFields[i, 1]), iif(::lShowTxtMemo, 79, 30))
+                  nLenMemo := Max(len(aFields[i, 1]), IIf(::lShowTxtMemo, 79, 30))
                   nLinesMemo := Max(mlCount(cCampo, nLenMemo), nLinesMemo)
                   cEste += memoline(cCampo, nLenMemo, 1) + " "
                   aMemo[i] := cCampo
@@ -769,7 +769,7 @@ FUNCTION ExecuteSP(cComm, aReturn)
    END SEQUENCE
 
    IF nError >= 0
-      AADD(aReturn, ORACLEGETBINDDATA(oConn:hdbc, 1))
+      AAdd(aReturn, ORACLEGETBINDDATA(oConn:hdbc, 1))
    ENDIF
 
    ORACLEFREEBIND(oConn:hdbc)

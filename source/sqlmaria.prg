@@ -180,9 +180,9 @@ METHOD SR_MARIA:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
 
    If lReSelect
       If !Empty(cCommand)
-         nRet := ::Execute(cCommand + iif(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
+         nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       Else
-         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + iif(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + iif(::lComments, " /* Open Workarea */", ""), .F.)
+         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
       EndIf
       If nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
          RETURN NIL
@@ -221,10 +221,10 @@ RETURN aFields
 METHOD SR_MARIA:LastError()
 
    If ::hStmt != NIL
-      RETURN "(" + alltrim(str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
+      RETURN "(" + AllTrim(str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
    EndIf
 
-RETURN "(" + alltrim(str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
+RETURN "(" + AllTrim(str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
 
 /*------------------------------------------------------------------------*/
 
@@ -268,7 +268,7 @@ METHOD SR_MARIA:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
       ::hStmt     = NIL
       ::hDbc      = hDbc
       cTargetDB   = "MARIADB Native"
-      cSystemVers = alltrim(str(MYSVERS(hDbc)))
+      cSystemVers = AllTrim(str(MYSVERS(hDbc)))
       nVersionp  := MYSVERS(hDbc)
 
    EndIf
@@ -319,7 +319,7 @@ RETURN ( ::nRetCode := MYSRollBack(::hDbc) )
 
 METHOD SR_MARIA:ExecuteRaw(cCommand)
 
-   If upper(left(ltrim(cCommand), 6)) == "SELECT" .OR. upper(left(ltrim(cCommand), 5)) == "SHOW "
+   If Upper(left(LTrim(cCommand), 6)) == "SELECT" .OR. Upper(left(LTrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
    Else
       ::lResultSet := .F.

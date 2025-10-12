@@ -180,9 +180,9 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
 
    IF lReSelect
       IF !Empty(cCommand)
-         nRet := ::Execute(cCommand + iif(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
+         nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       ELSE
-         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + iif(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + iif(::lComments, " /* Open Workarea */", ""), .F.)
+         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
       ENDIF
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
          RETURN NIL
@@ -198,7 +198,7 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
    ::nFields := nFields
 
    IF !Empty(cTable) .AND. empty(cCommand)
-      cTbl := lower(cTable)
+      cTbl := Lower(cTable)
       IF "." $ cTbl
          cOwner := SubStr(cTbl, 1, at(".", cTbl) - 1)
          cTbl := SubStr(cTbl, at(".", cTbl) + 1)
@@ -224,10 +224,10 @@ RETURN aFields
 METHOD SR_PGS:LastError()
 
    IF ::hStmt != NIL
-      RETURN "(" + alltrim(str(::nRetCode)) + ") " + PGSResStatus(::hDbc) + " - " + PGSErrMsg(::hDbc)
+      RETURN "(" + AllTrim(str(::nRetCode)) + ") " + PGSResStatus(::hDbc) + " - " + PGSErrMsg(::hDbc)
    ENDIF
 
-RETURN "(" + alltrim(str(::nRetCode)) + ") " + PGSErrMsg(::hDbc)
+RETURN "(" + AllTrim(str(::nRetCode)) + ") " + PGSErrMsg(::hDbc)
 
 /*------------------------------------------------------------------------*/
 
@@ -277,7 +277,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
 
    IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
       ::nRetCode := nRet
-      SR_MsgLogFile("Connection Error: " + alltrim(str(PGSStatus2(hDbc))) + " (see pgs.ch)")
+      SR_MsgLogFile("Connection Error: " + AllTrim(str(PGSStatus2(hDbc))) + " (see pgs.ch)")
       RETURN Self
    ELSE
       ::cConnect := cConnect
@@ -365,7 +365,7 @@ RETURN ::nRetCode
 
 METHOD SR_PGS:ExecuteRaw(cCommand)
 
-   IF upper(left(ltrim(cCommand), 6)) == "SELECT"
+   IF Upper(left(LTrim(cCommand), 6)) == "SELECT"
       ::lResultSet := .T.
    ELSE
       ::lResultSet := .F.

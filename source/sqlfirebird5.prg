@@ -177,11 +177,11 @@ METHOD SR_FIREBIRD5:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, c
 
    IF lReSelect
       IF !Empty(cCommand)
-         nRet := ::Execute(cCommand + iif(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
+         nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       ELSE
          // DOON'T remove "+0"
          ::Exec("select a.rdb$field_name, b.rdb$field_precision + 0 from rdb$relation_fields a, rdb$fields b where a.rdb$relation_name = '" + StrTran(cTable, chr(34), "") + "' and a.rdb$field_source = b.rdb$field_name", .F., .T., @aLocalPrecision)
-         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + iif(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + iif(::lComments, " /* Open Workarea */", ""), .F.)
+         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
       ENDIF
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
          RETURN NIL
@@ -207,8 +207,8 @@ METHOD SR_FIREBIRD5:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, c
          //_nLen := nLen (variable not used)
          _nDec := nDec
 
-         cName := upper(alltrim(cName))
-         nPos := aScan(aLocalPrecision, {|x|rtrim(x[1]) == cName})
+         cName := Upper(AllTrim(cName))
+         nPos := AScan(aLocalPrecision, {|x|RTrim(x[1]) == cName})
          cType := ::SQLType(nType, cName, nLen)
          nLenField := ::SQLLen(nType, nLen, @nDec)
          IF nPos > 0 .AND. aLocalPrecision[nPos, 2] > 0
@@ -243,7 +243,7 @@ METHOD SR_FIREBIRD5:LastError()
 
    cMsgError := FBError5(::hEnv, @nType)
 
-RETURN alltrim(cMsgError) + " - Native error code " + AllTrim(str(nType))
+RETURN allTrim(cMsgError) + " - Native error code " + AllTrim(str(nType))
 
 /*------------------------------------------------------------------------*/
 
@@ -272,7 +272,7 @@ METHOD SR_FIREBIRD5:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMa
 
    IF nRet != SQL_SUCCESS
       ::nRetCode := nRet
-      SR_MsgLogFile("Connection Error: " + alltrim(str(nRet)) + " (check fb.log) - Database: " + ::cDtb + " - Username : " + ::cUser + " (Password not shown for security)")
+      SR_MsgLogFile("Connection Error: " + AllTrim(str(nRet)) + " (check fb.log) - Database: " + ::cDtb + " - Username : " + ::cUser + " (Password not shown for security)")
       RETURN SELF
    ELSE
       ::cConnect := cConnect
@@ -285,7 +285,7 @@ METHOD SR_FIREBIRD5:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMa
 
    IF nRet != SQL_SUCCESS
       ::nRetCode := nRet
-      SR_MsgLogFile("Transaction Start error : " + alltrim(str(nRet)))
+      SR_MsgLogFile("Transaction Start error : " + AllTrim(str(nRet)))
       RETURN SELF
    ENDIF
 
@@ -329,7 +329,7 @@ METHOD SR_FIREBIRD5:ExecuteRaw(cCommand)
 
    LOCAL nRet
 
-   IF upper(left(ltrim(cCommand), 6)) == "SELECT" .OR. "RETURNING" $ upper(alltrim(cCommand))
+   IF Upper(left(LTrim(cCommand), 6)) == "SELECT" .OR. "RETURNING" $ Upper(AllTrim(cCommand))
       nRet := FBExecute5(::hEnv, cCommand, IB_DIALECT_CURRENT)
       ::lResultSet := .T.
    ELSE
@@ -359,7 +359,7 @@ METHOD SR_FIREBIRD5:MoreResults(aArray, lTranslate)
       DEFAULT aArray TO {}
       n := 1
 
-      AADD(aArray, Array(1))
+      AAdd(aArray, Array(1))
 
       aArray[n, 1] := nvalue
 

@@ -210,21 +210,21 @@ RETURN instance
 METHOD RelationManager:Clear(cAlias)
 
    ::oInternDictionary:Clear()
-   RemoveAll(::aDirectRelations, {|y|lower(y:oWorkarea1:cAlias) == lower(cAlias)})
+   RemoveAll(::aDirectRelations, {|y|Lower(y:oWorkarea1:cAlias) == Lower(cAlias)})
 
 RETURN NIL
 
 METHOD RelationManager:AddRelation(oFactory, pAlias1, pAlias2, pExpression)
 
-   LOCAL cAlias1 := upper(pAlias1)
-   LOCAL cAlias2 := upper(pAlias2)
-   LOCAL n := ascan(::aDirectRelations, {|x|upper(x:oWorkarea1:cAlias) == cAlias1 .AND. upper(x:oWorkarea2:cAlias) == cAlias2})
+   LOCAL cAlias1 := Upper(pAlias1)
+   LOCAL cAlias2 := Upper(pAlias2)
+   LOCAL n := AScan(::aDirectRelations, {|x|Upper(x:oWorkarea1:cAlias) == cAlias1 .AND. Upper(x:oWorkarea2:cAlias) == cAlias2})
    LOCAL oNewRelation := oFactory:NewDirectRelation(cAlias1, cAlias2, pExpression)
 
    IF n > 0
       ::aDirectRelations[n] := oNewRelation
    ELSE
-      aadd(::aDirectRelations, oNewRelation)
+      AAdd(::aDirectRelations, oNewRelation)
    ENDIF
    ::oInternDictionary:Clear()
 
@@ -238,20 +238,20 @@ METHOD RelationManager:GetRelations(cAlias1, cAlias2)
    LOCAL oDirectRelation
    LOCAL dico2
 
-   cAlias1 := upper(cAlias1)
-   cAlias2 := upper(cAlias2)
+   cAlias1 := Upper(cAlias1)
+   cAlias2 := Upper(cAlias2)
 
    IF ::oInternDictionary:lContainsKey(cAlias1) .AND. (dico2 := ::oInternDictionary:xValue(cAlias1)):lContainsKey(cAlias2)
       result := ::oInternDictionary:xValue(cAlias1):xValue(cAlias2)
    ELSE
       FOR i := 1 TO len(::aDirectRelations)
          oDirectRelation := ::aDirectRelations[i]
-         IF cAlias1 == upper(oDirectRelation:oWorkarea1:cAlias)
-            IF cAlias2 == upper(oDirectRelation:oWorkarea2:cAlias)
-               aadd(result, oDirectRelation)
+         IF cAlias1 == Upper(oDirectRelation:oWorkarea1:cAlias)
+            IF cAlias2 == Upper(oDirectRelation:oWorkarea2:cAlias)
+               AAdd(result, oDirectRelation)
             ELSE
                r := IndirectRelation():new()
-               aadd(r:aDirectRelations, oDirectRelation)
+               AAdd(r:aDirectRelations, oDirectRelation)
                aAddRange(result, ::BuildRelations(r, oDirectRelation:oWorkarea2:cAlias, cAlias2))
             ENDIF
          ENDIF
@@ -275,22 +275,22 @@ METHOD RelationManager:BuildRelations(oIndirectRelation, cAlias1, cAlias2)
    LOCAL j
    LOCAL oDirectRelation
 
-   cAlias1 := upper(cAlias1)
-   cAlias2 := upper(cAlias2)
+   cAlias1 := Upper(cAlias1)
+   cAlias2 := Upper(cAlias2)
 
    FOR i := 1 TO len(::aDirectRelations)
       oDirectRelation := ::aDirectRelations[i]
-      IF cAlias1 == upper(oDirectRelation:oWorkarea1:cAlias)
+      IF cAlias1 == Upper(oDirectRelation:oWorkarea1:cAlias)
          oDirectRelation := ::aDirectRelations[i]
          r := IndirectRelation():new()
          FOR j := 1 TO len(oIndirectRelation:aDirectRelations)
-             aadd(r:aDirectRelations, oIndirectRelation:aDirectRelations[j])
+             AAdd(r:aDirectRelations, oIndirectRelation:aDirectRelations[j])
          NEXT j
 
-         aadd(r:aDirectRelations, oDirectRelation)
+         AAdd(r:aDirectRelations, oDirectRelation)
 
          IF oDirectRelation:oWorkarea2:cAlias == cAlias2
-            aadd(result, r)
+            AAdd(result, r)
          ELSE
             aAddRange(result, ::BuildRelations(r, oDirectRelation:oWorkarea2:cAlias, cAlias2))
          ENDIF
@@ -348,7 +348,7 @@ METHOD DbIndex:new(pWorkarea, pName)
    ELSE
       ::oWorkarea := pWorkarea
    ENDIF
-   ::_cName := upper(pName)
+   ::_cName := Upper(pName)
    ::_aInfos := aWhere(pWorkarea:aIndex, {|x|x[10] == ::_cName})[1]
    ::oClipperExpression := ClipperExpression():new(::oWorkarea:cAlias, ::_aInfos[4], ::lIsSynthetic)
 
@@ -370,10 +370,10 @@ METHOD DbIndex:aDbFields()
       ::_aDbFields := {}
       IF ::lIsSynthetic()
          // ::oClipperExpression:nLength will evaluate the index expression which is a bit slow. It would be nice to have access to the legnth of a synthetic index.
-         aadd(::_aDbFields, DbField():new(HB_RegExAtX(".*\[(.*?)\]", ::_aInfos[1], .F.)[2, 1], "C", ::oClipperExpression:nLength)) //the way to get the name of the field that contains the synthetic index isn't very clean... We also suppose that the synthtic index has a fix length
+         AAdd(::_aDbFields, DbField():new(HB_RegExAtX(".*\[(.*?)\]", ::_aInfos[1], .F.)[2, 1], "C", ::oClipperExpression:nLength)) //the way to get the name of the field that contains the synthetic index isn't very clean... We also suppose that the synthtic index has a fix length
       ELSE
          FOR i := 1 TO len(::_aInfos[3]) - 1 // not SR_RECNO
-            aadd(::_aDbFields, ::oWorkarea:GetFieldByName(::_aInfos[3][i][1]))
+            AAdd(::_aDbFields, ::oWorkarea:GetFieldByName(::_aInfos[3][i][1]))
          NEXT i
       ENDIF
    ENDIF
@@ -566,12 +566,12 @@ FUNCTION GetIndexes(lOrdered)
       ::aIndexes := {}
       FOR i := 1 TO len(::aIndex)
          IF hb_regexLike("^\w+$", ::aIndex[i, 10])
-            aadd(::aIndexes, DbIndex():new(self, ::aIndex[i, 10]))
+            AAdd(::aIndexes, DbIndex():new(self, ::aIndex[i, 10]))
          ENDIF
       NEXT i
    ENDIF
    IF lOrdered // order can change with set order to => we could also redefine DbSetOrder() to sort aIndexes each time the order change.
-      asort(::aIndexes, {|x, y|&(::cAlias)->(OrdNumber(x:cName)) < &(::cAlias)->(OrdNumber(y:cName))})
+      ASort(::aIndexes, {|x, y|&(::cAlias)->(OrdNumber(x:cName)) < &(::cAlias)->(OrdNumber(y:cName))})
    ENDIF
 
 RETURN ::aIndexes
@@ -619,7 +619,7 @@ FUNCTION GetFieldByName(cName)
 
    LOCAL self := HB_QSelf()
 
-RETURN xFirst(::GetFields(), {|x|lower(x:cName) == lower(cName)})
+RETURN xFirst(::GetFields(), {|x|Lower(x:cName) == Lower(cName)})
 
 // should be implemented : GetTranslations() and lFixVariables
 FUNCTION NewParseForClause(cFor, lFixVariables)

@@ -532,7 +532,7 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
       ENDIF
 
       // ToDo: Add MUTEX here
-      aadd(aConnections, oConnect)
+      AAdd(aConnections, oConnect)
       nRet := len(aConnections)
 
       IF nActiveConnection == NIL .OR. nActiveConnection == 0
@@ -593,16 +593,16 @@ FUNCTION SR_ReloadFieldModifiers(oConnect)
                IF "." $ cLast
                   cLast := Upper(SubSTr(cLast, At(".", cLast) + 1))
                ENDIF
-               oConnect:aFieldModifier[alltrim(cLast)] := aFlds
+               oConnect:aFieldModifier[AllTrim(cLast)] := aFlds
                aFlds := {}
                cLast := aField[1]
             ENDIF
-            aadd(aFlds, {aField[2], aField[3], aField[4], aField[5]})
+            AAdd(aFlds, {aField[2], aField[3], aField[4], aField[5]})
          NEXT
          IF "." $ cLast
             cLast := Upper(SubSTr(cLast, At(".", cLast) + 1))
          ENDIF
-         oConnect:aFieldModifier[alltrim(cLast)] := aFlds
+         oConnect:aFieldModifier[AllTrim(cLast)] := aFlds
       ENDIF
    ELSE
       oConnect:Commit()
@@ -705,7 +705,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          oCnn:exec("SELECT convert( char(30), login_time, 21 ) FROM MASTER.DBO.SYSPROCESSES where SPID = @@SPID", .F., .T., @aRet)
 
          IF len(aRet) > 0
-            oCnn:cLoginTime := alltrim(aRet[1, 1])
+            oCnn:cLoginTime := AllTrim(aRet[1, 1])
          ENDIF
 
          oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ = @@SPID OR convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)", .F.)
@@ -793,7 +793,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
    oConnect:exec("SELECT VERSION_, SIGNATURE_ FROM " + SR_GetToolsOwner() + "SR_MGMNTVERSION", .F., .T., @aRet)
 
    IF len(aRet) > 0
-      cStartingVersion := alltrim(aRet[1, 1])
+      cStartingVersion := AllTrim(aRet[1, 1])
    ELSE
       cStartingVersion := ""
    ENDIF
@@ -807,7 +807,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:commit()
 
       IF oConnect:nSystemID == SYSTEMID_AZURE
-         oConnect:exec("CREATE CLUSTERED INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTVERSION01 ON " + SR_GetToolsOwner() + "SR_MGMNTVERSION ( VERSION_ )", .F.)
+         oConnect:exec("CREATE CLUSTERED INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTVERSION01 ON " + SR_GetToolsOwner() + "SR_MGMNTVERSION ( VERSION_ )", .F.)
          oConnect:commit()
       ENDIF
 
@@ -817,27 +817,27 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTINDEXES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), IDXNAME_ CHAR(64), PHIS_NAME_ CHAR(64), IDXKEY_ VARCHAR(254), IDXFOR_ VARCHAR(254), IDXCOL_ CHAR(3), TAG_ CHAR(30), TAGNUM_ CHAR(6) )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED ", " ") + " INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX01 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( TABLE_ )", .F.)
+      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED ", " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX01 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( TABLE_ )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX02 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( IDXNAME_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX02 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( IDXNAME_ )", .F.)
       oConnect:commit()
       oConnect:exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES", .F.)
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED ", " ") + " INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
+      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED ", " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
+      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
 
       // Caché - should add dual table ,like Oracle
 
@@ -850,7 +850,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
       oConnect:commit()
       oConnect:exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
       oConnect:commit()
@@ -898,11 +898,11 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       ENDSWITCH
 
       oConnect:commit()
-      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE," CLUSTERED " ," ") + " INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_ )", .F.)
+      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE," CLUSTERED " ," ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_ )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( WSID_, LOCK_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( WSID_, LOCK_ )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( SPID_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( SPID_ )", .F.)
       oConnect:commit()
 
       oConnect:exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
@@ -916,7 +916,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_ CHAR(50), COLUMN_ CHAR(50), TYPE_ CHAR(1), LEN_ CHAR(8), DEC_ CHAR(8) )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLANG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_, COLUMN_ )", .F.)
+      oConnect:exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLANG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_, COLUMN_ )", .F.)
       oConnect:commit()
 
       oConnect:exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
@@ -930,17 +930,17 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
 
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
 
       oConnect:commit()
       oConnect:exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
 
       oConnect:commit()
       oConnect:exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
@@ -1021,13 +1021,13 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       ENDSWITCH
 
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( SPID_, WPID_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( SPID_, WPID_ )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( APPUSER_, SPID_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( APPUSER_, SPID_ )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TIME_, SITE_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TIME_, SITE_ )", .F.)
       oConnect:commit()
-      oConnect:exec("CREATE INDEX " + iif(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG04 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TYPE_, TIME_ )", .F.)
+      oConnect:exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG04 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TYPE_, TIME_ )", .F.)
       oConnect:commit()
 */
 
@@ -1144,7 +1144,7 @@ RETURN NIL
 
 FUNCTION GetMLHash(cTab, cCol)
 
-   LOCAL cKey := PadR(upper(cTab), 50) + PadR(upper(cCol), 50)
+   LOCAL cKey := PadR(Upper(cTab), 50) + PadR(Upper(cCol), 50)
    LOCAL nPos := hb_HPos(hMultilangColumns, cKey)
 
    IF nPos > 0
@@ -1209,7 +1209,7 @@ FUNCTION SR_RecnoName(cName)
    LOCAL cOld := RecnoName
 
    IF cName != NIL
-      RecnoName := Upper(Alltrim(cName))
+      RecnoName := Upper(AllTrim(cName))
    ENDIF
 
 RETURN cOld
@@ -1245,7 +1245,7 @@ FUNCTION SR_DeletedName(cName)
    LOCAL cOld := DeletedName
 
    IF cName != NIL
-      DeletedName := Upper(Alltrim(cName))
+      DeletedName := Upper(AllTrim(cName))
    ENDIF
 
 RETURN cOld
@@ -1264,9 +1264,9 @@ FUNCTION SR_ExistTable(cTableName, cOwner, oCnn)
    IF cOwner == NIL
       cOwner := aRet[TABLE_INFO_OWNER_NAME]
       IF !Empty(SR_GetGlobalOwner())
-         cOwner := alltrim(SR_GetGlobalOwner())
+         cOwner := AllTrim(SR_GetGlobalOwner())
       ELSEIF !Empty(oCnn:cOwner)
-         cOwner := alltrim(oCnn:cOwner)
+         cOwner := AllTrim(oCnn:cOwner)
       ELSEIF cOwner == NIL
          cOwner := ""
       ENDIF
@@ -1276,7 +1276,7 @@ FUNCTION SR_ExistTable(cTableName, cOwner, oCnn)
       cOwner += "."
    ENDIF
 
-   cFileName := SR_ParseFileName(alltrim(aRet[TABLE_INFO_TABLE_NAME]))
+   cFileName := SR_ParseFileName(AllTrim(aRet[TABLE_INFO_TABLE_NAME]))
 
    IF oCnn:oSqlTransact == NIL
       nRet := oCnn:exec("SELECT * FROM " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + " WHERE 0 = 2", .F.)
@@ -1310,7 +1310,7 @@ FUNCTION SR_ExistIndex(cIndexName, cOwner)
    cIndexName := SR_ParseFileName(aRet[TABLE_INFO_TABLE_NAME])
 
    aRet := {}
-   nRet := oCnn:exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + Upper(Alltrim(cIndexName)) + "'", .F., .T., @aRet)
+   nRet := oCnn:exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
 
    IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) > 0
       RETURN .T.
@@ -1322,7 +1322,7 @@ RETURN .F.
 
 FUNCTION SR_File(cTableName)
 
-   LOCAL cTbl := lower(cTableName)
+   LOCAL cTbl := Lower(cTableName)
 
    DO CASE
    CASE ".dbf" $ cTbl .OR. ".dbt" $ cTbl
@@ -1491,7 +1491,7 @@ FUNCTION _SR_UnRegister(oWA)
    aActiveWAs := oWa:oSql:oHashActiveWAs:Find(oWA:cFileName)
 
    IF HB_ISARRAY(aActiveWAs)
-      DO WHILE (n := aScan(aActiveWAs, {|x|x:nThisArea == oWA:nThisArea})) > 0
+      DO WHILE (n := AScan(aActiveWAs, {|x|x:nThisArea == oWA:nThisArea})) > 0
          aDel(aActiveWAs, n)
          aSize(aActiveWAs, len(aActiveWAs) - 1)
       ENDDO
@@ -1508,7 +1508,7 @@ FUNCTION _SR_Register(oWA)
    aActiveWAs := oWa:oSql:oHashActiveWAs:Find(oWA:cFileName)
 
    IF HB_ISARRAY(aActiveWAs)
-      aadd(aActiveWAs, oWA)
+      AAdd(aActiveWAs, oWA)
    ELSE
       oWa:oSql:oHashActiveWAs:Insert(oWA:cFileName, {oWA})
    ENDIF
@@ -1545,7 +1545,7 @@ FUNCTION SR_GetUniqueSystemID()
    i1 := HB_RANDOMINT(1, 99999999 )
    i2 := HB_RANDOMINT(1, 99999999 )
 
-RETURN alltrim(SR_Val2Char(SR_GetCurrInstanceID())) + "__" + strZero(i1, 8) + "__" + strZero(i2, 8)
+RETURN AllTrim(SR_Val2Char(SR_GetCurrInstanceID())) + "__" + strZero(i1, 8) + "__" + strZero(i2, 8)
 
 /*------------------------------------------------------------------------*/
 
@@ -1561,7 +1561,7 @@ FUNCTION SR_GetInternalID()
    i1 := HB_RANDOMINT(1, 99999999 )
    i2 := HB_RANDOMINT(1, 99999999 )
 
-   cIntenalID := alltrim(SR_Val2Char(SR_GetCurrInstanceID())) + "__" + strZero(i1, 8) + "__" + strZero(i2, 8)
+   cIntenalID := AllTrim(SR_Val2Char(SR_GetCurrInstanceID())) + "__" + strZero(i1, 8) + "__" + strZero(i2, 8)
 
 RETURN cIntenalID
 
@@ -1597,14 +1597,14 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
 
    aRet := eval(SR_GetIndexInfoBlock(), cIndexName)
    ctempIndex := cIndexName
-   cIndexName := SR_ParseFileName(alltrim(aRet[TABLE_INFO_TABLE_NAME]))
+   cIndexName := SR_ParseFileName(AllTrim(aRet[TABLE_INFO_TABLE_NAME]))
 
    IF cOwner == NIL
       cOwner := aRet[TABLE_INFO_OWNER_NAME]
       IF !Empty(SR_GetGlobalOwner())
-         cOwner := alltrim(SR_GetGlobalOwner())
+         cOwner := AllTrim(SR_GetGlobalOwner())
       ELSEIF !Empty(oCnn:cOwner)
-         cOwner := alltrim(oCnn:cOwner)
+         cOwner := AllTrim(oCnn:cOwner)
       ELSEIF cOwner == NIL
          cOwner := ""
       ENDIF
@@ -1615,14 +1615,14 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
    ENDIF
 
    aRet := {}
-   nRet := oCnn:exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + Upper(Alltrim(cIndexName)) + "'", .F., .T., @aRet)
+   nRet := oCnn:exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
    IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) == 0
       // Index does not exist
       aRet := {}
-      nRet := oCnn:exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE PHIS_NAME_ = '" + Upper(Alltrim(cIndexName)) + "'", .F., .T., @aRet)
+      nRet := oCnn:exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE PHIS_NAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
       IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) == 0
          aRet := {}
-         nRet := oCnn:exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TAG_ = '" + Alltrim(ctempIndex) + "'", .F., .T., @aRet)
+         nRet := oCnn:exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TAG_ = '" + AllTrim(ctempIndex) + "'", .F., .T., @aRet)
          IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) == 0
             RETURN .F.
          ELSE
@@ -1631,18 +1631,18 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
       ENDIF
    ENDIF
 
-   cFileName := rtrim(aRet[1, 1])
-   cIndex    := rtrim(aRet[1, 2])
-   cIdxName  := rtrim(aRet[1, 3])
+   cFileName := RTrim(aRet[1, 1])
+   cIndex    := RTrim(aRet[1, 2])
+   cIdxName  := RTrim(aRet[1, 3])
    IF lTag
-      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + cFileName + "' AND PHIS_NAME_ = '" + cIndex + "'" + iif(oCnn:lComments," /* Wipe index info */",""), .F.)
+      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + cFileName + "' AND PHIS_NAME_ = '" + cIndex + "'" + IIf(oCnn:lComments," /* Wipe index info */",""), .F.)
    ELSE
-      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + cFileName + "' AND IDXNAME_ = '" + cIdxName + "'" + iif(oCnn:lComments," /* Wipe index info */",""), .F.)
+      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + cFileName + "' AND IDXNAME_ = '" + cIdxName + "'" + IIf(oCnn:lComments," /* Wipe index info */",""), .F.)
    ENDIF
    oCnn:Commit()
 
    FOR EACH aIndex IN aRet
-      cPhisicalName := rtrim(aIndex[2])
+      cPhisicalName := RTrim(aIndex[2])
 
       SWITCH oCnn:nSystemID
       CASE SYSTEMID_MSSQL6
@@ -1653,19 +1653,19 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
          EXIT
       CASE SYSTEMID_MYSQL
       CASE SYSTEMID_MARIADB
-         oCnn:exec("DROP INDEX " + cPhisicalName + " ON " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + iif(oCnn:lComments, " /* DROP Index */", ""), .F.)
+         oCnn:exec("DROP INDEX " + cPhisicalName + " ON " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
          EXIT
       CASE SYSTEMID_ORACLE
          IF len(aIndex[6]) > 4 .AND. aIndex[6][4] == "@"
-            oCnn:exec("DROP INDEX " + cOwner + "A$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + iif(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
+            oCnn:exec("DROP INDEX " + cOwner + "A$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
             oCnn:Commit()
-            oCnn:exec("DROP INDEX " + cOwner + "D$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + iif(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
+            oCnn:exec("DROP INDEX " + cOwner + "D$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
             oCnn:Commit()
          ENDIF
-         oCnn:exec("DROP INDEX " + cPhisicalName + iif(oCnn:lComments, " /* DROP Index */", ""), .F.)
+         oCnn:exec("DROP INDEX " + cPhisicalName + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
          EXIT
       OTHERWISE
-         oCnn:exec("DROP INDEX " + cPhisicalName + iif(oCnn:lComments, " /* DROP Index */", ""), .F.)
+         oCnn:exec("DROP INDEX " + cPhisicalName + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
       ENDSWITCH
 
       IF (!Empty(aIndex[4])) .OR. aIndex[5][1] == "#"
@@ -1673,7 +1673,7 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
          oWA := TEMPDROPCO->(dbInfo(DBI_INTERNAL_OBJECT))
 
          IF !Empty(aIndex[4])
-            oWA:DropColumn("INDKEY_" + alltrim(aIndex[4]), .F.)
+            oWA:DropColumn("INDKEY_" + AllTrim(aIndex[4]), .F.)
          ENDIF
          IF aIndex[5][1] == "#"
             oWA:DropColumn("INDFOR_" + substr(aIndex[5], 2, 3), .F.)
@@ -1699,14 +1699,14 @@ FUNCTION SR_DropTable(cFileName, cOwner)
    oCnn := SR_GetConnection()
 
    aRet := eval(SR_GetTableInfoBlock(), cFileName)
-   cFileName := SR_ParseFileName(alltrim(aRet[TABLE_INFO_TABLE_NAME]))
+   cFileName := SR_ParseFileName(AllTrim(aRet[TABLE_INFO_TABLE_NAME]))
 
    IF cOwner == NIL
       cOwner := aRet[TABLE_INFO_OWNER_NAME]
       IF !Empty(SR_GetGlobalOwner())
-         cOwner := alltrim(SR_GetGlobalOwner())
+         cOwner := AllTrim(SR_GetGlobalOwner())
       ELSEIF !Empty(oCnn:cOwner)
-         cOwner := alltrim(oCnn:cOwner)
+         cOwner := AllTrim(oCnn:cOwner)
       ELSEIF cOwner == NIL
          cOwner := ""
       ENDIF
@@ -1718,23 +1718,23 @@ FUNCTION SR_DropTable(cFileName, cOwner)
 
    /* Drop the table */
 
-   lRet := oCnn:exec("DROP TABLE " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + iif(oCnn:nSystemID == SYSTEMID_ORACLE, " CASCADE CONSTRAINTS", "") + iif(oCnn:lComments, " /* drop table */", ""), .T.) == SQL_SUCCESS
+   lRet := oCnn:exec("DROP TABLE " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + IIf(oCnn:nSystemID == SYSTEMID_ORACLE, " CASCADE CONSTRAINTS", "") + IIf(oCnn:lComments, " /* drop table */", ""), .T.) == SQL_SUCCESS
    oCnn:Commit()
 
    IF lRet
-      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + UPPER(cFileName) + "'" + iif(oCnn:lComments, " /* Wipe index info */", ""), .F.)
+      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe index info */", ""), .F.)
       oCnn:Commit()
-      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + UPPER(cFileName) + "'" + iif(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLANG WHERE TABLE_ = '" + UPPER(cFileName) + "'" + iif(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLANG WHERE TABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS WHERE TABLE_ = '" + UPPER(cFileName) + "'" + iif(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS WHERE TABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS WHERE SOURCETABLE_ = '" + UPPER(cFileName) + "'" + iif(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS WHERE SOURCETABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS WHERE SOURCETABLE_ = '" + UPPER(cFileName) + "'" + iif(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS WHERE SOURCETABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS WHERE SOURCETABLE_ = '" + UPPER(cFileName) + "'" + iif(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS WHERE SOURCETABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
    ENDIF
 
@@ -1752,14 +1752,14 @@ FUNCTION SR_ListIndex(cFilename)
    oCnn := SR_GetConnection()
 
    aRet := eval(SR_GetIndexInfoBlock(), cFilename)
-   cFilename := SR_ParseFileName(alltrim(aRet[TABLE_INFO_TABLE_NAME]))
+   cFilename := SR_ParseFileName(AllTrim(aRet[TABLE_INFO_TABLE_NAME]))
 
    aRet := {}
-   nRet := oCnn:exec("SELECT IDXNAME_,PHIS_NAME_,IDXKEY_,IDXFOR_,IDXCOL_,TAG_,TAGNUM_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + alltrim(upper(cFilename)) + "'", .F., .T., @aRet)
+   nRet := oCnn:exec("SELECT IDXNAME_,PHIS_NAME_,IDXKEY_,IDXFOR_,IDXCOL_,TAG_,TAGNUM_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + AllTrim(Upper(cFilename)) + "'", .F., .T., @aRet)
    HB_SYMBOL_UNUSED(nRet)
 
    FOR i := 1 TO len(aRet)
-      aRet[i, 1] := alltrim(aRet[i, 1])
+      aRet[i, 1] := AllTrim(aRet[i, 1])
    NEXT i
 
 RETURN aRet
@@ -1776,14 +1776,14 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
    oCnn := SR_GetConnection()
 
    aRet := eval(SR_GetTableInfoBlock(), cTable)
-   cTable := SR_ParseFileName(alltrim(aRet[TABLE_INFO_TABLE_NAME]))
+   cTable := SR_ParseFileName(AllTrim(aRet[TABLE_INFO_TABLE_NAME]))
 
    IF cOwner == NIL
       cOwner := aRet[TABLE_INFO_OWNER_NAME]
       IF !Empty(SR_GetGlobalOwner())
-         cOwner := alltrim(SR_GetGlobalOwner())
+         cOwner := AllTrim(SR_GetGlobalOwner())
       ELSEIF !Empty(oCnn:cOwner)
-         cOwner := alltrim(oCnn:cOwner)
+         cOwner := AllTrim(oCnn:cOwner)
       ELSEIF cOwner == NIL
          cOwner := ""
       ENDIF
@@ -1794,17 +1794,17 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
    ENDIF
 
    aRet := eval(SR_GetTableInfoBlock(), cNewName)
-   cNewName := SR_ParseFileName(alltrim(aRet[TABLE_INFO_TABLE_NAME]))
+   cNewName := SR_ParseFileName(AllTrim(aRet[TABLE_INFO_TABLE_NAME]))
 
    aRet := {}
-   nRet := oCnn:exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + upper(cTable) + "'", .F., .T., @aRet)
+   nRet := oCnn:exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + Upper(cTable) + "'", .F., .T., @aRet)
    IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) == 0
       // Table does not exist
       RETURN .F.
    ENDIF
 
    aRet := {}
-   nRet := oCnn:exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + upper(cNewName) + "'", .F., .T., @aRet)
+   nRet := oCnn:exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + Upper(cNewName) + "'", .F., .T., @aRet)
    HB_SYMBOL_UNUSED(nRet)
    IF len(aRet) > 0
       // Destination EXISTS !!
@@ -1834,7 +1834,7 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
       ENDIF
 
       IF oCnn:nSystemID == SYSTEMID_POSTGR
-         nRet := oCnn:exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cNewName, oCnn:nSystemID) + " ALTER COLUMN " + SR_RecnoName() + " SET DEFAULT nextval('" + lower(cNewName) + "_sq'::regclass)")
+         nRet := oCnn:exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cNewName, oCnn:nSystemID) + " ALTER COLUMN " + SR_RecnoName() + " SET DEFAULT nextval('" + Lower(cNewName) + "_sq'::regclass)")
          HB_SYMBOL_UNUSED(nRet)
       ENDIF
       IF oCnn:nSystemID == SYSTEMID_ORACLE
@@ -1872,7 +1872,7 @@ FUNCTION SR_ListCreatedTables()
    nRet := oCnn:exec("SELECT TABLE_ FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES", .F., .T., @aRet)
    HB_SYMBOL_UNUSED(nRet)
 
-   aEval(aRet, {|x| aadd(aRet2, alltrim(x[1])) })
+   aEval(aRet, {|x| AAdd(aRet2, AllTrim(x[1])) })
 
 RETURN aRet2
 
@@ -2042,7 +2042,7 @@ FUNCTION SR_SetLocks(uLocks, oCnn, nRetries)
       ENDIF
 
       IF nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO
-         aadd(aAdded, cValue)
+         AAdd(aAdded, cValue)
       ELSE
          lRet := .F.
          EXIT
@@ -2380,7 +2380,7 @@ HB_FUNC( SETFIREBIRDUSESHORTASNUM )
 
 FUNCTION SR_Version()
 
-RETURN HB_SR__VERSION_STRING + ", Build " + alltrim(strzero(HB_SQLRDD_BUILD, 4)) + ", " + HB_SR__MGMNT_VERSION
+RETURN HB_SR__VERSION_STRING + ", Build " + AllTrim(strzero(HB_SQLRDD_BUILD, 4)) + ", " + HB_SR__MGMNT_VERSION
 
 /*------------------------------------------------------------------------*/
 

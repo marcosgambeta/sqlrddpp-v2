@@ -171,9 +171,9 @@ METHOD SR_MYSQL:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
 
    IF lReSelect
       IF !Empty(cCommand)
-         nRet := ::Execute(cCommand + iif(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
+         nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       ELSE
-         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + iif(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + iif(::lComments, " /* Open Workarea */", ""), .F.)
+         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
       ENDIF
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
          RETURN NIL
@@ -210,10 +210,10 @@ RETURN aFields
 METHOD SR_MYSQL:LastError()
 
    IF ::hStmt != NIL
-      RETURN "(" + alltrim(str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
+      RETURN "(" + AllTrim(str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
    ENDIF
 
-RETURN "(" + alltrim(str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
+RETURN "(" + allTrim(str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
 
 METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
 
@@ -254,7 +254,7 @@ METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
       ::hStmt     := NIL
       ::hDbc      := hDbc
       cTargetDB   := "MySql Native"
-      cSystemVers := alltrim(str(MYSVERS(hDbc)))
+      cSystemVers := allTrim(str(MYSVERS(hDbc)))
       nVersionp   := MYSVERS(hDbc)
    ENDIF
 
@@ -299,7 +299,7 @@ RETURN (::nRetCode := MYSRollBack(::hDbc))
 
 METHOD SR_MYSQL:ExecuteRaw(cCommand)
 
-   IF upper(left(ltrim(cCommand), 6)) == "SELECT" .OR. upper(left(ltrim(cCommand), 5)) == "SHOW "
+   IF Upper(left(LTrim(cCommand), 6)) == "SELECT" .OR. Upper(left(LTrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
    ELSE
       ::lResultSet := .F.
