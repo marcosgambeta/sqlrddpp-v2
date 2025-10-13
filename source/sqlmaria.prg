@@ -221,10 +221,10 @@ RETURN aFields
 METHOD SR_MARIA:LastError()
 
    If ::hStmt != NIL
-      RETURN "(" + AllTrim(str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
+      RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
    EndIf
 
-RETURN "(" + AllTrim(str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
+RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
 
 /*------------------------------------------------------------------------*/
 
@@ -256,25 +256,25 @@ METHOD SR_MARIA:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
    hDbc := MYSConnect(::cHost, ::cUser, ::cPassWord, ::cDtb, ::cPort, ::cDtb, nTimeout, ::lCompress)
    nRet := MYSStatus(hDbc)
 
-   if nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
+   IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
       ::nRetCode = nRet
       ::nSystemID := 0
       SR_MsgLogFile("Connection Error")
       //nVersionp := 4 (local variable/value not used)
       HB_SYMBOL_UNUSED(cSystemVers)
       RETURN Self
-   else
+   ELSE
       ::cConnect  = cConnect
       ::hStmt     = NIL
       ::hDbc      = hDbc
       cTargetDB   = "MARIADB Native"
-      cSystemVers = AllTrim(str(MYSVERS(hDbc)))
+      cSystemVers = AllTrim(Str(MYSVERS(hDbc)))
       nVersionp  := MYSVERS(hDbc)
 
-   EndIf
+   ENDIF
 
    If (!::lQueryOnly) .AND. nVersionp < MINIMAL_MYSQL_SUPPORTED
-      SR_MsgLogFile("Connection Error: MariaDB version not supported : " + cSystemVers + " / minimun is " + str(MINIMAL_MYSQL_SUPPORTED))
+      SR_MsgLogFile("Connection Error: MariaDB version not supported : " + cSystemVers + " / minimun is " + Str(MINIMAL_MYSQL_SUPPORTED))
       ::End()
       ::nSystemID := 0
       ::nRetCode  := -1

@@ -116,7 +116,7 @@ RETURN NIL
 
 FUNCTION SR_Val2Char(a, n1, n2)
 
-   SWITCH valtype(a)
+   SWITCH ValType(a)
    CASE "C"
    CASE "M"
       RETURN a
@@ -225,7 +225,7 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
    LOCAL nOrd
    LOCAL aDirect := {}
 
-   IF select() == 0
+   IF Select() == 0
       SR_RuntimeErr(, "SR_ChengeStructure: Workarea not in use.")
    ENDIF
 
@@ -242,7 +242,7 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
       ENDIF
 
       cAlias   := Alias()
-      nAlias   := select()
+      nAlias   := Select()
       cTblName := oWA:cFileName
       nOrd     := IndexOrd()
       nReg     := recno()
@@ -513,7 +513,7 @@ FUNCTION SR_cDBValue(uData, nSystemID)
 
    default nSystemID TO SR_GetConnection():nSystemID
 
-RETURN SR_SubQuoted(valtype(uData), uData, nSystemID)
+RETURN SR_SubQuoted(ValType(uData), uData, nSystemID)
 
 /*------------------------------------------------------------------------*/
 
@@ -525,13 +525,13 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
 #if 0 // TODO: old code for reference (to be deleted)
    Do Case
    Case cType $ "CM" .AND. nSystemID == SYSTEMID_ORACLE
-      RETURN "'" + RTrim(strtran(uData, "'", "'||" + "CHR(39)" + "||'")) + "'"
+      RETURN "'" + RTrim(StrTran(uData, "'", "'||" + "CHR(39)" + "||'")) + "'"
    Case cType $ "CM" .AND. nSystemID == SYSTEMID_MSSQL7
-      RETURN "'" + RTrim(strtran(uData, "'", "'" + "'")) + "'"
+      RETURN "'" + RTrim(StrTran(uData, "'", "'" + "'")) + "'"
    Case cType $ "CM" .AND. nSystemID == SYSTEMID_POSTGR
-      RETURN "E'" + strtran(RTrim(strtran(uData, "'", "'" + "'")), "\", "\\") + "'"
+      RETURN "E'" + StrTran(RTrim(StrTran(uData, "'", "'" + "'")), "\", "\\") + "'"
    Case cType $ "CM"
-      RETURN "'" + RTrim(strtran(uData, "'", "")) + "'"
+      RETURN "'" + RTrim(StrTran(uData, "'", "")) + "'"
    Case cType == "D" .AND. nSystemID == SYSTEMID_ORACLE
       RETURN "TO_DATE('" + RTrim(DtoS(uData)) + "','YYYYMMDD')"
    Case cType == "D" .AND. (nSystemID == SYSTEMID_IBMDB2 .OR. nSystemID == SYSTEMID_ADABAS)
@@ -549,7 +549,7 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
    Case cType == "D"
       RETURN "'" + dtos(uData) + "'"
    Case cType == "N"
-      RETURN LTrim(str(uData))
+      RETURN LTrim(Str(uData))
    Case cType == "L" .AND. (nSystemID == SYSTEMID_POSTGR .OR. nSystemID == SYSTEMID_FIREBR3)
       RETURN IIf(uData, "true", "false")
    Case cType == "L" .AND. nSystemID == SYSTEMID_INFORM
@@ -578,7 +578,7 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
 
    OtherWise
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + str(Len(cRet), 10) + cRet, nSystemID)
+      RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, nSystemID)
    EndCase
 #endif
 
@@ -588,13 +588,13 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
    CASE "M"
       SWITCH nSystemID
       CASE SYSTEMID_ORACLE
-         RETURN "'" + RTrim(strtran(uData, "'", "'||" + "CHR(39)" + "||'")) + "'"
+         RETURN "'" + RTrim(StrTran(uData, "'", "'||" + "CHR(39)" + "||'")) + "'"
       CASE SYSTEMID_MSSQL7
-         RETURN "'" + RTrim(strtran(uData, "'", "'" + "'")) + "'"
+         RETURN "'" + RTrim(StrTran(uData, "'", "'" + "'")) + "'"
       CASE SYSTEMID_POSTGR
-         RETURN "E'" + strtran(RTrim(strtran(uData, "'", "'" + "'")), "\", "\\") + "'"
+         RETURN "E'" + StrTran(RTrim(StrTran(uData, "'", "'" + "'")), "\", "\\") + "'"
       OTHERWISE
-         RETURN "'" + RTrim(strtran(uData, "'", "")) + "'"
+         RETURN "'" + RTrim(StrTran(uData, "'", "")) + "'"
       ENDSWITCH
 
    CASE "D"
@@ -622,7 +622,7 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
       ENDSWITCH
 
    CASE "N"
-      RETURN LTrim(str(uData))
+      RETURN LTrim(Str(uData))
 
    CASE "L"
       SWITCH nSystemID
@@ -655,7 +655,7 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
 
    OTHERWISE
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + str(Len(cRet), 10) + cRet, nSystemID)
+      RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, nSystemID)
 
    ENDSWITCH
 
@@ -811,7 +811,7 @@ RETURN cRet
 
 FUNCTION SR_Val2CharQ(uData)
 
-   LOCAL cType := valtype(uData)
+   LOCAL cType := ValType(uData)
 
    SWITCH cType
    CASE "C"
@@ -1488,7 +1488,7 @@ FUNCTION SR_GetStack()
 
    DO WHILE (i < 70)
       IF !Empty(ProcName(i))
-         cErrorLog += SR_CRLF + Trim(ProcName(i)) + "     Linha : " + AllTrim(str(ProcLine(i)))
+         cErrorLog += SR_CRLF + Trim(ProcName(i)) + "     Linha : " + AllTrim(Str(ProcLine(i)))
       ENDIF
       i++
    ENDDO
@@ -2128,7 +2128,7 @@ FUNCTION SR_SetFieldDefault(cTable, cField, cDefault)
 
    oCnn := SR_GetConnection()
    IF HB_ISNUMERIC(cDefault)
-      cSql += AllTrim(str(cDefault))
+      cSql += AllTrim(Str(cDefault))
    ELSEIF HB_ISSTRING(cDefault)
       IF Empty(cDefault)
          cSql += "''"

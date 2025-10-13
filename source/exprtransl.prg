@@ -192,7 +192,7 @@ ENDCLASS
 
 METHOD ExpressionTranslator:new(pWorkarea, pFixVariables, pSimplifyCondition, pIndexExpression)
 
-   IF HB_ISCHAR(pWorkarea)
+   IF HB_IsChar(pWorkarea)
       ::_oDefaultContext := oGetWorkarea(pWorkarea)
    ELSE
       ::_oDefaultContext := pWorkarea
@@ -271,7 +271,7 @@ METHOD ExpressionTranslator:Translate(oExpression, x)
    LOCAL aFilters := {}
 
    BEGIN SEQUENCE WITH __BreakBlock()
-      result := IIf(pcount() == 2, ::InternalTranslate(oExpression, @x), ::InternalTranslate(oExpression))
+      result := IIf(PCount() == 2, ::InternalTranslate(oExpression, @x), ::InternalTranslate(oExpression))
 
       IF oExpression:isKindOf("ConditionBase")
          IF Len(::aRelations) > 0
@@ -306,7 +306,7 @@ METHOD ExpressionTranslator:Translate(oExpression, x)
                         i--
                      ENDIF
                   NEXT i
-                  if !lProgress
+                  IF !lProgress
                      _SR_Throw(ErrorNew(,,,, "Circular dependency in the relations. Pass the parameter lFetchJoin to .F. to avoid this problem."))
                   ENDIF
                ENDDO
@@ -342,7 +342,7 @@ METHOD ExpressionTranslator:InternalTranslate(oExpression, x)
       IF ::lSimplifyCondition
          oExpression := ::_oConditionSimplifier:Simplify(oExpression)
       ENDIF
-      IF pcount() == 2 .AND. oExpression:lIsSimple .AND. oExpression:oExpression:ValueType == "value"
+      IF PCount() == 2 .AND. oExpression:lIsSimple .AND. oExpression:oExpression:ValueType == "value"
          x := Upper(oExpression:Value) == ".T." // Value take denied into account.
       ENDIF
       result := ::TranslateCondition(oExpression)
@@ -646,7 +646,7 @@ METHOD MSSQLExpressionTranslator:TranslateFunctionExpression(oFunctionExpression
       RETURN "convert(char, " + ::InternalTranslate(aParamExprs[1]) + ")"
    CASE cFunctionName == "val"
       IF set(_SET_FIXED)
-         RETURN "convert(decimal(38," + AllTrim(str(set(_SET_DECIMALS))) + "), " + ::InternalTranslate(aParamExprs[1]) + ")"
+         RETURN "convert(decimal(38," + AllTrim(Str(set(_SET_DECIMALS))) + "), " + ::InternalTranslate(aParamExprs[1]) + ")"
       ENDIF
       RETURN "convert(float, " + ::InternalTranslate(aParamExprs[1]) + ")"
    CASE cFunctionName == "int"
@@ -711,7 +711,7 @@ METHOD MSSQLExpressionTranslator:TranslateFunctionExpression(oFunctionExpression
       RETURN "convert(char, " + ::InternalTranslate(aParamExprs[1]) + ")"
    CASE "val"
       IF set(_SET_FIXED)
-         RETURN "convert(decimal(38," + AllTrim(str(set(_SET_DECIMALS))) + "), " + ::InternalTranslate(aParamExprs[1]) + ")"
+         RETURN "convert(decimal(38," + AllTrim(Str(set(_SET_DECIMALS))) + "), " + ::InternalTranslate(aParamExprs[1]) + ")"
       ENDIF
       RETURN "convert(float, " + ::InternalTranslate(aParamExprs[1]) + ")"
    CASE "int"
@@ -921,7 +921,7 @@ METHOD EnchancedDirectRelation:oExpression(xValue)
    IF ::_oExpression == NIL
       cRelationExpr := ::oClipperExpression:cValue
       IF ::oClipperExpression:nLength > ::nMaxLength
-         cRelationExpr := "left(" + cRelationExpr + ", " + str(::nMaxLength) + ")"
+         cRelationExpr := "left(" + cRelationExpr + ", " + Str(::nMaxLength) + ")"
       ENDIF
       ::_oExpression := ExpressionParser():new(::oWorkarea1:cAlias):Parse(cRelationExpr)
    ENDIF
@@ -937,7 +937,7 @@ METHOD EnchancedDirectRelation:oIndexExpression(xValue)
    IF ::_oIndexExpression == NIL
       cIndexExpr := IIf(::oSeekIndex:lIsSynthetic, ::oSeekIndex:aDbFields[1]:cName, ::oSeekIndex:oClipperExpression:cValue)
       IF ::oSeekIndex:nLength > ::nMaxLength
-         cIndexExpr := "left(" + cIndexExpr + ", " + str(::nMaxLength) + ")"
+         cIndexExpr := "left(" + cIndexExpr + ", " + Str(::nMaxLength) + ")"
       ENDIF
       ::_oIndexExpression := ExpressionParser():new(::oWorkarea2:cAlias):Parse(cIndexExpr)
    ENDIF

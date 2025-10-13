@@ -217,7 +217,7 @@ METHOD SR_FIREBIRD:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cR
          ENDIF
 
          IF cType == "U"
-            ::RuntimeErr("", SR_Msg(21) + cName + " : " + str(nType))
+            ::RuntimeErr("", SR_Msg(21) + cName + " : " + Str(nType))
          ELSE
             aFields[n] := {cName, cType, nLenField, nDec, nNull >= 1, nType, , n, _nDec, ,}
          ENDIF
@@ -242,7 +242,7 @@ METHOD SR_FIREBIRD:LastError()
 
    cMsgError := FBError(::hEnv, @nType)
 
-RETURN AllTrim(cMsgError) + " - Native error code " + AllTrim(str(nType))
+RETURN AllTrim(cMsgError) + " - Native error code " + AllTrim(Str(nType))
 
 /*------------------------------------------------------------------------*/
 
@@ -271,7 +271,7 @@ METHOD SR_FIREBIRD:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMax
 
    IF nRet != SQL_SUCCESS
       ::nRetCode := nRet
-      SR_MsgLogFile("Connection Error: " + AllTrim(str(nRet)) + " (check fb.log) - Database: " + ::cDtb + " - Username : " + ::cUser + " (Password not shown for security)")
+      SR_MsgLogFile("Connection Error: " + AllTrim(Str(nRet)) + " (check fb.log) - Database: " + ::cDtb + " - Username : " + ::cUser + " (Password not shown for security)")
       RETURN SELF
    ELSE
       ::cConnect := cConnect
@@ -283,7 +283,7 @@ METHOD SR_FIREBIRD:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMax
 
    IF nRet != SQL_SUCCESS
       ::nRetCode := nRet
-      SR_MsgLogFile("Transaction Start error : " + AllTrim(str(nRet)))
+      SR_MsgLogFile("Transaction Start error : " + AllTrim(Str(nRet)))
       RETURN SELF
    ENDIF
 

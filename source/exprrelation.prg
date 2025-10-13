@@ -133,12 +133,12 @@ ENDCLASS
 
 METHOD DirectRelation:new(pWorkarea1, pWorkarea2, pExpression)
 
-   IF HB_ISCHAR(pWorkarea1)
+   IF HB_IsChar(pWorkarea1)
       ::oWorkarea1 := oGetWorkarea(pWorkarea1)
    ELSE
       ::oWorkarea1 := pWorkarea1
    ENDIF
-   IF HB_ISCHAR(pWorkarea2)
+   IF HB_IsChar(pWorkarea2)
       ::oWorkarea2 := oGetWorkarea(pWorkarea2)
    ELSE
       ::oWorkarea2 := pWorkarea2
@@ -343,7 +343,7 @@ ENDCLASS
 
 METHOD DbIndex:new(pWorkarea, pName)
 
-   IF HB_ISCHAR(pWorkarea)
+   IF HB_IsChar(pWorkarea)
       ::oWorkarea := oGetWorkarea(pWorkarea)
    ELSE
       ::oWorkarea := pWorkarea
@@ -464,7 +464,7 @@ METHOD ClipperExpression:new(pContext, pValue, pIgnoreRelations)
 
    ::cContext := pContext
    ::cValue := pValue
-   ::lIgnoreRelations := pcount() == 3 .AND. pIgnoreRelations
+   ::lIgnoreRelations := PCount() == 3 .AND. pIgnoreRelations
 
 RETURN SELF
 
@@ -487,13 +487,13 @@ METHOD ClipperExpression:Evaluate(lIgnoreRelations)
    //nseconds := seconds() (not used)
 
    BEGIN SEQUENCE WITH __BreakBlock()
-      if pcount() == 1 .AND. lIgnoreRelations
-         save_slct := select()
+      IF PCount() == 1 .AND. lIgnoreRelations
+         save_slct := Select()
          SelectFirstAreaNotInUse()
          USE &(oGetWorkarea(::cContext):cFileName) VIA "SQLRDD" ALIAS "AliasWithoutRelation"
          result := &(::cValue)
          CLOSE ("AliasWithoutRelation")
-         select(save_slct)
+         Select(save_slct)
       ELSE
          result := &(::cContext)->(&(::cValue))
       ENDIF
@@ -507,7 +507,7 @@ RETURN result
 METHOD ClipperExpression:cType()
 
    IF ::_cType == NIL
-      ::_cType := valtype(::cEvaluation())
+      ::_cType := ValType(::cEvaluation())
    ENDIF
 
 RETURN ::_cType
@@ -599,9 +599,9 @@ FUNCTION GetFields()
    LOCAL _aLengths
 
    IF ::aDbFields == NIL
-      save_slct := select()
-      select(::cAlias)
-      nCount := fcount()
+      save_slct := Select()
+      Select(::cAlias)
+      nCount := FCount()
       _aTypes := Array(nCount)
       _aNames := Array(nCount)
       _aLengths := Array(nCount)
@@ -610,7 +610,7 @@ FUNCTION GetFields()
       FOR i := 1 TO nCount
          ::aDbFields[i] := DbField():new(_aNames[i], _aTypes[i], _aLengths[i])
       NEXT i
-      select(save_slct)
+      Select(save_slct)
    ENDIF
 
 RETURN ::aDbFields

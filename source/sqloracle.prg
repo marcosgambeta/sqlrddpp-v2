@@ -186,7 +186,7 @@ METHOD SR_ORACLE:AllocStatement()
       ::lSetNext := .F.
       nRet := ::SetStmtOptions(::nSetOpt, ::nSetValue)
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
-         SR_MsgLogFile(SR_Msg(23) + " (" + AllTrim(str(nRet)) + ") : " + ::LastError())
+         SR_MsgLogFile(SR_Msg(23) + " (" + AllTrim(Str(nRet)) + ") : " + ::LastError())
       ENDIF
    ENDIF
 
@@ -231,7 +231,7 @@ METHOD SR_ORACLE:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRec
    ::nFields := SQLO_NUMCOLS(::hDBC)
 
    IF ::nFields < 0
-      ::RunTimeErr("", "SQLO_NUMCOLS Error" + SR_CRLF + str(::nFields) + SR_CRLF + "Last command sent to database : " + ::cLastComm)
+      ::RunTimeErr("", "SQLO_NUMCOLS Error" + SR_CRLF + Str(::nFields) + SR_CRLF + "Last command sent to database : " + ::cLastComm)
       RETURN NIL
    ENDIF
 
@@ -261,7 +261,7 @@ METHOD SR_ORACLE:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRec
          ENDIF
 
          IF cType == "U"
-            ::RuntimeErr("", SR_Msg(21) + cName + " : " + str(nType))
+            ::RuntimeErr("", SR_Msg(21) + cName + " : " + Str(nType))
          ELSE
             aFields[n] := { cName, cType, nLenField, nDec, nNull, nType, , n, , ,}
          ENDIF
@@ -281,7 +281,7 @@ RETURN aFields
 
 METHOD SR_ORACLE:LastError()
 
-RETURN SQLO_GETERRORDESCR(::hDBC) + " retcode: " + sr_val2Char(::nRetCode) + " - " + AllTrim(str(SQLO_GETERRORCODE(::hDBC)))
+RETURN SQLO_GETERRORDESCR(::hDBC) + " retcode: " + sr_val2Char(::nRetCode) + " - " + AllTrim(Str(SQLO_GETERRORCODE(::hDBC)))
 
 /*------------------------------------------------------------------------*/
 
@@ -332,7 +332,7 @@ METHOD SR_ORACLE:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBu
    ::exec("select sid from " + IIf(::lCluster, "g", "") + "v$session where AUDSID = sys_context('USERENV','sessionid')", .T., .T., @aRet)
 
    IF Len(aRet) > 0
-      ::uSid := val(str(aRet[1, 1], 8, 0))
+      ::uSid := val(Str(aRet[1, 1], 8, 0))
    ENDIF
 
 RETURN Self
@@ -345,7 +345,7 @@ METHOD SR_ORACLE:End()
 
    IF !Empty(::hDbc)
      IF (nRet := SQLO_DISCONNECT(::hDbc)) != SQL_SUCCESS
-        SR_MsgLogFile("Error disconnecting : " + str(nRet) + SR_CRLF + ::LastError())
+        SR_MsgLogFile("Error disconnecting : " + Str(nRet) + SR_CRLF + ::LastError())
      ENDIF
    ENDIF
 
@@ -494,7 +494,7 @@ METHOD SR_ORACLE:ExecSP(cComm, aReturn, nParam, aType)
    END SEQUENCE
 
    IF nError < 0
-      ::RunTimeErr("", str(SQLO_GETERRORCODE(::hDbc), 4) + " - " + SQLO_GETERRORDESCR(::hDbc))
+      ::RunTimeErr("", Str(SQLO_GETERRORCODE(::hDbc), 4) + " - " + SQLO_GETERRORDESCR(::hDbc))
    ELSE
    //IF nError >= 0
       FOR i := 1 TO nParam
@@ -556,7 +556,7 @@ METHOD SR_ORACLE:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMax
    IF nError < 0
       IF lFetch
        // ::RunTimeErr("", "SQLExecDirect Error Erro na STORE PROCEDURE")
-       ::RunTimeErr("", str(SQLO_GETERRORCODE(::hDbc), 4) + " - " + SQLO_GETERRORDESCR(::hDbc) + ::cLastComm)
+       ::RunTimeErr("", Str(SQLO_GETERRORCODE(::hDbc), 4) + " - " + SQLO_GETERRORDESCR(::hDbc) + ::cLastComm)
       ENDIF
    ENDIF
 

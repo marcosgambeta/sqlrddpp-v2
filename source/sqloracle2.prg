@@ -185,7 +185,7 @@ METHOD SR_ORACLE2:AllocStatement()
       ::lSetNext := .F.
       nRet := ::SetStmtOptions(::nSetOpt, ::nSetValue)
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
-         SR_MsgLogFile(SR_Msg(23) + " (" + AllTrim(str(nRet)) + ") : " + ::LastError())
+         SR_MsgLogFile(SR_Msg(23) + " (" + AllTrim(Str(nRet)) + ") : " + ::LastError())
       ENDIF
    ENDIF
 
@@ -229,7 +229,7 @@ METHOD SR_ORACLE2:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRe
    ::nFields := SQLO2_NUMCOLS(::hDBC)
 
    IF ::nFields < 0
-      ::RunTimeErr("", "SQLO2_NUMCOLS Error" + SR_CRLF + str(::nFields) + SR_CRLF + "Last command sent to database : " + ::cLastComm)
+      ::RunTimeErr("", "SQLO2_NUMCOLS Error" + SR_CRLF + Str(::nFields) + SR_CRLF + "Last command sent to database : " + ::cLastComm)
       RETURN NIL
    ENDIF
 
@@ -259,7 +259,7 @@ METHOD SR_ORACLE2:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRe
          ENDIF
 
          IF cType == "U"
-            ::RuntimeErr("", SR_Msg(21) + cName + " : " + str(nType))
+            ::RuntimeErr("", SR_Msg(21) + cName + " : " + Str(nType))
          ELSE
             aFields[n] := {cName, cType, nLenField, nDec, nNull, nType, , n, , ,}
          ENDIF
@@ -279,7 +279,7 @@ RETURN aFields
 
 METHOD SR_ORACLE2:LastError()
 
-RETURN SQLO2_GETERRORDESCR(::hDBC) + " retcode: " + sr_val2Char(::nRetCode) + " - " + AllTrim(str(SQLO2_GETERRORCODE(::hDBC)))
+RETURN SQLO2_GETERRORDESCR(::hDBC) + " retcode: " + sr_val2Char(::nRetCode) + " - " + AllTrim(Str(SQLO2_GETERRORCODE(::hDBC)))
 
 /*------------------------------------------------------------------------*/
 
@@ -343,13 +343,13 @@ METHOD SR_ORACLE2:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxB
    IF !Empty(cMatch)
       aVersion := hb_atokens(cMatch, ".")
    ELSE
-      aVersion := hb_atokens(strtran(Upper(aRet[1, 1]), "ORACLE ", ""), ".")
+      aVersion := hb_atokens(StrTran(Upper(aRet[1, 1]), "ORACLE ", ""), ".")
    ENDIF
 
    ::exec("select sid from " + IIf(::lCluster, "g", "") + "v$session where AUDSID = sys_context('USERENV','sessionid')", .T., .T., @aRet)
 
    IF Len(aRet) > 0
-      ::uSid := val(str(aRet[1, 1], 8, 0))
+      ::uSid := val(Str(aRet[1, 1], 8, 0))
    ENDIF
    SQLO2_SETSTATEMENTCACHESIZE(hdbc, 50)
    ::lOracle12 := (Val(aversion[1]) == 12)
@@ -364,7 +364,7 @@ METHOD SR_ORACLE2:End()
 
    IF !Empty(::hDbc)
      IF (nRet := SQLO2_DISCONNECT(::hDbc)) != SQL_SUCCESS
-        SR_MsgLogFile("Error disconnecting : " + str(nRet) + SR_CRLF + ::LastError())
+        SR_MsgLogFile("Error disconnecting : " + Str(nRet) + SR_CRLF + ::LastError())
      ENDIF
    ENDIF
 
@@ -407,7 +407,7 @@ METHOD SR_ORACLE2:ExecuteRaw(cCommand)
          ORACLEBINDALLOC2(::hDBC, Len(::aBindParameters))
          FOR i := 1 TO Len(::aBindParameters )
             IF HB_ISARRAY(::aBindParameters[i])
-               IF HB_ISCHAR(::aBindParameters[i, 2])
+               IF HB_IsChar(::aBindParameters[i, 2])
                   ORACLEINBINDPARAM2(::hDBC, i, -1, ::aBindParameters[i, 3], 0, ::aBindParameters[i, 2], .T.)
                ELSEIF HB_ISDATE(::aBindParameters[i, 2])
                   ORACLEINBINDPARAM2(::hDBC, i, 8, ::aBindParameters[i, 3], 0, ::aBindParameters[i, 2], .T.)
@@ -417,7 +417,7 @@ METHOD SR_ORACLE2:ExecuteRaw(cCommand)
                   ORACLEINBINDPARAM2(::hDBC, i, 2, 15, 0, ::aBindParameters[i, 2], .T.)
                ENDIF
             ELSE
-               IF HB_ISCHAR(::aBindParameters[i])
+               IF HB_IsChar(::aBindParameters[i])
                   ORACLEINBINDPARAM2(::hDBC, i, -1, Len(::aBindParameters[i]), 0, ::aBindParameters[i], .T.)
                ELSEIF HB_ISDATE(::aBindParameters[i])
                   ORACLEINBINDPARAM2(::hDBC, i, 8, ::aBindParameters[i], 0, ::aBindParameters[i], .T.)
@@ -551,7 +551,7 @@ METHOD SR_ORACLE2:ExecSP(cComm, aReturn, nParam, aType)
    END SEQUENCE
 
    IF nError < 0
-      ::RunTimeErr("", str(SQLO2_GETERRORCODE(::hDbc), 4) + " - " + SQLO2_GETERRORDESCR(::hDbc))
+      ::RunTimeErr("", Str(SQLO2_GETERRORCODE(::hDbc), 4) + " - " + SQLO2_GETERRORDESCR(::hDbc))
    ELSE
    //IF nError >= 0
       FOR i := 1 TO nParam
@@ -613,7 +613,7 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
    IF nError < 0
       IF lFetch
          // ::RunTimeErr("", "SQLExecDirect Error Erro na STORE PROCEDURE")
-         ::RunTimeErr("", str(SQLO2_GETERRORCODE(::hDbc), 4) + " - " + SQLO2_GETERRORDESCR(::hDbc) + ::cLastComm)
+         ::RunTimeErr("", Str(SQLO2_GETERRORCODE(::hDbc), 4) + " - " + SQLO2_GETERRORDESCR(::hDbc) + ::cLastComm)
       ENDIF
    ENDIF
 

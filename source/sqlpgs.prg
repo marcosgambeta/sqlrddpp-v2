@@ -224,10 +224,10 @@ RETURN aFields
 METHOD SR_PGS:LastError()
 
    IF ::hStmt != NIL
-      RETURN "(" + AllTrim(str(::nRetCode)) + ") " + PGSResStatus(::hDbc) + " - " + PGSErrMsg(::hDbc)
+      RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + PGSResStatus(::hDbc) + " - " + PGSErrMsg(::hDbc)
    ENDIF
 
-RETURN "(" + AllTrim(str(::nRetCode)) + ") " + PGSErrMsg(::hDbc)
+RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + PGSErrMsg(::hDbc)
 
 /*------------------------------------------------------------------------*/
 
@@ -266,7 +266,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
 
    DEFAULT ::cPort TO 5432
 
-   cConnect := "host=" + ::cHost + " user=" + ::cUser + " password=" + ::cPassword + " dbname=" + ::cDTB + " port=" + str(::cPort, 6)
+   cConnect := "host=" + ::cHost + " user=" + ::cUser + " password=" + ::cPassword + " dbname=" + ::cDTB + " port=" + Str(::cPort, 6)
 
    IF !Empty(::sslcert)
       cConnect += " sslmode=prefer sslcert=" + ::sslcert + " sslkey=" + ::sslkey + " sslrootcert=" + ::sslrootcert + " sslcrl=" + ::sslcrl
@@ -277,7 +277,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
 
    IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
       ::nRetCode := nRet
-      SR_MsgLogFile("Connection Error: " + AllTrim(str(PGSStatus2(hDbc))) + " (see pgs.ch)")
+      SR_MsgLogFile("Connection Error: " + AllTrim(Str(PGSStatus2(hDbc))) + " (see pgs.ch)")
       RETURN Self
    ELSE
       ::cConnect := cConnect
@@ -292,7 +292,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
          IF !Empty(cMatch)
             aVersion := hb_atokens(cMatch, ".")
          ELSE
-            aVersion := hb_atokens(strtran(Upper(aRet[1, 1]), "POSTGRESQL ", ""), ".")
+            aVersion := hb_atokens(StrTran(Upper(aRet[1, 1]), "POSTGRESQL ", ""), ".")
          ENDIF
       ELSE
          cSystemVers := "??"
@@ -321,7 +321,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
    ::exec("select pg_backend_pid()", .T., .T., @aRet)
 
    IF Len(aRet) > 0
-      ::uSid := val(str(aRet[1, 1], 8, 0))
+      ::uSid := val(Str(aRet[1, 1], 8, 0))
    ENDIF
 
 RETURN Self
@@ -383,7 +383,7 @@ METHOD SR_PGS:AllocStatement()
       IF ::nSetOpt == SQL_ATTR_QUERY_TIMEOUT
 /*
          Commented 2005/02/04 - It's better to wait forever on a lock than have a corruct transaction
-         PGSExec(::hDbc, "set statement_timeout=" + str(::nSetValue * 1000))
+         PGSExec(::hDbc, "set statement_timeout=" + Str(::nSetValue * 1000))
 */
       ENDIF
       ::lSetNext := .F.

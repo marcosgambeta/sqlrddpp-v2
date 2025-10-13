@@ -210,10 +210,10 @@ RETURN aFields
 METHOD SR_MYSQL:LastError()
 
    IF ::hStmt != NIL
-      RETURN "(" + AllTrim(str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
+      RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
    ENDIF
 
-RETURN "(" + allTrim(str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
+RETURN "(" + allTrim(Str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
 
 METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
 
@@ -254,12 +254,12 @@ METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
       ::hStmt     := NIL
       ::hDbc      := hDbc
       cTargetDB   := "MySql Native"
-      cSystemVers := allTrim(str(MYSVERS(hDbc)))
+      cSystemVers := allTrim(Str(MYSVERS(hDbc)))
       nVersionp   := MYSVERS(hDbc)
    ENDIF
 
    IF !::lQueryOnly .AND. nVersionp < MINIMAL_MYSQL_SUPPORTED
-      SR_MsgLogFile("Connection Error: MySQL version not supported : " + cSystemVers + " / minimun is " + str(MINIMAL_MYSQL_SUPPORTED))
+      SR_MsgLogFile("Connection Error: MySQL version not supported : " + cSystemVers + " / minimun is " + Str(MINIMAL_MYSQL_SUPPORTED))
       ::End()
       ::nSystemID := 0
       ::nRetCode  := -1

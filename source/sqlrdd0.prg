@@ -234,7 +234,7 @@ FUNCTION SR_SetSVIndex(cSet)
 
    LOCAL cOld := cSynthetiVInd
 
-   IF HB_ISCHAR(cSet)
+   IF HB_IsChar(cSet)
       IF Len(cSet) != 3 .OR. " " $ cSet .OR. "." $ cSet
          SR_RuntimeErr("SR_SetSVIndex()", "Invalid parameter: " + cSet)
       ENDIF
@@ -284,7 +284,7 @@ FUNCTION SR_SetTblSpaceData(cSet)
    LOCAL cOld := cTblSpaceData
    LOCAL oSql
 
-   IF HB_ISCHAR(cSet)
+   IF HB_IsChar(cSet)
       cTblSpaceData := cSet
    ELSEIF Empty(cTblSpaceData)
       oSql := SR_GetConnection()
@@ -302,7 +302,7 @@ FUNCTION SR_SetTblSpaceIndx(cSet)
    LOCAL cOld := cTblSpaceIndx
    LOCAL oSql
 
-   IF HB_ISCHAR(cSet)
+   IF HB_IsChar(cSet)
       cTblSpaceIndx := cSet
    ELSEIF Empty(cTblSpaceIndx)
       oSql := SR_GetConnection()
@@ -320,7 +320,7 @@ FUNCTION SR_SetTblSpaceLob(cSet)
    LOCAL cOld := cTblSpaceLob
    LOCAL oSql
 
-   IF HB_ISCHAR(cSet)
+   IF HB_IsChar(cSet)
       cTblSpaceLob := cSet
    ELSEIF Empty(cTblSpaceLob)
       oSql := SR_GetConnection()
@@ -337,7 +337,7 @@ FUNCTION SR_SetRDDTemp(cSet)
 
    LOCAL cOld := cRDDTemp
 
-   IF HB_ISCHAR(cSet)
+   IF HB_IsChar(cSet)
       cRDDTemp := cSet
    ENDIF
 
@@ -505,14 +505,14 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
 #endif
       EXIT
    OTHERWISE
-      SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + str(nType))
+      SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + Str(nType))
       RETURN -1
    ENDSWITCH
 
    IF HB_ISOBJECT(oConnect)
       oConnect:Connect("", cUser, cPassword, 1, cOwner, 4000, .F., cDSN, 50, "ANSI", 0, 0, 0, lCounter, lAutoCommit, nTimeout)
    ELSE
-      SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + str(nType))
+      SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + Str(nType))
       RETURN -1
    ENDIF
 
@@ -662,10 +662,10 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          oCnn:exec("select sid from " + IIf(oCnn:lCluster, "g", "") + "v$session where AUDSID = sys_context('USERENV','sessionid')", .T., .T., @aRet)
 
          IF Len(aRet) > 0
-            oCnn:uSid := val(str(aRet[1, 1], 8, 0))
+            oCnn:uSid := val(Str(aRet[1, 1], 8, 0))
          ENDIF
 
-         oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ = " + str(oCnn:uSid) + " OR SPID_ NOT IN (select " + chr(34) + "AUDSID" + chr(34) + " from " + IIf(oCnn:lCluster, "g", "") + "v$session)", .F.)
+         oCnn:exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ = " + Str(oCnn:uSid) + " OR SPID_ NOT IN (select " + chr(34) + "AUDSID" + chr(34) + " from " + IIf(oCnn:lCluster, "g", "") + "v$session)", .F.)
          oCnn:Commit()
          EXIT
 
@@ -1571,7 +1571,7 @@ FUNCTION SR_SetCollation(cName)
 
    LOCAL cOld := cCollation
 
-   IF HB_ISCHAR(cName)
+   IF HB_IsChar(cName)
       cCollation := cName
    ENDIF
 
@@ -1985,7 +1985,7 @@ FUNCTION SR_SetLocks(uLocks, oCnn, nRetries)
    ENDIF
 
    DO CASE
-   CASE HB_ISCHAR(uLocks)
+   CASE HB_IsChar(uLocks)
       aLocks := {uLocks}
    CASE HB_ISARRAY(uLocks)
       aLocks := uLocks
@@ -2004,7 +2004,7 @@ FUNCTION SR_SetLocks(uLocks, oCnn, nRetries)
          cDel := "DELETE FROM SR_MGMNTLOCKS WHERE convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)"
          EXIT
       CASE SYSTEMID_ORACLE
-         cIns := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + "', " + str(oCnn:uSid) + " )"
+         cIns := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + "', " + Str(oCnn:uSid) + " )"
          cDel := "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (select " + chr(34) + "AUDSID" + chr(34) + " from " + IIf(oCnn:lCluster, "g", "") + "v$session)"
          EXIT
       CASE SYSTEMID_POSTGR
@@ -2083,7 +2083,7 @@ FUNCTION SR_ReleaseLocks(uLocks, oCnn)
    ENDIF
 
    DO CASE
-   CASE HB_ISCHAR(uLocks)
+   CASE HB_IsChar(uLocks)
       aLocks := {uLocks}
    CASE HB_ISARRAY(uLocks)
       aLocks := uLocks

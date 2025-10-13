@@ -272,7 +272,7 @@ METHOD SR_CONNECTION:LogQuery(cCommand, cType, nLogMode, nCost)
    ENDIF
 
    cSql := "INSERT INTO " + ::cQueryOwner + "SR_MGMNTLOGCHG (SPID_, WPID_, TYPE_, APPUSER_, TIME_, QUERY_, CALLSTACK_, SITE_, CONTROL_, COST_ ) VALUES ( " + ;
-           str(::uSid) + "," + str(SR_GetCurrInstanceID()) + ", '" + cType + "','" + ::cAppUser + "','" + dtos(date()) + time() + strzero(seconds() * 1000, 8) + "'," + sr_cDbValue(cCommand, ::nSystemID) + "," + cStack + ",'" + ::cSite + "', NULL, " + str(nCost) + " )"
+           Str(::uSid) + "," + Str(SR_GetCurrInstanceID()) + ", '" + cType + "','" + ::cAppUser + "','" + dtos(date()) + time() + strzero(seconds() * 1000, 8) + "'," + sr_cDbValue(cCommand, ::nSystemID) + "," + cStack + ",'" + ::cSite + "', NULL, " + Str(nCost) + " )"
    oSql:execute(cSql, , , .T.)
    oSql:FreeStatement()
 
@@ -895,9 +895,9 @@ METHOD SR_CONNECTION:Commit(lNoLog)
       ENDIF
 
       IF StrZero(::nLogMode, SQLLOGCHANGES_SIZE)[4] == "1" .OR. ::oSqlTransact == NIL
-         SELF:execute("DELETE FROM " + ::cQueryOwner + "SR_MGMNTLOGCHG WHERE SPID_ = " + str(::uSid),,,, .T.)
+         SELF:execute("DELETE FROM " + ::cQueryOwner + "SR_MGMNTLOGCHG WHERE SPID_ = " + Str(::uSid),,,, .T.)
       ELSE
-         ::oSqlTransact:execute("DELETE FROM " + ::cQueryOwner + "SR_MGMNTLOGCHG WHERE SPID_ = " + str(::uSid),,,, .T.)
+         ::oSqlTransact:execute("DELETE FROM " + ::cQueryOwner + "SR_MGMNTLOGCHG WHERE SPID_ = " + Str(::uSid),,,, .T.)
          ::oSqlTransact:FreeStatement()
          ::oSqlTransact:commit(.T.)
       ENDIF
@@ -935,9 +935,9 @@ METHOD SR_CONNECTION:RollBack()
       ENDIF
 
       IF StrZero(::nLogMode, SQLLOGCHANGES_SIZE)[4] == "1" .OR. ::oSqlTransact == NIL
-         SELF:execute("DELETE FROM " + ::cQueryOwner + "SR_MGMNTLOGCHG WHERE SPID_ = " + str(::uSid),,,, .T.)
+         SELF:execute("DELETE FROM " + ::cQueryOwner + "SR_MGMNTLOGCHG WHERE SPID_ = " + Str(::uSid),,,, .T.)
       ELSE
-         ::oSqlTransact:execute("DELETE FROM " + ::cQueryOwner + "SR_MGMNTLOGCHG WHERE SPID_ = " + str(::uSid),,,, .T.)
+         ::oSqlTransact:execute("DELETE FROM " + ::cQueryOwner + "SR_MGMNTLOGCHG WHERE SPID_ = " + Str(::uSid),,,, .T.)
          ::oSqlTransact:FreeStatement()
          ::oSqlTransact:commit(.T.)
       ENDIF
@@ -1182,7 +1182,7 @@ METHOD SR_CONNECTION:Connect(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxB
 
    SWITCH ::nSystemID
    CASE SYSTEMID_ORACLE
-      ::cLockWait := " WAIT " + str(int(::nLockWaitTime))
+      ::cLockWait := " WAIT " + Str(int(::nLockWaitTime))
       EXIT
    OTHERWISE
       ::cLockWait := ""
@@ -1384,7 +1384,7 @@ FUNCTION SR_SetTraceLog(cLog)
 
    cOld := oSql:cLowLevLogFile
 
-   IF HB_ISCHAR(cLog)
+   IF HB_IsChar(cLog)
       oSql:cLowLevLogFile := cLog
    ENDIF
 

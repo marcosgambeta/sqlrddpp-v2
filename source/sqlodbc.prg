@@ -263,7 +263,7 @@ METHOD SR_ODBC:AllocStatement()
       ::lSetNext := .F.
       nRet := ::SetStmtOptions(::nSetOpt, ::nSetValue)
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
-         SR_MsgLogFile(SR_Msg(23) + " (" + AllTrim(str(nRet)) + ") : " + ::LastError())
+         SR_MsgLogFile(SR_Msg(23) + " (" + AllTrim(Str(nRet)) + ") : " + ::LastError())
       ENDIF
    ENDIF
 
@@ -364,7 +364,7 @@ METHOD SR_ODBC:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecno
          ENDIF
 */
          IF cType == "U"
-            ::RuntimeErr("", SR_Msg(21) + cName + " : " + str(nType))
+            ::RuntimeErr("", SR_Msg(21) + cName + " : " + Str(nType))
          ELSE
             aFields[n] := {cName, cType, nLenField, IIf(cType == "D", 0, nDec), nNull >= 1, nType, nLen, n, _nDec}
          ENDIF
@@ -421,7 +421,7 @@ METHOD SR_ODBC:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff
       ::hEnv := hEnv
    ELSE
       ::nRetCode := nRet
-      SR_MsgLogFile("SQLALLOCENV Error" + str(nRet))
+      SR_MsgLogFile("SQLALLOCENV Error" + Str(nRet))
       RETURN SELF
    ENDIF
 
@@ -429,7 +429,7 @@ METHOD SR_ODBC:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff
       ::hDbc := hDbc
    ELSE
       ::nRetCode := nRet
-      SR_MsgLogFile("SQLALLOCCONNECT Error" + str(nRet))
+      SR_MsgLogFile("SQLALLOCCONNECT Error" + Str(nRet))
       RETURN SELF
    ENDIF
 
@@ -463,7 +463,7 @@ METHOD SR_ODBC:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff
    CASE SYSTEMID_AZURE
       ::exec("select cast( @@spid as numeric )", .T., .T., @aRet)
       IF Len(aRet) > 0
-         ::uSid := val(str(aRet[1, 1], 8, 0))
+         ::uSid := val(Str(aRet[1, 1], 8, 0))
       ENDIF
       EXIT
    ENDSWITCH
@@ -477,13 +477,13 @@ METHOD SR_ODBC:End()
    ::Commit(.T.)
 
    IF (nRet := SR_Disconn(::hDbc)) != SQL_SUCCESS
-      SR_MsgLogFile("Error disconnecting : " + str(nRet) + SR_CRLF + ::LastError())
+      SR_MsgLogFile("Error disconnecting : " + Str(nRet) + SR_CRLF + ::LastError())
    ELSE
       IF (nRet := SR_FreeCon(::hDbc)) != SQL_SUCCESS
-         SR_MsgLogFile("Error in SR_FreeCon() : " + str(nRet) + SR_CRLF + ::LastError())
+         SR_MsgLogFile("Error in SR_FreeCon() : " + Str(nRet) + SR_CRLF + ::LastError())
       ELSE
          If (nRet := SR_FreeEnv(::hEnv)) != SQL_SUCCESS
-            SR_MsgLogFile("Error in SR_FreeEnv() : " + str(nRet) + SR_CRLF + ::LastError())
+            SR_MsgLogFile("Error in SR_FreeEnv() : " + Str(nRet) + SR_CRLF + ::LastError())
          EndIf
       ENDIF
    ENDIF

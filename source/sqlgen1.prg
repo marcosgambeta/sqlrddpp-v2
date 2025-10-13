@@ -507,22 +507,22 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
             SWITCH nSystemId
             CASE SYSTEMID_MSSQL7
             CASE SYSTEMID_CACHE
-               cSql += "TOP " + LTrim(str(uData)) + " "
+               cSql += "TOP " + LTrim(Str(uData)) + " "
                EXIT
             CASE SYSTEMID_FIREBR
             CASE SYSTEMID_FIREBR3
             CASE SYSTEMID_FIREBR4
             CASE SYSTEMID_FIREBR5
             CASE SYSTEMID_INFORM
-               cSql += "FIRST " + LTrim(str(uData)) + " "
+               cSql += "FIRST " + LTrim(Str(uData)) + " "
                EXIT
             CASE SYSTEMID_MYSQL
             CASE SYSTEMID_MARIADB
             CASE SYSTEMID_POSTGR
-               cTrailler := " LIMIT " + LTrim(str(uData)) + " "
+               cTrailler := " LIMIT " + LTrim(Str(uData)) + " "
                EXIT
             CASE SYSTEMID_IBMDB2
-               cTrailler := " fetch first " + LTrim(str(uData)) + " rows only"
+               cTrailler := " fetch first " + LTrim(Str(uData)) + " rows only"
                EXIT
             ENDSWITCH
             PASSTHROUGH
@@ -1224,7 +1224,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
 
 FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
 
-   LOCAL cType := valtype(uData)
+   LOCAL cType := ValType(uData)
    LOCAL uElement
    LOCAL cRet := ""
 
@@ -1263,7 +1263,7 @@ FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
    CASE cType == "D"
       RETURN ("'" + dtos(uData) + "'")
    CASE cType == "N"
-      RETURN LTrim(str(uData))
+      RETURN LTrim(Str(uData))
    CASE cType == "L" .AND. nSystemID == SYSTEMID_POSTGR
       RETURN IIf(uData, "true", "false")
    CASE cType == "L" .AND. nSystemID == SYSTEMID_INFORM
@@ -1277,7 +1277,7 @@ FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
       RETURN cRet
    CASE cType == "O"
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN SR_SQLQuotedString(SQL_SERIALIZED_SIGNATURE + str(Len(cRet), 10) + cRet, nSystemID, lNotNull)
+      RETURN SR_SQLQuotedString(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, nSystemID, lNotNull)
    ENDCASE
 #endif
 
@@ -1319,7 +1319,7 @@ FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
       ENDSWITCH
 
    CASE "N"
-      RETURN LTrim(str(uData))
+      RETURN LTrim(Str(uData))
 
    CASE "L"
       SWITCH nSystemID
@@ -1339,7 +1339,7 @@ FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
 
    CASE "O"
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN SR_SQLQuotedString(SQL_SERIALIZED_SIGNATURE + str(Len(cRet), 10) + cRet, nSystemID, lNotNull)
+      RETURN SR_SQLQuotedString(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, nSystemID, lNotNull)
 
    ENDSWITCH
 
@@ -1417,7 +1417,7 @@ STATIC FUNCTION SR_SolveFilters(aFilters, aRet, cAlias, nSystemID)
 
    LOCAL i
 
-   IF !(HB_ISARRAY(aRet) .AND. Len(aRet) >= 2 .AND. HB_ISCHAR(aRet[1]))
+   IF !(HB_ISARRAY(aRet) .AND. Len(aRet) >= 2 .AND. HB_IsChar(aRet[1]))
       RETURN .F.
    ENDIF
 
@@ -1643,15 +1643,15 @@ FUNCTION SR_TableAttr(cTableName, nSystemID)
       ENDIF
    ENDIF
 
-   cTableName := strtran(AllTrim(Lower(cTableName)), ".dbf", "_dbf")
-   cTableName := strtran(cTableName, ".ntx", "")
-   cTableName := strtran(cTableName, ".cdx", "")
-   cTableName := strtran(cTableName, "\", "_")
+   cTableName := StrTran(AllTrim(Lower(cTableName)), ".dbf", "_dbf")
+   cTableName := StrTran(cTableName, ".ntx", "")
+   cTableName := StrTran(cTableName, ".cdx", "")
+   cTableName := StrTran(cTableName, "\", "_")
    IF SubStr(cTableName, 1, 1) == "/"
       cTableName := SubStr(cTableName, 2)
    ENDIF
-   cTableName := strtran(cTableName, "/", "_")
-   cTableName := strtran(cTableName, ".", "_")
+   cTableName := StrTran(cTableName, "/", "_")
+   cTableName := StrTran(cTableName, ".", "_")
    cTableName := AllTrim(cTableName)
 
    IF Len(cTableName) > 30
@@ -1708,15 +1708,15 @@ FUNCTION SR_IndexAttr(cTableName, nSystemID)
       ENDIF
    ENDIF
 
-   cTableName := strtran(AllTrim(Lower(cTableName)), ".dbf", "_dbf")
-   cTableName := strtran(cTableName, ".ntx", "")
-   cTableName := strtran(cTableName, ".cdx", "")
-   cTableName := strtran(cTableName, "\", "_")
+   cTableName := StrTran(AllTrim(Lower(cTableName)), ".dbf", "_dbf")
+   cTableName := StrTran(cTableName, ".ntx", "")
+   cTableName := StrTran(cTableName, ".cdx", "")
+   cTableName := StrTran(cTableName, "\", "_")
    IF SubStr(cTableName, 1, 1) == "/"
       cTableName := SubStr(cTableName, 2)
    ENDIF
-   cTableName := strtran(cTableName, "/", "_")
-   cTableName := strtran(cTableName, ".", "_")
+   cTableName := StrTran(cTableName, "/", "_")
+   cTableName := StrTran(cTableName, ".", "_")
    cTableName := AllTrim(cTableName)
 
    IF Len(cTableName) > 30

@@ -183,7 +183,7 @@ METHOD ExpressionSimplifier:Simplify(oExpression)
       RECOVER
       END SEQUENCE
       IF lEvaluated
-         SWITCH valtype(newValue)
+         SWITCH ValType(newValue)
          CASE "C"
             newValue := "'" + newValue + "'"
             result := ValueExpression():new(oExpression:cContext, newValue)
@@ -195,7 +195,7 @@ METHOD ExpressionSimplifier:Simplify(oExpression)
             result := ValueExpression():new(oExpression:cContext, newValue)
             EXIT
          CASE "D"
-            newValue := "'" + dtoc(newValue) + "'"
+            newValue := "'" + DToC(newValue) + "'"
             result := FunctionExpression():new(oExpression:cContext, "ctod(" + newValue + ")", "ctod", {Parameter():new(ValueExpression():new(oExpression:cContext, newValue), .F.)})
          ENDSWITCH
       ENDIF
@@ -232,7 +232,7 @@ METHOD ExpressionSimplifier:Simplify(oExpression)
    IF result == NIL
       result := oExpression
    ENDIF
-   result:lSimplified = .T.
+   result:lSimplified := .T.
 
 RETURN result
 

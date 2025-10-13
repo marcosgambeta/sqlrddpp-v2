@@ -195,8 +195,8 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    IF !Empty(cWhere) .AND. HB_ISARRAY(aVarSust)
 
       FOR i := 1 TO Len(aVarSust)
-         cBind := ":" + AllTrim(str(i))
-         cWhere := strtran(cWhere, cBind, sr_cdbvalue(aVarSust[i]))
+         cBind := ":" + AllTrim(Str(i))
+         cWhere := StrTran(cWhere, cBind, sr_cdbvalue(aVarSust[i]))
       NEXT i
      // nat := at
    ENDIF
@@ -260,12 +260,12 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       cAlias := "tmpedit"
       nAliasTmp++
       hHashData[nAliasTmp] := hb_hash()
-      hHashData[nAliasTmp]["cFile"] := strtran(cfile, ".tmp", "")
+      hHashData[nAliasTmp]["cFile"] := StrTran(cfile, ".tmp", "")
    ELSE
       cAlias := "tmpedit" + strzero(nAliasTmp, 3)
       nAliasTmp++
       hHashData[nAliasTmp] := hb_hash()
-      hHashData[nAliasTmp]["cFile"] := strtran(cfile, ".tmp", "")
+      hHashData[nAliasTmp]["cFile"] := StrTran(cfile, ".tmp", "")
    ENDIF
    hHashData[nAliasTmp]["eof"] := .F.
    refreshFullData(csql, cAlias, cfile, nHigerBound, nLowerBound, nStep)
@@ -321,16 +321,16 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
            invalid or empty, then the dbEdit() will ignore it. */
 
    IF !HB_IsNil(nTop) .AND. !HB_IsNumeric(nTop)
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(nTop) + ">", Procname() + " <nTop>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(nTop) + ">", Procname() + " <nTop>"))
    ENDIF
    IF !HB_IsNil(nLeft) .AND. !HB_IsNumeric(nLeft)
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(nLeft) + ">", Procname() + " <nLeft>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(nLeft) + ">", Procname() + " <nLeft>"))
    ENDIF
    IF !HB_IsNil(nBottom) .AND. !HB_IsNumeric(nBottom)
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(nBottom) + ">", Procname() + " <nBottom>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(nBottom) + ">", Procname() + " <nBottom>"))
    ENDIF
    IF !HB_IsNil(nRight) .AND. !HB_IsNumeric(nRight)
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(nRight) + ">", Procname() + " <nRight>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(nRight) + ">", Procname() + " <nRight>"))
    ENDIF
 
    nTop    := Max(0, nTop)
@@ -342,7 +342,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
     * string or NIL, but in xHarbour can be a codeblock also.
    */
    IF !HB_IsNil(xUserFunc) .AND. (!HB_IsString(xUserFunc) .AND. !HB_IsBlock(xUserFunc) .AND. !HB_IsLogical(xUserFunc))
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(xUserFunc) + ">", Procname() + " <xUserFunc>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(xUserFunc) + ">", Procname() + " <xUserFunc>"))
    ELSE
       IF HB_IsString(xUserFunc) .AND. Empty(xUserFunc)
          xUserFunc := NIL
@@ -353,35 +353,35 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    ENDIF
 
    IF !HB_IsNil(acColumnSayPictures) .AND. (!HB_IsString(acColumnSayPictures) .AND. !HB_IsArray(acColumnSayPictures))
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(acColumnSayPictures) + ">", Procname() + " <acColumnSayPictures|cColumnSayPicture>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(acColumnSayPictures) + ">", Procname() + " <acColumnSayPictures|cColumnSayPicture>"))
    ENDIF
 
    IF !HB_IsNil(acColumnHeaders) .AND. (!HB_IsString(acColumnHeaders) .AND. !HB_IsArray(acColumnHeaders))
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(acColumnHeaders) + ">", Procname() + " <acColumnHeaders|cColumnHeader>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(acColumnHeaders) + ">", Procname() + " <acColumnHeaders|cColumnHeader>"))
    ENDIF
 
    IF !HB_IsNil(acHeadingSep) .AND. (!HB_IsString(acHeadingSep) .AND. !HB_IsArray(acHeadingSep))
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(acHeadingSep) + ">", Procname() + " <acHeadingSeparators|cHeadingSeparator>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(acHeadingSep) + ">", Procname() + " <acHeadingSeparators|cHeadingSeparator>"))
    ENDIF
 
    IF !HB_IsNil(acColumnSep) .AND. (!HB_IsString(acColumnSep) .AND. !HB_IsArray(acColumnSep))
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(acColumnSep) + ">", Procname() + " <acColumnSeparators|cColumnSeparator>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(acColumnSep) + ">", Procname() + " <acColumnSeparators|cColumnSeparator>"))
    ENDIF
 
    IF !HB_IsNil(acFootingSep) .AND. (!HB_IsString(acFootingSep) .AND. !HB_IsArray(acFootingSep))
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(acFootingSep) + ">", Procname() + " <acFootingSeparators|cFootingSeparator>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(acFootingSep) + ">", Procname() + " <acFootingSeparators|cFootingSeparator>"))
    ENDIF
 
    IF !HB_IsNil(acColumnFootings) .AND. (!HB_IsString(acColumnFootings) .AND. !HB_IsArray(acColumnFootings))
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(acColumnFootings) + ">", Procname() + " <acColumnFootings|cColumnFooting>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(acColumnFootings) + ">", Procname() + " <acColumnFootings|cColumnFooting>"))
    ENDIF
 
    IF !HB_IsNil(bPreBlock) .AND. !HB_IsBlock(bPreBlock)
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(bPreBlock) + ">", Procname() + " <bPreBlockBlock>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(bPreBlock) + ">", Procname() + " <bPreBlockBlock>"))
    ENDIF
 
    IF !HB_IsNil(bPostBlock) .AND. !HB_IsBlock(bPostBlock)
-      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + valtype(bPostBlock) + ">", Procname() + " <bPostBlockBlock>"))
+      Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(bPostBlock) + ">", Procname() + " <bPostBlockBlock>"))
    ENDIF
 
    IF HB_ISBLOCK(bPreBlock)
@@ -692,11 +692,11 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
 
    SetCursor(nCursor)
    SetPos(row(), 0)
-   IF select(cAlias ) > 0
+   IF Select(cAlias ) > 0
       (cAlias)->(dbclosearea())
    ENDIF
    IF nOldArea > 0
-      select(nOldArea)
+      Select(nOldArea)
    ENDIF
    IF file(hHashData[nAliasTmp]["cFile"] + "sqllog.dbf")
       ferase(hHashData[nAliasTmp]["cFile"] + "sqllog.dbf")
@@ -706,8 +706,8 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       nAliasTmp--
    ENDIF
    ferase(cFiletoDelete)
-   IF file(strtran(cFiletoDelete, ".tmp", ".adi"))
-      ferase(strtran(cFiletoDelete, ".tmp", ".adi"))
+   IF file(StrTran(cFiletoDelete, ".tmp", ".adi"))
+      ferase(StrTran(cFiletoDelete, ".tmp", ".adi"))
    ENDIF
 
 /* Clipper's NG says that DBEdit always returns NIL, but doesn't. */
@@ -793,7 +793,7 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
    IF nRet == DE_REFRESH
 
       IF nKey == K_DEL
-         if IsPrimaryKeyDeleted(cAlias, cTable)
+         IF IsPrimaryKeyDeleted(cAlias, cTable)
             (calias)->(rlock())
             (calias)->(dbdelete())
             (calias)->(dbunlock())
@@ -810,14 +810,14 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
          //cSql := sr_getconnection():cLastcomm
          //IF Upper(ctable) $ Upper(cSql) .AND. "INSERT" $ Upper(cSql )
          //   cValues := SubStr(cSql, at("VALUES", Upper(cSql)))
-         //   cSql := strtran(csql, cvalues, "")
+         //   cSql := StrTran(csql, cvalues, "")
          //   cvalues := AllTrim(values)
          //   cSql := AllTrim(cSql)
          //   cSql := SubStr(csql, at("(", csql) + 1)
-         //   csql :=strtran(csql, ")", "")
+         //   csql :=StrTran(csql, ")", "")
          //   cvalues := AllTrim(cvalues)
          //   cvalues := SubStr(cvalues, at("(", cvalues) + 1)
-         //   cvalues :=strtran(cvalues, ")", "")
+         //   cvalues :=StrTran(cvalues, ")", "")
          //   aField := hb_atokens(csql, ",")
          //   aVal := hb_atokens(cvalues, ",")
          //   (calias)->(dbappend())
@@ -1164,24 +1164,24 @@ STATIC FUNCTION refreshFullData(csql, cAlias, cfile, nHigh, nLow, nStep)
 
    DEFAULT cFile TO (calias)->(dbinfo(10))
 
-   //IF select(caLias) > 0
+   //IF Select(caLias) > 0
    //   ZAP
    //ENDIF
-   //cSql := strtran(csql, ":HigerBound", str(nHigh))
-   //cSql := strtran(csql, ":LowerBound", str(nLow))
+   //cSql := StrTran(csql, ":HigerBound", Str(nHigh))
+   //cSql := StrTran(csql, ":LowerBound", Str(nLow))
    //
    //sr_getconnection():exec(cSql, , .T., , cfile, cAlias)
    //(calias)->(dbgotop())
    nBeforeTotRec := (calias)->(reccount())
-   IF select(caLias) > 0
+   IF Select(caLias) > 0
       IF (calias)->(eof())
          nRecno := nBeforeTotRec
       ELSE
          nRecno := (calias)->(recno())
       ENDIF
    ENDIF
-   cSql := strtran(csql, ":HigerBound", str(nHigh))
-   cSql := strtran(csql, ":LowerBound", str(nLow))
+   cSql := StrTran(csql, ":HigerBound", Str(nHigh))
+   cSql := StrTran(csql, ":LowerBound", Str(nLow))
 
    sr_getconnection():exec(cSql, , .T., , cfile, cAlias)
    nAfterRec := (calias)->(reccount())
@@ -1398,17 +1398,17 @@ FUNCTION insertupdated(calias, ctable)
 
       IF !Empty(cSql)
          cValues := SubStr(cSql, at("VALUES", Upper(cSql)))
-         cSql := strtran(csql, cvalues, "")
+         cSql := StrTran(csql, cvalues, "")
          cvalues := AllTrim(cvalues)
          cSql := AllTrim(cSql)
          cSql := SubStr(csql, at("(", csql) + 1)
-         csql :=strtran(csql, ")", "")
+         csql :=StrTran(csql, ")", "")
 
          cSql := AllTrim(cSql)
          cvalues := AllTrim(cvalues)
          cvalues := SubStr(cvalues, at("(", cvalues) + 1)
-         cvalues :=strtran(cvalues, ")", "")
-         //cvalues := strtran(cvalues, "'", "")
+         cvalues :=StrTran(cvalues, ")", "")
+         //cvalues := StrTran(cvalues, "'", "")
          aField := hb_atokens(csql, ",")
          aVal := hb_atokens(cvalues, ",")
          //(calias)->(dbappend())
@@ -1425,10 +1425,10 @@ FUNCTION insertupdated(calias, ctable)
             IF nPos > 0
                IF "TO_DATE(" $ Upper(aval[npos])
                   aval[nPos] := SubStr(aval[npos], at("TO_DATE(", Upper(aval[nPos])) + 8)
-                  aval[npos] := strtran(aval[npos], "'", "")
+                  aval[npos] := StrTran(aval[npos], "'", "")
                   aval[npos] := stod(aval[npos])
                ENDIF
-               IF HB_ISCHAR(aval[npos])
+               IF HB_IsChar(aval[npos])
                   cSql += " " + aTemp  + " = " +  aVal[nPos]
                ELSEIF  HB_ISNUMERIC(aval[npos]) .OR. HB_ISDATE(aval[npos])
                   cSql += " " + aTemp  + " = " +  sr_cdbvalue(aVal[nPos])
@@ -1441,7 +1441,7 @@ FUNCTION insertupdated(calias, ctable)
          csql := "select " + cfields + " from " + ctable + " where rownum <4  order by " + cDesc
       ENDIF
       USE (csql) NEW alias "INSSQLTMP" VIA "SQLRDD"
-      if INSSQLTMP->(reccount()) > 0
+      IF INSSQLTMP->(reccount()) > 0
 
          inssqltmp->(dbgotop())
          DO WHILE !inssqltmp->(eof())
@@ -1454,9 +1454,9 @@ FUNCTION insertupdated(calias, ctable)
                      cSqlTmp += inssqltmp->(fieldget(i))
                   ELSEIF inssqltmp->(fieldtype(i)) == "N"
                      IF adb[npos, 4] > 0
-                        cSqlTmp += str(inssqltmp->(fieldget(i)), adb[npos, 3], adb[npos, 4])
+                        cSqlTmp += Str(inssqltmp->(fieldget(i)), adb[npos, 3], adb[npos, 4])
                      ELSE
-                        cSqlTmp += str(inssqltmp->(fieldget(i)), adb[npos, 3])
+                        cSqlTmp += Str(inssqltmp->(fieldget(i)), adb[npos, 3])
                      ENDIF
                   ELSEIF inssqltmp->(fieldtype(i)) == "D"
                      cSqlTmp += dtos(inssqltmp->(fieldget(i)))
@@ -1479,7 +1479,7 @@ FUNCTION insertupdated(calias, ctable)
    ENDIF
 
    //(calias)->(dbgoto((calias)->(lastrec())))
-   select(calias)
+   Select(calias)
 
 RETURN NIL
 
@@ -1523,9 +1523,9 @@ FUNCTION createkeyfrompk(calias, ctable, lDescIndex)
                   ckey += atemp + "+"
                ELSEIF adb[npos, 2] == "N"
                   IF adb[npos, 4] > 0
-                     ckey += "str(" + atemp + "," + str(adb[npos, 3]) + "," + str(adb[npos, 4]) + ")+"
+                     ckey += "str(" + atemp + "," + Str(adb[npos, 3]) + "," + Str(adb[npos, 4]) + ")+"
                   ELSE
-                     ckey += "str(" + atemp + "," + str(adb[npos, 3]) + ")+"
+                     ckey += "str(" + atemp + "," + Str(adb[npos, 3]) + ")+"
                   ENDIF
                ELSEIF adb[npos, 2] == "D"
                   ckey += "dtos(" + atemp + ")+"
