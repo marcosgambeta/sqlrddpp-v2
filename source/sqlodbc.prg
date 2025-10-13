@@ -105,9 +105,9 @@ METHOD SR_ODBC:Getline(aFields, lTranslate, aArray)
    DEFAULT lTranslate TO .T.
 
    IF aArray == NIL
-      aArray := Array(len(aFields))
-   ELSEIF len(aArray) < len(aFields)
-      aSize(aArray, len(aFields))
+      aArray := Array(Len(aFields))
+   ELSEIF Len(aArray) < Len(aFields)
+      aSize(aArray, Len(aFields))
    ENDIF
 
    IF ::aCurrLine == NIL
@@ -116,7 +116,7 @@ METHOD SR_ODBC:Getline(aFields, lTranslate, aArray)
       RETURN aArray
    ENDIF
 
-   FOR i := 1 TO len(aArray)
+   FOR i := 1 TO Len(aArray)
       aArray[i] := ::aCurrLine[i]
    NEXT i
 
@@ -195,8 +195,8 @@ METHOD SR_ODBC:MoreResults(aArray, lTranslate)
       ENDIF
 
       DO WHILE (::nRetCode := ::FetchRaw(lTranslate, aFieldsMore)) = SQL_SUCCESS
-         AAdd(aArray, Array(len(aFieldsMore)))
-         FOR i := 1 TO len(aFieldsMore)
+         AAdd(aArray, Array(Len(aFieldsMore)))
+         FOR i := 1 TO Len(aFieldsMore)
             aArray[n, i] := ::FieldGet(i, aFieldsMore, lTranslate)
          NEXT i
          n++
@@ -233,7 +233,7 @@ RETURN ::nRetCode
 
 METHOD SR_ODBC:FreeStatement()
 
-   IF !empty(::hStmt) // != NIL // != 0
+   IF !Empty(::hStmt) // != NIL // != 0
       IF SR_FreeStm(::hStmt, SQL_DROP) != SQL_SUCCESS
          ::RunTimeErr("", "SQLFreeStmt [DROP] error" + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
       ENDIF
@@ -434,7 +434,7 @@ METHOD SR_ODBC:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff
    ENDIF
 
    IF !Empty(::cDTB)
-      SR_SetCOnnectAttr(hDbc, SQL_ATTR_CURRENT_CATALOG, ::cDTB, len(::cDTB))
+      SR_SetCOnnectAttr(hDbc, SQL_ATTR_CURRENT_CATALOG, ::cDTB, Len(::cDTB))
    ENDIF
 
    cConnect := AllTrim(cConnect)
@@ -462,7 +462,7 @@ METHOD SR_ODBC:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff
    CASE SYSTEMID_MSSQL7
    CASE SYSTEMID_AZURE
       ::exec("select cast( @@spid as numeric )", .T., .T., @aRet)
-      IF len(aRet) > 0
+      IF Len(aRet) > 0
          ::uSid := val(str(aRet[1, 1], 8, 0))
       ENDIF
       EXIT

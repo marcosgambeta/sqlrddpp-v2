@@ -117,7 +117,7 @@ FUNCTION SR_CheckCnn(nConnection)
    DEFAULT nConnection TO nActiveConnection
    DEFAULT aConnections TO {}
 
-   IF nConnection > len(aConnections) .OR. nConnection == 0
+   IF nConnection > Len(aConnections) .OR. nConnection == 0
       RETURN .F.
    ENDIF
 
@@ -143,7 +143,7 @@ FUNCTION SR_CheckConnection(nConnection)
    DEFAULT nConnection TO nActiveConnection
    DEFAULT aConnections TO {}
 
-   IF nConnection > len(aConnections) .OR. nConnection == 0 .OR. nConnection < 0
+   IF nConnection > Len(aConnections) .OR. nConnection == 0 .OR. nConnection < 0
       RETURN SR_RuntimeErr("SR_CheckConnection()", SR_Msg(7))
    ENDIF
 
@@ -235,7 +235,7 @@ FUNCTION SR_SetSVIndex(cSet)
    LOCAL cOld := cSynthetiVInd
 
    IF HB_ISCHAR(cSet)
-      IF len(cSet) != 3 .OR. " " $ cSet .OR. "." $ cSet
+      IF Len(cSet) != 3 .OR. " " $ cSet .OR. "." $ cSet
          SR_RuntimeErr("SR_SetSVIndex()", "Invalid parameter: " + cSet)
       ENDIF
       cSynthetiVInd := cSet
@@ -368,7 +368,7 @@ FUNCTION SR_SetActiveConnection(nCnn)
    DEFAULT nCnn TO 1
    DEFAULT aConnections TO {}
 
-   IF nCnn != 0 .AND. nCnn <= len(aConnections)
+   IF nCnn != 0 .AND. nCnn <= Len(aConnections)
       nActiveConnection := nCnn
    ELSE
       RETURN -1
@@ -533,7 +533,7 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
 
       // ToDo: Add MUTEX here
       AAdd(aConnections, oConnect)
-      nRet := len(aConnections)
+      nRet := Len(aConnections)
 
       IF nActiveConnection == NIL .OR. nActiveConnection == 0
          nActiveConnection := nRet
@@ -542,11 +542,11 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
       oConnect:nID := nRet
 
       IF !lNoSetEnv
-         IF empty(SR_SetEnvSQLRDD(oConnect))
+         IF Empty(SR_SetEnvSQLRDD(oConnect))
             RETURN -1
          ENDIF
       ELSE
-         IF empty(SR_SetEnvMinimal(oConnect))
+         IF Empty(SR_SetEnvMinimal(oConnect))
             RETURN -1
          ENDIF
       ENDIF
@@ -586,12 +586,12 @@ FUNCTION SR_ReloadFieldModifiers(oConnect)
       oConnect:aFieldModifier := {=>}
       hb_HAllocate(oConnect:aFieldModifier, 10000)
       oConnect:nTCCompat := 2
-      IF len(aRet) > 0
+      IF Len(aRet) > 0
          cLast := aRet[1, 1]
          FOR EACH aField IN aRet
             IF aField[1] != cLast
                IF "." $ cLast
-                  cLast := Upper(SubSTr(cLast, At(".", cLast) + 1))
+                  cLast := Upper(SubStr(cLast, At(".", cLast) + 1))
                ENDIF
                oConnect:aFieldModifier[AllTrim(cLast)] := aFlds
                aFlds := {}
@@ -600,7 +600,7 @@ FUNCTION SR_ReloadFieldModifiers(oConnect)
             AAdd(aFlds, {aField[2], aField[3], aField[4], aField[5]})
          NEXT
          IF "." $ cLast
-            cLast := Upper(SubSTr(cLast, At(".", cLast) + 1))
+            cLast := Upper(SubStr(cLast, At(".", cLast) + 1))
          ENDIF
          oConnect:aFieldModifier[AllTrim(cLast)] := aFlds
       ENDIF
@@ -661,7 +661,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          aRet := {}
          oCnn:exec("select sid from " + IIf(oCnn:lCluster, "g", "") + "v$session where AUDSID = sys_context('USERENV','sessionid')", .T., .T., @aRet)
 
-         IF len(aRet) > 0
+         IF Len(aRet) > 0
             oCnn:uSid := val(str(aRet[1, 1], 8, 0))
          ENDIF
 
@@ -679,7 +679,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          IF SR_UseSequences() .AND. i == 1
             aRet := {}
             oCnn:exec("VALUES NEXTVAL FOR N_RECNO", .F., .T., @aRet)
-            IF len(aRet) == 0
+            IF Len(aRet) == 0
                oCnn:exec("CREATE SEQUENCE N_RECNO START WITH 1 INCREMENT BY 1 NOMAXVALUE NOCYCLE")
             ENDIF
          ENDIF
@@ -704,7 +704,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          aRet := {}
          oCnn:exec("SELECT convert( char(30), login_time, 21 ) FROM MASTER.DBO.SYSPROCESSES where SPID = @@SPID", .F., .T., @aRet)
 
-         IF len(aRet) > 0
+         IF Len(aRet) > 0
             oCnn:cLoginTime := AllTrim(aRet[1, 1])
          ENDIF
 
@@ -745,7 +745,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
 
          aRet := {}
          oCnn:exec("select * from " + SR_GetToolsOwner() + "dual", .F., .T., @aRet)
-         IF len(aRet) == 0
+         IF Len(aRet) == 0
             oConnect:exec("create table " + SR_GetToolsOwner() + "dual (dummy char(1))", .F.)
             oConnect:exec("insert into " + SR_GetToolsOwner() + "dual (dummy) values (0)", .F.)
             oConnect:commit()
@@ -792,7 +792,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
    aRet := {}
    oConnect:exec("SELECT VERSION_, SIGNATURE_ FROM " + SR_GetToolsOwner() + "SR_MGMNTVERSION", .F., .T., @aRet)
 
-   IF len(aRet) > 0
+   IF Len(aRet) > 0
       cStartingVersion := AllTrim(aRet[1, 1])
    ELSE
       cStartingVersion := ""
@@ -1124,7 +1124,7 @@ FUNCTION SR_ReloadMLHash(oConnect)
    oConnect:commit()
 
    hMultilangColumns := hb_Hash()
-   hb_HAllocate(hMultilangColumns, max(10, len(aRet)))
+   hb_HAllocate(hMultilangColumns, max(10, Len(aRet)))
 
    FOR EACH aCol IN aRet
       hMultilangColumns[aCol[1] + aCol[2]] := aCol
@@ -1272,7 +1272,7 @@ FUNCTION SR_ExistTable(cTableName, cOwner, oCnn)
       ENDIF
    ENDIF
 
-   IF (!Empty(cOwner)) .AND. right(cOwner, 1) != "."
+   IF (!Empty(cOwner)) .AND. Right(cOwner, 1) != "."
       cOwner += "."
    ENDIF
 
@@ -1312,7 +1312,7 @@ FUNCTION SR_ExistIndex(cIndexName, cOwner)
    aRet := {}
    nRet := oCnn:exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
 
-   IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) > 0
+   IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) > 0
       RETURN .T.
    ENDIF
 
@@ -1346,14 +1346,14 @@ FUNCTION SR_EndConnection(nConnection)
 
    SR_CheckConnection(nConnection)
 
-   IF nConnection > len(aConnections) .OR. nConnection == 0 .OR. nConnection < 0
+   IF nConnection > Len(aConnections) .OR. nConnection == 0 .OR. nConnection < 0
       RETURN NIL
    ENDIF
 
    oCnn := aConnections[nConnection]
 
-   IF nConnection == len(aConnections)
-      aSize(aConnections, len(aConnections) - 1)
+   IF nConnection == Len(aConnections)
+      aSize(aConnections, Len(aConnections) - 1)
    ELSE
       aConnections[nConnection] := NIL
    ENDIF
@@ -1366,7 +1366,7 @@ FUNCTION SR_EndConnection(nConnection)
       uRet := oCnn:end()
    ENDIF
 
-   nActiveConnection := len(aConnections)
+   nActiveConnection := Len(aConnections)
 
 RETURN uRet
 
@@ -1475,8 +1475,8 @@ RETURN NIL
 Procedure SR_End()
 
    DEFAULT aConnections TO {}
-   DO WHILE len(aConnections) > 0
-      SR_EndConnection(len(aConnections))
+   DO WHILE Len(aConnections) > 0
+      SR_EndConnection(Len(aConnections))
    ENDDO
 
 Return
@@ -1493,7 +1493,7 @@ FUNCTION _SR_UnRegister(oWA)
    IF HB_ISARRAY(aActiveWAs)
       DO WHILE (n := AScan(aActiveWAs, {|x|x:nThisArea == oWA:nThisArea})) > 0
          aDel(aActiveWAs, n)
-         aSize(aActiveWAs, len(aActiveWAs) - 1)
+         aSize(aActiveWAs, Len(aActiveWAs) - 1)
       ENDDO
    ENDIF
 
@@ -1610,20 +1610,20 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
       ENDIF
    ENDIF
 
-   IF (!Empty(cOwner)) .AND. right(cOwner, 1) != "."
+   IF (!Empty(cOwner)) .AND. Right(cOwner, 1) != "."
       cOwner += "."
    ENDIF
 
    aRet := {}
    nRet := oCnn:exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
-   IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) == 0
+   IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) == 0
       // Index does not exist
       aRet := {}
       nRet := oCnn:exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE PHIS_NAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
-      IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) == 0
+      IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) == 0
          aRet := {}
          nRet := oCnn:exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TAG_ = '" + AllTrim(ctempIndex) + "'", .F., .T., @aRet)
-         IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) == 0
+         IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) == 0
             RETURN .F.
          ELSE
             lTag := .T.
@@ -1656,7 +1656,7 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
          oCnn:exec("DROP INDEX " + cPhisicalName + " ON " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
          EXIT
       CASE SYSTEMID_ORACLE
-         IF len(aIndex[6]) > 4 .AND. aIndex[6][4] == "@"
+         IF Len(aIndex[6]) > 4 .AND. aIndex[6][4] == "@"
             oCnn:exec("DROP INDEX " + cOwner + "A$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
             oCnn:Commit()
             oCnn:exec("DROP INDEX " + cOwner + "D$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
@@ -1676,7 +1676,7 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
             oWA:DropColumn("INDKEY_" + AllTrim(aIndex[4]), .F.)
          ENDIF
          IF aIndex[5][1] == "#"
-            oWA:DropColumn("INDFOR_" + substr(aIndex[5], 2, 3), .F.)
+            oWA:DropColumn("INDFOR_" + SubStr(aIndex[5], 2, 3), .F.)
          ENDIF
 
          TEMPDROPCO->(dbCLoseArea())
@@ -1712,7 +1712,7 @@ FUNCTION SR_DropTable(cFileName, cOwner)
       ENDIF
    ENDIF
 
-   IF (!Empty(cOwner)) .AND. right(cOwner, 1) != "."
+   IF (!Empty(cOwner)) .AND. Right(cOwner, 1) != "."
       cOwner += "."
    ENDIF
 
@@ -1758,7 +1758,7 @@ FUNCTION SR_ListIndex(cFilename)
    nRet := oCnn:exec("SELECT IDXNAME_,PHIS_NAME_,IDXKEY_,IDXFOR_,IDXCOL_,TAG_,TAGNUM_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + AllTrim(Upper(cFilename)) + "'", .F., .T., @aRet)
    HB_SYMBOL_UNUSED(nRet)
 
-   FOR i := 1 TO len(aRet)
+   FOR i := 1 TO Len(aRet)
       aRet[i, 1] := AllTrim(aRet[i, 1])
    NEXT i
 
@@ -1789,7 +1789,7 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
       ENDIF
    ENDIF
 
-   IF (!Empty(cOwner)) .AND. right(cOwner, 1) != "."
+   IF (!Empty(cOwner)) .AND. Right(cOwner, 1) != "."
       cOwner += "."
    ENDIF
 
@@ -1798,7 +1798,7 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
 
    aRet := {}
    nRet := oCnn:exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + Upper(cTable) + "'", .F., .T., @aRet)
-   IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. len(aRet) == 0
+   IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) == 0
       // Table does not exist
       RETURN .F.
    ENDIF
@@ -1806,7 +1806,7 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
    aRet := {}
    nRet := oCnn:exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + Upper(cNewName) + "'", .F., .T., @aRet)
    HB_SYMBOL_UNUSED(nRet)
-   IF len(aRet) > 0
+   IF Len(aRet) > 0
       // Destination EXISTS !!
       RETURN .F.
    ENDIF
@@ -1872,7 +1872,7 @@ FUNCTION SR_ListCreatedTables()
    nRet := oCnn:exec("SELECT TABLE_ FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES", .F., .T., @aRet)
    HB_SYMBOL_UNUSED(nRet)
 
-   aEval(aRet, {|x| AAdd(aRet2, AllTrim(x[1])) })
+   aEval(aRet, {|x|AAdd(aRet2, AllTrim(x[1])) })
 
 RETURN aRet2
 
@@ -1885,7 +1885,7 @@ FUNCTION SR_SetToolsOwner(cOwner)
 
    IF cOwner != NIL
       cToolsOwner := cOwner
-      IF (!Empty(cOwner)) .AND. right(cToolsOwner, 1) != "."
+      IF (!Empty(cOwner)) .AND. Right(cToolsOwner, 1) != "."
          cToolsOwner += "."
       ENDIF
    ELSE

@@ -140,12 +140,12 @@ METHOD ParserBase:GetOperands(cExpression, cAlias, oOperand1, oConnector, oOpera
    cAlias := IIf((cNewAlias := ::ExtractAlias1(@cExpression)) != NIL, cNewAlias, cAlias)
 
    DO WHILE hb_regexLike("^\?(?:[^\'\?]*?(?:\'[^\']*\'))*[^\'\?]*\?$", cExpression)
-      cExpression := AllTrim(substr(cExpression, 2, len(cExpression) - 2))
+      cExpression := AllTrim(SubStr(cExpression, 2, Len(cExpression) - 2))
       cAlias := IIf((cNewAlias := ::ExtractAlias2(@cExpression)) != NIL, cNewAlias, cAlias)
       ::ResolveParenthesis(@cExpression)
    ENDDO
 
-   FOR i := 1 TO len(::SortedOperators)
+   FOR i := 1 TO Len(::SortedOperators)
       o := ::SortedOperators[i]
       cRegO := "^((?:[^\'\?]*(?:\'[^\']*\'|\?(?:[^\'\?]*(?:\'[^\']*\'))*[^\'\?]*\?))*?[^\'\?]*?)(" + o:cPattern + ")(\s*[^>].*)$"
       IF HB_RegExMatch(cRegO, cExpression, .F.)
@@ -166,7 +166,7 @@ METHOD ParserBase:ResolveParenthesis(cExpression)
    LOCAL i
    LOCAL nParenthesisDeep := 0
 
-   FOR i := 1 TO len(cExpression)
+   FOR i := 1 TO Len(cExpression)
       SWITCH cExpression[i]
       CASE "'"
          DO WHILE cExpression[++i] != "'"
@@ -193,7 +193,7 @@ METHOD ParserBase:RestoreParenthesis(cExpression)
    LOCAL cParenthesis := "("
    LOCAL i
 
-   FOR i := 1 TO len(cExpression)
+   FOR i := 1 TO Len(cExpression)
       IF cExpression[i] == "'"
          DO WHILE cExpression[++i] != "'"
          ENDDO
@@ -375,8 +375,8 @@ METHOD ConditionParser:new(pWorkarea)
        ComparisonOperator():new("included", {"$"})               ;
       }
 
-   cOperatorsChoice := cJoin(xSelect(::aClipperComparisonOperators, {|x| x:cPattern}), "|")
-   cOperatorsChars := cPattern(CharList(cJoin(xSelectMany(::aClipperComparisonOperators, {|x| x:aSymbols}), "")))
+   cOperatorsChoice := cJoin(xSelect(::aClipperComparisonOperators, {|x|x:cPattern}), "|")
+   cOperatorsChars := cPattern(CharList(cJoin(xSelectMany(::aClipperComparisonOperators, {|x|x:aSymbols}), "")))
 
    ::_cRegOperator := ;
       HB_RegExComp("^((?:[^\'\?]*?(?:\'[^\']*\'|\?(?:[^\'\?]*?(?:\'[^\']*\'))*[^\'\?]*?\?))*(?:[^\'\?]*?[^-" + ;
@@ -424,7 +424,7 @@ METHOD ConditionParser:GetOperands(cExpression, cAlias, oOperand1, oConnector, o
          IF HB_RegExMatch(::_cRegOperator, cExpression, .F.)
             aGroups := HB_RegExAtX(::_cRegOperator, cExpression)
 
-            oComparisonOperator := xFirst(::aClipperComparisonOperators, {|y| aGroups[3, 1] $ y:aSymbols})
+            oComparisonOperator := xFirst(::aClipperComparisonOperators, {|y|aGroups[3, 1] $ y:aSymbols})
 
             oOperand1 := Comparison():new(cAlias, ;
                                           ::RestoreParenthesis(cExpression), ;

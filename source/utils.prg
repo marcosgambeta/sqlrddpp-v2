@@ -82,7 +82,7 @@ RETURN NIL
 
 FUNCTION SR_WorkareaFileName()
 
-   IF empty(alias())
+   IF Empty(Alias())
       RETURN ""
    ENDIF
 
@@ -96,7 +96,7 @@ RETURN dbInfo(DBI_INTERNAL_OBJECT):cFileName
 
 FUNCTION SR_dbStruct()
 
-   IF empty(alias())
+   IF Empty(Alias())
       RETURN {}
    ENDIF
 
@@ -229,7 +229,7 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
       SR_RuntimeErr(, "SR_ChengeStructure: Workarea not in use.")
    ENDIF
 
-   IF len(aNewStruct) < 1 .OR. !HB_ISARRAY(aNewStruct) .OR. !HB_ISARRAY(aNewStruct[1])
+   IF Len(aNewStruct) < 1 .OR. !HB_ISARRAY(aNewStruct) .OR. !HB_ISARRAY(aNewStruct[1])
       SR_RuntimeErr(, "SR_ChengeStructure: Invalid arguments [2].")
    ENDIF
 
@@ -241,7 +241,7 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
          SR_RuntimeErr(, "SR_ChengeStructure: Invalid arguments [1]: " + cTableName)
       ENDIF
 
-      cAlias   := alias()
+      cAlias   := Alias()
       nAlias   := select()
       cTblName := oWA:cFileName
       nOrd     := IndexOrd()
@@ -252,11 +252,11 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
       SR_LogFile("changestruct.log", {oWA:cFileName, "Original Structure:", e"\r\n" + sr_showVector(oWA:aFields)})
       SR_LogFile("changestruct.log", {oWA:cFileName, "New Structure:", e"\r\n" + sr_showVector(aNewStruct)})
 
-      FOR i := 1 TO len(aNewStruct)
+      FOR i := 1 TO Len(aNewStruct)
          aNewStruct[i, 1] := Upper(AllTrim(aNewStruct[i, 1]))
          IF (n := AScan(oWA:aFields, {|x|x[1] == aNewStruct[i, 1]})) > 0
 
-            aSize(aNewStruct[i], max(len(aNewStruct[i]), 5))
+            aSize(aNewStruct[i], max(Len(aNewStruct[i]), 5))
 
             IF aNewStruct[i, 2] == oWA:aFields[n, 2] .AND. aNewStruct[i, 3] == oWA:aFields[n, 3] .AND. aNewStruct[i, 4] == oWA:aFields[n, 4]
                // Structure is identical. Only need to check for NOT NULL flag.
@@ -306,7 +306,7 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
          ENDIF
       NEXT i
 
-      FOR i := 1 TO len(oWA:aFields)
+      FOR i := 1 TO Len(oWA:aFields)
          IF (n := AScan(aNewStruct, {|x|x[1] == oWA:aFields[i, 1]})) == 0
             HB_SYMBOL_UNUSED(n) // Variable 'N' is assigned but not used
             IF (!oWA:aFields[i, 1] == oWA:cRecnoName) .AND. (!oWA:aFields[i, 1] == oWA:cDeletedName) .AND. oWA:oSql:nSystemID != SYSTEMID_IBMDB2
@@ -330,11 +330,11 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
          oWA:AlterColumnsDirect(aDirect, .T., .F., @aTofix)
       ENDIF
 
-      IF len(aToFix) > 0
+      IF Len(aToFix) > 0
          oWA:AlterColumns(aToFix, .T.)
       ENDIF
 
-      FOR i := 1 TO len(aToDrop)
+      FOR i := 1 TO Len(aToDrop)
          IF aToDrop[i, 1] == "BACKUP_"
             oWA:DropColumn(aToDrop[i, 1], .F.)
          ELSE
@@ -414,7 +414,7 @@ FUNCTION SR_SetReverseIndex(nIndex, lSet)
 
    LOCAL lOldSet
 
-   IF IS_SQLRDD .AND. nIndex > 0 .AND. nIndex <= len((Select())->(dbInfo(DBI_INTERNAL_OBJECT)):aIndex)
+   IF IS_SQLRDD .AND. nIndex > 0 .AND. nIndex <= Len((Select())->(dbInfo(DBI_INTERNAL_OBJECT)):aIndex)
       lOldSet := (Select())->(dbInfo(DBI_INTERNAL_OBJECT)):aIndex[nIndex, DESCEND_INDEX_ORDER]
       IF HB_ISLOGICAL(lSet)
          (Select())->(dbInfo(DBI_INTERNAL_OBJECT)):aIndex[nIndex, DESCEND_INDEX_ORDER] := lSet
@@ -578,7 +578,7 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
 
    OtherWise
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + str(len(cRet), 10) + cRet, nSystemID)
+      RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + str(Len(cRet), 10) + cRet, nSystemID)
    EndCase
 #endif
 
@@ -655,7 +655,7 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
 
    OTHERWISE
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + str(len(cRet), 10) + cRet, nSystemID)
+      RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + str(Len(cRet), 10) + cRet, nSystemID)
 
    ENDSWITCH
 
@@ -703,7 +703,7 @@ FUNCTION SR_WriteTimeLog(cComm, oCnn, nLimisencos)
 
    END SEQUENCE
 
-   dbSelectArea(nAlAtual)
+   DBSelectArea(nAlAtual)
 
 RETURN NIL
 
@@ -772,7 +772,7 @@ FUNCTION SR_WriteDbLog(cComm, oCnn)
 
    END SEQUENCE
 
-   dbSelectArea(nAlAtual)
+   DBSelectArea(nAlAtual)
 
 RETURN NIL
 
@@ -787,12 +787,12 @@ FUNCTION SR_ShowVector(a)
 
       cRet := "{"
 
-      FOR i := 1 TO len(a)
+      FOR i := 1 TO Len(a)
 
          IF HB_ISARRAY(a[i])
-            cRet += SR_showvector(a[i]) + IIf(i == len(a), "", ",") + SR_CRLF
+            cRet += SR_showvector(a[i]) + IIf(i == Len(a), "", ",") + SR_CRLF
          ELSE
-            cRet += SR_Val2CharQ(a[i]) + IIf(i == len(a), "", ",")
+            cRet += SR_Val2CharQ(a[i]) + IIf(i == Len(a), "", ",")
          ENDIF
 
       NEXT i
@@ -1040,12 +1040,12 @@ FUNCTION SR_Deserialize(uData)
 
    // cTemp := udata
    // altd()
-   // cHex := SR_HEXTOSTR(SubStr(uData, 21, val(substr(uData, 11, 10))))
+   // cHex := SR_HEXTOSTR(SubStr(uData, 21, val(SubStr(uData, 11, 10))))
    // cdes := sr_Deserialize1(cHex)
    // tracelog(udata, chex, cdes)
    // RETURN cdes
 
-RETURN SR_Deserialize1(SR_HEXTOSTR(SubStr(uData, 21, val(substr(uData, 11, 10)))))
+RETURN SR_Deserialize1(SR_HEXTOSTR(SubStr(uData, 21, val(SubStr(uData, 11, 10)))))
 
 /*------------------------------------------------------------------------*/
 
@@ -1178,7 +1178,7 @@ RETURN Self
 
 METHOD SqlFastHash:Insert(uHashKey, xValue)
 
-   IF len(::hHash) > HASH_TABLE_SIZE
+   IF Len(::hHash) > HASH_TABLE_SIZE
       ::hHash := {=>}          /* Reset hash table */
       HB_GCALL(.T.)            /* Release memory blocks */
    ENDIF
@@ -1723,7 +1723,7 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
 
         cColorNorm := cColor11
 
-        IF !empty(cColor12)
+        IF !Empty(cColor12)
 
             IF IsDigit(cColor12)
                cColor12 := COLORLETTER(cColor12)
@@ -1741,7 +1741,7 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
 
 
       // if second color pair exist, then xHarbour alert will handle properly.
-      IF !empty(cColorPair2)
+      IF !Empty(cColorPair2)
 
          nSlash := At("/", cColorPair2)
 
@@ -1761,7 +1761,7 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
 
             cColorHigh := cColor21
 
-            IF !empty(cColor22)
+            IF !Empty(cColor22)
 
                 IF IsDigit(cColor22)
                    cColor22 := COLORLETTER(cColor22)
@@ -1779,7 +1779,7 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
          ENDIF
 
       ELSE // if does not exist the second color pair, xHarbour alert will behave like Clipper
-         IF empty(cColor11) .OR. empty(cColor12)
+         IF Empty(cColor11) .OR. Empty(cColor12)
             cColor11 := "B"
             cColor12 := "W+"
          ELSE

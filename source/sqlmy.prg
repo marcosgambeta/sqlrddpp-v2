@@ -100,9 +100,9 @@ METHOD SR_MYSQL:Getline(aFields, lTranslate, aArray)
    DEFAULT lTranslate TO .T.
 
    IF aArray == NIL
-      aArray := Array(len(aFields))
-   ELSEIF len(aArray) < len(aFields)
-      aSize(aArray, len(aFields))
+      aArray := Array(Len(aFields))
+   ELSEIF Len(aArray) < Len(aFields)
+      aSize(aArray, Len(aFields))
    ENDIF
 
    IF ::aCurrLine == NIL
@@ -111,7 +111,7 @@ METHOD SR_MYSQL:Getline(aFields, lTranslate, aArray)
       RETURN aArray
    ENDIF
 
-   FOR i := 1 TO len(aArray)
+   FOR i := 1 TO Len(aArray)
       aArray[i] := ::aCurrLine[i]
    NEXT i
 
@@ -188,7 +188,7 @@ METHOD SR_MYSQL:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
 
    ::nFields := MYSCols(::hDbc)
 
-   // IF (!Empty(cTable)) .AND. empty(cCommand)
+   // IF (!Empty(cTable)) .AND. Empty(cCommand)
    //    cTbl := cTable
    //    aFields := MYSTableAttr(::hDbc, cTbl)
    // ELSE
@@ -299,7 +299,7 @@ RETURN (::nRetCode := MYSRollBack(::hDbc))
 
 METHOD SR_MYSQL:ExecuteRaw(cCommand)
 
-   IF Upper(left(LTrim(cCommand), 6)) == "SELECT" .OR. Upper(left(LTrim(cCommand), 5)) == "SHOW "
+   IF Upper(Left(LTrim(cCommand), 6)) == "SELECT" .OR. Upper(Left(LTrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
    ELSE
       ::lResultSet := .F.

@@ -206,7 +206,7 @@ METHOD ExpressionSimplifier:Simplify(oExpression)
       ELSEIF oExpression:isKindOf("FunctionExpression")
          newParams := {}
          lAtLeastOneParamSimplified := .F.
-         FOR i := 1 TO len(oExpression:aParameters)
+         FOR i := 1 TO Len(oExpression:aParameters)
             oParameter := oExpression:aParameters[i]
             IF oParameter:oExpression:isKindOf("ConditionBase")
                simplifier := ::oConditionSimplifier
@@ -222,8 +222,8 @@ METHOD ExpressionSimplifier:Simplify(oExpression)
          NEXT i
          IF lAtLeastOneParamSimplified
             newClipperString := oExpression:cFunctionName + "("
-            FOR i := 1 TO len(newParams)
-               newClipperString += newParams[i]:oExpression:oClipperExpression:cValue + IIf(i == len(newParams), ")", ",")
+            FOR i := 1 TO Len(newParams)
+               newClipperString += newParams[i]:oExpression:oClipperExpression:cValue + IIf(i == Len(newParams), ")", ",")
             NEXT i
             result := FunctionExpression():new(oExpression:cContext, newClipperString, oExpression:cFunctionName, newParams)
          ENDIF
@@ -268,7 +268,7 @@ METHOD ExpressionSimplifier:ValueAssessable(oExpression)
       lRet := ::lFixVariables
       EXIT
    CASE "field"
-      lRet := (::lIgnoreRelations .OR. !::cContext == oExpression:cContext .AND. len(RelationManager():new():GetRelations(::cContext, oExpression:cContext)) == 0) .AND. ::lFixVariables
+      lRet := (::lIgnoreRelations .OR. !::cContext == oExpression:cContext .AND. Len(RelationManager():new():GetRelations(::cContext, oExpression:cContext)) == 0) .AND. ::lFixVariables
    ENDSWITCH
 
 RETURN lRet

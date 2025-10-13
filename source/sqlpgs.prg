@@ -98,9 +98,9 @@ METHOD SR_PGS:Getline(aFields, lTranslate, aArray)
    DEFAULT lTranslate TO .T.
 
    IF aArray == NIL
-      aArray := Array(len(aFields))
-   ELSEIF len(aArray) != len(aFields)
-      aSize(aArray, len(aFields))
+      aArray := Array(Len(aFields))
+   ELSEIF Len(aArray) != Len(aFields)
+      aSize(aArray, Len(aFields))
    ENDIF
 
    IF ::aCurrLine == NIL
@@ -109,7 +109,7 @@ METHOD SR_PGS:Getline(aFields, lTranslate, aArray)
       RETURN aArray
    ENDIF
 
-   FOR i := 1 TO len(aArray)
+   FOR i := 1 TO Len(aArray)
       aArray[i] := ::aCurrLine[i]
    NEXT i
 
@@ -197,14 +197,14 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
    nFields := PGSCols(::hStmt)
    ::nFields := nFields
 
-   IF !Empty(cTable) .AND. empty(cCommand)
+   IF !Empty(cTable) .AND. Empty(cCommand)
       cTbl := Lower(cTable)
       IF "." $ cTbl
          cOwner := SubStr(cTbl, 1, at(".", cTbl) - 1)
          cTbl := SubStr(cTbl, at(".", cTbl) + 1)
       ENDIF
-      IF left(cTbl, 1) == chr(34) // "
-         cTbl := SubStr(cTbl, 2, len(cTbl) - 2)
+      IF Left(cTbl, 1) == chr(34) // "
+         cTbl := SubStr(cTbl, 2, Len(cTbl) - 2)
       ENDIF
       aFields := PGSTableAttr(::hDbc, cTbl, cOwner)
    ELSE
@@ -285,11 +285,11 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
       ::hDbc := hDbc
       cTargetDB := "PostgreSQL Native"
       ::exec("select version()", .T., .T., @aRet)
-      IF len(aRet) > 0
+      IF Len(aRet) > 0
          cSystemVers := aRet[1, 1]
          cString := aRet[1, 1]
          cMatch := HB_AtX(s_reEnvVar, cString, , @nStart, @nLen)
-         IF !empty(cMatch)
+         IF !Empty(cMatch)
             aVersion := hb_atokens(cMatch, ".")
          ELSE
             aVersion := hb_atokens(strtran(Upper(aRet[1, 1]), "POSTGRESQL ", ""), ".")
@@ -320,7 +320,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
 
    ::exec("select pg_backend_pid()", .T., .T., @aRet)
 
-   IF len(aRet) > 0
+   IF Len(aRet) > 0
       ::uSid := val(str(aRet[1, 1], 8, 0))
    ENDIF
 
@@ -365,7 +365,7 @@ RETURN ::nRetCode
 
 METHOD SR_PGS:ExecuteRaw(cCommand)
 
-   IF Upper(left(LTrim(cCommand), 6)) == "SELECT"
+   IF Upper(Left(LTrim(cCommand), 6)) == "SELECT"
       ::lResultSet := .T.
    ELSE
       ::lResultSet := .F.

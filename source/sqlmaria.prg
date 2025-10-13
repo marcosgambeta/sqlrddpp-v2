@@ -105,9 +105,9 @@ METHOD SR_MARIA:Getline(aFields, lTranslate, aArray)
    DEFAULT lTranslate TO .T.
 
    If aArray == NIL
-      aArray := Array(len(aFields))
-   ElseIf len(aArray) < len(aFields)
-      aSize(aArray, len(aFields))
+      aArray := Array(Len(aFields))
+   ElseIf Len(aArray) < Len(aFields)
+      aSize(aArray, Len(aFields))
    EndIf
 
    If ::aCurrLine == NIL
@@ -116,7 +116,7 @@ METHOD SR_MARIA:Getline(aFields, lTranslate, aArray)
       RETURN aArray
    EndIf
 
-   FOR i := 1 TO len(aArray)
+   FOR i := 1 TO Len(aArray)
       aArray[i] := ::aCurrLine[i]
    NEXT i
 
@@ -197,7 +197,7 @@ METHOD SR_MARIA:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
 
    ::nFields   := MYSCols(::hDbc)
 
-//   If (!Empty(cTable)) .AND. empty(cCommand)
+//   If (!Empty(cTable)) .AND. Empty(cCommand)
 //      cTbl := cTable
 //      aFields := MYSTableAttr(::hDbc, cTbl)
 //   Else
@@ -319,7 +319,7 @@ RETURN ( ::nRetCode := MYSRollBack(::hDbc) )
 
 METHOD SR_MARIA:ExecuteRaw(cCommand)
 
-   If Upper(left(LTrim(cCommand), 6)) == "SELECT" .OR. Upper(left(LTrim(cCommand), 5)) == "SHOW "
+   If Upper(Left(LTrim(cCommand), 6)) == "SELECT" .OR. Upper(Left(LTrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
    Else
       ::lResultSet := .F.

@@ -88,9 +88,9 @@ METHOD SR_FIREBIRD:Getline(aFields, lTranslate, aArray)
    DEFAULT lTranslate TO .T.
 
    IF aArray == NIL
-      aArray := Array(len(aFields))
-   ELSEIF len(aArray) != len(aFields)
-      aSize(aArray, len(aFields))
+      aArray := Array(Len(aFields))
+   ELSEIF Len(aArray) != Len(aFields)
+      aSize(aArray, Len(aFields))
    ENDIF
 
    IF ::aCurrLine == NIL
@@ -99,7 +99,7 @@ METHOD SR_FIREBIRD:Getline(aFields, lTranslate, aArray)
       RETURN aArray
    ENDIF
 
-   FOR i := 1 TO len(aArray)
+   FOR i := 1 TO Len(aArray)
       aArray[i] := ::aCurrLine[i]
    NEXT i
 
@@ -327,7 +327,7 @@ METHOD SR_FIREBIRD:ExecuteRaw(cCommand)
 
    LOCAL nRet
 
-   IF Upper(left(LTrim(cCommand), 6)) == "SELECT"
+   IF Upper(Left(LTrim(cCommand), 6)) == "SELECT"
       nRet := FBExecute(::hEnv, cCommand, IB_DIALECT_CURRENT)
       ::lResultSet := .T.
    ELSE

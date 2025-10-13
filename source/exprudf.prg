@@ -48,18 +48,18 @@ FUNCTION cJoin(aArray, cString)
    LOCAL result := ""
    LOCAL i
 
-   IF len(aArray) > 0
-      FOR i := 1 TO len(aArray) - 1
+   IF Len(aArray) > 0
+      FOR i := 1 TO Len(aArray) - 1
          result += aArray[i] + cString
       NEXT i
-      result += aArray[len(aArray)]
+      result += aArray[Len(aArray)]
    ENDIF
 
 RETURN result
 
 FUNCTION xSelect(aArray, bSelector)
 
-   LOCAL newArray := array(len(aArray))
+   LOCAL newArray := array(Len(aArray))
 
    aeval(aArray, {|x, n|newArray[n] := eval(bSelector, x)})
 
@@ -98,7 +98,7 @@ RETURN aArray[i]
 
 FUNCTION xFirstOrDefault(aArray)
 
-   IF len(aArray) == 0
+   IF Len(aArray) == 0
       RETURN NIL
    ENDIF
 
@@ -159,7 +159,7 @@ PROCEDURE RemoveAll(aArray, bPredicate)
 
    LOCAL i
 
-   FOR i := 1 TO len(aArray)
+   FOR i := 1 TO Len(aArray)
       IF eval(bPredicate, aArray[i])
           adel(aArray, i, .T.)
           i--
@@ -194,7 +194,7 @@ CLASS Dictionary
    METHOD At(nIndex)
 
    EXPORTED:
-   ACCESS nLength INLINE len(::aInternArray)
+   ACCESS nLength INLINE Len(::aInternArray)
 
    EXPORTED:
    METHOD SetValue(xKey, xValue)

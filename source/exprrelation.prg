@@ -47,21 +47,21 @@
 FUNCTION NewDbSetRelation(cAlias, bRelation, cRelation, lScoped)
 
    DbSetRelation(cAlias, bRelation, cRelation, lScoped)
-   RelationManager():new():AddRelation(EnchancedRelationFactory():new(), alias(), cAlias, cRelation)
+   RelationManager():new():AddRelation(EnchancedRelationFactory():new(), Alias(), cAlias, cRelation)
 
 RETURN NIL
 
 FUNCTION NewdbClearRelation()
 
    dbClearRelation()
-   RelationManager():new():Clear(alias())
+   RelationManager():new():Clear(Alias())
 
 RETURN NIL
 
 FUNCTION Newdbclearfilter()
 
    dbclearfilter()
-   oGetWorkarea(alias()):cFilterExpression := ""
+   oGetWorkarea(Alias()):cFilterExpression := ""
 
 RETURN NIL
 
@@ -84,8 +84,8 @@ PROCEDURE SelectFirstAreaNotInUse()
    LOCAL nArea
 
    FOR nArea := 1 TO 65534
-      IF Empty(alias(nArea))
-         dbSelectArea(nArea)
+      IF Empty(Alias(nArea))
+         DBSelectArea(nArea)
          EXIT
       ENDIF
    NEXT
@@ -244,7 +244,7 @@ METHOD RelationManager:GetRelations(cAlias1, cAlias2)
    IF ::oInternDictionary:lContainsKey(cAlias1) .AND. (dico2 := ::oInternDictionary:xValue(cAlias1)):lContainsKey(cAlias2)
       result := ::oInternDictionary:xValue(cAlias1):xValue(cAlias2)
    ELSE
-      FOR i := 1 TO len(::aDirectRelations)
+      FOR i := 1 TO Len(::aDirectRelations)
          oDirectRelation := ::aDirectRelations[i]
          IF cAlias1 == Upper(oDirectRelation:oWorkarea1:cAlias)
             IF cAlias2 == Upper(oDirectRelation:oWorkarea2:cAlias)
@@ -278,12 +278,12 @@ METHOD RelationManager:BuildRelations(oIndirectRelation, cAlias1, cAlias2)
    cAlias1 := Upper(cAlias1)
    cAlias2 := Upper(cAlias2)
 
-   FOR i := 1 TO len(::aDirectRelations)
+   FOR i := 1 TO Len(::aDirectRelations)
       oDirectRelation := ::aDirectRelations[i]
       IF cAlias1 == Upper(oDirectRelation:oWorkarea1:cAlias)
          oDirectRelation := ::aDirectRelations[i]
          r := IndirectRelation():new()
-         FOR j := 1 TO len(oIndirectRelation:aDirectRelations)
+         FOR j := 1 TO Len(oIndirectRelation:aDirectRelations)
              AAdd(r:aDirectRelations, oIndirectRelation:aDirectRelations[j])
          NEXT j
 
@@ -372,7 +372,7 @@ METHOD DbIndex:aDbFields()
          // ::oClipperExpression:nLength will evaluate the index expression which is a bit slow. It would be nice to have access to the legnth of a synthetic index.
          AAdd(::_aDbFields, DbField():new(HB_RegExAtX(".*\[(.*?)\]", ::_aInfos[1], .F.)[2, 1], "C", ::oClipperExpression:nLength)) //the way to get the name of the field that contains the synthetic index isn't very clean... We also suppose that the synthtic index has a fix length
       ELSE
-         FOR i := 1 TO len(::_aInfos[3]) - 1 // not SR_RECNO
+         FOR i := 1 TO Len(::_aInfos[3]) - 1 // not SR_RECNO
             AAdd(::_aDbFields, ::oWorkarea:GetFieldByName(::_aInfos[3][i][1]))
          NEXT i
       ENDIF
@@ -515,7 +515,7 @@ RETURN ::_cType
 METHOD ClipperExpression:nLength()
 
    IF ::_nLength == NIL
-      ::_nLength := len(::cEvaluation())
+      ::_nLength := Len(::cEvaluation())
    ENDIF
 
 RETURN ::_nLength
@@ -564,7 +564,7 @@ FUNCTION GetIndexes(lOrdered)
    lOrdered := lOrdered == NIL .OR. lOrdered
    IF ::aIndexes == NIL
       ::aIndexes := {}
-      FOR i := 1 TO len(::aIndex)
+      FOR i := 1 TO Len(::aIndex)
          IF hb_regexLike("^\w+$", ::aIndex[i, 10])
             AAdd(::aIndexes, DbIndex():new(self, ::aIndex[i, 10]))
          ENDIF

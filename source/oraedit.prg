@@ -170,7 +170,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
          ENDIF
       NEXT
 
-      //cCols := substr(cCols, 1, len(cCols) - 1)
+      //cCols := SubStr(cCols, 1, Len(cCols) - 1)
 
       FOR EACH acolsadded IN aTempCols
          FOR EACH n IN acolsadded[2]
@@ -186,21 +186,21 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
          ENDIF
       NEXT
 
-      cCols := substr(cCols, 1, len(cCols) - 1)
+      cCols := SubStr(cCols, 1, Len(cCols) - 1)
    ENDIF
 
    cSql := "Select  " + cCols + "  from " + cTable
    cCount := "select count(*) from " + cTable
 
-   IF !empty(cWhere) .AND. HB_ISARRAY(aVarSust)
+   IF !Empty(cWhere) .AND. HB_ISARRAY(aVarSust)
 
-      FOR i := 1 TO len(aVarSust)
+      FOR i := 1 TO Len(aVarSust)
          cBind := ":" + AllTrim(str(i))
          cWhere := strtran(cWhere, cBind, sr_cdbvalue(aVarSust[i]))
       NEXT i
      // nat := at
    ENDIF
-   IF !empty(cWhere)
+   IF !Empty(cWhere)
       IF "ORDER BY" $ Upper(cwhere)
          IF " DESC" $ Upper(cwhere)
             lDescIndex := .T.
@@ -216,13 +216,13 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
          ENDIF
       ELSE
          aPk := GETPRIMARYKEY(cTable)
-         IF len(aPk) > 0
+         IF Len(aPk) > 0
             FOR EACH aTemp IN aPk
                cdesc += atemp + " ,"
             NEXT
-            cdesc := substr(cdesc, 1, len(cdesc) - 1)
+            cdesc := SubStr(cdesc, 1, Len(cdesc) - 1)
          ENDIF
-         IF !empty(cDesc)
+         IF !Empty(cDesc)
             cSql += " where " + cWhere + " ORDER BY " +cDesc
             cCount += " where  " + cWhere
          ELSE
@@ -236,7 +236,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
 
    cSql :=  "select * from ( select a.*, rownum r from ( " + cSql + ") a where rownum <= :HigerBound  ) where r >= :LowerBound"
    sr_getconnection():exec(ccount, , .T., @aret)
-   IF len(aRet) > 0
+   IF Len(aRet) > 0
       IF aret[1, 1] < 100
          nHigerBound := aret[1, 1]
          nLowerBound := 1
@@ -590,7 +590,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
          nRecno := recno()
 
          sr_getconnection():exec(ccount, , .T., @aret)
-         IF len(aRet) >0
+         IF Len(aRet) >0
             IF (calias)->(lastrec()) < aret[1, 1]
                nHigerBound += nStep
                refreshFullData(csql, cAlias, cfile, nHigerBound, nLowerBound, nStep)
@@ -809,19 +809,19 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
          otbr:refreshall()
          //cSql := sr_getconnection():cLastcomm
          //IF Upper(ctable) $ Upper(cSql) .AND. "INSERT" $ Upper(cSql )
-         //   cValues := substr(cSql, at("VALUES", Upper(cSql)))
+         //   cValues := SubStr(cSql, at("VALUES", Upper(cSql)))
          //   cSql := strtran(csql, cvalues, "")
          //   cvalues := AllTrim(values)
          //   cSql := AllTrim(cSql)
-         //   cSql := substr(csql, at("(", csql) + 1)
+         //   cSql := SubStr(csql, at("(", csql) + 1)
          //   csql :=strtran(csql, ")", "")
          //   cvalues := AllTrim(cvalues)
-         //   cvalues := substr(cvalues, at("(", cvalues) + 1)
+         //   cvalues := SubStr(cvalues, at("(", cvalues) + 1)
          //   cvalues :=strtran(cvalues, ")", "")
          //   aField := hb_atokens(csql, ",")
          //   aVal := hb_atokens(cvalues, ",")
          //   (calias)->(dbappend())
-         //   FOR i := 1 TO len(afield)
+         //   FOR i := 1 TO Len(afield)
          //      BEGIN SEQUENCE WITH __BreakBlock()
          //         (calias)->(fieldput((calias)->(fieldpos(aField[i])), aval[i]))
          //      RECOVER
@@ -843,7 +843,7 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
    // A change was occurred on UDF (append, delete or skip).
    lChanged := (nLastRec != (cAlias)->(lastrec()) .OR. Deleted() != lDeleted .OR. nRec != Recno())
 
-   IF len(aret ) > 0 .AND. nRet == DE_REFRESH
+   IF Len(aret ) > 0 .AND. nRet == DE_REFRESH
       lChanged := lChanged .OR. reccount() != aret[1, 1]
    ENDIF
    IF nRet == DE_ABORT .OR. nRet = DE_APPEND
@@ -1204,12 +1204,12 @@ FUNCTION GETPRIMARYKEY(cTable)
    LOCAL cSql
 
    IF "." $ CTABLE
-      CSQL :=  "SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner FROM all_constraints cons, all_cons_columns cols WHERE cols.table_name = " + sr_cdbvalue(Upper(AllTrim(SUBSTR(cTable, AT('.', CTABLE) + 1))) ) + " AND cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner ORDER BY cols.table_name, cols.position"
+      CSQL :=  "SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner FROM all_constraints cons, all_cons_columns cols WHERE cols.table_name = " + sr_cdbvalue(Upper(AllTrim(SubStr(cTable, AT('.', CTABLE) + 1))) ) + " AND cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner ORDER BY cols.table_name, cols.position"
    ELSE
       CSQL :=  "SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner FROM all_constraints cons, all_cons_columns cols WHERE cols.table_name = " + sr_cdbvalue(Upper(AllTrim(cTable)) ) + " AND cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner ORDER BY cols.table_name, cols.position"
    ENDIF
    sr_getconnection():exec(cSql, , .T., @aret)
-   IF len(aRet) > 0
+   IF Len(aRet) > 0
       FOR EACH aTemp IN aRet
          AAdd(aFields, AllTrim(aTemp[2]))
       NEXT
@@ -1231,24 +1231,24 @@ FUNCTION GETREFRESHCURVALUE(calias, ctable)
    LOCAL ckey
    LOCAL aTmp
 
-   IF len(aFields) > 0
+   IF Len(aFields) > 0
       cSql := "select * from " + ctable
       cSql += " where "
 
       FOR EACH aTemp IN aFields
          cKey := (calias)->(fieldGet((cAlias)->(fieldpos(aTemp))))
-         IF empty(ckey)
+         IF Empty(ckey)
             cSql += " " + aTemp  + " is null "
          ELSE
             cSql += " " + aTemp  + " = " + sr_cdbvalue(ckey)
          ENDIF
          cSql += " AND "
       NEXT
-      cSql := substr(cSql, 1, len(csql) - 4)
+      cSql := SubStr(cSql, 1, Len(csql) - 4)
 
       sr_getconnection():exec(cSql, , .T., @aret)
       aFields2 := sr_getconnection():aFields
-      IF len(aret) > 0
+      IF Len(aret) > 0
          (calias)->(rlock())
          aTemp := aret[1]
          FOR EACH aTmp IN aFields2
@@ -1283,7 +1283,7 @@ FUNCTION GETREFRESHCURINSVALUE(calias, ctable, calias2)
    LOCAL nposf
    LOCAL aTmp
 
-   IF len(aFields) > 0
+   IF Len(aFields) > 0
       cSql := "select * from " + ctable
       cSql += " where "
 
@@ -1292,7 +1292,7 @@ FUNCTION GETREFRESHCURINSVALUE(calias, ctable, calias2)
          cSql += " AND "
       NEXT
 
-      cSql := substr(cSql, 1, len(csql) - 4)
+      cSql := SubStr(cSql, 1, Len(csql) - 4)
       //corrigido neste ponto
       //sr_getconnection():exec(cSql, , .T., , cfile, cAlias2, 1)
       //(calias2)->(dbgobottom())
@@ -1301,7 +1301,7 @@ FUNCTION GETREFRESHCURINSVALUE(calias, ctable, calias2)
       sr_getconnection():exec(cSql, , .T., @aret)
       aFields2 := sr_getconnection():aFields
 
-      IF len(aret) > 0
+      IF Len(aret) > 0
    
          //FOR EACH aTemp IN aRet
          (calias2)->(dbappend())
@@ -1338,23 +1338,23 @@ FUNCTION IsPrimaryKeyDeleted(calias, cTable)
    LOCAL nFieldPos
    LOCAL xVal
 
-   IF len(aFields) > 0
+   IF Len(aFields) > 0
       cSql := "select * from " + ctable
       cSql += " where "
       FOR EACH aTemp IN aFields
          nFieldPos := (cAlias)->(fieldpos(aTemp))
          xval := (calias)->(fieldGet(nfieldPos))
-         IF empty(xval)
+         IF Empty(xval)
             cSql += " " + aTemp + " is null "
          ELSE
             cSql += " " + aTemp + " = " + sr_cdbvalue(xVal)
          ENDIF
          cSql += " AND "
       NEXT
-      cSql := substr(cSql, 1, len(csql) - 4)
+      cSql := SubStr(cSql, 1, Len(csql) - 4)
 
       sr_getconnection():exec(cSql, , .T., @aret)
-      IF len(aRet ) == 0
+      IF Len(aRet ) == 0
          RETURN .T.
       ENDIF
    ENDIF
@@ -1367,8 +1367,8 @@ FUNCTION insertupdated(calias, ctable)
    LOCAL cFields := ""
    LOCAL cDesc := ""
    LOCAL ctemp := (calias)->(dbinfo(10))
-   LOCAL cFileDrive := substr(cTemp, 1, rat("\", cTemp) - 2)
-   LOCAL cFile := substr(cTemp, rat("\", cTemp) + 1)
+   LOCAL cFileDrive := SubStr(cTemp, 1, rat("\", cTemp) - 2)
+   LOCAL cFile := SubStr(cTemp, rat("\", cTemp) + 1)
    LOCAL aVal
    LOCAL cSqlTmp := ""
    LOCAL aTemp
@@ -1382,8 +1382,8 @@ FUNCTION insertupdated(calias, ctable)
    LOCAL cvalues := ""
    LOCAL aField
 
-   cFile := substr(cfile, 1, at(".", cfile) - 1)
-   IF len(aFields) > 0
+   cFile := SubStr(cfile, 1, at(".", cfile) - 1)
+   IF Len(aFields) > 0
       FOR EACH aTemp IN afields
          cFields += aTemp + ","
          cdesc += atemp + " DESC,"
@@ -1392,27 +1392,27 @@ FUNCTION insertupdated(calias, ctable)
             AAdd(aTemp2, adb[npos, 2])
          ENDIF
       NEXT
-      cdesc := substr(cdesc, 1, len(cdesc) - 1)
-      cFields := substr(cFields, 1, len(cFields) - 1)
+      cdesc := SubStr(cdesc, 1, Len(cdesc) - 1)
+      cFields := SubStr(cFields, 1, Len(cFields) - 1)
       cSql :=GetLastInsertCommand(cTable)
 
-      IF !empty(cSql)
-         cValues := substr(cSql, at("VALUES", Upper(cSql)))
+      IF !Empty(cSql)
+         cValues := SubStr(cSql, at("VALUES", Upper(cSql)))
          cSql := strtran(csql, cvalues, "")
          cvalues := AllTrim(cvalues)
          cSql := AllTrim(cSql)
-         cSql := substr(csql, at("(", csql) + 1)
+         cSql := SubStr(csql, at("(", csql) + 1)
          csql :=strtran(csql, ")", "")
 
          cSql := AllTrim(cSql)
          cvalues := AllTrim(cvalues)
-         cvalues := substr(cvalues, at("(", cvalues) + 1)
+         cvalues := SubStr(cvalues, at("(", cvalues) + 1)
          cvalues :=strtran(cvalues, ")", "")
          //cvalues := strtran(cvalues, "'", "")
          aField := hb_atokens(csql, ",")
          aVal := hb_atokens(cvalues, ",")
          //(calias)->(dbappend())
-         //FOR i := 1 TO len(afield)
+         //FOR i := 1 TO Len(afield)
          //   BEGIN SEQUENCE WITH __BreakBlock()
          //      (calias)->(fieldput((calias)->(fieldpos(aField[i])), aval[i]))
          //   RECOVER
@@ -1424,7 +1424,7 @@ FUNCTION insertupdated(calias, ctable)
             nPos := AScan(afield,{|x|Upper(x) == Upper(aTemp)})
             IF nPos > 0
                IF "TO_DATE(" $ Upper(aval[npos])
-                  aval[nPos] := substr(aval[npos], at("TO_DATE(", Upper(aval[nPos])) + 8)
+                  aval[nPos] := SubStr(aval[npos], at("TO_DATE(", Upper(aval[nPos])) + 8)
                   aval[npos] := strtran(aval[npos], "'", "")
                   aval[npos] := stod(aval[npos])
                ENDIF
@@ -1436,7 +1436,7 @@ FUNCTION insertupdated(calias, ctable)
                cSql += " AND "
             ENDIF
          NEXT
-         cSql := substr(cSql, 1, len(csql) - 4)
+         cSql := SubStr(cSql, 1, Len(csql) - 4)
       ELSE
          csql := "select " + cfields + " from " + ctable + " where rownum <4  order by " + cDesc
       ENDIF
@@ -1484,7 +1484,7 @@ FUNCTION insertupdated(calias, ctable)
 RETURN NIL
 
 //(calias)->(dbappend())
-//FOR i := 1 TO len(afield)
+//FOR i := 1 TO Len(afield)
 //   BEGIN SEQUENCE WITH __BreakBlock()
 //      (calias)->(fieldput((calias)->(fieldpos(aField[i])), aval[i]))
 //   RECOVER
@@ -1505,8 +1505,8 @@ FUNCTION createkeyfrompk(calias, ctable, lDescIndex)
 
    DEFAULT lDescIndex TO .F.
 
-   IF len(aFields) > 0
-      IF len(afields) == 1
+   IF Len(aFields) > 0
+      IF Len(afields) == 1
          cKey := afields[1]
       ELSE
          FOR EACH aTemp IN afields
@@ -1533,8 +1533,8 @@ FUNCTION createkeyfrompk(calias, ctable, lDescIndex)
             ENDIF
          NEXT
          ckey := AllTrim(ckey)
-         IF substr(ckey, -1, 1) == "+"
-            cKey := substr(cKey, 1, len(ckey) - 1)
+         IF SubStr(ckey, -1, 1) == "+"
+            cKey := SubStr(cKey, 1, Len(ckey) - 1)
          ENDIF
       ENDIF
       IF lDescIndex
@@ -1621,7 +1621,7 @@ FUNCTION SR_WriteDbLog(cComm, oCnn)
 
    END SEQUENCE
 
-   dbSelectArea(nAlAtual)
+   DBSelectArea(nAlAtual)
 
 RETURN NIL
 
@@ -1654,6 +1654,6 @@ FUNCTION GetLastInsertCommand(cTable)
       SQLLOG->(DBSKIP(-1))
    ENDDO
    SQLLOG->(dbCloseArea())
-   dbSelectArea(nAlAtual)
+   DBSelectArea(nAlAtual)
 
 RETURN CRET
