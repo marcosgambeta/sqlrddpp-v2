@@ -2049,7 +2049,7 @@ METHOD SR_WORKAREA:RuntimeErr(cOperation, cErr, nOSCode, nGenCode, SubCode)
 
    SR_LogFile("sqlerror.log", {cDescr})
 
-   Throw(oErr)
+   _SR_Throw(oErr)
 
 RETURN NIL
 
