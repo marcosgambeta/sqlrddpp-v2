@@ -54,7 +54,7 @@
 #include <error.ch>
 #include "sqlrddsetup.ch"
 
-#define SR_CRLF   (chr(13) + chr(10))
+#define SR_CRLF   (Chr(13) + Chr(10))
 
 REQUEST HB_Deserialize
 REQUEST HB_DeserialNext
@@ -104,7 +104,7 @@ FUNCTION SR_dbStruct()
       RETURN {}
    ENDIF
 
-RETURN aclone(dbInfo(DBI_INTERNAL_OBJECT):aFields)
+RETURN AClone(dbInfo(DBI_INTERNAL_OBJECT):aFields)
 
 /*------------------------------------------------------------------------*/
 
@@ -272,19 +272,19 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
             ELSEIF oWA:oSql:nSystemID == SYSTEMID_IBMDB2
                SR_LogFile("changestruct.log", {oWA:cFileName, "Column cannot be changed:", aNewStruct[i, 1], " - Operation not supported by back end database"})
             ELSEIF aNewStruct[i, 2] == "M" .AND. oWA:aFields[n, 2] == "C"
-               AAdd(aToFix, aClone(aNewStruct[i]))
+               AAdd(aToFix, AClone(aNewStruct[i]))
                SR_LogFile("changestruct.log", {oWA:cFileName, "Will Change data type of field:", aNewStruct[i, 1], "from", oWA:aFields[n, 2], "to", aNewStruct[i, 2]})
             ELSEIF aNewStruct[i, 2] == "C" .AND. oWA:aFields[n, 2] == "M"
-               AAdd(aToFix, aClone(aNewStruct[i]))
+               AAdd(aToFix, AClone(aNewStruct[i]))
                SR_LogFile("changestruct.log", {oWA:cFileName, "Warning: Possible data loss changing data type:", aNewStruct[i, 1], "from", oWA:aFields[n, 2], "to", aNewStruct[i, 2]})
             ELSEIF aNewStruct[i, 2] != oWA:aFields[n, 2]
                IF aNewStruct[i, 2] $"CN" .AND. oWA:aFields[n, 2] $"CN" .AND. oWA:oSql:nSystemID == SYSTEMID_POSTGR
 
 *                   IF "8.4" $ oWA:oSql:cSystemVers .OR. "9.0" $ oWA:oSql:cSystemVers
                   IF oWA:oSql:lPostgresql8 .AND. !oWA:oSql:lPostgresql83
-                     AAdd(aDirect, aClone(aNewStruct[i]))
+                     AAdd(aDirect, AClone(aNewStruct[i]))
                   ELSE
-                     AAdd(aToFix, aClone(aNewStruct[i]))
+                     AAdd(aToFix, AClone(aNewStruct[i]))
                   ENDIF
                   SR_LogFile("changestruct.log", {oWA:cFileName, "Warning: Possible data loss changing field types:", aNewStruct[i, 1], "from", oWA:aFields[n, 2], "to", aNewStruct[i, 2]})
                ELSE
@@ -292,16 +292,16 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
                ENDIF
             ELSEIF aNewStruct[i, 3] >= oWA:aFields[n, 3] .AND. oWA:aFields[n, 2] $ "CN"
 
-               AAdd(aDirect, aClone(aNewStruct[i]))
+               AAdd(aDirect, AClone(aNewStruct[i]))
                SR_LogFile("changestruct.log", {oWA:cFileName, "Will Change field size:", aNewStruct[i, 1], "from", oWA:aFields[n, 3], "to", aNewStruct[i, 3]})
             ELSEIF aNewStruct[i, 3] < oWA:aFields[n, 3] .AND. oWA:aFields[n, 2] $ "CN"
-               AAdd(aToFix, aClone(aNewStruct[i]))
+               AAdd(aToFix, AClone(aNewStruct[i]))
                SR_LogFile("changestruct.log", {oWA:cFileName, "Warning: Possible data loss changing field size:", aNewStruct[i, 1], "from", oWA:aFields[n, 3], "to", aNewStruct[i, 3]})
             ELSE
                SR_LogFile("changestruct.log", {oWA:cFileName, "Column cannot be changed:", aNewStruct[i, 1]})
             ENDIF
          ELSE
-            AAdd(aToFix, aClone(aNewStruct[i]))
+            AAdd(aToFix, AClone(aNewStruct[i]))
             SR_LogFile("changestruct.log", {oWA:cFileName, "Will add column:", aNewStruct[i, 1]})
          ENDIF
       NEXT i
@@ -310,7 +310,7 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
          IF (n := AScan(aNewStruct, {|x|x[1] == oWA:aFields[i, 1]})) == 0
             HB_SYMBOL_UNUSED(n) // Variable 'N' is assigned but not used
             IF (!oWA:aFields[i, 1] == oWA:cRecnoName) .AND. (!oWA:aFields[i, 1] == oWA:cDeletedName) .AND. oWA:oSql:nSystemID != SYSTEMID_IBMDB2
-               AAdd(aToDrop, aClone(oWA:aFields[i]))
+               AAdd(aToDrop, AClone(oWA:aFields[i]))
                SR_LogFile("changestruct.log", {oWA:cFileName, "Will drop:", oWA:aFields[i, 1]})
             ENDIF
          ENDIF
@@ -723,7 +723,7 @@ FUNCTION SR_uCharToVal(cVal, cType, nLen)
    CASE "D"
       RETURN ctod(cVal)
    CASE "N"
-      RETURN val(cVal)
+      RETURN Val(cVal)
    CASE "L"
       RETURN cVal $ "1.T.SYsy.t."
    ENDSWITCH
@@ -1040,12 +1040,12 @@ FUNCTION SR_Deserialize(uData)
 
    // cTemp := udata
    // altd()
-   // cHex := SR_HEXTOSTR(SubStr(uData, 21, val(SubStr(uData, 11, 10))))
+   // cHex := SR_HEXTOSTR(SubStr(uData, 21, Val(SubStr(uData, 11, 10))))
    // cdes := sr_Deserialize1(cHex)
    // tracelog(udata, chex, cdes)
    // RETURN cdes
 
-RETURN SR_Deserialize1(SR_HEXTOSTR(SubStr(uData, 21, val(SubStr(uData, 11, 10)))))
+RETURN SR_Deserialize1(SR_HEXTOSTR(SubStr(uData, 21, Val(SubStr(uData, 11, 10)))))
 
 /*------------------------------------------------------------------------*/
 
@@ -1395,7 +1395,7 @@ FUNCTION SR_RollBackTransaction(nCnn)
       IF oCnn:nTransacCount >  0
          oCnn:nTransacCount := 0
          // Should CLEAN UP ALL workareas BEFORE issue the ROLLBACK
-         _SR_ScanExecAll({|y, x|HB_SYMBOL_UNUSED(y), aeval(x, {|z|z:Refresh(.F.)})})
+         _SR_ScanExecAll({|y, x|HB_SYMBOL_UNUSED(y), AEval(x, {|z|z:Refresh(.F.)})})
          oCnn:RollBack()
       ENDIF
    ENDIF

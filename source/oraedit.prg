@@ -770,8 +770,8 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
 
    ELSEIF nMode == DE_IDLE .OR. nMode == DE_EMPTY
 
-      KEYBOARD chr(0)
-      inkey()
+      KEYBOARD Chr(0)
+      Inkey()
 
    ENDIF
 
@@ -809,14 +809,14 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
          otbr:refreshall()
          //cSql := sr_getconnection():cLastcomm
          //IF Upper(ctable) $ Upper(cSql) .AND. "INSERT" $ Upper(cSql )
-         //   cValues := SubStr(cSql, at("VALUES", Upper(cSql)))
+         //   cValues := SubStr(cSql, At("VALUES", Upper(cSql)))
          //   cSql := StrTran(csql, cvalues, "")
          //   cvalues := AllTrim(values)
          //   cSql := AllTrim(cSql)
-         //   cSql := SubStr(csql, at("(", csql) + 1)
+         //   cSql := SubStr(csql, At("(", csql) + 1)
          //   csql :=StrTran(csql, ")", "")
          //   cvalues := AllTrim(cvalues)
-         //   cvalues := SubStr(cvalues, at("(", cvalues) + 1)
+         //   cvalues := SubStr(cvalues, At("(", cvalues) + 1)
          //   cvalues :=StrTran(cvalues, ")", "")
          //   aField := hb_atokens(csql, ",")
          //   aVal := hb_atokens(cvalues, ",")
@@ -1367,8 +1367,8 @@ FUNCTION insertupdated(calias, ctable)
    LOCAL cFields := ""
    LOCAL cDesc := ""
    LOCAL ctemp := (calias)->(dbinfo(10))
-   LOCAL cFileDrive := SubStr(cTemp, 1, rat("\", cTemp) - 2)
-   LOCAL cFile := SubStr(cTemp, rat("\", cTemp) + 1)
+   LOCAL cFileDrive := SubStr(cTemp, 1, RAt("\", cTemp) - 2)
+   LOCAL cFile := SubStr(cTemp, RAt("\", cTemp) + 1)
    LOCAL aVal
    LOCAL cSqlTmp := ""
    LOCAL aTemp
@@ -1382,7 +1382,7 @@ FUNCTION insertupdated(calias, ctable)
    LOCAL cvalues := ""
    LOCAL aField
 
-   cFile := SubStr(cfile, 1, at(".", cfile) - 1)
+   cFile := SubStr(cfile, 1, At(".", cfile) - 1)
    IF Len(aFields) > 0
       FOR EACH aTemp IN afields
          cFields += aTemp + ","
@@ -1397,16 +1397,16 @@ FUNCTION insertupdated(calias, ctable)
       cSql :=GetLastInsertCommand(cTable)
 
       IF !Empty(cSql)
-         cValues := SubStr(cSql, at("VALUES", Upper(cSql)))
+         cValues := SubStr(cSql, At("VALUES", Upper(cSql)))
          cSql := StrTran(csql, cvalues, "")
          cvalues := AllTrim(cvalues)
          cSql := AllTrim(cSql)
-         cSql := SubStr(csql, at("(", csql) + 1)
+         cSql := SubStr(csql, At("(", csql) + 1)
          csql :=StrTran(csql, ")", "")
 
          cSql := AllTrim(cSql)
          cvalues := AllTrim(cvalues)
-         cvalues := SubStr(cvalues, at("(", cvalues) + 1)
+         cvalues := SubStr(cvalues, At("(", cvalues) + 1)
          cvalues :=StrTran(cvalues, ")", "")
          //cvalues := StrTran(cvalues, "'", "")
          aField := hb_atokens(csql, ",")
@@ -1424,7 +1424,7 @@ FUNCTION insertupdated(calias, ctable)
             nPos := AScan(afield,{|x|Upper(x) == Upper(aTemp)})
             IF nPos > 0
                IF "TO_DATE(" $ Upper(aval[npos])
-                  aval[nPos] := SubStr(aval[npos], at("TO_DATE(", Upper(aval[nPos])) + 8)
+                  aval[nPos] := SubStr(aval[npos], At("TO_DATE(", Upper(aval[nPos])) + 8)
                   aval[npos] := StrTran(aval[npos], "'", "")
                   aval[npos] := stod(aval[npos])
                ENDIF

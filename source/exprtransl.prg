@@ -293,7 +293,7 @@ METHOD ExpressionTranslator:Translate(oExpression, x)
 
             IF ::lFetchJoin
                addedAliases := {Lower(::_oDefaultContext:cAlias)}
-               aInitRelations := aclone(::aRelations)
+               aInitRelations := AClone(::aRelations)
                aSortedRelations := {}
                DO WHILE Len(aInitRelations) > 0
                   lProgress := .F.
@@ -302,7 +302,7 @@ METHOD ExpressionTranslator:Translate(oExpression, x)
                         AAdd(addedAliases, Lower(aInitRelations[i]:oWorkArea2:cAlias))
                         AAdd(aSortedRelations, aInitRelations[i])
                         hb_ADel(aInitRelations, i, .T.)
-                        lProgress = .T.
+                        lProgress := .T.
                         i--
                      ENDIF
                   NEXT i
@@ -606,9 +606,9 @@ METHOD MSSQLExpressionTranslator:TranslateComparison(oComparison)
    LOCAL bLike := {|x|IIf(hb_regexLike("^\'.*\'$", x), " like '%" + SubStr(x, 2, Len(x) - 2) + "%'", " like '%'+" + x + "+'")}
 
    IF oComparison:oOperator:cName == "included"
-      RETURN ::TranslateExpression(oComparison:oOperand2) + eval(bLike, ::TranslateExpression(oComparison:oOperand1))
+      RETURN ::TranslateExpression(oComparison:oOperand2) + Eval(bLike, ::TranslateExpression(oComparison:oOperand1))
    ELSEIF !set(_SET_EXACT) .AND. oComparison:oOperator:cName == "equal" .AND. oComparison:oOperand2:GetType() == "C"
-      RETURN ::TranslateExpression(oComparison:oOperand1) + eval(bLike, ::TranslateExpression(oComparison:oOperand2))
+      RETURN ::TranslateExpression(oComparison:oOperand1) + Eval(bLike, ::TranslateExpression(oComparison:oOperand2))
    ELSEIF oComparison:oOperand2:isKindOf("ValueExpression") .AND. Upper(oComparison:oOperand2:Value) == "NIL"
       IF oComparison:oOperator:cName == "equal" .OR. oComparison:oOperator:cName == "equalEqual"
          RETURN ::TranslateExpression(oComparison:oOperand1) + " IS NULL"

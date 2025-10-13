@@ -135,12 +135,12 @@ FUNCTION OraSel1(n, aret, csql, adata)
             FOR EACH atmp IN aOraClipCursors[n]["aFields"]
                /*
                IF "TO_CHAR(" $ Upper(atmp[1])
-                  atmp[1] := SubStr(atmp[1], at("TO_DATE(", Upper(atmp[1])) + 9)
-                  atmp[1] := SubStr(atmp[1], 1, at(",", Upper(atmp[1])) - 1)
+                  atmp[1] := SubStr(atmp[1], At("TO_DATE(", Upper(atmp[1])) + 9)
+                  atmp[1] := SubStr(atmp[1], 1, At(",", Upper(atmp[1])) - 1)
                ENDIF
                IF "DECODE(" $ Upper(atmp[1])
-                  atmp[1] := SubStr(atmp[1], at("DECODE(", Upper(atmp[1])) + 8)
-                  atmp[1] := SubStr(atmp[1], 1, at(",", Upper(atmp[1])) - 1)
+                  atmp[1] := SubStr(atmp[1], At("DECODE(", Upper(atmp[1])) + 8)
+                  atmp[1] := SubStr(atmp[1], 1, At(",", Upper(atmp[1])) - 1)
                ENDIF
                */
                atmp[1] := "fld" + strzero(ncount++, 5)
@@ -165,7 +165,7 @@ FUNCTION OraSel1(n, aret, csql, adata)
          ELSE
             IF Len(aRet) >= 1
                aOraClipCursors[n]["data"] := aret[1]
-               aret := aclone(aOraClipCursors[n]["data"])
+               aret := AClone(aOraClipCursors[n]["data"])
             ENDIF
             aOraClipCursors[n]["completed"] := .F.
             aOraClipCursors[n]["eof"] := .F.
@@ -174,7 +174,7 @@ FUNCTION OraSel1(n, aret, csql, adata)
          /*
          IF Len(aRet) >= 1
             aDataRet := aRet[1]
-            aret := aclone(aDataRet)
+            aret := AClone(aDataRet)
          ENDIF
          */
       ELSE
@@ -205,7 +205,7 @@ FUNCTION OraSel1(n, aret, csql, adata)
       nError := ExecuteSql(csql, @cursor, n) // sr_getconnection():exec(csql, , .T., @aret)
    ENDIF
 
-   //aOraClipCursors[n]["ret"] := aclone(aret)
+   //aOraClipCursors[n]["ret"] := AClone(aret)
    IF nError == 0
       aOraClipCursors[n]["cursoropen"] := .T.
       aOraClipCursors[n]["cursor"] := cursor
@@ -232,12 +232,12 @@ FUNCTION OraSel1(n, aret, csql, adata)
          FOR EACH atmp IN aOraClipCursors[n]["aFields"]
             /*
             IF "TO_CHAR(" $ atmp[1]
-               atmp[1] := SubStr(atmp[1], at("TO_DATE(", Upper(atmp[1])) + 9)
-               atmp[1] := SubStr(atmp[1], 1, at(",", Upper(atmp[1])) - 1)
+               atmp[1] := SubStr(atmp[1], At("TO_DATE(", Upper(atmp[1])) + 9)
+               atmp[1] := SubStr(atmp[1], 1, At(",", Upper(atmp[1])) - 1)
             ENDIF
             IF "DECODE(" $ Upper(atmp[1])
-               atmp[1] := SubStr(atmp[1], at("DECODE(", Upper(atmp[1])) + 8)
-               atmp[1] := SubStr(atmp[1], 1, at(",", Upper(atmp[1])) - 1)
+               atmp[1] := SubStr(atmp[1], At("DECODE(", Upper(atmp[1])) + 8)
+               atmp[1] := SubStr(atmp[1], 1, At(",", Upper(atmp[1])) - 1)
             ENDIF
             */
             atmp[1] := "fld" + strzero(ncount++, 5)
@@ -252,7 +252,7 @@ FUNCTION OraSel1(n, aret, csql, adata)
       ELSE
          IF Len(aRet) >= 1
             aOraClipCursors[n]["data"] := aret[1]
-            aret := aclone(aOraClipCursors[n]["data"])
+            aret := AClone(aOraClipCursors[n]["data"])
          ENDIF
          aOraClipCursors[n]["completed"] := .F.
          aOraClipCursors[n]["eof"] := .F.
@@ -1504,12 +1504,12 @@ FUNCTION OraTBrowse(nCursor1, cSql, c, oBrowse, bBLock)
       obrowse:forcestable()
       aReg := {}
       FOR i := 1 TO fcount()
-         //AAdd(aReg, eVal(obrowse:GetColumn(i):Block))
+         //AAdd(aReg, Eval(obrowse:GetColumn(i):Block))
          oCol := oBrowse:getcolumn(i)
          AAdd(aReg, fieldget(i))
       NEXT i
       nKey := inkey(0)
-      aRet := eval(bBLock, nkey, obrowse, aReg)
+      aRet := Eval(bBLock, nkey, obrowse, aReg)
       IF Aret == NIL
          LOOP
       ENDIF
@@ -1642,7 +1642,7 @@ RETURN NIL
 
 FUNCTION SR_AdjustNum(a)
 
-   LOCAL b := aClone(a)
+   LOCAL b := AClone(a)
    LOCAL i
    LOCAL lNwgOldCompat := .F.
 

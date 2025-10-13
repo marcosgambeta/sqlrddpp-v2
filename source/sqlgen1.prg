@@ -51,7 +51,7 @@
 #include "hbsql.ch"
 #include "sqlrddsetup.ch"
 
-#define SR_CRLF   (chr(13) + chr(10))
+#define SR_CRLF   (Chr(13) + Chr(10))
 
 /*
 * Readble Macros
@@ -60,7 +60,7 @@
 #define cJoinWords(nType, nSystemID)    aJoinWords[nSystemID,nType]
 
 #define  SKIPFWD            nIP++;uData:=apCode[nIP]
-#define  PARAM_SOLV         IIf(HB_ISBLOCK(aParam[uData+1]),eval(aParam[uData+1]),aParam[uData+1])
+#define  PARAM_SOLV         IIf(HB_ISBLOCK(aParam[uData+1]),Eval(aParam[uData+1]),aParam[uData+1])
 #define  RECURSIVE_CALL     nIP++;cSql+=SR_SQLCodeGen2(apCode,aParam,nSystemId,lIdent,@nIP,nContext,@nSpaces,lParseTableName);Exit
 #define  GETPARAM           cSql+=IIf(uData+1<=Len(aParam),PARAM_SOLV,"##PARAM_"+strzero(uData+1,3)+"_NOT_SUPPLIED##");nIP++;Exit
 #define  GETPARAM_QUOTED    cSql+=IIf(uData+1<=Len(aParam),SR_DBQUALIFY(PARAM_SOLV, nSystemID),"##PARAM_"+strzero(uData+1,3)+"_NOT_SUPPLIED##");nIP++;Exit
@@ -241,7 +241,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
          CASE SQL_PCODE_TABLE_NAME
             SKIPFWD
             IF lParseTableName
-               aRet := eval(bTableInfo, uData, nSystemId)
+               aRet := Eval(bTableInfo, uData, nSystemId)
                AAdd(aTables, aRet[TABLE_INFO_TABLE_NAME])
                AAdd(aQualifiedTables, aRet[TABLE_INFO_QUALIFIED_NAME])
                IF nContext == SQL_CONTEXT_UPDATE
@@ -283,7 +283,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
          CASE SQL_PCODE_TABLE_PARAM
             SKIPFWD
             IF lParseTableName
-               aRet := eval(bTableInfo, IIf(uData + 1 <= Len(aParam), IIf(HB_ISBLOCK(aParam[uData + 1]), eval(aParam[uData + 1]), aParam[uData + 1]), "##PARAM_" + strzero(uData + 1, 3) + "_NOT_SUPPLIED##"), nSystemId)
+               aRet := Eval(bTableInfo, IIf(uData + 1 <= Len(aParam), IIf(HB_ISBLOCK(aParam[uData + 1]), Eval(aParam[uData + 1]), aParam[uData + 1]), "##PARAM_" + strzero(uData + 1, 3) + "_NOT_SUPPLIED##"), nSystemId)
                IF nContext != SQL_CONTEXT_SELECT_FROM
                   cSql += aRet[TABLE_INFO_QUALIFIED_NAME]
                ELSE
@@ -301,7 +301,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                   cSql +=  NEWLINE + IDENTSPACE + "  "
                ENDIF
             ELSE
-               uData := IIf(uData + 1 <= Len(aParam), IIf(HB_ISBLOCK(aParam[uData + 1]), eval(aParam[uData + 1]), aParam[uData + 1]), "##PARAM_" + strzero(uData + 1, 3) + "_NOT_SUPPLIED##")
+               uData := IIf(uData + 1 <= Len(aParam), IIf(HB_ISBLOCK(aParam[uData + 1]), Eval(aParam[uData + 1]), aParam[uData + 1]), "##PARAM_" + strzero(uData + 1, 3) + "_NOT_SUPPLIED##")
                IF nContext != SQL_CONTEXT_SELECT_FROM
                   cSql += uData
                ELSE
@@ -319,7 +319,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
          CASE SQL_PCODE_TABLE_BINDVAR
             SKIPFWD
             IF lParseTableName
-               aRet := eval(bTableInfo, &uData, nSystemId)
+               aRet := Eval(bTableInfo, &uData, nSystemId)
                AAdd(aTables, aRet[TABLE_INFO_TABLE_NAME])
                AAdd(aQualifiedTables, aRet[TABLE_INFO_QUALIFIED_NAME])
                IF nContext == SQL_CONTEXT_UPDATE
@@ -1638,8 +1638,8 @@ FUNCTION SR_TableAttr(cTableName, nSystemID)
       ELSE
         cSlash := "\"
       ENDIF
-      IF SubStr(cTableName, 2, rat(cSlash, cTableName) - 2) == CurDir()
-         cTableName := SubStr(cTableName, Rat(cSlash, cTableName) + 1)
+      IF SubStr(cTableName, 2, RAt(cSlash, cTableName) - 2) == CurDir()
+         cTableName := SubStr(cTableName, RAt(cSlash, cTableName) + 1)
       ENDIF
    ENDIF
 
@@ -1703,8 +1703,8 @@ FUNCTION SR_IndexAttr(cTableName, nSystemID)
       ELSE
         cSlash := "\"
       ENDIF
-      IF SubStr(cTableName, 2, rat(cSlash, cTableName) - 2) == CurDir()
-         cTableName := SubStr(cTableName, Rat(cSlash, cTableName) + 1)
+      IF SubStr(cTableName, 2, RAt(cSlash, cTableName) - 2) == CurDir()
+         cTableName := SubStr(cTableName, RAt(cSlash, cTableName) + 1)
       ENDIF
    ENDIF
 

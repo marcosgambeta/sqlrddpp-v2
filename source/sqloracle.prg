@@ -53,7 +53,7 @@
 #include "msg.ch"
 #include "sqlrddsetup.ch"
 
-#define SR_CRLF   (chr(13) + chr(10))
+#define SR_CRLF   (Chr(13) + Chr(10))
 
 #define DEBUGSESSION     .F.
 #define ARRAY_BLOCK      500
@@ -332,7 +332,7 @@ METHOD SR_ORACLE:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBu
    ::exec("select sid from " + IIf(::lCluster, "g", "") + "v$session where AUDSID = sys_context('USERENV','sessionid')", .T., .T., @aRet)
 
    IF Len(aRet) > 0
-      ::uSid := val(Str(aRet[1, 1], 8, 0))
+      ::uSid := Val(Str(aRet[1, 1], 8, 0))
    ENDIF
 
 RETURN Self
@@ -393,9 +393,9 @@ RETURN nRet
 STATIC FUNCTION ProcessParams(cSql, nBound)
 
    LOCAL nPos
-   LOCAL cTemp := SubStr(cSql, 1, AT("?" , cSql) - 1)
-   LOCAL lHasParen := Rat(")", cSql) > 0
-   LOCAL lHasPointComma := Rat(";", cSql) > 0
+   LOCAL cTemp := SubStr(cSql, 1, At("?" , cSql) - 1)
+   LOCAL lHasParen := RAt(")", cSql) > 0
+   LOCAL lHasPointComma := RAt(";", cSql) > 0
    LOCAL aItens
    LOCAL cOriginal := cTemp + " "
    LOCAL xParam

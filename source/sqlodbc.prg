@@ -53,7 +53,7 @@
 #include "msg.ch"
 #include "sqlrddsetup.ch"
 
-#define SR_CRLF   (chr(13) + chr(10))
+#define SR_CRLF   (Chr(13) + Chr(10))
 
 #define DEBUGSESSION     .F.
 #define ARRAY_BLOCK      500
@@ -463,7 +463,7 @@ METHOD SR_ODBC:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff
    CASE SYSTEMID_AZURE
       ::exec("select cast( @@spid as numeric )", .T., .T., @aRet)
       IF Len(aRet) > 0
-         ::uSid := val(Str(aRet[1, 1], 8, 0))
+         ::uSid := Val(Str(aRet[1, 1], 8, 0))
       ENDIF
       EXIT
    ENDSWITCH

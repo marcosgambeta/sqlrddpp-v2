@@ -58,7 +58,7 @@
 
 #define DEBUGSESSION     .F.
 
-#define SR_CRLF   (chr(13) + chr(10))
+#define SR_CRLF   (Chr(13) + Chr(10))
 
 STATIC lNwgOldCompat := .F.
 
@@ -757,18 +757,18 @@ METHOD SR_CONNECTION:DetectTargetDb()
    CASE ("SQL Server" $ cTargetDB .AND. "00.53.0000" $ ::cSystemVers) .OR. ("MICROSOFT SQL SERVER" $ cTargetDB)
       ::nSystemID := SYSTEMID_MSSQL7
       aVers := hb_atokens(::cSystemVers, '.')
-      IF val(aVers[1]) >= 8
+      IF Val(aVers[1]) >= 8
          ::lClustered := .T.
       ENDIF
          //culik 30/12/2011 adicionado para indicar se e  sqlserver versao 2008 ou superior
-      IF val(aVers[1]) >= 10
+      IF Val(aVers[1]) >= 10
          ::lSqlServer2008 := .T.
       ENDIF
 
    CASE ("MICROSOFT" $ cTargetDB .AND. "SQL" $ cTargetDB .AND. "SERVER" $ cTargetDB .AND.("7.0" $ ::cSystemVers .OR. "8.0" $ ::cSystemVers .OR. "9.0" $ ::cSystemVers .OR. "10.00" $ ::cSystemVers .OR. "10.50" $ ::cSystemVers .OR. "11.00" $ ::cSystemVers)) //.OR. ( "SQL SERVER" $ cTargetDB .AND. !("SYBASE" $ cTargetDB))
       ::nSystemID := SYSTEMID_MSSQL7
       aVers := hb_atokens(::cSystemVers, '.')
-      IF val(aVers[1]) >= 8
+      IF Val(aVers[1]) >= 8
          ::lClustered := .T.
       ENDIF
    CASE "ANYWHERE" $ cTargetDB
@@ -802,11 +802,11 @@ METHOD SR_CONNECTION:DetectTargetDb()
    CASE "FIREBIRD" $ cTargetDb .OR. "INTERBASE" $ cTargetdb
       ::nSystemID := SYSTEMID_FIREBR
       aVers := hb_atokens(::cSystemVers, '.')
-      IF val(aVers[1]) >= 5
+      IF Val(aVers[1]) >= 5
          ::nSystemID := SYSTEMID_FIREBR5
-      ELSEIF val(aVers[1]) >= 4
+      ELSEIF Val(aVers[1]) >= 4
          ::nSystemID := SYSTEMID_FIREBR4
-      ELSEIF val(aVers[1]) >= 3
+      ELSEIF Val(aVers[1]) >= 3
          ::nSystemID := SYSTEMID_FIREBR3
       ENDIF
    CASE "INTERSYSTEMS CACHE" $ cTargetDb
@@ -1181,7 +1181,7 @@ METHOD SR_CONNECTION:Connect(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxB
 
    SWITCH ::nSystemID
    CASE SYSTEMID_ORACLE
-      ::cLockWait := " WAIT " + Str(int(::nLockWaitTime))
+      ::cLockWait := " WAIT " + Str(Int(::nLockWaitTime))
       EXIT
    OTHERWISE
       ::cLockWait := ""

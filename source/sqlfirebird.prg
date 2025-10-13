@@ -54,7 +54,7 @@
 #include "firebird.ch"
 #include "sqlrddsetup.ch"
 
-#define SR_CRLF   (chr(13) + chr(10))
+#define SR_CRLF   (Chr(13) + Chr(10))
 
 #define DEBUGSESSION     .F.
 #define ARRAY_BLOCK      500
@@ -179,7 +179,7 @@ METHOD SR_FIREBIRD:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cR
          nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       ELSE
          // DOON'T remove "+0"
-         ::Exec("select a.rdb$field_name, b.rdb$field_precision + 0 from rdb$relation_fields a, rdb$fields b where a.rdb$relation_name = '" + StrTran(cTable, chr(34), "") + "' and a.rdb$field_source = b.rdb$field_name", .F., .T., @aLocalPrecision)
+         ::Exec("select a.rdb$field_name, b.rdb$field_precision + 0 from rdb$relation_fields a, rdb$fields b where a.rdb$relation_name = '" + StrTran(cTable, Chr(34), "") + "' and a.rdb$field_source = b.rdb$field_name", .F., .T., @aLocalPrecision)
          nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
       ENDIF
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
@@ -276,7 +276,7 @@ METHOD SR_FIREBIRD:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMax
    ELSE
       ::cConnect := cConnect
       cTargetDB := StrTran(FBVERSION(hEnv), "(access method)", "")
-      cSystemVers := SubStr(cTargetDB, at("Firebird ", cTargetDB) + 9, 3)
+      cSystemVers := SubStr(cTargetDB, At("Firebird ", cTargetDB) + 9, 3)
    ENDIF
 
    nRet := FBBeginTransaction(hEnv)

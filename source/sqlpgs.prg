@@ -54,7 +54,7 @@
 #include "pgs.ch"
 #include "sqlrddsetup.ch"
 
-#define SR_CRLF   (chr(13) + chr(10))
+#define SR_CRLF   (Chr(13) + Chr(10))
 
 /*------------------------------------------------------------------------*/
 
@@ -200,10 +200,10 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
    IF !Empty(cTable) .AND. Empty(cCommand)
       cTbl := Lower(cTable)
       IF "." $ cTbl
-         cOwner := SubStr(cTbl, 1, at(".", cTbl) - 1)
-         cTbl := SubStr(cTbl, at(".", cTbl) + 1)
+         cOwner := SubStr(cTbl, 1, At(".", cTbl) - 1)
+         cTbl := SubStr(cTbl, At(".", cTbl) + 1)
       ENDIF
-      IF Left(cTbl, 1) == chr(34) // "
+      IF Left(cTbl, 1) == Chr(34) // "
          cTbl := SubStr(cTbl, 2, Len(cTbl) - 2)
       ENDIF
       aFields := PGSTableAttr(::hDbc, cTbl, cOwner)
@@ -321,7 +321,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
    ::exec("select pg_backend_pid()", .T., .T., @aRet)
 
    IF Len(aRet) > 0
-      ::uSid := val(Str(aRet[1, 1], 8, 0))
+      ::uSid := Val(Str(aRet[1, 1], 8, 0))
    ENDIF
 
 RETURN Self
