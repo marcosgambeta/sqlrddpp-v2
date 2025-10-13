@@ -301,7 +301,7 @@ METHOD ExpressionTranslator:Translate(oExpression, x)
                      IF Len(aWhere(aInitRelations[i]:aDependingContexts, {|x|!Lower(x) $ addedAliases})) == 1
                         AAdd(addedAliases, Lower(aInitRelations[i]:oWorkArea2:cAlias))
                         AAdd(aSortedRelations, aInitRelations[i])
-                        adel(aInitRelations, i, .T.)
+                        hb_ADel(aInitRelations, i, .T.)
                         lProgress = .T.
                         i--
                      ENDIF

@@ -161,7 +161,7 @@ PROCEDURE RemoveAll(aArray, bPredicate)
 
    FOR i := 1 TO Len(aArray)
       IF eval(bPredicate, aArray[i])
-          adel(aArray, i, .T.)
+          hb_ADel(aArray, i, .T.)
           i--
       ENDIF
    NEXT i
@@ -265,7 +265,7 @@ METHOD Dictionary:Remove(xKey)
       Throw(ErrorNew(,,,, "The key " + cstr(xKey) + " was not found."))
    ENDIF
 
-RETURN adel(::aInternArray, nIndex, .T.)
+RETURN hb_ADel(::aInternArray, nIndex, .T.)
 
 METHOD Dictionary:Clear()
 
