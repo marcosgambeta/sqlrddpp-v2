@@ -57,9 +57,9 @@
 
 #define SR_CRLF   (Chr(13) + Chr(10))
 
-#define  DEBUGSESSION                .F.
-#define ARRAY_BLOCK                  500
-#define MINIMAL_MYSQL_SUPPORTED  40105
+#define DEBUGSESSION .F.
+#define ARRAY_BLOCK 500
+#define MINIMAL_MYSQL_SUPPORTED 40105
 
 CLASS SR_MYSQL FROM SR_CONNECTION
 
@@ -102,7 +102,7 @@ METHOD SR_MYSQL:Getline(aFields, lTranslate, aArray)
    IF aArray == NIL
       aArray := Array(Len(aFields))
    ELSEIF Len(aArray) < Len(aFields)
-      aSize(aArray, Len(aFields))
+      ASize(aArray, Len(aFields))
    ENDIF
 
    IF ::aCurrLine == NIL
@@ -121,7 +121,7 @@ METHOD SR_MYSQL:FieldGet(nField, aFields, lTranslate)
 
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
-      ::aCurrLine := array(LEN(aFields))
+      ::aCurrLine := array(Len(aFields))
       MYSLINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, ::aCurrLine)
    ENDIF
 
@@ -131,7 +131,7 @@ METHOD SR_MYSQL:FetchRaw(lTranslate, aFields)
 
    ::nRetCode := SQL_ERROR
 
-   DEFAULT aFields    TO ::aFields
+   DEFAULT aFields TO ::aFields
    DEFAULT lTranslate TO .T.
 
    IF ::hStmt != NIL
@@ -163,10 +163,10 @@ METHOD SR_MYSQL:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
    //LOCAL cVlr := "" (variable not used)
    LOCAL aFld
 
-   DEFAULT lReSelect    TO .T.
-   DEFAULT lLoadCache   TO .F.
-   DEFAULT cWhere       TO ""
-   DEFAULT cRecnoName   TO SR_RecnoName()
+   DEFAULT lReSelect TO .T.
+   DEFAULT lLoadCache TO .F.
+   DEFAULT cWhere TO ""
+   DEFAULT cRecnoName TO SR_RecnoName()
    DEFAULT cDeletedName TO SR_DeletedName()
 
    IF lReSelect
@@ -201,9 +201,9 @@ METHOD SR_MYSQL:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
       aFld[FIELD_ENUM] := aFld:__enumIndex()
    NEXT
 
-   If lReSelect .AND. !lLoadCache
+   IF lReSelect .AND. !lLoadCache
       ::FreeStatement()
-   EndIf
+   ENDIF
 
 RETURN aFields
 
@@ -249,28 +249,28 @@ METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
       //nVersionp := MINIMAL_MYSQL_SUPPORTED - 100 (local variable/value not used)
       HB_SYMBOL_UNUSED(cSystemVers)
       RETURN SELF
-   ELSE
-      ::cConnect  := cConnect
-      ::hStmt     := NIL
-      ::hDbc      := hDbc
-      cTargetDB   := "MySql Native"
-      cSystemVers := allTrim(Str(MYSVERS(hDbc)))
-      nVersionp   := MYSVERS(hDbc)
    ENDIF
+
+   ::cConnect := cConnect
+   ::hStmt := NIL
+   ::hDbc := hDbc
+   cTargetDB := "MySql Native"
+   cSystemVers := AllTrim(Str(MYSVERS(hDbc)))
+   nVersionp := MYSVERS(hDbc)
 
    IF !::lQueryOnly .AND. nVersionp < MINIMAL_MYSQL_SUPPORTED
       SR_MsgLogFile("Connection Error: MySQL version not supported : " + cSystemVers + " / minimun is " + Str(MINIMAL_MYSQL_SUPPORTED))
       ::End()
       ::nSystemID := 0
-      ::nRetCode  := -1
+      ::nRetCode := -1
       RETURN SELF
    ENDIF
 
    ::cSystemName := cTargetDB
    ::cSystemVers := cSystemVers
-   ::nSystemID   := SYSTEMID_MYSQL
-   ::cTargetDB   := Upper(cTargetDB)
-   ::uSid        := MYSGETCONNID(hDbc)
+   ::nSystemID := SYSTEMID_MYSQL
+   ::cTargetDB := Upper(cTargetDB)
+   ::uSid := MYSGETCONNID(hDbc)
 
 RETURN SELF
 
@@ -299,7 +299,8 @@ RETURN (::nRetCode := MYSRollBack(::hDbc))
 
 METHOD SR_MYSQL:ExecuteRaw(cCommand)
 
-   IF Upper(Left(LTrim(cCommand), 6)) == "SELECT" .OR. Upper(Left(LTrim(cCommand), 5)) == "SHOW "
+   IF Upper(Left(LTrim(cCommand), 6)) == "SELECT" .OR. ;
+      Upper(Left(LTrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
    ELSE
       ::lResultSet := .F.
