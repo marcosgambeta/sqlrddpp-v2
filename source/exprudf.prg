@@ -59,7 +59,7 @@ RETURN result
 
 FUNCTION xSelect(aArray, bSelector)
 
-   LOCAL newArray := array(Len(aArray))
+   LOCAL newArray := Array(Len(aArray))
 
    AEval(aArray, {|x, n|newArray[n] := Eval(bSelector, x)})
 
@@ -262,7 +262,7 @@ METHOD Dictionary:Remove(xKey)
    LOCAL nIndex := ::nIndexOfKey(xKey)
 
    IF nIndex == 0
-      _SR_Throw(ErrorNew(,,,, "The key " + cstr(xKey) + " was not found."))
+      _SR_Throw(ErrorNew(, , , , "The key " + cstr(xKey) + " was not found."))
    ENDIF
 
 RETURN hb_ADel(::aInternArray, nIndex, .T.)
