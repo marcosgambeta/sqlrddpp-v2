@@ -307,12 +307,12 @@ METHOD ExpressionTranslator:Translate(oExpression, x)
                      ENDIF
                   NEXT i
                   IF !lProgress
-                     _SR_Throw(ErrorNew(,,,, "Circular dependency in the relations. Pass the parameter lFetchJoin to .F. to avoid this problem."))
+                     _SR_Throw(ErrorNew(, , , , "Circular dependency in the relations. Pass the parameter lFetchJoin to .F. to avoid this problem."))
                   ENDIF
                ENDDO
 
                FOR EACH oRelation IN aSortedRelations
-                  resultHeader += " inner join " + oRelation:oWorkArea2:cFileName + " " + ::cAs + " " +  Upper(oRelation:oWorkArea2:cAlias) + " on " + oRelation:cSQLJoin
+                  resultHeader += " inner join " + oRelation:oWorkArea2:cFileName + " " + ::cAs + " " + Upper(oRelation:oWorkArea2:cAlias) + " on " + oRelation:cSQLJoin
                NEXT
             ELSE
                FOR EACH oRelation IN ::aRelations
@@ -428,15 +428,15 @@ METHOD ExpressionTranslator:TranslateFunctionExpression(oFunctionExpression)
 
 RETURN cSQLFunctionName + "(" + cJoin(aParameters, ",") + ")"
 
-/*
+#if 0
 METHOD ExpressionTranslator:CheckParams(oFunctionExpression)
 
    IF AScan(oFunctionExpression:aParameters, {|x|x:lIsByRef}) > 0
-      _SR_Throw(ErrorNew(,,,, "The expression cannot be translated because " + oFunctionExpression:cFunctionName + " contains a parameter passed by reference"))
+      _SR_Throw(ErrorNew(, , , , "The expression cannot be translated because " + oFunctionExpression:cFunctionName + " contains a parameter passed by reference"))
    ENDIF
 
 RETURN
-*/
+#endif
 
 METHOD ExpressionTranslator:TranslateValueExpression(oValueExpression)
 
@@ -661,7 +661,7 @@ METHOD MSSQLExpressionTranslator:TranslateFunctionExpression(oFunctionExpression
             secondParam := ::super:TranslateBooleanExpression(aParamExprs[2])
             thirdParam := ::super:TranslateBooleanExpression(aParamExprs[3])
          ELSE
-            _SR_Throw(ErrorNew(,,,, "TSQL doesn't support condition as the second or third parameter of the 'CASE WHEN ELSE END' structure"))
+            _SR_Throw(ErrorNew(, , , , "TSQL doesn't support condition as the second or third parameter of the 'CASE WHEN ELSE END' structure"))
          ENDIF
       ELSE
          secondParam := ::InternalTranslate(aParamExprs[2])
@@ -691,7 +691,7 @@ METHOD MSSQLExpressionTranslator:TranslateFunctionExpression(oFunctionExpression
          cSavedFormat := set(_SET_DATEFORMAT)
          dDate := oFunctionExpression:oClipperExpression:Evaluate()
          SET DATE AMERICAN
-         result := "'" + dtoc(dDate) + "'"
+         result := "'" + DToC(dDate) + "'"
          SET DATE FORMAT cSavedFormat
          RETURN result
       ENDIF
@@ -758,7 +758,7 @@ METHOD MSSQLExpressionTranslator:TranslateFunctionExpression(oFunctionExpression
          cSavedFormat := set(_SET_DATEFORMAT)
          dDate := oFunctionExpression:oClipperExpression:Evaluate()
          SET DATE AMERICAN
-         result := "'" + dtoc(dDate) + "'"
+         result := "'" + DToC(dDate) + "'"
          SET DATE FORMAT cSavedFormat
          RETURN result
       ENDIF
@@ -908,7 +908,7 @@ METHOD EnchancedDirectRelation:new(pWorkarea1, pWorkarea2, pExpression)
    ::oSeekIndex := ::oWorkArea2:GetControllingIndex()
    indexLength := IIf(::oSeekIndex == NIL, 15, ::oSeekIndex:nLength)
    ::lSameLength := ::oClipperExpression:nLength == indexLength
-   ::nMaxLength := min(::oClipperExpression:nLength, indexLength)
+   ::nMaxLength := Min(::oClipperExpression:nLength, indexLength)
 
 RETURN SELF
 
