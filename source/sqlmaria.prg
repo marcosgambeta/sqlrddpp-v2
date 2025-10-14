@@ -61,7 +61,7 @@
 #define ARRAY_BLOCK                  500
 #define MINIMAL_MYSQL_SUPPORTED  50100
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 CLASS SR_MARIA FROM SR_CONNECTION
 
@@ -81,9 +81,10 @@ CLASS SR_MARIA FROM SR_CONNECTION
    METHOD Getline(aFields, lTranslate, aArray)
    METHOD KillConnectionID(nID) INLINE MYSKILLCONNID(::hDbc, nID)
    METHOD GetAffectedRows()
+
 ENDCLASS
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:MoreResults(aArray, lTranslate)
 
@@ -96,7 +97,7 @@ METHOD SR_MARIA:MoreResults(aArray, lTranslate)
 
 RETURN nRet
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:Getline(aFields, lTranslate, aArray)
 
@@ -104,17 +105,17 @@ METHOD SR_MARIA:Getline(aFields, lTranslate, aArray)
 
    DEFAULT lTranslate TO .T.
 
-   If aArray == NIL
+   IF aArray == NIL
       aArray := Array(Len(aFields))
-   ElseIf Len(aArray) < Len(aFields)
-      aSize(aArray, Len(aFields))
-   EndIf
+   ELSEIF Len(aArray) < Len(aFields)
+      ASize(aArray, Len(aFields))
+   ENDIF
 
-   If ::aCurrLine == NIL
+   IF ::aCurrLine == NIL
       MYSLINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, aArray)
       ::aCurrLine := aArray
       RETURN aArray
-   EndIf
+   ENDIF
 
    FOR i := 1 TO Len(aArray)
       aArray[i] := ::aCurrLine[i]
@@ -122,44 +123,47 @@ METHOD SR_MARIA:Getline(aFields, lTranslate, aArray)
 
 RETURN aArray
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:FieldGet(nField, aFields, lTranslate)
-   If ::aCurrLine == NIL
+
+   IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
-      ::aCurrLine := array(LEN(aFields))
+      ::aCurrLine := array(Len(aFields))
       MYSLINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, ::aCurrLine)
-   EndIf
+   ENDIF
 
 RETURN ::aCurrLine[nField]
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:FetchRaw(lTranslate, aFields)
 
    ::nRetCode := SQL_ERROR
-   DEFAULT aFields    TO ::aFields
+   DEFAULT aFields TO ::aFields
    DEFAULT lTranslate TO .T.
 
-   If ::hStmt != NIL
+   IF ::hStmt != NIL
       ::nRetCode := MYSFetch(::hDbc)
       ::aCurrLine := NIL
-   Else
+   ELSE
       ::RunTimeErr("", "MySQLFetch - Invalid cursor state" + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
-   EndIf
+   ENDIF
 
 RETURN ::nRetCode
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:FreeStatement()
-   If ::hStmt != NIL
-      MYSClear ( ::hDbc )
-   EndIf
+
+   IF ::hStmt != NIL
+      MYSClear(::hDbc)
+   ENDIF
    ::hStmt := NIL
+
 RETURN NIL
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
@@ -172,64 +176,64 @@ METHOD SR_MARIA:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
    //LOCAL cVlr := "" (variable not used)
    LOCAL aFld
 
-   DEFAULT lReSelect    TO .T.
-   DEFAULT lLoadCache   TO .F.
-   DEFAULT cWhere       TO ""
-   DEFAULT cRecnoName   TO SR_RecnoName()
+   DEFAULT lReSelect TO .T.
+   DEFAULT lLoadCache TO .F.
+   DEFAULT cWhere TO ""
+   DEFAULT cRecnoName TO SR_RecnoName()
    DEFAULT cDeletedName TO SR_DeletedName()
 
-   If lReSelect
-      If !Empty(cCommand)
+   IF lReSelect
+      IF !Empty(cCommand)
          nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
-      Else
+      ELSE
          nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
-      EndIf
-      If nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
+      ENDIF
+      IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
          RETURN NIL
-      EndIf
-   EndIf
+      ENDIF
+   ENDIF
 
-   If MYSResultStatus(::hDbc) != SQL_SUCCESS
+   IF MYSResultStatus(::hDbc) != SQL_SUCCESS
       ::RunTimeErr("", "SqlNumResultCols Error" + SR_CRLF + SR_CRLF + ;
-               "Last command sent to database : " + SR_CRLF + ::cLastComm)
+         "Last command sent to database : " + SR_CRLF + ::cLastComm)
       RETURN NIL
-   endif
+   ENDIF
 
-   ::nFields   := MYSCols(::hDbc)
+   ::nFields := MYSCols(::hDbc)
 
-//   If (!Empty(cTable)) .AND. Empty(cCommand)
-//      cTbl := cTable
-//      aFields := MYSTableAttr(::hDbc, cTbl)
-//   Else
+   // IF (!Empty(cTable)) .AND. Empty(cCommand)
+   //    cTbl := cTable
+   //    aFields := MYSTableAttr(::hDbc, cTbl)
+   // ELSE
       aFields := MYSQueryAttr(::hDbc)
-//   EndIf
+   // ENDIF
 
    ::aFields := aFields
 
    FOR EACH aFld IN ::aFields
-      aFld[FIELD_ENUM] = aFld:__enumIndex()
+      aFld[FIELD_ENUM] := aFld:__enumIndex()
    NEXT
 
-   If lReSelect .AND. !lLoadCache
+   IF lReSelect .AND. !lLoadCache
       ::FreeStatement()
-   EndIf
+   ENDIF
 
 RETURN aFields
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:LastError()
 
-   If ::hStmt != NIL
+   IF ::hStmt != NIL
       RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + MYSResStatus(::hDbc) + " - " + MYSErrMsg(::hDbc)
-   EndIf
+   ENDIF
 
 RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + MYSErrMsg(::hDbc)
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
-METHOD SR_MARIA:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
-            cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
+METHOD SR_MARIA:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
+   cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
 
    //LOCAL hEnv := 0 (variable not used)
    LOCAL hDbc //:= 0 (value not used)
@@ -257,78 +261,85 @@ METHOD SR_MARIA:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
    nRet := MYSStatus(hDbc)
 
    IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
-      ::nRetCode = nRet
+      ::nRetCode := nRet
       ::nSystemID := 0
       SR_MsgLogFile("Connection Error")
       //nVersionp := 4 (local variable/value not used)
       HB_SYMBOL_UNUSED(cSystemVers)
       RETURN Self
-   ELSE
-      ::cConnect  = cConnect
-      ::hStmt     = NIL
-      ::hDbc      = hDbc
-      cTargetDB   = "MARIADB Native"
-      cSystemVers = AllTrim(Str(MYSVERS(hDbc)))
-      nVersionp  := MYSVERS(hDbc)
-
    ENDIF
 
-   If (!::lQueryOnly) .AND. nVersionp < MINIMAL_MYSQL_SUPPORTED
+   ::cConnect := cConnect
+   ::hStmt := NIL
+   ::hDbc := hDbc
+   cTargetDB := "MARIADB Native"
+   cSystemVers := AllTrim(Str(MYSVERS(hDbc)))
+   nVersionp := MYSVERS(hDbc)
+
+   IF (!::lQueryOnly) .AND. nVersionp < MINIMAL_MYSQL_SUPPORTED
       SR_MsgLogFile("Connection Error: MariaDB version not supported : " + cSystemVers + " / minimun is " + Str(MINIMAL_MYSQL_SUPPORTED))
       ::End()
       ::nSystemID := 0
-      ::nRetCode  := -1
+      ::nRetCode := -1
       RETURN Self
-   EndIf
+   ENDIF
 
    ::cSystemName := cTargetDB
    ::cSystemVers := cSystemVers
-   ::nSystemID   := SYSTEMID_MARIADB
-   ::cTargetDB   := Upper(cTargetDB)
-   ::uSid        := MYSGETCONNID(hDbc)
-   ::lMariaDb    :=.T.
+   ::nSystemID := SYSTEMID_MARIADB
+   ::cTargetDB := Upper(cTargetDB)
+   ::uSid := MYSGETCONNID(hDbc)
+   ::lMariaDb :=.T.
 
 RETURN Self
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:End()
 
    ::Commit(.T.)
    ::FreeStatement()
 
-   If !Empty(::hDbc)
+   IF !Empty(::hDbc)
       MYSFinish(::hDbc)
-   EndIf
+   ENDIF
 
 RETURN ::super:End()
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:Commit(lNoLog)
-   ::super:Commit(lNoLog)
-RETURN ( ::nRetCode := MYSCommit(::hDbc) )
 
-/*------------------------------------------------------------------------*/
+   ::super:Commit(lNoLog)
+
+RETURN (::nRetCode := MYSCommit(::hDbc))
+
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:RollBack()
-   ::super:RollBack()
-RETURN ( ::nRetCode := MYSRollBack(::hDbc) )
 
-/*------------------------------------------------------------------------*/
+   ::super:RollBack()
+
+RETURN (::nRetCode := MYSRollBack(::hDbc))
+
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:ExecuteRaw(cCommand)
 
-   If Upper(Left(LTrim(cCommand), 6)) == "SELECT" .OR. Upper(Left(LTrim(cCommand), 5)) == "SHOW "
+   IF Upper(Left(LTrim(cCommand), 6)) == "SELECT" .OR. ;
+      Upper(Left(LTrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
-   Else
+   ELSE
       ::lResultSet := .F.
-   EndIf
+   ENDIF
 
    ::hStmt := MYSExec(::hDbc, cCommand)
+
 RETURN MYSResultStatus(::hDbc)
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_MARIA:GetAffectedRows()
 RETURN MYSAFFECTEDROWS(::hDbc)
+
+//------------------------------------------------------------------------
