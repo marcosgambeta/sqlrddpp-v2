@@ -1656,7 +1656,7 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
          oCnn:Exec("DROP INDEX " + cPhisicalName + " ON " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
          EXIT
       CASE SYSTEMID_ORACLE
-         IF Len(aIndex[6]) > 4 .AND. aIndex[6][4] == "@"
+         IF Len(aIndex[6]) > 4 .AND. SubStr(aIndex[6], 4, 1) == "@"
             oCnn:Exec("DROP INDEX " + cOwner + "A$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
             oCnn:Commit()
             oCnn:Exec("DROP INDEX " + cOwner + "D$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
@@ -1668,14 +1668,14 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
          oCnn:Exec("DROP INDEX " + cPhisicalName + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
       ENDSWITCH
 
-      IF (!Empty(aIndex[4])) .OR. aIndex[5][1] == "#"
+      IF (!Empty(aIndex[4])) .OR. SubStr(aIndex[5], 1, 1) == "#"
          USE (cFileName) NEW VIA "SQLRDD" ALIAS "TEMPDROPCO" exclusive
          oWA := TEMPDROPCO->(dbInfo(DBI_INTERNAL_OBJECT))
 
          IF !Empty(aIndex[4])
             oWA:DropColumn("INDKEY_" + AllTrim(aIndex[4]), .F.)
          ENDIF
-         IF aIndex[5][1] == "#"
+         IF SubStr(aIndex[5], 1, 1) == "#"
             oWA:DropColumn("INDFOR_" + SubStr(aIndex[5], 2, 3), .F.)
          ENDIF
 
