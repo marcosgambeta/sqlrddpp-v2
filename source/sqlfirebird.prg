@@ -59,7 +59,7 @@
 #define DEBUGSESSION     .F.
 #define ARRAY_BLOCK      500
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 CLASS SR_FIREBIRD FROM SR_CONNECTION
 
@@ -79,7 +79,7 @@ CLASS SR_FIREBIRD FROM SR_CONNECTION
 
 ENDCLASS
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:Getline(aFields, lTranslate, aArray)
 
@@ -90,7 +90,7 @@ METHOD SR_FIREBIRD:Getline(aFields, lTranslate, aArray)
    IF aArray == NIL
       aArray := Array(Len(aFields))
    ELSEIF Len(aArray) != Len(aFields)
-      aSize(aArray, Len(aFields))
+      ASize(aArray, Len(aFields))
    ENDIF
 
    IF ::aCurrLine == NIL
@@ -105,19 +105,19 @@ METHOD SR_FIREBIRD:Getline(aFields, lTranslate, aArray)
 
 RETURN aArray
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:FieldGet(nField, aFields, lTranslate)
 
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
-      ::aCurrLine := array(LEN(aFields))
+      ::aCurrLine := Array(Len(aFields))
       FBLINEPROCESSED(::hEnv, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, ::aCurrLine)
    ENDIF
 
 RETURN ::aCurrLine[nField]
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:FetchRaw(lTranslate, aFields)
 
@@ -134,7 +134,7 @@ METHOD SR_FIREBIRD:FetchRaw(lTranslate, aFields)
 
 RETURN ::nRetCode
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:AllocStatement()
 
@@ -147,7 +147,7 @@ METHOD SR_FIREBIRD:AllocStatement()
 
 RETURN SQL_SUCCESS
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
@@ -233,7 +233,7 @@ METHOD SR_FIREBIRD:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cR
 
 RETURN aFields
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:LastError()
 
@@ -244,7 +244,7 @@ METHOD SR_FIREBIRD:LastError()
 
 RETURN AllTrim(cMsgError) + " - Native error code " + AllTrim(Str(nType))
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
    cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
@@ -295,7 +295,7 @@ METHOD SR_FIREBIRD:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMax
 
 RETURN SELF
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:End()
 
@@ -304,7 +304,7 @@ METHOD SR_FIREBIRD:End()
 
 RETURN ::Super:End()
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:Commit()
 
@@ -313,7 +313,7 @@ METHOD SR_FIREBIRD:Commit()
 
 RETURN (::nRetCode := FBBeginTransaction(::hEnv))
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:RollBack()
 
@@ -321,7 +321,7 @@ METHOD SR_FIREBIRD:RollBack()
 
 RETURN (::nRetCode := FBRollBackTransaction(::hEnv))
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_FIREBIRD:ExecuteRaw(cCommand)
 
@@ -337,4 +337,4 @@ METHOD SR_FIREBIRD:ExecuteRaw(cCommand)
 
 RETURN nRet
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
