@@ -55,12 +55,12 @@
 
 #define SR_CRLF   (Chr(13) + Chr(10))
 
-#define DEBUGSESSION     .F.
-#define ARRAY_BLOCK      500
+#define DEBUGSESSION .F.
+#define ARRAY_BLOCK 500
 
-#define SQL_LONGDATA_COMPAT          1253
-#define SQL_ATTR_LONGDATA_COMPAT    SQL_LONGDATA_COMPAT
-#define SQL_LD_COMPAT_YES            1
+#define SQL_LONGDATA_COMPAT 1253
+#define SQL_ATTR_LONGDATA_COMPAT SQL_LONGDATA_COMPAT
+#define SQL_LD_COMPAT_YES 1
 
 CLASS SR_ODBC FROM SR_CONNECTION
 
@@ -107,7 +107,7 @@ METHOD SR_ODBC:Getline(aFields, lTranslate, aArray)
    IF aArray == NIL
       aArray := Array(Len(aFields))
    ELSEIF Len(aArray) < Len(aFields)
-      aSize(aArray, Len(aFields))
+      ASize(aArray, Len(aFields))
    ENDIF
 
    IF ::aCurrLine == NIL
@@ -137,9 +137,9 @@ METHOD SR_ODBC:DriverCatTables()
    IF nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO
 
       nAllocated := ARRAY_BLOCK1
-      //nBlocks    := 1 (variable not used)
-      n          := 0
-      aFields    := ::IniFields(.F.,,,,,,)
+      //nBlocks := 1 (variable not used)
+      n := 0
+      aFields := ::IniFields(.F., , , , , ,)
 
       DO WHILE (::nRetCode := ::Fetch()) = SQL_SUCCESS
 
@@ -162,7 +162,7 @@ METHOD SR_ODBC:DriverCatTables()
                nAllocated += ARRAY_BLOCK5
             ENDSWITCH
 
-            aSize(aArray, nAllocated)
+            ASize(aArray, nAllocated)
          ENDIF
 
          aArray[n] := {::FieldGet(3, aFields, .F.)}
@@ -170,7 +170,7 @@ METHOD SR_ODBC:DriverCatTables()
    ENDIF
 
    ::FreeStatement()
-   aSize(aArray, n)
+   ASize(aArray, n)
 
 RETURN aArray
 
@@ -210,7 +210,7 @@ METHOD SR_ODBC:FieldGet(nField, aFields, lTranslate)
 
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
-      ::aCurrLine := array(LEN(aFields))
+      ::aCurrLine := array(Len(aFields))
       SR_ODBCLINEPROCESSED(::hStmt, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, ::aCurrLine)
    ENDIF
 
@@ -219,7 +219,7 @@ RETURN ::aCurrLine[nField]
 METHOD SR_ODBC:FetchRaw(lTranslate, aFields)
 
    ::nRetCode := SQL_ERROR
-   DEFAULT aFields    TO ::aFields
+   DEFAULT aFields TO ::aFields
    DEFAULT lTranslate TO .T.
 
    IF ::hStmt != NIL
@@ -246,13 +246,13 @@ METHOD SR_ODBC:AllocStatement()
 
    LOCAL hStmtLocal := NIL
    LOCAL nRet := 0
-   
+
    HB_SYMBOL_UNUSED(nRet)
 
    ::FreeStatement()
 
    IF (nRet := SR_AllocSt(::hDbc, @hStmtLocal)) == SQL_SUCCESS
-      ::hStmt = hStmtLocal
+      ::hStmt := hStmtLocal
    ELSE
       ::nRetCode := nRet
       ::RunTimeErr("", "SQLAllocStmt [NEW] Error" + SR_CRLF + SR_CRLF + ::LastError() + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
@@ -290,10 +290,10 @@ METHOD SR_ODBC:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecno
    //LOCAL nBfLn
    //LOCAL nOut
 
-   DEFAULT lReSelect    TO .T.
-   DEFAULT lLoadCache   TO .F.
-   DEFAULT cWhere       TO ""
-   DEFAULT cRecnoName   TO SR_RecnoName()
+   DEFAULT lReSelect TO .T.
+   DEFAULT lLoadCache TO .F.
+   DEFAULT cWhere TO ""
+   DEFAULT cRecnoName TO SR_RecnoName()
    DEFAULT cDeletedName TO SR_DeletedName()
 
    IF lReSelect
@@ -357,12 +357,12 @@ METHOD SR_ODBC:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecno
             cType := "L"
             nLenField := 1
          ENDIF
-/*
+#if 0
          IF ::nSystemID == SYSTEMID_POSTGR
             nRet := SR_ColAttribute(::hStmt, n, SQL_DESC_NULLABLE, @cVlr, 64, @nBfLn, @nOut)
             nNull := nOut
          ENDIF
-*/
+#endif
          IF cType == "U"
             ::RuntimeErr("", SR_Msg(21) + cName + " : " + Str(nType))
          ELSE
