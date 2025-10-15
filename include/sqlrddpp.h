@@ -5,6 +5,8 @@
 #define SQLRDDPP_H
 
 // Define SR_NULLPTR:
+#define SR_NULLPTR nullptr
+#if 0
 // If the compiler is a C++ compiler and the standard is C++11 or upper, define SR_NULLPTR as nullptr.
 // If the compiler is a C compiler and the standard is C23 or upper, define SR_NULLPTR as nullptr.
 // Otherwise, define SR_NULLPTR as '((void *)0)'.
@@ -23,6 +25,7 @@
 #endif
 #else
 #define SR_NULLPTR ((void *)0)
+#endif
 #endif
 #endif
 
