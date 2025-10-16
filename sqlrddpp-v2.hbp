@@ -57,6 +57,7 @@ source/sqlorax.cpp
 source/sqlrdd1.cpp
 source/sqlsrodbc.cpp
 source/xthrow.cpp
+source/xhbenum.cpp
 
 -hbx=sqlrddpp-v2.hbx
 sqlrddpp-v2.hbx
