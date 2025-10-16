@@ -114,7 +114,7 @@ METHOD SR_ORACLE2:Getline(aFields, lTranslate, aArray)
    IF aArray == NIL
       aArray := Array(Len(aFields))
    ELSEIF Len(aArray) < Len(aFields)
-      aSize(aArray, Len(aFields))
+      ASize(aArray, Len(aFields))
    ENDIF
 
    IF ::aCurrLine == NIL
@@ -135,7 +135,7 @@ METHOD SR_ORACLE2:FieldGet(nField, aFields, lTranslate)
 
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
-      ::aCurrLine := array(LEN(aFields))
+      ::aCurrLine := Array(LEN(aFields))
       SQLO2_LINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, ::aCurrLine)
    ENDIF
 
@@ -146,7 +146,7 @@ RETURN ::aCurrLine[nField]
 METHOD SR_ORACLE2:FetchRaw(lTranslate, aFields)
 
    ::nRetCode := SQL_ERROR
-   DEFAULT aFields    TO ::aFields
+   DEFAULT aFields TO ::aFields
    DEFAULT lTranslate TO .T.
 
    IF ::hDBC != NIL
@@ -204,10 +204,10 @@ METHOD SR_ORACLE2:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRe
    LOCAL aFields
    LOCAL nRet
 
-   DEFAULT lReSelect    TO .T.
-   DEFAULT lLoadCache   TO .F.
-   DEFAULT cWhere       TO ""
-   DEFAULT cRecnoName   TO SR_RecnoName()
+   DEFAULT lReSelect TO .T.
+   DEFAULT lLoadCache TO .F.
+   DEFAULT cWhere TO ""
+   DEFAULT cRecnoName TO SR_RecnoName()
    DEFAULT cDeletedName TO SR_DeletedName()
 
    IF lReSelect
@@ -235,27 +235,27 @@ METHOD SR_ORACLE2:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRe
       IF (::nRetCode := SQLO2_DESCRIBECOL(::hDBC, n, @cName, @nType, @nLen, @nDec, @nNull)) != SQL_SUCCESS
          ::RunTimeErr("", "SQLDescribeCol Error" + SR_CRLF + ::LastError() + SR_CRLF + "Last command sent to database : " + ::cLastComm)
          RETURN NIL
+      ENDIF
+
+      cName := Upper(AllTrim(cName))
+
+      IF (nLen == 2000 .OR. nLen == 4000) .AND. SR_SetNwgCompat()
+         nType := SQL_FAKE_LOB
+      ENDIF
+
+      nLenField := ::SQLLen(nType, nLen, @nDec)
+      cType := ::SQLType(nType, cName, nLen)
+
+      IF !::lQueryOnly .AND. cType == "N" .AND. nLenField == 38 .AND. nDec == 0
+         cType := "L"
+         nLenField := 1
+         nType := SQL_BIT
+      ENDIF
+
+      IF cType == "U"
+         ::RuntimeErr("", SR_Msg(21) + cName + " : " + Str(nType))
       ELSE
-         cName := Upper(AllTrim(cName))
-
-         IF (nLen == 2000 .OR. nLen == 4000) .AND. SR_SetNwgCompat()
-            nType := SQL_FAKE_LOB
-         ENDIF
-
-         nLenField := ::SQLLen(nType, nLen, @nDec)
-         cType := ::SQLType(nType, cName, nLen)
-
-         IF !::lQueryOnly .AND. cType == "N" .AND. nLenField == 38 .AND. nDec == 0
-            cType     := "L"
-            nLenField := 1
-            nType     := SQL_BIT
-         ENDIF
-
-         IF cType == "U"
-            ::RuntimeErr("", SR_Msg(21) + cName + " : " + Str(nType))
-         ELSE
-            aFields[n] := {cName, cType, nLenField, nDec, nNull, nType, , n, , ,}
-         ENDIF
+         aFields[n] := {cName, cType, nLenField, nDec, nNull, nType, , n, , ,}
       ENDIF
 
    NEXT n
@@ -316,17 +316,17 @@ METHOD SR_ORACLE2:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxB
       SR_MsgLogFile("Connection Error: " + ::lastError() + " - Connection string: " + ::cUser + "/" + Replicate("*", Len(::cPassWord)) + "@" + ::cDtb)
       HB_SYMBOL_UNUSED(cSystemVers)
       RETURN SELF
-   ELSE
-      ::cConnect  := cConnect
-      ::hDbc      := hDbc
-      cTargetDB   := "Oracle"
-      cSystemVers := SQLO2_DBMSNAME(hDbc)
    ENDIF
+
+   ::cConnect := cConnect
+   ::hDbc := hDbc
+   cTargetDB := "Oracle"
+   cSystemVers := SQLO2_DBMSNAME(hDbc)
 
    ::cSystemName := cTargetDB
    ::cSystemVers := cSystemVers
-   ::nSystemID   := SYSTEMID_ORACLE
-   ::cTargetDB   := Upper(cTargetDB)
+   ::nSystemID := SYSTEMID_ORACLE
+   ::cTargetDB := Upper(cTargetDB)
 
    aRet := {{cSystemVers}}
    cMatch := HB_AtX(s_reEnvVar, cSystemVers, , @nStart, @nLen)
@@ -582,11 +582,11 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
 
    ::AllocStatement()
 
-   DEFAULT lMsg         TO .T.
-   DEFAULT lFetch       TO .F.
-   DEFAULT nMaxRecords  TO 99999999999999
-   DEFAULT lNoRecno     TO .F.
-   DEFAULT cRecnoName   TO SR_RecnoName()
+   DEFAULT lMsg TO .T.
+   DEFAULT lFetch TO .F.
+   DEFAULT nMaxRecords TO 99999999999999
+   DEFAULT lNoRecno TO .F.
+   DEFAULT cRecnoName TO SR_RecnoName()
    DEFAULT cDeletedName TO SR_DeletedName()
 
    BEGIN SEQUENCE WITH __BreakBlock()
@@ -633,12 +633,12 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
                      nFieldRec := i
                   ENDIF
                NEXT i
-               dbCreate(cFile, SR_AdjustNum(aDb), SR_SetRDDTemp())
+               DBCreate(cFile, SR_AdjustNum(aDb), SR_SetRDDTemp())
             ELSE
-               dbCreate(cFile, SR_AdjustNum(aFields), SR_SetRDDTemp())
+               DBCreate(cFile, SR_AdjustNum(aFields), SR_SetRDDTemp())
             ENDIF
 
-            dbUseArea(.T., SR_SetRDDTemp(), cFile, cAlias, .F.)
+            DBUseArea(.T., SR_SetRDDTemp(), cFile, cAlias, .F.)
          ELSE
             DBSelectArea(cAlias)
          ENDIF
@@ -670,7 +670,7 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
 
          ENDDO
 
-         dbGoTop()
+         DBGoTop()
 
       ELSEIF aArray == NIL
 
@@ -687,8 +687,8 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
 
          DO WHILE n <= ::nMaxTextLines .AND. ((::nRetCode := ::Fetch(, lTranslate)) == SQL_SUCCESS)
 
-            cEste      := ""
-            nLenMemo   := 0
+            cEste := ""
+            nLenMemo := 0
             nLinesMemo := 0
 
             FOR i := 1 TO Len(aFields)
@@ -729,7 +729,7 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
 
          IF HB_ISARRAY(aArray)
             IF Len(aArray) == 0
-               aSize(aArray, ARRAY_BLOCK1)
+               ASize(aArray, ARRAY_BLOCK1)
                nAllocated := ARRAY_BLOCK1
             ELSE
                nAllocated := Len(aArray)
@@ -761,9 +761,9 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
                OTHERWISE
                   nAllocated += ARRAY_BLOCK5
                ENDSWITCH
-               aSize(aArray, nAllocated)
+               ASize(aArray, nAllocated)
             ENDIF
-            aArray[n] := array(Len(aFields))
+            aArray[n] := Array(Len(aFields))
             FOR i := 1 TO Len(aFields)
                aArray[n, i] := ::FieldGet(i, aFields, lTranslate)
             NEXT i
@@ -771,7 +771,7 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
                EXIT
             ENDIF
          ENDDO
-         aSize(aArray, n)
+         ASize(aArray, n)
       ENDIF
 
    ENDIF
@@ -823,7 +823,7 @@ RETURN nError
 #if 0
 FUNCTION SR_AdjustNum(a)
 
-   LOCAL b := aClone(a)
+   LOCAL b := AClone(a)
    LOCAL i
 
    FOR i := 1 TO Len(b)
@@ -840,7 +840,7 @@ FUNCTION SR_AdjustNum(a)
 
       IF lNwgOldCompat
          IF b[i, 2] = "N" .AND. b[i, 4] >= (b[i, 3] - 1)
-            b[i, 4] := abs(b[i, 3] - 2)
+            b[i, 4] := Abs(b[i, 3] - 2)
          ENDIF
       ENDIF
 
