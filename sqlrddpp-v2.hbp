@@ -36,6 +36,7 @@ source/sqlrdd0.prg
 source/sqlrdd2.prg
 source/utils.prg
 source/utilslang.prg
+source/txml.prg
 
 #source/sql.y
 {c}source/sqly.c
@@ -58,6 +59,7 @@ source/sqlrdd1.cpp
 source/sqlsrodbc.cpp
 source/xthrow.cpp
 source/xhbenum.cpp
+source/srxml.cpp
 
 -hbx=sqlrddpp-v2.hbx
 sqlrddpp-v2.hbx
