@@ -7733,7 +7733,7 @@ METHOD SR_WORKAREA:sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, c
       ENDIF
 
       IF ((!::lHistoric .AND. Len(aCols) == 1) .OR. (::lHistoric .AND. Len(aCols) == 2))
-         IF AllTrim(aCols[1]) <> ::cRecnoName   //minor hack for indexes with only recno (or history) column....
+         IF AllTrim(aCols[1]) != ::cRecnoName   //minor hack for indexes with only recno (or history) column....
             AAdd(aCols, ::cRecnoName)
          ENDIF
       ELSE
@@ -9526,7 +9526,7 @@ METHOD SR_WORKAREA:DropColRules(cColumn, lDisplayErrorMessage, aDeletedIndexes)
 
                ::oSql:Commit()
 
-               IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO .OR. nRet == SQL_NO_DATA_FOUND) .AND. aDeletedIndexes <> NIL
+               IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO .OR. nRet == SQL_NO_DATA_FOUND) .AND. aDeletedIndexes != NIL
                   AAdd(aDeletedIndexes, AClone(aIndexes[i]))
                ENDIF
 
