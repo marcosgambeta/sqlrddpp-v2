@@ -1704,13 +1704,13 @@ STATIC FUNCTION OraFetch(n)
 
    SETORAHANDLE(hDBC, hDBCHandle)
 
-   IF aOraClipCursors[n]["curpos"] <= (cAlias)->(RecCount()) .AND. aOraClipCursors[n]["curpos"] <> 0
+   IF aOraClipCursors[n]["curpos"] <= (cAlias)->(RecCount()) .AND. aOraClipCursors[n]["curpos"] != 0
       (cAlias)->(dBGoto(aOraClipCursors[n]["curpos"]))
    ELSEIF !aOraClipCursors[n]["completed"]
 
       nError := oSql:Fetch(, aOraClipCursors[n]["aFields"])
 
-      aOraClipCursors[n]["eof"] := nError <> 0
+      aOraClipCursors[n]["eof"] := nError != 0
       aOraClipCursors[n]["data"] := {}
       IF nError == 0
 
@@ -1779,7 +1779,7 @@ STATIC FUNCTION OraFetchSelect(n)
 
    nError := oSql:Fetch()
 
-   aOraClipCursors[n]["eof"] := nError <> 0
+   aOraClipCursors[n]["eof"] := nError != 0
 
    IF nError == 0
 
