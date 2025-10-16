@@ -55,7 +55,7 @@
 #include "pgs.ch"
 #include "sqlrddsetup.ch"
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 CLASS SR_PGS FROM SR_CONNECTION
 
@@ -79,7 +79,7 @@ CLASS SR_PGS FROM SR_CONNECTION
 
 ENDCLASS
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:MoreResults(aArray, lTranslate)
 
@@ -88,7 +88,7 @@ METHOD SR_PGS:MoreResults(aArray, lTranslate)
 
 RETURN -1
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:Getline(aFields, lTranslate, aArray)
 
@@ -114,7 +114,7 @@ METHOD SR_PGS:Getline(aFields, lTranslate, aArray)
 
 RETURN aArray
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:FieldGet(nField, aFields, lTranslate)
 
@@ -126,7 +126,7 @@ METHOD SR_PGS:FieldGet(nField, aFields, lTranslate)
 
 RETURN ::aCurrLine[nField]
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:FetchRaw(lTranslate, aFields)
 
@@ -143,7 +143,7 @@ METHOD SR_PGS:FetchRaw(lTranslate, aFields)
 
 RETURN ::nRetCode
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:FreeStatement()
 
@@ -154,7 +154,7 @@ METHOD SR_PGS:FreeStatement()
 
 RETURN NIL
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
@@ -168,7 +168,7 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
    //LOCAL cVlr := "" (variable not used)
    LOCAL cTbl
    LOCAL cOwner := "public"
-   
+
    HB_SYMBOL_UNUSED(aFields)
 
    DEFAULT lReSelect TO .T.
@@ -218,7 +218,7 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
 
 RETURN aFields
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:LastError()
 
@@ -228,7 +228,7 @@ METHOD SR_PGS:LastError()
 
 RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + PGSErrMsg(::hDbc)
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
    cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
@@ -246,7 +246,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
    LOCAL nlen
    LOCAL s_reEnvVar := HB_RegexComp("(\d+\.\d+\.\d+)")
    LOCAL cString
-   
+
    HB_SYMBOL_UNUSED(cSystemVers)
 
    HB_SYMBOL_UNUSED(cDSN)
@@ -278,32 +278,31 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
       ::nRetCode := nRet
       SR_MsgLogFile("Connection Error: " + AllTrim(Str(PGSStatus2(hDbc))) + " (see pgs.ch)")
       RETURN Self
-   ELSE
-      ::cConnect := cConnect
-      ::hStmt := NIL
-      ::hDbc := hDbc
-      cTargetDB := "PostgreSQL Native"
-      ::exec("select version()", .T., .T., @aRet)
-      IF Len(aRet) > 0
-         cSystemVers := aRet[1, 1]
-         cString := aRet[1, 1]
-         cMatch := HB_AtX(s_reEnvVar, cString, , @nStart, @nLen)
-         IF !Empty(cMatch)
-            aVersion := hb_atokens(cMatch, ".")
-         ELSE
-            aVersion := hb_atokens(StrTran(Upper(aRet[1, 1]), "POSTGRESQL ", ""), ".")
-         ENDIF
+   ENDIF
+
+   ::cConnect := cConnect
+   ::hStmt := NIL
+   ::hDbc := hDbc
+   cTargetDB := "PostgreSQL Native"
+   ::Exec("select version()", .T., .T., @aRet)
+   IF Len(aRet) > 0
+      cSystemVers := aRet[1, 1]
+      cString := aRet[1, 1]
+      cMatch := HB_AtX(s_reEnvVar, cString, , @nStart, @nLen)
+      IF !Empty(cMatch)
+         aVersion := hb_atokens(cMatch, ".")
       ELSE
-         cSystemVers := "??"
-         aVersion := {"6", "0"}
+         aVersion := hb_atokens(StrTran(Upper(aRet[1, 1]), "POSTGRESQL ", ""), ".")
       ENDIF
+   ELSE
+      cSystemVers := "??"
+      aVersion := {"6", "0"}
    ENDIF
 
    ::cSystemName := cTargetDB
    ::cSystemVers := cSystemVers
    ::nSystemID := SYSTEMID_POSTGR
    ::cTargetDB := Upper(cTargetDB)
-
 
    // IF !("7.3" $ cSystemVers .OR. "7.4" $ cSystemVers .OR. "8.0" $ cSystemVers .OR. "8.1" $ cSystemVers .OR. "8.2" $ cSystemVers .OR. "8.3" $ cSystemVers .OR. "8.4" $ cSystemVers .OR. "9.0" $ cSystemVers or. "9.1" $ cSystemVers)
 
@@ -317,7 +316,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
       ::lPostgresql83 := (Val(aversion[1]) == 8 .AND. Val(aversion[2]) == 3)
    ENDIF
 
-   ::exec("select pg_backend_pid()", .T., .T., @aRet)
+   ::Exec("select pg_backend_pid()", .T., .T., @aRet)
 
    IF Len(aRet) > 0
       ::uSid := Val(Str(aRet[1, 1], 8, 0))
@@ -325,7 +324,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
 
 RETURN Self
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:End()
 
@@ -342,25 +341,25 @@ METHOD SR_PGS:End()
 
 RETURN NIL
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:Commit(lNoLog)
 
    ::Super:Commit(lNoLog)
 
-RETURN (::nRetCode := ::exec("COMMIT;BEGIN", .F.))
+RETURN (::nRetCode := ::Exec("COMMIT;BEGIN", .F.))
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:RollBack()
 
    ::Super:RollBack()
    ::nRetCode := PGSRollBack(::hDbc)
-   ::exec("BEGIN", .F.)
+   ::Exec("BEGIN", .F.)
 
 RETURN ::nRetCode
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:ExecuteRaw(cCommand)
 
@@ -374,25 +373,23 @@ METHOD SR_PGS:ExecuteRaw(cCommand)
 
 RETURN PGSResultStatus(::hStmt)
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:AllocStatement()
 
    IF ::lSetNext
       IF ::nSetOpt == SQL_ATTR_QUERY_TIMEOUT
-/*
-         Commented 2005/02/04 - It's better to wait forever on a lock than have a corruct transaction
-         PGSExec(::hDbc, "set statement_timeout=" + Str(::nSetValue * 1000))
-*/
+         // Commented 2005/02/04 - It's better to wait forever on a lock than have a corruct transaction
+         // PGSExec(::hDbc, "set statement_timeout=" + Str(::nSetValue * 1000))
       ENDIF
       ::lSetNext := .F.
    ENDIF
 
 RETURN SQL_SUCCESS
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 METHOD SR_PGS:GetAffectedRows()
 RETURN PGSAFFECTEDROWS(::hDbc)
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
