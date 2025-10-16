@@ -39,7 +39,7 @@ source/utilslang.prg
 source/txml.prg
 
 #source/sql.y
-{c}source/sqly.c
+source/sqly.c
 
 source/compat.cpp
 source/firebird.cpp
