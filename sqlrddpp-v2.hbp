@@ -68,6 +68,4 @@ sqlrddpp-v2.hbx
 
 {allmsvc}-cflag=/D_CRT_SECURE_NO_WARNINGS
 
-xhb.hbc
-
 -cpp
