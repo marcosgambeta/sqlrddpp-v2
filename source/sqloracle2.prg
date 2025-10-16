@@ -175,7 +175,6 @@ RETURN NIL
 
 METHOD SR_ORACLE2:AllocStatement()
 
-   //LOCAL hStmtLocal := 0 (variable not used)
    LOCAL nRet := 0
 
    ::FreeStatement()
@@ -200,13 +199,10 @@ METHOD SR_ORACLE2:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRe
    LOCAL nNull := 0
    LOCAL nDec := 0
    LOCAL cName
-   //LOCAL _nLen (variable not used)
-   //LOCAL _nDec (variable not used)
    LOCAL cType
    LOCAL nLenField
-   LOCAL aFields //:= {} (value not used)
+   LOCAL aFields
    LOCAL nRet
-   //LOCAL cVlr := "" (variable not used)
 
    DEFAULT lReSelect    TO .T.
    DEFAULT lLoadCache   TO .F.
@@ -240,8 +236,6 @@ METHOD SR_ORACLE2:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRe
          ::RunTimeErr("", "SQLDescribeCol Error" + SR_CRLF + ::LastError() + SR_CRLF + "Last command sent to database : " + ::cLastComm)
          RETURN NIL
       ELSE
-         //_nLen := nLen (variable not used)
-         //_nDec := nDec (variable not used)
          cName := Upper(AllTrim(cName))
 
          IF (nLen == 2000 .OR. nLen == 4000) .AND. SR_SetNwgCompat()
@@ -284,12 +278,9 @@ RETURN SQLO2_GETERRORDESCR(::hDBC) + " retcode: " + sr_val2Char(::nRetCode) + " 
 
 METHOD SR_ORACLE2:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
 
-   //LOCAL hEnv := 0 (variable not used)
    LOCAL hDbc := 0
    LOCAL nret
-   //LOCAL cVersion := "" (variable not used)
    LOCAL cSystemVers := ""
-   //LOCAL cBuff := "" (variable not used)
    LOCAL aRet := {}
    LOCAL aVersion
    LOCAL cmatch
@@ -570,10 +561,8 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
    LOCAL i
    LOCAL n
    LOCAL nAllocated := 0
-   //LOCAL nBlocks (variable not used)
    LOCAL nError
    LOCAL aFields
-   //LOCAL nCols (variable not used)
    LOCAL aDb
    LOCAL nFieldRec
    LOCAL aMemo
@@ -589,7 +578,6 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
    DEFAULT nMaxRecords TO 999999999999 // TODO:
    DEFAULT cVar TO ":c1"
 
-   //HB_SYMBOL_UNUSED(ncols) (variable not used)
    HB_SYMBOL_UNUSED(nlogmode)
 
    ::AllocStatement()
@@ -751,7 +739,6 @@ METHOD SR_ORACLE2:ExecSPRC(cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMa
             nAllocated := ARRAY_BLOCK1
          ENDIF
 
-         //nBlocks := 1 (variable not used)
          n := 0
          aFields := ::IniFields(.F., , , ,, cRecnoName, cDeletedName)
 
