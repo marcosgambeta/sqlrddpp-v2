@@ -56,7 +56,7 @@
 * Readble Macros
 */
 
-#define cJoinWords(nType, nSystemID)    aJoinWords[nSystemID,nType]
+#define cJoinWords(nType, nSystemID)    s_aJoinWords[nSystemID,nType]
 
 #define  SKIPFWD            nIP++;uData:=apCode[nIP]
 #define  PARAM_SOLV         IIf(HB_ISBLOCK(aParam[uData+1]),Eval(aParam[uData+1]),aParam[uData+1])
@@ -78,12 +78,12 @@
 
 #xtranslate Default(<Var>, <xVal>) => IIf(<Var> == NIL, <Var> := <xVal>, NIL)
 
-STATIC bTableInfo
-STATIC bIndexInfo
+STATIC s_bTableInfo
+STATIC s_bIndexInfo
 
-STATIC nRecordNum := 0
-STATIC bNextRecord
-STATIC aJoinWords
+STATIC s_nRecordNum := 0
+STATIC s_bNextRecord
+STATIC s_aJoinWords
 
 /*
 * SQL Code generation
@@ -240,7 +240,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
          CASE SQL_PCODE_TABLE_NAME
             SKIPFWD
             IF lParseTableName
-               aRet := Eval(bTableInfo, uData, nSystemId)
+               aRet := Eval(s_bTableInfo, uData, nSystemId)
                AAdd(aTables, aRet[TABLE_INFO_TABLE_NAME])
                AAdd(aQualifiedTables, aRet[TABLE_INFO_QUALIFIED_NAME])
                IF nContext == SQL_CONTEXT_UPDATE
@@ -282,7 +282,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
          CASE SQL_PCODE_TABLE_PARAM
             SKIPFWD
             IF lParseTableName
-               aRet := Eval(bTableInfo, IIf(uData + 1 <= Len(aParam), IIf(HB_ISBLOCK(aParam[uData + 1]), Eval(aParam[uData + 1]), aParam[uData + 1]), "##PARAM_" + strzero(uData + 1, 3) + "_NOT_SUPPLIED##"), nSystemId)
+               aRet := Eval(s_bTableInfo, IIf(uData + 1 <= Len(aParam), IIf(HB_ISBLOCK(aParam[uData + 1]), Eval(aParam[uData + 1]), aParam[uData + 1]), "##PARAM_" + strzero(uData + 1, 3) + "_NOT_SUPPLIED##"), nSystemId)
                IF nContext != SQL_CONTEXT_SELECT_FROM
                   cSql += aRet[TABLE_INFO_QUALIFIED_NAME]
                ELSE
@@ -318,7 +318,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
          CASE SQL_PCODE_TABLE_BINDVAR
             SKIPFWD
             IF lParseTableName
-               aRet := Eval(bTableInfo, &uData, nSystemId)
+               aRet := Eval(s_bTableInfo, &uData, nSystemId)
                AAdd(aTables, aRet[TABLE_INFO_TABLE_NAME])
                AAdd(aQualifiedTables, aRet[TABLE_INFO_QUALIFIED_NAME])
                IF nContext == SQL_CONTEXT_UPDATE
@@ -1439,11 +1439,11 @@ RETURN .T.
 
 PROCEDURE __SR_StartSQL()
 
-   bTableInfo := {|cTableName, nSystemID|SR_TableAttr(cTableName, nSystemID)}
-   bIndexInfo := {|cIndexName, nSystemID|SR_IndexAttr(cIndexName, nSystemID)}
-   bNextRecord := {||++nRecordNum}
-   aJoinWords := Array(SUPPORTED_DATABASES)
-   aFill(aJoinWords, {" LEFT OUTER JOIN ", " RIGHT OUTER JOIN ", " LEFT JOIN ", " RIGHT JOIN ", " JOIN "})
+   s_bTableInfo := {|cTableName, nSystemID|SR_TableAttr(cTableName, nSystemID)}
+   s_bIndexInfo := {|cIndexName, nSystemID|SR_IndexAttr(cIndexName, nSystemID)}
+   s_bNextRecord := {||++s_nRecordNum}
+   s_aJoinWords := Array(SUPPORTED_DATABASES)
+   aFill(s_aJoinWords, {" LEFT OUTER JOIN ", " RIGHT OUTER JOIN ", " LEFT JOIN ", " RIGHT JOIN ", " JOIN "})
 
 RETURN
 
@@ -1455,7 +1455,7 @@ FUNCTION SR_SetTableInfoBlock(b)
       RETURN .F.
    ENDIF
 
-   bTableInfo := b
+   s_bTableInfo := b
 
 RETURN .T.
 
@@ -1467,7 +1467,7 @@ FUNCTION SR_SetIndexInfoBlock(b)
       RETURN .F.
    ENDIF
 
-   bIndexInfo := b
+   s_bIndexInfo := b
 
 RETURN .T.
 
@@ -1475,13 +1475,13 @@ RETURN .T.
 
 FUNCTION SR_GetTableInfoBlock()
 
-RETURN bTableInfo
+RETURN s_bTableInfo
 
 /*------------------------------------------------------------------------*/
 
 FUNCTION SR_GetIndexInfoBlock()
 
-RETURN bIndexInfo
+RETURN s_bIndexInfo
 
 /*------------------------------------------------------------------------*/
 
@@ -1491,7 +1491,7 @@ FUNCTION SR_SetNextRecordBlock(b)
       RETURN .F.
    ENDIF
 
-   bNextRecord := b
+   s_bNextRecord := b
 
 RETURN .T.
 
@@ -1499,7 +1499,7 @@ RETURN .T.
 
 FUNCTION SR_GetNextRecordBlock()
 
-RETURN bNextRecord
+RETURN s_bNextRecord
 
 /*
 * Version Report
