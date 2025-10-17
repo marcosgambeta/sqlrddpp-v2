@@ -1075,7 +1075,7 @@ void SetIndexBindStructure(SQLEXAREAP thiswa)
   if (thiswa->hOrdCurrent > 0) {
     pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
     pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
-    thiswa->indexColumns = hb_arrayLen(pColumns);
+    thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
     // Alloc memory for binding structures
     thiswa->IndexBindings[thiswa->hOrdCurrent] =
@@ -1634,7 +1634,7 @@ HB_BOOL getColumnList(SQLEXAREAP thiswa)
       for (n = 1; n <= thiswa->area.uiFieldCount; n++) {
         pField = thiswa->area.lpFields + n - 1;
         fName = const_cast<char *>(hb_dynsymName((PHB_DYNS)pField->sym));
-        len = strlen(fName);
+        len = static_cast<int>(strlen(fName));
         memset(colName, 0, HB_SYMBOL_NAME_LEN);
         hb_xmemcpy(colName, fName, len);
         colName = QualifyName(colName, thiswa);
@@ -1671,7 +1671,7 @@ HB_BOOL getColumnList(SQLEXAREAP thiswa)
       if (thiswa->uiFieldList[n - 1]) {
         pField = thiswa->area.lpFields + n - 1;
         fName = const_cast<char *>(hb_dynsymName((PHB_DYNS)pField->sym));
-        len = strlen(fName);
+        len = static_cast<int>(strlen(fName));
         memset(colName, 0, HB_SYMBOL_NAME_LEN);
         hb_xmemcpy(colName, fName, len);
         colName = QualifyName(colName, thiswa);
@@ -2039,7 +2039,7 @@ static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa)
     if (thiswa->hOrdCurrent > 0) {
       pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
       pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
-      thiswa->indexColumns = hb_arrayLen(pColumns);
+      thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
     } else {
       thiswa->indexColumns = 1; // Natural order, RECNO
     }
@@ -2687,8 +2687,8 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREAP thiswa, HB_LONG lToSkip)
     // Cache was unsuccessful, so get a new list from database
 
     if (thiswa->hOrdCurrent > 0) {
-      thiswa->indexColumns = hb_arrayLen(hb_arrayGetItemPtr(
-          hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent)), INDEX_FIELDS));
+      thiswa->indexColumns = static_cast<int>(hb_arrayLen(hb_arrayGetItemPtr(
+          hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent)), INDEX_FIELDS)));
     } else {
       thiswa->indexColumns = 1; // Natural order, RECNO
     }
@@ -2907,7 +2907,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
   }
   if (HB_IS_STRING(itemTemp)) {
     char *bBuffer = const_cast<char *>(hb_itemGetCPtr(itemTemp)); // const char * to char *
-    HB_LONG lLenBuff = hb_itemGetCLen(itemTemp);
+    HB_LONG lLenBuff = static_cast<HB_LONG>(hb_itemGetCLen(itemTemp));
     PHB_ITEM pTemp;
     if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
       if (s_pSym_SR_DESERIALIZE == nullptr) {
@@ -3558,8 +3558,8 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
   }
 
   if (thiswa->hOrdCurrent > 0) {
-    thiswa->indexColumns = hb_arrayLen(hb_arrayGetItemPtr(
-        hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent)), INDEX_FIELDS));
+    thiswa->indexColumns = static_cast<int>(hb_arrayLen(hb_arrayGetItemPtr(
+        hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent)), INDEX_FIELDS)));
     bOldReverseIndex = thiswa->bReverseIndex;
     thiswa->bReverseIndex = hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX);
     if (thiswa->IndexBindings[thiswa->hOrdCurrent]) {
@@ -3635,7 +3635,7 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREAP thiswa, HB_USHORT uiIndex, LPDBORDER
 
   HB_TRACE(HB_TR_DEBUG, ("sqlExOrderInfo(%p, %hu, %p)", thiswa, uiIndex, pInfo));
 
-  lIndexes = hb_itemSize(thiswa->aOrders);
+  lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
 
   if (lIndexes) {
     switch (uiIndex) {
