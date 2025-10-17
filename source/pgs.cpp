@@ -845,7 +845,7 @@ HB_FUNC(PGSLINEPROCESSED)
   assert(session->stmt != nullptr);
 
   if (session) {
-    cols = hb_arrayLen(pFields);
+    cols = static_cast<HB_LONG>(hb_arrayLen(pFields));
 
     for (i = 0; i < cols; i++) {
       temp = hb_itemNew(nullptr);
