@@ -342,7 +342,7 @@ static void sqlGetCleanBuffer(SQLAREAP thiswa)
   hb_arraySetForward(thiswa->aInfo, AINFO_RECNO, pCol);
   hb_itemRelease(pCol);
   if (!thiswa->isam) {
-    hb_arraySetNL(thiswa->aInfo, AINFO_NPOSCACHE, hb_arrayLen(thiswa->aCache) + 1);
+    hb_arraySetNL(thiswa->aInfo, AINFO_NPOSCACHE, static_cast<long>(hb_arrayLen(thiswa->aCache)) + 1);
   }
 }
 
@@ -2500,7 +2500,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
     return Harbour::SUCCESS;
   }
 
-  lIndexes = hb_itemSize(thiswa->aOrders);
+  lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
 
   if (lIndexes) { /* Exists opened orders ? */
     switch (uiIndex) {
@@ -2794,7 +2794,7 @@ static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem
   // sr_TraceLog(nullptr, "sqlScopeInfo, nScope: %i\n", nScope);
 
   hb_itemClear(pItem);
-  lIndexes = hb_itemSize(thiswa->aOrders);
+  lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
 
   if (lIndexes) { /* Exists opened orders ? */
     if (HB_IS_OBJECT(thiswa->oWorkArea)) {
@@ -3099,7 +3099,7 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
     return false;
   }
 
-  numFields = hb_itemSize(thiswa->aStruct);
+  numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));
@@ -3199,7 +3199,7 @@ static HB_BOOL SetFields(SQLAREAP thiswa)
     return false;
   }
 
-  numFields = hb_itemSize(thiswa->aStruct);
+  numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));
