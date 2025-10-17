@@ -60,14 +60,14 @@ FUNCTION OraExecSql(n, c, adata)
    LOCAL cbind
    LOCAL i
 
-   IF aData != NIL .AND. HB_ISARRAY(adata)
+   IF aData != NIL .AND. HB_IsArray(adata)
       FOR i := Len(aData) TO 1 STEP -1
          cBind := ":" + AllTrim(Str(i))
          c := StrTran(c, cBind, sr_cdbvalue(adata[i]))
       NEXT i
    ENDIF
 
-RETURN sr_getconnection():exec(c, , .F.)
+RETURN SR_GetConnection():Exec(c, , .F.)
 
 FUNCTION cssel1(n, aret, csql, adata)
 RETURN OraSel1(n, @aret, csql, adata)
@@ -87,7 +87,7 @@ RETURN nret
 
 FUNCTION OraSel1(n, aret, csql, adata)
 
-   LOCAL oSql := sr_getconnection()
+   LOCAL oSql := SR_GetConnection()
    LOCAL nError
    LOCAL i
    LOCAL cBind := ""
@@ -109,10 +109,10 @@ FUNCTION OraSel1(n, aret, csql, adata)
 
       IF "ROWID" $ csql
          s_aOraClipCursors[n]["data"] := {}
-         nError := sr_getconnection():exec(csql, , .T., @aret)
+         nError := SR_GetConnection():Exec(csql, , .T., @aret)
          lRowId := .T.
       ELSE
-         nError := ExecuteSql(csql, @cursor, n) // sr_getconnection():exec(csql, , .T., @aret)
+         nError := ExecuteSql(csql, @cursor, n) // SR_GetConnection():Exec(csql, , .T., @aret)
          // s_aOraClipCursors[n]["ret"] := s_aOraClipCursors[n]["data"]
       ENDIF
 
@@ -125,15 +125,15 @@ FUNCTION OraSel1(n, aret, csql, adata)
          s_aOraClipCursors[n]["error"] := 0
          s_aOraClipCursors[n]["nrowread"] := -1
          s_aOraClipCursors[n]["lastsql"] := cSql
-         s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+         s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
          IF !lRowid
-            s_aOraClipCursors[n]["aFields"] := sr_getconnection():IniFields(.F.) //aFields
+            s_aOraClipCursors[n]["aFields"] := SR_GetConnection():IniFields(.F.) //aFields
             s_aOraClipCursors[n]["data"] := {}
             s_aOraClipCursors[n]["completed"] := .F.
             s_aOraClipCursors[n]["eof"] := .F.
 
             FOR EACH atmp IN s_aOraClipCursors[n]["aFields"]
-               /*
+#if 0
                IF "TO_CHAR(" $ Upper(atmp[1])
                   atmp[1] := SubStr(atmp[1], At("TO_DATE(", Upper(atmp[1])) + 9)
                   atmp[1] := SubStr(atmp[1], 1, At(",", Upper(atmp[1])) - 1)
@@ -142,21 +142,21 @@ FUNCTION OraSel1(n, aret, csql, adata)
                   atmp[1] := SubStr(atmp[1], At("DECODE(", Upper(atmp[1])) + 8)
                   atmp[1] := SubStr(atmp[1], 1, At(",", Upper(atmp[1])) - 1)
                ENDIF
-               */
-               atmp[1] := "fld" + strzero(ncount++, 5)
+#endif
+               atmp[1] := "fld" + StrZero(ncount++, 5)
             NEXT
 
-            fclose(HB_FTEMPCREATE(".", "tmp", , @cTmpFile))
+            FClose(HB_FTEMPCREATE(".", "tmp", , @cTmpFile))
             s_aOraClipCursors[n]["aliastmp"] := StrTran(StrTran(cTmpFile, ".", ""), "\", "")
-            IF file(StrTran(cTmpfile, ".\", ""))
-               ferase(StrTran(cTmpfile, ".\", ""))
+            IF File(StrTran(cTmpfile, ".\", ""))
+               FErase(StrTran(cTmpfile, ".\", ""))
             ENDIF
-            IF file(cTmpfile)
-               ferase(cTmpfile)
+            IF File(cTmpfile)
+               FErase(cTmpfile)
             ENDIF
             s_aOraClipCursors[n]["tmpfile"] := cTmpFile
-            dbCreate(cTmpFile, SR_AdjustNum(s_aOraClipCursors[n]["aFields"]), SR_SetRDDTemp())
-            dbuseArea(.T., SR_SetRDDTemp(), cTmpFile, s_aOraClipCursors[n]["aliastmp"])
+            DBCreate(cTmpFile, SR_AdjustNum(s_aOraClipCursors[n]["aFields"]), SR_SetRDDTemp())
+            DBUseArea(.T., SR_SetRDDTemp(), cTmpFile, s_aOraClipCursors[n]["aliastmp"])
             cTmpFile := StrTran(cTmpfile, ".\", "")
             OraFetch(n)
             aRet := s_aOraClipCursors[n]["data"]
@@ -171,18 +171,18 @@ FUNCTION OraSel1(n, aret, csql, adata)
             s_aOraClipCursors[n]["eof"] := .F.
             s_nlasterror := 0
          ENDIF
-         /*
+#if 0
          IF Len(aRet) >= 1
             aDataRet := aRet[1]
             aret := AClone(aDataRet)
          ENDIF
-         */
+#endif
       ELSE
          s_aOraClipCursors[n]["eof"] := .T.
-         s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+         s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
          s_aOraClipCursors[n]["lastsql"] := ""
          s_aOraClipCursors[n]["rowaffected"] := 0
-         s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+         s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
          s_aOraClipCursors[n]["aFields"] := {}
       ENDIF
       IF nArea > 0
@@ -196,13 +196,13 @@ FUNCTION OraSel1(n, aret, csql, adata)
       cBind := ":" + AllTrim(Str(i))
       cSql := StrTran(cSql, cBind, sr_cdbvalue(adata[i]))
    NEXT i
-   //nError := sr_getconnection():exec(csql, , .T., @aret)
+   //nError := SR_GetConnection():Exec(csql, , .T., @aret)
    IF "ROWID" $ csql
       s_aOraClipCursors[n]["data"] := {}
-      nError := sr_getconnection():exec(csql, , .T., @aret)
+      nError := SR_GetConnection():Exec(csql, , .T., @aret)
       lRowId := .T.
    ELSE
-      nError := ExecuteSql(csql, @cursor, n) // sr_getconnection():exec(csql, , .T., @aret)
+      nError := ExecuteSql(csql, @cursor, n) // SR_GetConnection():Exec(csql, , .T., @aret)
    ENDIF
 
    //s_aOraClipCursors[n]["ret"] := AClone(aret)
@@ -215,22 +215,22 @@ FUNCTION OraSel1(n, aret, csql, adata)
       s_aOraClipCursors[n]["error"] := 0
       s_aOraClipCursors[n]["nrowread"] := -1
       s_aOraClipCursors[n]["lastsql"] := cSql
-      s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+      s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
       IF !lRowid
-         s_aOraClipCursors[n]["aFields"] :=  sr_getconnection():IniFields(.F.) //aFields
+         s_aOraClipCursors[n]["aFields"] :=  SR_GetConnection():IniFields(.F.) //aFields
          s_aOraClipCursors[n]["completed"] := .F.
          s_aOraClipCursors[n]["eof"] := .F.
          s_nlasterror := 0
-         fclose(HB_FTEMPCREATE(".", "tmp", , @cTmpFile))
+         FClose(HB_FTEMPCREATE(".", "tmp", , @cTmpFile))
          s_aOraClipCursors[n]["aliastmp"] := StrTran(StrTran(cTmpFile, ".", ""), "\", "")
-         IF file(StrTran(cTmpfile, ".\", ""))
-            ferase(StrTran(cTmpfile, ".\", ""))
+         IF File(StrTran(cTmpfile, ".\", ""))
+            FErase(StrTran(cTmpfile, ".\", ""))
          ENDIF
-         IF file(cTmpfile)
-            ferase(cTmpfile)
+         IF File(cTmpfile)
+            FErase(cTmpfile)
          ENDIF
          FOR EACH atmp IN s_aOraClipCursors[n]["aFields"]
-            /*
+#if 0
             IF "TO_CHAR(" $ atmp[1]
                atmp[1] := SubStr(atmp[1], At("TO_DATE(", Upper(atmp[1])) + 9)
                atmp[1] := SubStr(atmp[1], 1, At(",", Upper(atmp[1])) - 1)
@@ -239,13 +239,13 @@ FUNCTION OraSel1(n, aret, csql, adata)
                atmp[1] := SubStr(atmp[1], At("DECODE(", Upper(atmp[1])) + 8)
                atmp[1] := SubStr(atmp[1], 1, At(",", Upper(atmp[1])) - 1)
             ENDIF
-            */
-            atmp[1] := "fld" + strzero(ncount++, 5)
+#endif
+            atmp[1] := "fld" + StrZero(ncount++, 5)
          NEXT
 
          s_aOraClipCursors[n]["tmpfile"] := cTmpFile
-         dbCreate(cTmpFile, SR_AdjustNum(s_aOraClipCursors[n]["aFields"]), SR_SetRDDTemp())
-         dbuseArea(.T., SR_SetRDDTemp(), cTmpFile, s_aOraClipCursors[n]["aliastmp"])
+         DBCreate(cTmpFile, SR_AdjustNum(s_aOraClipCursors[n]["aFields"]), SR_SetRDDTemp())
+         DBUseArea(.T., SR_SetRDDTemp(), cTmpFile, s_aOraClipCursors[n]["aliastmp"])
          cTmpFile := StrTran(cTmpfile, ".\", "")
          orafetch(n)
          aret := s_aOraClipCursors[n]["data"]
@@ -260,11 +260,11 @@ FUNCTION OraSel1(n, aret, csql, adata)
       ENDIF
    ELSE
       s_aOraClipCursors[n]["eof"] := .T.
-      s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[n]["lastsql"] := ""
       s_aOraClipCursors[n]["rowaffected"] := 0
       s_aOraClipCursors[n]["aFields"] := {}
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
    ENDIF
    IF nArea > 0
       Select(nArea)
@@ -292,31 +292,31 @@ FUNCTION OraDelete(nCursor2, cTabOrgMat, cwhere, adata)
 
    LOCAL csql := "delete from " + cTabOrgMat
    LOCAL i
-   LOCAL oSql := sr_getconnection()
+   LOCAL oSql := SR_GetConnection()
    LOCAL nError
    LOCAL e
    LOCAL cBind
 
-   IF pCount() == 3
+   IF PCount() == 3
       cSql +=  " where " +  cwhere
-   ELSEIF pCount() == 4
+   ELSEIF PCount() == 4
       FOR i := 1 TO Len(aData)
          cBind := ":" + AllTrim(Str(i))
          cwhere := StrTran(cwhere, cBind, sr_cdbvalue(adata[i]))
       NEXT i
       cSql += " where " +  cwhere
    ENDIF
-   nError := sr_getconnection():exec(csql, , .F.)
+   nError := SR_GetConnection():Exec(csql, , .F.)
    IF nError == 0
       s_aOraClipCursors[nCursor2]["error"] := 0
       s_aOraClipCursors[nCursor2]["lastsql"] := cSql
-      s_aOraClipCursors[ncursor2]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+      s_aOraClipCursors[ncursor2]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
       s_nlasterror := 0
    ELSE
-      s_aOraClipCursors[nCursor2]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[nCursor2]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[nCursor2]["lastsql"] := ""
       s_aOraClipCursors[ncursor2]["rowaffected"] := 0
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
    ENDIF
 
 RETURN nError
@@ -339,7 +339,7 @@ FUNCTION OraErrMsg()
    LOCAL e
 
    BEGIN SEQUENCE WITH __BreakBlock()
-      c := SQLO_GETERRORDESCR(sr_getconnection():hDBC)
+      c := SQLO_GETERRORDESCR(SR_GetConnection():hDBC)
    RECOVER USING e
       c := "usuario nao conectado"
    END SEQUENCE
@@ -352,7 +352,7 @@ FUNCTION OraUpdate(nCursor, cTabAutos, aCols, aDadosAlt, cWhere, aChave)
    LOCAL n
    LOCAL i
    LOCAL e
-   LOCAL oSql := sr_getconnection()
+   LOCAL oSql := SR_GetConnection()
    LOCAL nError
    LOCAL cbind
    LOCAL nPos
@@ -369,9 +369,9 @@ FUNCTION OraUpdate(nCursor, cTabAutos, aCols, aDadosAlt, cWhere, aChave)
    NEXT n
    cSql := SubStr(csql, 1, Len(csql) - 1)
 
-   IF pcount() == 5
+   IF PCount() == 5
       csql +=  " where " +  cwhere
-   ELSEIF pcount() == 6
+   ELSEIF PCount() == 6
       FOR i := Len(aChave) TO 1 STEP -1
          cBind := ":" + AllTrim(Str(i))
          cwhere := StrTran(cwhere, cBind, sr_cdbvalue(aChave[i]))
@@ -379,18 +379,18 @@ FUNCTION OraUpdate(nCursor, cTabAutos, aCols, aDadosAlt, cWhere, aChave)
       cSql += " where " +  cwhere
    ENDIF
    BEGIN SEQUENCE WITH __BreakBlock()
-      nError := sr_getconnection():exec(csql, , .F.)
+      nError := SR_GetConnection():Exec(csql, , .F.)
       s_aOraClipCursors[nCursor]["error"] := 0
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
-      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
       s_aOraClipCursors[ncursor]["cwhere"] := cwhere
       s_nlasterror := 0
    RECOVER USING e
       nerror := -1
-      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[nCursor]["lastsql"] := ""
       s_aOraClipCursors[ncursor]["rowaffected"] := 0
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
    END SEQUENCE
 
 RETURN nError
@@ -428,7 +428,7 @@ FUNCTION OraLogon(cCnxName, cUser, cPwd, cAlias, nCnxType)
       s_aOraclipHash[cCnxName] := hb_hash()
       s_aOraclipHash[cCnxName]["nRet"] := nRet
       s_aOraclipHash[cCnxName]["alias"] := cAlias
-      s_aOraclipHash[cCnxName]["time"] := dtoc(date()) + "-" + time()
+      s_aOraclipHash[cCnxName]["time"] := DToC(Date()) + "-" + Time()
       s_aOraclipHash[cCnxName]["user"] := cUSer
       s_aOraclipHash[cCnxName]["pwd"] := cPwd
    ENDIF
@@ -519,7 +519,7 @@ FUNCTION oraeof(n)
    LOCAL i
 
    IF s_aOraClipCursors[n]["completed"]
-      lreturn := .T. // (s_aOraClipCursors[n]["aliastmp"])->(eof())
+      lreturn := .T. // (s_aOraClipCursors[n]["aliastmp"])->(Eof())
    ELSE
       IF !s_aOraClipCursors[n]["completed"] .AND. s_aOraClipCursors[n]["eof"]
          lreturn := .T.
@@ -553,8 +553,8 @@ FUNCTION orastruct(n, ctable)
    LOCAL csql := "select * from " + ctable + " where 1 == 1"
 
    USE (csql) NEW VIA "SQLRDD" ALIAS "ZZZZZZZZZZ"
-   aStru := zzzzzzzzzz->(dbstruct())
-   zzzzzzzzzz->(dbclosearea())
+   aStru := zzzzzzzzzz->(DBStruct())
+   zzzzzzzzzz->(DBCloseArea())
 
 RETURN astru
 
@@ -564,13 +564,13 @@ FUNCTION OraSetPwd(nCursor, cUser, cPassword)
    LOCAL nRet
    LOCAL e
 
-   nRet := sr_getconnection():exec(cSql, , .F.)
+   nRet := SR_GetConnection():Exec(cSql, , .F.)
 
 RETURN nRet
 
 FUNCTION OraSingle(n, csql, adata)
 
-   LOCAL oSql := sr_getconnection()
+   LOCAL oSql := SR_GetConnection()
    LOCAL nError
    LOCAL aRet := {}
    LOCAL i
@@ -578,13 +578,13 @@ FUNCTION OraSingle(n, csql, adata)
    LOCAL cBind
 
    IF adata == NIL
-      nError := sr_getconnection():exec(csql, , .T., @aret)
+      nError := SR_GetConnection():Exec(csql, , .T., @aret)
       IF nError == 0
          s_aOraClipCursors[n]["error"] := 0
          s_aOraClipCursors[n]["lastsql"] := cSql
-         s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+         s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
          s_nlasterror := 0
-         s_aOraClipCursors[n]["aFields"] := sr_Getconnection():aFields
+         s_aOraClipCursors[n]["aFields"] := SR_GetConnection():aFields
          IF Len(aret) == 1
             IF Len(aRet[1]) == 1
                RETURN aret[1, 1]
@@ -594,8 +594,8 @@ FUNCTION OraSingle(n, csql, adata)
          ENDIF
 
       ELSE
-         s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
-         s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+         s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
+         s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
          s_aOraClipCursors[n]["lastsql"] := ""
          s_aOraClipCursors[n]["rowaffected"] := 0
          s_aOraClipCursors[n]["aFields"] := {}
@@ -610,7 +610,7 @@ FUNCTION OraSingle(n, csql, adata)
    NEXT i
 
    BEGIN SEQUENCE WITH __BreakBlock()
-      nError := sr_getconnection():exec(csql, , .T., @aret)
+      nError := SR_GetConnection():Exec(csql, , .T., @aret)
    RECOVER USING e
       nerror := -1
    END SEQUENCE
@@ -623,12 +623,12 @@ FUNCTION OraSingle(n, csql, adata)
       s_aOraClipCursors[n]["error"] := 0
       s_aOraClipCursors[n]["nrowread"] := -1
       s_aOraClipCursors[n]["lastsql"] := cSql
-      s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
-      s_aOraClipCursors[n]["aFields"] := sr_getconnection():aFields
+      s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
+      s_aOraClipCursors[n]["aFields"] := SR_GetConnection():aFields
       s_nlasterror := 0
    ELSE
-      s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[n]["lastsql"] := ""
       s_aOraClipCursors[n]["rowaffected"] := 0
       s_aOraClipCursors[n]["aFields"] := {}
@@ -643,7 +643,7 @@ FUNCTION OraInsert(nCursor, cTable, aCols, aData)
    LOCAL i
    LOCAL nError
    LOCAL e
-   LOCAL osql := sr_getconnection()
+   LOCAL osql := SR_GetConnection()
 
    IF Len(acols) > 0
       cSql += "( "
@@ -675,17 +675,17 @@ FUNCTION OraInsert(nCursor, cTable, aCols, aData)
    cSql += cValues
 
    BEGIN SEQUENCE WITH __BreakBlock()
-      nError := sr_getconnection():exec(csql, , .F.,)
+      nError := SR_GetConnection():Exec(csql, , .F.,)
       s_aOraClipCursors[nCursor]["error"] := 0
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
-      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
       s_aOraClipCursors[ncursor]["acols"] := acols
       s_aOraClipCursors[ncursor]["avalues"] := aData
       s_nlasterror := 0
    RECOVER USING e
       nerror := -1
-      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
       s_aOraClipCursors[ncursor]["rowaffected"] := 0
    END SEQUENCE
@@ -701,14 +701,14 @@ FUNCTION OraCount(nCursor, cTabela, cWhere, aVarSust)
    LOCAL i
    LOCAL cbind
 
-   IF pcount() < 2
+   IF PCount() < 2
       RETURN NIL
    ENDIF
-   IF pcount() == 2
+   IF PCount() == 2
       cSql := "select count(*) from " +cTabela
-   ELSEIF pCount() == 3
+   ELSEIF PCount() == 3
       cSql := "select count(*) from " +cTabela + " where " + cwhere
-   ELSEIF pCount() == 4
+   ELSEIF PCount() == 4
       cSql := "select count(*) from " +cTabela
       FOR i := 1 TO Len(aVarSust)
          cBind := ":" + AllTrim(Str(i))
@@ -716,18 +716,18 @@ FUNCTION OraCount(nCursor, cTabela, cWhere, aVarSust)
       NEXT i
       cSql += " where " +  cwhere
    ENDIF
-   nErro := sr_Getconnection():exec(cSql, , .T., @aret)
+   nErro := SR_GetConnection():Exec(cSql, , .T., @aret)
    IF nErro == 0
       s_aOraClipCursors[nCursor]["error"] := 0
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
-      //s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+      //s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
       s_nlasterror := 0
       RETURN aRet[1, 1]
    ELSE
-      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
       //s_aOraClipCursors[ncursor]["rowaffected"] := 0
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
    ENDIF
 
 RETURN 0
@@ -737,7 +737,7 @@ RETURN NIL
 
 FUNCTION oraerror(n)
 
-   IF pcount() == 0
+   IF PCount() == 0
       RETURN s_nlasterror
    ENDIF
 
@@ -772,14 +772,14 @@ FUNCTION OraPLSQL(nCursor, cPLSQL, aVarSust)
    LOCAL oSql
 
    s_lReleaseBind := .T.
-   IF HB_ISARRAY(aVarSust)
+   IF HB_IsArray(aVarSust)
       FOR i := Len(aVarSust) TO 1 STEP -1
          cBind := ":" + AllTrim(Str(i))
          cPLSQL := StrTran(cPLSQL, cBind, sr_cdbvalue(aVarSust[i]))
       NEXT i
    ENDIF
    IF Len(s_hplVars) > 0
-      oSql := sr_getconnection()
+      oSql := SR_GetConnection()
       oracleprePARE(osql:hdbc, cPLSQL)
       oraclebindalloc(oSql:hdbc, Len(s_hplVars))
       FOR i := 1 TO Len(s_hplVars)
@@ -803,9 +803,9 @@ FUNCTION OraPLSQL(nCursor, cPLSQL, aVarSust)
          s_nlasterror := 0
       RECOVER USING e
          nerror := -1
-         s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+         s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
          s_aOraClipCursors[nCursor]["lastsql"] := ""
-         s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+         s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       END SEQUENCE
       IF nerror >= 0
          FOR i := 1 TO Len(s_hplVars)
@@ -845,10 +845,10 @@ FUNCTION OCTBROWSEDB(a, s, d, f)
 RETURN tbrowsedb(a, s, d, f)
 
 FUNCTION csxerror()
-RETURN sr_Getconnection():nretcode
+RETURN SR_GetConnection():nretcode
 
 FUNCTION csxerrmsg()
-RETURN SQLO_GETERRORCODE(sr_getconnection():hDBC)
+RETURN SQLO_GETERRORCODE(SR_GetConnection():hDBC)
 
 FUNCTION CSXCLEARFILTER()
 
@@ -870,10 +870,10 @@ FUNCTION CSXsetFILTER(a)
 RETURN NIL
 
 FUNCTION orarowid()
-RETURN (Alias())->(recno())
+RETURN (Alias())->(RecNo())
 
 FUNCTION csxrowid()
-RETURN (Alias())->(recno())
+RETURN (Alias())->(RecNo())
 
 FUNCTION csx()
 RETURN NIL
@@ -915,14 +915,14 @@ FUNCTION OraMax(nCursor, cTable, cColumn, cWhere, aVarSust)
    LOCAL cwhere1
    LOCAL cBind
 
-   IF pcount() < 3
+   IF PCount() < 3
       RETURN NIL
    ENDIF
    cSql := "select max( " +cColumn + " ) from " +cTable
 
-   IF pCount() == 4
+   IF PCount() == 4
       cSql +=  " where " + cwhere
-   ELSEIF pCount() == 5
+   ELSEIF PCount() == 5
       FOR i := 1 TO Len(aVarSust)
          cBind := ":" + AllTrim(Str(i))
          cwhere := StrTran(cwhere, cBind, sr_cdbvalue(aVarSust[i]))
@@ -930,17 +930,17 @@ FUNCTION OraMax(nCursor, cTable, cColumn, cWhere, aVarSust)
       cSql += " where " +  cwhere
    ENDIF
 
-   nErro := sr_Getconnection():exec(cSql, , .T., @aret)
+   nErro := SR_GetConnection():Exec(cSql, , .T., @aret)
 
    IF nErro == 0
       s_aOraClipCursors[nCursor]["error"] := 0
       s_aOraClipCursors[nCurSor]["lastsql"] := cSql
-      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
       s_nlasterror := 0
       RETURN aRet[1, 1]
    ELSE
-      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
       s_aOraClipCursors[ncursor]["rowaffected"] := 0
    ENDIF
@@ -949,7 +949,7 @@ RETURN NIL
 
 FUNCTION OraSelect(n, aret, csql, adata, nRows)
 
-   //LOCAL oSql := sr_getconnection()
+   //LOCAL oSql := SR_GetConnection()
    LOCAL nError
    LOCAL i
    LOCAL e
@@ -965,12 +965,12 @@ FUNCTION OraSelect(n, aret, csql, adata, nRows)
    IF adata == NIL
       //IF nrows > F.
       //ELSE
-      //nError := sr_getconnection():exec(csql, , .T., @aret)
+      //nError := SR_GetConnection():Exec(csql, , .T., @aret)
       //ENDIF
       //comentada linha sandro, desnecessario neste ponto, existe abaixo
       //s_aOraClipCursors[n]["ret"] := aret
       //velho
-      nError := ExecuteSql(csql, @cursor, n) // sr_getconnection():exec(csql, , .T., @aret)
+      nError := ExecuteSql(csql, @cursor, n) // SR_GetConnection():Exec(csql, , .T., @aret)
       IF nError == 0
          s_aOraClipCursors[n]["cursoropen"] := .T.
          s_aOraClipCursors[n]["cursor"] := cursor
@@ -980,15 +980,15 @@ FUNCTION OraSelect(n, aret, csql, adata, nRows)
          s_aOraClipCursors[n]["error"] := 0
          s_aOraClipCursors[n]["nrowread"] := -1
          s_aOraClipCursors[n]["lastsql"] := cSql
-         s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
-         s_aOraClipCursors[n]["aFields"] := sr_getconnection():IniFields(.F.) //aFields
+         s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
+         s_aOraClipCursors[n]["aFields"] := SR_GetConnection():IniFields(.F.) //aFields
          s_aOraClipCursors[n]["data"] := {}
          s_aOraClipCursors[n]["completed"] := .F.
          s_aOraClipCursors[n]["eof"] := .F.
          IF nRows > -1
             FOR nPos := 1 TO nRows
                OraFetchSelect(n)
-               IF LEN(s_aOraClipCursors[n]["data"]) > 0
+               IF Len(s_aOraClipCursors[n]["data"]) > 0
                   AAdd(aRet, s_aOraClipCursors[n]["data"])
                ENDIF
             NEXT nPos
@@ -1008,8 +1008,8 @@ FUNCTION OraSelect(n, aret, csql, adata, nRows)
          //
          //   s_aOraClipCursors[n]["ret"] := aret
          //   s_aOraClipCursors[n]["lastsql"] := cSql
-         //   s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
-         //   s_aOraClipCursors[n]["aFields"] := sr_getconnection():aFields
+         //   s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
+         //   s_aOraClipCursors[n]["aFields"] := SR_GetConnection():aFields
          //   s_nlasterror := 0
          //   IF nRows > -1
          //      FOR EACH aTemp IN aRet
@@ -1022,8 +1022,8 @@ FUNCTION OraSelect(n, aret, csql, adata, nRows)
          //      aRet := aDataRet
          //   ENDIF
       ELSE
-         s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
-         s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+         s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
+         s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
          s_aOraClipCursors[n]["lastsql"] := cSql
          s_aOraClipCursors[n]["rowaffected"] := 0
          s_aOraClipCursors[n]["aFields"] := {}
@@ -1035,7 +1035,7 @@ FUNCTION OraSelect(n, aret, csql, adata, nRows)
       cBind := ":" + AllTrim(Str(i))
       cSql := StrTran(cSql, cBind, sr_cdbvalue(adata[i]))
    NEXT i
-   nError := ExecuteSql(csql, @cursor, n) // sr_getconnection():exec(csql, , .T., @aret)
+   nError := ExecuteSql(csql, @cursor, n) // SR_GetConnection():Exec(csql, , .T., @aret)
    IF nError == 0
       s_aOraClipCursors[n]["cursoropen"] := .T.
       s_aOraClipCursors[n]["cursor"] := cursor
@@ -1045,15 +1045,15 @@ FUNCTION OraSelect(n, aret, csql, adata, nRows)
       s_aOraClipCursors[n]["error"] := 0
       s_aOraClipCursors[n]["nrowread"] := -1
       s_aOraClipCursors[n]["lastsql"] := cSql
-      s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
-      s_aOraClipCursors[n]["aFields"] := sr_getconnection():IniFields(.F.) //aFields
+      s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
+      s_aOraClipCursors[n]["aFields"] := SR_GetConnection():IniFields(.F.) //aFields
       s_aOraClipCursors[n]["data"] := {}
       s_aOraClipCursors[n]["completed"] := .F.
       s_aOraClipCursors[n]["eof"] := .F.
       IF nRows > -1
          FOR nPos := 1 TO nRows
             OraFetchSelect(n)
-            IF LEN(s_aOraClipCursors[n]["data"]) > 0
+            IF Len(s_aOraClipCursors[n]["data"]) > 0
                AAdd(aRet, s_aOraClipCursors[n]["data"])
             ENDIF
          NEXT nPos
@@ -1063,7 +1063,7 @@ FUNCTION OraSelect(n, aret, csql, adata, nRows)
          ENDDO
       ENDIF
 
-//    nError := sr_getconnection():exec(csql, , .T., @aret)
+//    nError := SR_GetConnection():Exec(csql, , .T., @aret)
 //    s_aOraClipCursors[n]["ret"] := aret
 //velho
 //    IF nError == 0
@@ -1074,8 +1074,8 @@ FUNCTION OraSelect(n, aret, csql, adata, nRows)
 //       s_aOraClipCursors[n]["error"] := 0
 //       s_aOraClipCursors[n]["nrowread"] := nRows
 //       s_aOraClipCursors[n]["lastsql"] := cSql
-//       s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
-//       s_aOraClipCursors[n]["aFields"] := sr_getconnection():aFields
+//       s_aOraClipCursors[n]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
+//       s_aOraClipCursors[n]["aFields"] := SR_GetConnection():aFields
 //       s_nlasterror := 0
 //       IF nRows > -1
 //          FOR EACH aTemp IN aRet
@@ -1089,8 +1089,8 @@ FUNCTION OraSelect(n, aret, csql, adata, nRows)
 //       ENDIF
 //
    ELSE
-      s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[n]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[n]["lastsql"] := ""
       s_aOraClipCursors[n]["rowaffected"] := 0
       s_aOraClipCursors[n]["aFields"] := {}
@@ -1112,7 +1112,7 @@ FUNCTION OraUpdIns(nCursor, cTable, aCols, aDataUpd, aDataIns, cWhere, aVarSust)
 
 RETURN nRet
 
-/*
+#if 0
 FUNCTION OraUpdIns(nCursor, cTable, aCols, aDataUpd, aDataIns, cWhere, aVarSust)
 
    LOCAL nRet
@@ -1124,7 +1124,7 @@ FUNCTION OraUpdIns(nCursor, cTable, aCols, aDataUpd, aDataIns, cWhere, aVarSust)
    ENDIF
 
 RETURN nRet
-*/
+#endif
 
 FUNCTION Orasum(nCursor, cTable, cColumn , cWhere , aVarSust)
 
@@ -1135,14 +1135,14 @@ FUNCTION Orasum(nCursor, cTable, cColumn , cWhere , aVarSust)
    LOCAL cBind
    LOCAL i
 
-   IF pcount() < 3
+   IF PCount() < 3
       RETURN NIL
    ENDIF
    cSql := "select sum( " +cColumn + " ) from " +cTable
 
-   IF pCount() == 4
+   IF PCount() == 4
       cSql +=  " where " + cwhere
-   ELSEIF pCount() == 5
+   ELSEIF PCount() == 5
       FOR i := 1 TO Len(aVarSust)
          cBind := ":" + AllTrim(Str(i))
          cwhere := StrTran(cwhere, cBind, sr_cdbvalue(aVarSust[i]))
@@ -1150,19 +1150,19 @@ FUNCTION Orasum(nCursor, cTable, cColumn , cWhere , aVarSust)
       cSql += " where " +  cwhere
    ENDIF
 
-   nErro := sr_Getconnection():exec(cSql, , .T., @aret)
+   nErro := SR_GetConnection():Exec(cSql, , .T., @aret)
 
    IF nErro == 0
       s_aOraClipCursors[nCursor]["error"] := 0
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
-      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
       s_nlasterror := 0
       RETURN aRet[1, 1]
    ELSE
-      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
       s_aOraClipCursors[ncursor]["rowaffected"] := 0
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
    ENDIF
 
 RETURN NIL
@@ -1172,7 +1172,7 @@ FUNCTION csxBegin()
    LOCAL oCnn
 
    SR_BeginTransaction()
-   oCnn := sr_getconnection()
+   oCnn := SR_GetConnection()
 
 RETURN IIf(oCnn:nTransacCount > 0, 0, -1)
 
@@ -1214,13 +1214,13 @@ FUNCTION OraSelNext(nCursor, aTableData, nRows)
          IF nRows > -1
             FOR nPos := 1 TO nRows
                OraFetchSelect(nCursor)
-               IF LEN(s_aOraClipCursors[nCursor]["data"]) > 0
+               IF Len(s_aOraClipCursors[nCursor]["data"]) > 0
                   AAdd(aDataRet, s_aOraClipCursors[nCursor]["data"])
                ENDIF
             NEXT nPos
          ELSE
             DO WHILE OraFetchSelect(nCursor) == 0
-               IF LEN(s_aOraClipCursors[nCursor]["data"]) > 0
+               IF Len(s_aOraClipCursors[nCursor]["data"]) > 0
                   AAdd(aDataRet, s_aOraClipCursors[nCursor]["data"])
                ENDIF
             ENDDO
@@ -1275,10 +1275,10 @@ FUNCTION csExecSQL(nCursor, cSQL, aVarSust)
 
    BEGIN SEQUENCE WITH __BreakBlock()
       hData := s_aOraClipCursors[nCursor]
-      osql := sr_getconnection()
+      osql := SR_GetConnection()
       IF Upper(SubStr(cSql, 6)) == "BEGIN "
-         IF pCount() == 3
-            IF HB_ISARRAY(aVarSust)
+         IF PCount() == 3
+            IF HB_IsArray(aVarSust)
                FOR i := Len(aVarSust) TO 1 STEP -1
                   cBind := ":" + AllTrim(Str(i) )
                   cSQL := StrTran(cSQL, cBind, sr_cdbvalue(aVarSust[i]))
@@ -1292,26 +1292,26 @@ FUNCTION csExecSQL(nCursor, cSQL, aVarSust)
          IF nRet == 0
             s_aOraClipCursors[nCursor]["error"] := 0
             s_aOraClipCursors[nCursor]["lastsql"] := cSql
-            s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+            s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
          ELSE
-            s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
-            s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+            s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
+            s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
             s_aOraClipCursors[nCursor]["errormsg"] := SQLO_GETERRORDESCR(osql:hDBC)
             s_aOraClipCursors[nCursor]["lastsql"] := ""
             s_aOraClipCursors[ncursor]["rowaffected"] := 0
          ENDIF
       ELSE
-         nRet := osql:exec(cSql, , .F.)
+         nRet := osql:Exec(cSql, , .F.)
          s_nlasterror := 0
          s_aOraClipCursors[nCursor]["errormsg"] := ""
          IF nRet == 0
             s_aOraClipCursors[nCursor]["error"] := 0
             s_aOraClipCursors[nCursor]["lastsql"] := cSql
-            s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+            s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
          ELSE
             s_aOraClipCursors[nCursor]["error"] := osql:lasterror()
             s_aOraClipCursors[nCursor]["errormsg"] := SQLO_GETERRORDESCR(osql:hDBC)
-            s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+            s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
             s_aOraClipCursors[nCursor]["lastsql"] := cSql
             s_aOraClipCursors[ncursor]["rowaffected"] := 0
          ENDIF
@@ -1332,7 +1332,7 @@ FUNCTION csErrMsg(nCursor)
 
    BEGIN SEQUENCE WITH __BreakBlock()
       hData := s_aOraClipCursors[nCursor]
-      osql := sr_getconnection()
+      osql := SR_GetConnection()
       cRet :=  hData["errormsg"]
    RECOVER USING e
    END SEQUENCE
@@ -1349,7 +1349,7 @@ FUNCTION CSVALIDCNX(nCursor)
 
    BEGIN SEQUENCE WITH __BreakBlock()
       hData := s_aOraClipCursors[nCursor]
-      osql := sr_getconnection()
+      osql := SR_GetConnection()
       lRet := hData["nRet"] > 0
    RECOVER USING e
       lRet := .F.
@@ -1366,7 +1366,7 @@ FUNCTION CSUSER(nCursor)
 
    BEGIN SEQUENCE WITH __BreakBlock()
       hData := s_aOraClipCursors[nCursor]
-      osql := sr_getconnection()
+      osql := SR_GetConnection()
       cRet := hData["user"]
    RECOVER USING e
       cRet := ""
@@ -1402,21 +1402,21 @@ FUNCTION OraExists(nCursor, cTable, cWhere, aVarSust)
    LOCAL cwhere1
    LOCAL cBind
 
-   IF pcount() < 3
+   IF PCount() < 3
       RETURN NIL
    ENDIF
    cSql := "select * from " +cTable
 
-   IF pCount() == 3
+   IF PCount() == 3
       cSql +=  " where " + cwhere
-   ELSEIF pCount() == 4
+   ELSEIF PCount() == 4
       FOR i := 1 TO Len(aVarSust)
          cBind := ":" + AllTrim(Str(i))
          cwhere := StrTran(cwhere, cBind, sr_cdbvalue(aVarSust[i]))
       NEXT i
       cSql += " where " +  cwhere
    ENDIF
-   nErro := sr_Getconnection():exec(cSql, , .T., @aret)
+   nErro := SR_GetConnection():Exec(cSql, , .T., @aret)
    IF nErro == 0
       RETURN Len(aRet) > 0
    ENDIF
@@ -1433,14 +1433,14 @@ FUNCTION OraMin(nCursor, cTable, cColumn , cWhere , aVarSust)
    LOCAL cBind
    LOCAL i
 
-   IF pcount() < 3
+   IF PCount() < 3
       RETURN NIL
    ENDIF
    cSql := "select mim( " +cColumn + " ) from " +cTable
 
-   IF pCount() == 4
+   IF PCount() == 4
       cSql +=  " where " + cwhere
-   ELSEIF pCount() == 5
+   ELSEIF PCount() == 5
       FOR i := Len(aVarSust) TO 1 STEP -1
          cBind := ":" + AllTrim(Str(i))
          cwhere := StrTran(cwhere, cBind, sr_cdbvalue(aVarSust[i]))
@@ -1448,17 +1448,17 @@ FUNCTION OraMin(nCursor, cTable, cColumn , cWhere , aVarSust)
       cSql += " where " +  cwhere
    ENDIF
 
-   nErro := sr_Getconnection():exec(cSql, , .T., @aret)
+   nErro := SR_GetConnection():Exec(cSql, , .T., @aret)
 
    IF nErro ==0
       s_aOraClipCursors[nCursor]["error"] := 0
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
-      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(sr_getconnection():hdbc)
+      s_aOraClipCursors[ncursor]["rowaffected"] := GETAFFECTROWS(SR_GetConnection():hdbc)
       s_nlasterror := 0
       RETURN aRet[1, 1]
    ELSE
-      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(sr_getconnection():hDBC)
-      s_nlasterror := SQLO_GETERRORCODE(sr_getconnection():hDBC)
+      s_aOraClipCursors[nCursor]["error"] := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
+      s_nlasterror := SQLO_GETERRORCODE(SR_GetConnection():hDBC)
       s_aOraClipCursors[nCursor]["lastsql"] := cSql
       s_aOraClipCursors[ncursor]["rowaffected"] := 0
    ENDIF
@@ -1493,22 +1493,22 @@ FUNCTION OraTBrowse(nCursor1, cSql, c, oBrowse, bBLock)
    LOCAL aRet := {}
    LOCAL lRet := .T.
    LOCAL nKey
-   LOCAL oSql := sr_getconnection()
+   LOCAL oSql := SR_GetConnection()
    LOCAL oCol
 
-   fclose(HB_FTEMPCREATEEX(@cTempFile, , "tmp", ".dbf"))
+   FClose(HB_FTEMPCREATEEX(@cTempFile, , "tmp", ".dbf"))
 
-   osql:exec(cSql, , .T., , cTempFile)
+   osql:Exec(cSql, , .T., , cTempFile)
 
    DO WHILE lRet
       obrowse:forcestable()
       aReg := {}
-      FOR i := 1 TO fcount()
+      FOR i := 1 TO FCount()
          //AAdd(aReg, Eval(obrowse:GetColumn(i):Block))
          oCol := oBrowse:getcolumn(i)
-         AAdd(aReg, fieldget(i))
+         AAdd(aReg, FieldGet(i))
       NEXT i
-      nKey := inkey(0)
+      nKey := Inkey(0)
       aRet := Eval(bBLock, nkey, obrowse, aReg)
       IF Aret == NIL
          LOOP
@@ -1519,7 +1519,7 @@ FUNCTION OraTBrowse(nCursor1, cSql, c, oBrowse, bBLock)
          EXIT
       CASE _ORATBROWSE_REFRESHALL
          ZAP
-         osql:exec(cSql, , .T., , cTempFile)
+         osql:Exec(cSql, , .T., , cTempFile)
          GO TOP
          EXIT
       CASE  _ORATBROWSE_EXIT
@@ -1576,8 +1576,8 @@ STATIC FUNCTION mySQLLen(nType, nLen, nDec)
          nLen := 14
       ENDIF
       IF !(nLen = 38 .AND. nDec = 0)
-         nLen := min(nLen, 20)
-         nLen := max(nLen, 1)
+         nLen := Min(nLen, 20)
+         nLen := Max(nLen, 1)
       ENDIF
       EXIT
    CASE SQL_DATE
@@ -1660,7 +1660,7 @@ FUNCTION SR_AdjustNum(a)
 
       IF lNwgOldCompat
          IF b[i, 2] = "N" .AND. b[i, 4] >= (b[i, 3] - 1)
-            b[i, 4] := abs(b[i, 3] - 2)
+            b[i, 4] := Abs(b[i, 3] - 2)
          ENDIF
       ENDIF
       IF b[i, 2] == "N" .AND. b[i, 4] >= 5
@@ -1684,7 +1684,7 @@ STATIC FUNCTION ExecuteSql(csql, cursor, n)
    // END SEQUENCE
    // IF nError > 0
    nError := Sqlo_Execute(SR_GetConnection():hdbc, cSql)
-   //nError := sr_Getconnection():executeraw(cSql)
+   //nError := SR_GetConnection():ExecuteRaw(cSql)
    cursor := GETORAHANDLE(SR_GetConnection():hdbc)
    // ENDIF
 
@@ -1692,7 +1692,7 @@ RETURN nError
 
 STATIC FUNCTION OraFetch(n)
 
-   LOCAL oSql := sr_getconnection()
+   LOCAL oSql := SR_GetConnection()
    LOCAL hDBC := oSql:hdbc
    LOCAL nError
    LOCAL hDBCHandle := s_aOraClipCursors[n]["cursor"]
@@ -1705,7 +1705,7 @@ STATIC FUNCTION OraFetch(n)
    SETORAHANDLE(hDBC, hDBCHandle)
 
    IF s_aOraClipCursors[n]["curpos"] <= (cAlias)->(RecCount()) .AND. s_aOraClipCursors[n]["curpos"] != 0
-      (cAlias)->(dBGoto(s_aOraClipCursors[n]["curpos"]))
+      (cAlias)->(DBGoTo(s_aOraClipCursors[n]["curpos"]))
    ELSEIF !s_aOraClipCursors[n]["completed"]
 
       nError := oSql:Fetch(, s_aOraClipCursors[n]["aFields"])
@@ -1716,11 +1716,11 @@ STATIC FUNCTION OraFetch(n)
 
          aArray := Array(Len(s_aOraClipCursors[n]["aFields"]))
 
-         (cAlias)->(dBAppend())
+         (cAlias)->(DBAppend())
          FOR i := 1 TO Len(s_aOraClipCursors[n]["aFields"])
             (cAlias)->(FieldPut(i, oSql:FieldGet(i, s_aOraClipCursors[n]["aFields"])))
          NEXT i
-         (cAlias)->(dBUnlock())
+         (cAlias)->(DBUnlock())
       ELSE
          //FOR i := 1 TO Len(s_aOraClipCursors[n]["data"])
          aDb := s_aOraClipCursors[n]["aFields"]
@@ -1733,7 +1733,7 @@ STATIC FUNCTION OraFetch(n)
                AAdd(s_aOraClipCursors[n]["data"], 0)
                EXIT
             CASE "D"
-               AAdd(s_aOraClipCursors[n]["data"], ctod(""))
+               AAdd(s_aOraClipCursors[n]["data"], CToD(""))
                EXIT
             CASE "L"
                AAdd(s_aOraClipCursors[n]["data"], .F.)
@@ -1746,17 +1746,17 @@ STATIC FUNCTION OraFetch(n)
          s_aOraClipCursors[n]["cursoropen"] := .F.
          SQLO_CLOSESTMT(hDBC)
 
-         IF select(s_aOraClipCursors[n]["aliastmp"]) > 0
-            (s_aOraClipCursors[n]["aliastmp"])->(dbclosearea())
-            ferase(s_aOraClipCursors[n]["tmpfile"])
+         IF Select(s_aOraClipCursors[n]["aliastmp"]) > 0
+            (s_aOraClipCursors[n]["aliastmp"])->(DBCloseArea())
+            FErase(s_aOraClipCursors[n]["tmpfile"])
          ENDIF
 
       ENDIF
 
    ELSE
-      (cAlias)->(dBGoto(s_aOraClipCursors[n]["curpos"]))
+      (cAlias)->(DBGoTo(s_aOraClipCursors[n]["curpos"]))
    ENDIF
-   IF select(s_aOraClipCursors[n]["aliastmp"]) > 0
+   IF Select(s_aOraClipCursors[n]["aliastmp"]) > 0
       FOR i := 1 TO Len(s_aOraClipCursors[n]["aFields"])
          AAdd(s_aOraClipCursors[n]["data"], (cAlias)->(FieldGet(i)))
       NEXT i
@@ -1766,7 +1766,7 @@ RETURN nError
 
 STATIC FUNCTION OraFetchSelect(n)
 
-   LOCAL oSql := sr_getconnection()
+   LOCAL oSql := SR_GetConnection()
    LOCAL hDBC := oSql:hdbc
    LOCAL nError
    LOCAL hDBCHandle := s_aOraClipCursors[n]["cursor"]
@@ -1806,12 +1806,12 @@ STATIC FUNCTION GerGhost(uDat)
 
    IF HB_IsChar(uDat)
       RETURN ""
-   ELSEIF HB_ISNUMERIC(uDat)
+   ELSEIF HB_IsNumeric(uDat)
       RETURN 0
-   ELSEIF HB_ISLOGICAL(uDat)
+   ELSEIF HB_IsLogical(uDat)
       RETURN .F.
-   ELSEIF HB_ISDATE(uDat)
-      RETURN ctod("")
+   ELSEIF HB_IsDate(uDat)
+      RETURN CToD("")
    ENDIF
 
 RETURN ""
@@ -1821,7 +1821,7 @@ RETURN s_aOraClipCursors[ncursor]
 
 STATIC FUNCTION closecursor(n)
 
-   LOCAL osql := sr_getconnection()
+   LOCAL osql := SR_GetConnection()
    LOCAL hdbc := osql:hdbc
 
    BEGIN SEQUENCE WITH __BreakBlock()
@@ -1833,8 +1833,8 @@ STATIC FUNCTION closecursor(n)
          s_aOraClipCursors[n]["cursoropen"] := .F.
       ENDIF
       IF Select(s_aOraClipCursors[n]["aliastmp"]) > 0
-         (s_aOraClipCursors[n]["aliastmp"])->(dbclosearea())
-         ferase(s_aOraClipCursors[n]["tmpfile"])
+         (s_aOraClipCursors[n]["aliastmp"])->(DBCloseArea())
+         FErase(s_aOraClipCursors[n]["tmpfile"])
       ENDIF
    RECOVER USING e
    END SEQUENCE
@@ -1881,22 +1881,22 @@ struct _OCI_SESSION
 using OCI_SESSION = _OCI_SESSION;
 using POCI_SESSION = OCI_SESSION *;
 
-HB_FUNC( GETORAHANDLE )
+HB_FUNC(GETORAHANDLE)
 {
-   OCI_SESSION * p = (OCI_SESSION *) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+  OCI_SESSION *p = (OCI_SESSION *)hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
 
-   if( p ) {
-      hb_retni(p->stmt);
-   }
+  if (p) {
+    hb_retni(p->stmt);
+  }
 }
 
-HB_FUNC( SETORAHANDLE )
+HB_FUNC(SETORAHANDLE)
 {
-   OCI_SESSION * p  = (OCI_SESSION *) hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
+  OCI_SESSION *p = (OCI_SESSION *)hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER));
 
-   if( p ) {
-      p->stmt = hb_parni(2);
-   }
+  if (p) {
+    p->stmt = hb_parni(2);
+  }
 }
 
 #pragma BEGINDUMP
