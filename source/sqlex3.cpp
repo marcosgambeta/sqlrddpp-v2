@@ -311,7 +311,7 @@ HB_BOOL CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel)
 
     pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
     pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
-    thiswa->indexColumns = hb_arrayLen(pColumns);
+    thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
     // Free the statements we are about to recreate
 
@@ -394,7 +394,7 @@ HB_ERRCODE FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *queryLev
   if (HB_IS_STRING(pKey)) {
     // parse Key string and split it in index fields
 
-    lenKey = hb_itemGetCLen(pKey);
+    lenKey = static_cast<int>(hb_itemGetCLen(pKey));
     szKey = hb_itemGetCPtr(pKey);
     *queryLevel = thiswa->indexColumns;
 
