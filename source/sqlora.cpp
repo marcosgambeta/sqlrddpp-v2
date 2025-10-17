@@ -2646,7 +2646,7 @@ static inline int DEFUN(_bind_by_pos, (stp, param_pos, param_type, param_addr, p
 
     dbp->status =
         OCIBindByPos(stp->stmthp, bindp_addr, dbp->errhp, (ub4)param_pos, (dvoid *)param_addr, (sword)param_size,
-                     param_type, (dvoid *)ind_addr, (ub2 *)0, (ub2 *)0, (ub4)0, (ub4 *)0, OCI_DEFAULT);
+                     static_cast<ub2>(param_type), (dvoid *)ind_addr, (ub2 *)0, (ub2 *)0, (ub4)0, (ub4 *)0, OCI_DEFAULT);
 
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos. Cannot bind", nullptr);
     if (is_array) {
@@ -2765,7 +2765,7 @@ static inline int DEFUN(
     stp->ocolsv[value_pos - 1].dtype = (ub2)value_type;
 
     dbp->status = OCIDefineByPos(stp->stmthp, &stp->defnpv[value_pos - 1], dbp->errhp, (ub4)value_pos,
-                                 (ub1 *)value_addr, (sword)value_size, value_type, (dvoid *)ind_addr, (ub2 *)rlen_addr,
+                                 (ub1 *)value_addr, (sword)value_size, static_cast<ub2>(value_type), (dvoid *)ind_addr, (ub2 *)rlen_addr,
                                  (ub2 *)rcode_addr, OCI_DEFAULT);
 
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos2: Cannot define", nullptr);
@@ -2821,7 +2821,7 @@ static inline int DEFUN(
     stp->ocolsv[value_pos - 1].dtype = (ub2)value_type;
 
     dbp->status = OCIDefineByPos(stp->stmthp, &stp->defnpv[value_pos - 1], stp->dbp->errhp, (ub4)value_pos,
-                                 (ub1 *)value_addr, (sword)value_size, value_type, (dvoid *)ind_addr, (ub2 *)rlen_addr,
+                                 (ub1 *)value_addr, (sword)value_size, static_cast<ub2>(value_type), (dvoid *)ind_addr, (ub2 *)rlen_addr,
                                  (ub2 *)rcode_addr, OCI_DEFAULT);
 
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos: Cannot define", nullptr);
@@ -2881,7 +2881,7 @@ static int DEFUN(_bind_argv, (stp, argc, argv), sqlo_stmt_struct_ptr_t stp AND u
       size = 0;
     } else {
       *ind_ptr = SQLO_NOT_NULL_IND;
-      size = strlen(*arg) + 1;
+      size = static_cast<unsigned int>(strlen(*arg)) + 1;
     }
 
     dbp->status = _bind_by_pos(stp, arg_idx + 1, SQLOT_STR, *arg, size, ind_ptr, 0);
@@ -3795,7 +3795,7 @@ static int DEFUN(_prepare, (stp, stmt, stmt_type), sqlo_stmt_struct_ptr_t stp AN
 
   dbp = stp->dbp;
 
-  dbp->status = OCIStmtPrepare(stp->stmthp, dbp->errhp, (text *)stmt, strlen(stmt), OCI_NTV_SYNTAX, OCI_DEFAULT);
+  dbp->status = OCIStmtPrepare(stp->stmthp, dbp->errhp, (text *)stmt, static_cast<ub4>(strlen(stmt)), OCI_NTV_SYNTAX, OCI_DEFAULT);
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "_prepare: OCIStmtPrepare: status=%d", dbp->status););
 
@@ -4404,7 +4404,7 @@ int DEFUN(sqlo_exec, (dbh, stmt, rr), sqlo_db_handle_t dbh AND const char *stmt 
 
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_exec", "OCIHandleAlloc(stmt)");
 
-  dbp->status = OCIStmtPrepare(dbp->stmthp, dbp->errhp, (text *)stmt, strlen(stmt), OCI_NTV_SYNTAX, OCI_DEFAULT);
+  dbp->status = OCIStmtPrepare(dbp->stmthp, dbp->errhp, (text *)stmt, static_cast<ub4>(strlen(stmt)), OCI_NTV_SYNTAX, OCI_DEFAULT);
 
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_exec(prepare)", const_cast<char *>(stmt));
   //  } else {
@@ -5122,7 +5122,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   }
 
   /* Create a server context */
-  dbp->status = OCIServerAttach(dbp->srvhp, dbp->errhp, (text *)dbp->tnsname, strlen(dbp->tnsname), OCI_DEFAULT);
+  dbp->status = OCIServerAttach(dbp->srvhp, dbp->errhp, (text *)dbp->tnsname, static_cast<ub4>(strlen(dbp->tnsname)), OCI_DEFAULT);
   CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_server_attach", "OCISeverAttach(tnsname)");
 
   /* release allocated resources */
@@ -5666,7 +5666,7 @@ int DEFUN(sqlo_bind_ref_cursor, (sth, cursor_name, sth2p),
 
     *sth2p = static_cast<int>(ENCODE_STH(st2p->sth, st2p->dbp->dbh));
 
-    status = OCIBindByName(stp->stmthp, bindp_addr, stp->dbp->errhp, (text *)cursor_name, strlen(cursor_name),
+    status = OCIBindByName(stp->stmthp, bindp_addr, stp->dbp->errhp, (text *)cursor_name, static_cast<ub4>(strlen(cursor_name)),
                            (dvoid *)&st2p->stmthp, (sb4)0, (ub2)SQLT_RSET, (dvoid *)0, (ub2 *)0, (ub2 *)0, (ub4)0,
                            (ub4 *)0, OCI_DEFAULT);
 
