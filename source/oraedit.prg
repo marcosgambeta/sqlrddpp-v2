@@ -399,7 +399,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    // Save previous cursor shape and position.
    nCursor := SetCursor(SC_NONE)
 
-   IIf(HB_IsNil(acFootingSep) .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
+   IIf(acFootingSep == NIL .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
 
    /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
    DispBegin()
