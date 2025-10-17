@@ -115,14 +115,14 @@ HB_FUNC_EXTERN(SR_INIT);
 HB_FUNC_EXTERN(__SR_STARTSQL);
 HB_FUNC_EXTERN(SQLRDD);
 
-static int pageReadSize = PAGE_READ_SIZE;
-static int bufferPoolSize = BUFFER_POOL_SIZE;
+static int s_pageReadSize = PAGE_READ_SIZE;
+static int s_bufferPoolSize = BUFFER_POOL_SIZE;
 static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa);
-static int bOldReverseIndex = 0;
+static int s_bOldReverseIndex = 0;
 static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact);
 static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 // static bool _SqlExIsLogFirst = true; not used
-static bool _SqlExIsLogFile = false;
+static bool s__SqlExIsLogFile = false;
 
 HB_BOOL SqlExIsLog();
 void SqlExLog(const char *str, int ver);
@@ -1740,9 +1740,9 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
   // Check for maximum buffer pool size
 
-  if ((static_cast<HB_LONG>(hb_hashLen(thiswa->hBufferPool))) > bufferPoolSize) {
+  if ((static_cast<HB_LONG>(hb_hashLen(thiswa->hBufferPool))) > s_bufferPoolSize) {
     hb_hashNew(thiswa->hBufferPool);
-    hb_hashPreallocate(thiswa->hBufferPool, static_cast<HB_ULONG>(bufferPoolSize * 1.2));
+    hb_hashPreallocate(thiswa->hBufferPool, static_cast<HB_ULONG>(s_bufferPoolSize * 1.2));
   }
 
   // Not found, so let's try the database...
@@ -1769,7 +1769,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
     // Adjust SQL to 'pageReadSize' params
 
-    for (i = 1; i < pageReadSize; i++) {
+    for (i = 1; i < s_pageReadSize; i++) {
       thiswa->sSqlBuffer[++iEnd] = ',';
       thiswa->sSqlBuffer[++iEnd] = '?';
     }
@@ -1795,7 +1795,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
       return Harbour::FAILURE;
     }
 
-    for (i = 0; i < pageReadSize; i++) {
+    for (i = 0; i < s_pageReadSize; i++) {
       res = SQLBindParameter(thiswa->hStmtBuffer, i + 1, SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0,
                              &(thiswa->lRecordToRetrieve[i]), 0, nullptr);
 
@@ -1809,7 +1809,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
   bTranslate = false;
 
   // Sets the bindvar contents
-  for (i = 0; i < pageReadSize; i++) {
+  for (i = 0; i < s_pageReadSize; i++) {
     thiswa->lRecordToRetrieve[i] =
         (thiswa->recordListPos + i < thiswa->recordListSize ? thiswa->recordList[thiswa->recordListPos + i] : 0);
   }
@@ -1826,7 +1826,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
   // bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1);
 
-  for (iRow = 1; iRow <= pageReadSize; iRow++) {
+  for (iRow = 1; iRow <= s_pageReadSize; iRow++) {
     res = SQLFetch(thiswa->hStmtBuffer);
     if (res != SQL_SUCCESS) {
       // if( res == SQL_ERROR ) {
@@ -2156,7 +2156,7 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREAP thiswa)
 
   if (thiswa->lEofAt) {
     SELF_GOTO(reinterpret_cast<AREAP>(thiswa), static_cast<HB_LONG>(thiswa->lEofAt));
-    if (thiswa->bReverseIndex != bOldReverseIndex) {
+    if (thiswa->bReverseIndex != s_bOldReverseIndex) {
       thiswa->recordListDirection = LIST_BACKWARD;
       getOrderByExpression(thiswa, false);
       getWhereExpression(thiswa, LIST_FROM_BOTTOM);
@@ -2305,7 +2305,7 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREAP thiswa)
 
   if (thiswa->lBofAt) {
     SELF_GOTO(reinterpret_cast<AREAP>(thiswa), static_cast<HB_LONG>(thiswa->lBofAt));
-    if (thiswa->bReverseIndex != bOldReverseIndex) {
+    if (thiswa->bReverseIndex != s_bOldReverseIndex) {
       thiswa->recordListDirection = LIST_FORWARD;
       getOrderByExpression(thiswa, false);
       getWhereExpression(thiswa, LIST_FROM_TOP);
@@ -3420,7 +3420,7 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREAP thiswa)
   thiswa->bOrderChanged = false;
   thiswa->bConnVerified = false;
   thiswa->recordList = static_cast<HB_ULONG *>(hb_xgrab(RECORD_LIST_SIZE * sizeof(HB_ULONG)));
-  thiswa->lRecordToRetrieve = static_cast<HB_ULONG *>(hb_xgrab(pageReadSize * sizeof(HB_ULONG)));
+  thiswa->lRecordToRetrieve = static_cast<HB_ULONG *>(hb_xgrab(s_pageReadSize * sizeof(HB_ULONG)));
   thiswa->deletedList = static_cast<char *>(hb_xgrab(RECORD_LIST_SIZE * sizeof(char)));
   thiswa->sSql = static_cast<char *>(hb_xgrab(MAX_SQL_QUERY_LEN * sizeof(char)));
   memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
@@ -3433,7 +3433,7 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREAP thiswa)
   thiswa->InsertRecord = nullptr;
   thiswa->CurrRecord = nullptr;
 
-  hb_hashPreallocate(thiswa->hBufferPool, static_cast<HB_ULONG>(bufferPoolSize * 1.2));
+  hb_hashPreallocate(thiswa->hBufferPool, static_cast<HB_ULONG>(s_bufferPoolSize * 1.2));
 
   memset(thiswa->updatedMask, 0, MAX_FIELDS);
   memset(thiswa->editMask, 0, MAX_FIELDS);
@@ -3515,7 +3515,7 @@ static HB_ERRCODE sqlExOrderListAdd(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInfo)
     thiswa->lBofAt = 0;
     thiswa->lEofAt = 0;
     thiswa->indexLevel = -1;
-    bOldReverseIndex = thiswa->bReverseIndex;
+    s_bOldReverseIndex = thiswa->bReverseIndex;
     thiswa->bReverseIndex = hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX);
   }
 
@@ -3560,7 +3560,7 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
   if (thiswa->hOrdCurrent > 0) {
     thiswa->indexColumns = static_cast<int>(hb_arrayLen(hb_arrayGetItemPtr(
         hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent)), INDEX_FIELDS)));
-    bOldReverseIndex = thiswa->bReverseIndex;
+    s_bOldReverseIndex = thiswa->bReverseIndex;
     thiswa->bReverseIndex = hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX);
     if (thiswa->IndexBindings[thiswa->hOrdCurrent]) {
       hb_xfree(thiswa->IndexBindings[thiswa->hOrdCurrent]);
@@ -3606,7 +3606,7 @@ static HB_ERRCODE sqlExOrderCreate(SQLEXAREAP thiswa, LPDBORDERCREATEINFO pOrder
   }
 
   if (err == Harbour::SUCCESS) {
-    bOldReverseIndex = thiswa->bReverseIndex;
+    s_bOldReverseIndex = thiswa->bReverseIndex;
     thiswa->bReverseIndex = hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX);
   }
 
@@ -3673,7 +3673,7 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREAP thiswa, HB_USHORT uiIndex, LPDBORDER
     }
     default: {
       uiError = SUPER_ORDINFO(reinterpret_cast<AREAP>(thiswa), uiIndex, pInfo);
-      bOldReverseIndex = thiswa->bReverseIndex;
+      s_bOldReverseIndex = thiswa->bReverseIndex;
       thiswa->bReverseIndex = hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX); // OrderInfo() may change this flag
     }
     }
@@ -3970,14 +3970,14 @@ HB_CALL_ON_STARTUP_END(_hb_sqlEx_rdd_init_)
 HB_FUNC(SR_SETPAGEREADSIZE)
 {
   if (HB_ISNUM(1)) {
-    pageReadSize = hb_itemGetNL(hb_param(1, Harbour::Item::NUMERIC));
+    s_pageReadSize = hb_itemGetNL(hb_param(1, Harbour::Item::NUMERIC));
   }
 }
 
 HB_FUNC(SR_SETBUFFERPOOLSIZE)
 {
   if (HB_ISNUM(1)) {
-    bufferPoolSize = hb_itemGetNL(hb_param(1, Harbour::Item::NUMERIC));
+    s_bufferPoolSize = hb_itemGetNL(hb_param(1, Harbour::Item::NUMERIC));
   }
 }
 
@@ -4130,10 +4130,10 @@ HB_BOOL SqlExIsLog()
 
       if( FILE *file = fopen("sqlex.debug", "r") ) {
         fclose(file);
-        _SqlExIsLogFile = true;
+        s__SqlExIsLogFile = true;
       }
    }
 #endif
 
-  return _SqlExIsLogFile;
+  return s__SqlExIsLogFile;
 }
