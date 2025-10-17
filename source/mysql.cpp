@@ -166,7 +166,7 @@ HB_FUNC(MYSEXEC)
   assert(session->dbh != nullptr);
   session->ulAffected_rows = 0;
   // mysql_query(session->dbh, szQuery);
-  mysql_real_query(session->dbh, szQuery, hb_parclen(2));
+  mysql_real_query(session->dbh, szQuery, static_cast<unsigned long>(hb_parclen(2)));
   session->stmt = mysql_store_result(session->dbh);
   session->ulAffected_rows = mysql_affected_rows(session->dbh);
   if (session->stmt) {
@@ -405,7 +405,7 @@ HB_FUNC(MYSLINEPROCESSED)
     hb_retni(SQL_INVALID_HANDLE);
   } else {
     if (session->ifetch >= -1) {
-      cols = hb_arrayLen(pFields);
+      cols = static_cast<int>(hb_arrayLen(pFields));
 
       mysql_data_seek(session->stmt, session->ifetch);
       thisrow = mysql_fetch_row(session->stmt);
@@ -684,7 +684,7 @@ HB_FUNC(MYSTABLEATTR)
   sprintf(attcmm, "select * from %s where 0 = 1", hb_parc(2));
 
   // mysql_query(session->dbh, attcmm);
-  mysql_real_query(session->dbh, attcmm, strlen(attcmm));
+  mysql_real_query(session->dbh, attcmm, static_cast<unsigned long>(strlen(attcmm)));
   session->stmt = mysql_store_result(session->dbh);
 
   if (!session->stmt) {
