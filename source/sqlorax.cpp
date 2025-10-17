@@ -738,7 +738,7 @@ HB_FUNC(ORACLEWRITEMEMO)
         return;
       }
 
-      status = sqlo_lob_write_buffer(session->dbh, loblp, strlen(sMemo), sMemo, strlen(sMemo), SQLO_ONE_PIECE);
+      status = sqlo_lob_write_buffer(session->dbh, loblp, static_cast<unsigned int>(strlen(sMemo)), sMemo, static_cast<unsigned int>(strlen(sMemo)), SQLO_ONE_PIECE);
 
       if (status < 0) {
         sqlo_free_lob_desc(session->dbh, &loblp);
