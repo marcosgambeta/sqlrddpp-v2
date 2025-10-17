@@ -145,7 +145,7 @@ HB_FUNC(SR_INSTALLDSN)
     auto szDriver = hb_parc(1);
     char *szAttributes = hb_strdup(hb_parc(2));
 
-    for (x = strlen(szAttributes), y = 0; y < x; y++) {
+    for (x = static_cast<int>(strlen(szAttributes)), y = 0; y < x; y++) {
       if (szAttributes[y] == ';') {
         szAttributes[y] = '\0';
       }
@@ -173,7 +173,7 @@ HB_FUNC(SR_UNINSTALLDSN)
     auto szDriver = hb_parc(1);
     char *szAttributes = hb_strdup(hb_parc(2));
 
-    for (x = strlen(szAttributes), y = 0; y < x; y++) {
+    for (x = static_cast<int>(strlen(szAttributes)), y = 0; y < x; y++) {
       if (szAttributes[y] == ';') {
         szAttributes[y] = '\0';
       }
@@ -591,7 +591,7 @@ HB_FUNC(SR_ODBCLINEPROCESSED)
                          hb_paramError(3));
   }
 
-  int cols = hb_arrayLen(pFields);
+  int cols = static_cast<int>(hb_arrayLen(pFields));
 
   if (cols <= 0) {
     hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
@@ -660,7 +660,7 @@ HB_FUNC(SR_ODBCGETLINES) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lTra
                          hb_paramError(3));
   }
 
-  int cols = hb_arrayLen(pFields);
+  int cols = static_cast<int>(hb_arrayLen(pFields));
 
   if (cols <= 0) {
     hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
@@ -713,7 +713,7 @@ HB_FUNC(SR_ODBCGETLINES) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lTra
 
     for (i = 1; i <= cols; i++) {
       bOut = nullptr;
-      lInitBuff = lLen;
+      lInitBuff = static_cast<HB_LONG>(lLen);
       lLenOut = 0;
       iReallocs = 0;
       temp = hb_itemNew(nullptr);
@@ -1086,7 +1086,7 @@ HB_FUNC(SR_ODBCWRITEMEMO)
   auto pArray = hb_param(5, Harbour::Item::ARRAY);
   auto hDbc = static_cast<SQLHDBC>(hb_parptr(1));
 
-  HB_ULONG uiLen = hb_arrayLen(pArray);
+  HB_ULONG uiLen = static_cast<HB_ULONG>(hb_arrayLen(pArray));
 
   if (hDbc && uiLen > 0) {
 #if ODBCVER >= 0x0300
@@ -1186,25 +1186,25 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
     if (lLen < 10) {
       long int val = 0;
       if (SQL_SUCCEEDED(res = SQLGetData(hStmt, ui, SQL_C_LONG, &val, sizeof(val), &iLen))) {
-        hb_itemPutNLLen(pItem, val, lLen);
+        hb_itemPutNLLen(pItem, val, static_cast<int>(lLen));
       }
       if (static_cast<int>(iLen) == SQL_NULL_DATA) {
         if (cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE) {
           hb_itemPutL(pItem, false);
         } else {
-          hb_itemPutNLLen(pItem, 0, lLen);
+          hb_itemPutNLLen(pItem, 0, static_cast<int>(lLen));
         }
       }
     } else {
       HB_I64 val = 0;
       if (SQL_SUCCEEDED(res = SQLGetData(hStmt, ui, SQL_C_SBIGINT, &val, sizeof(val), &iLen))) {
-        hb_itemPutNIntLen(pItem, val, lLen);
+        hb_itemPutNIntLen(pItem, val, static_cast<int>(lLen));
       }
       if (static_cast<int>(iLen) == SQL_NULL_DATA) {
         if (cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE) {
           hb_itemPutL(pItem, false);
         } else {
-          hb_itemPutNIntLen(pItem, 0, lLen);
+          hb_itemPutNIntLen(pItem, 0, static_cast<int>(lLen));
         }
       }
     }
@@ -1220,10 +1220,10 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
       lLen -= (lDec + 1);
     }
     if (SQL_SUCCEEDED(res = SQLGetData(hStmt, ui, SQL_C_DOUBLE, &val, sizeof(val), &iLen))) {
-      hb_itemPutNDLen(pItem, val, lLen, lDec);
+      hb_itemPutNDLen(pItem, val, static_cast<int>(lLen), static_cast<int>(lDec));
     }
     if (static_cast<int>(iLen) == SQL_NULL_DATA) {
-      hb_itemPutNDLen(pItem, 0.0, lLen, lDec);
+      hb_itemPutNDLen(pItem, 0.0, static_cast<int>(lLen), static_cast<int>(lDec));
     }
     break;
   }
