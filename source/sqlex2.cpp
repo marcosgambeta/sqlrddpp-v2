@@ -87,7 +87,7 @@ char *QualifyName(char *szName, SQLEXAREAP thiswa)
 {
   int i, len;
 
-  len = strlen(szName);
+  len = static_cast<int>(strlen(szName));
 
   for (i = 0; i < len; i++) {
     if (szName[i] == '\0') {
@@ -142,7 +142,7 @@ static void ResolveSpecialCols(SQLEXAREAP thiswa)
   if (iOldArea != thiswa->area.uiArea) {
     hb_rddSelectWorkAreaNumber(thiswa->area.uiArea);
   }
-  iIndexes = hb_arrayLen(thiswa->pIndexMgmnt);
+  iIndexes = static_cast<int>(hb_arrayLen(thiswa->pIndexMgmnt));
 
   for (i = 1; i <= iIndexes; i++) {
     pIndex = hb_arrayGetItemPtr(thiswa->pIndexMgmnt, i);
@@ -224,7 +224,7 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
   COLUMNBINDP InsertRecord;
   HB_USHORT uiPos;
 
-  iCols = hb_arrayLen(thiswa->aFields);
+  iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
   if (!thiswa->InsertRecord) {
     SetInsertRecordStructure(thiswa);
@@ -427,7 +427,7 @@ HB_ERRCODE BindInsertColumns(SQLEXAREAP thiswa)
   COLUMNBINDP InsertRecord;
   SQLRETURN res = SQL_ERROR;
 
-  iCols = hb_arrayLen(thiswa->aFields);
+  iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
   InsertRecord = thiswa->InsertRecord;
   iBind = 0;
 
@@ -446,7 +446,7 @@ HB_ERRCODE BindInsertColumns(SQLEXAREAP thiswa)
       case SQL_C_BINARY: {
         SQLINTEGER nInd;
         InsertRecord->lIndPtr = SQL_NTS;
-        nInd = strlen(reinterpret_cast<const char *>(InsertRecord->asChar.value));
+        nInd = static_cast<SQLINTEGER>(strlen(reinterpret_cast<const char *>(InsertRecord->asChar.value)));
         res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_CHAR,
                                SQL_LONGVARCHAR, InsertRecord->asChar.size_alloc, 0, InsertRecord->asChar.value, nInd,
                                &(InsertRecord->lIndPtr));
@@ -505,7 +505,7 @@ HB_ERRCODE FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate)
   PHB_ITEM pFieldData, pTemp;
   COLUMNBINDP InsertRecord;
 
-  iCols = hb_arrayLen(thiswa->aFields);
+  iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
   if (bUpdate) {
     InsertRecord = thiswa->CurrRecord;
@@ -740,7 +740,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
       case SQL_C_BINARY: {
         SQLINTEGER nInd;
         CurrRecord->lIndPtr = SQL_NTS;
-        nInd = strlen(reinterpret_cast<const char *>(CurrRecord->asChar.value));
+        nInd = static_cast<SQLINTEGER>(strlen(reinterpret_cast<const char *>(CurrRecord->asChar.value)));
         res = SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_CHAR,
                                SQL_LONGVARCHAR, CurrRecord->asChar.size_alloc, 0, CurrRecord->asChar.value, nInd,
                                &(CurrRecord->lIndPtr));
@@ -814,7 +814,7 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
     // Check if any updated column is included in current index column list
     pColumns = hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent)),
                                   INDEX_FIELDS);
-    thiswa->indexColumns = hb_arrayLen(pColumns);
+    thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
     for (i = 1; i <= thiswa->indexColumns; i++) {
       if (thiswa->editMask[hb_arrayGetNL(hb_arrayGetItemPtr(pColumns, i), 2) - 1]) {
