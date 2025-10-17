@@ -164,7 +164,7 @@ static void fb_log_status5(PFB_SESSION session, const char *from)
     // util_output("%s%s", s, nl);
   }
 
-  session->errorcode = session->status[1];
+  session->errorcode = static_cast<long>(session->status[1]);
   HB_SYMBOL_UNUSED(from);
 
   if (session->transac) {
@@ -210,20 +210,20 @@ HB_FUNC(FBCONNECT5) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv)
   i = 0;
   dpb[i++] = isc_dpb_version1;
   dpb[i++] = isc_dpb_user_name;
-  len = strlen(user);
+  len = static_cast<int>(strlen(user));
   dpb[i++] = static_cast<char>(len);
   memcpy(&(dpb[i]), user, len);
   i += len;
 
   dpb[i++] = isc_dpb_password;
-  len = strlen(passwd);
+  len = static_cast<int>(strlen(passwd));
   dpb[i++] = static_cast<char>(len);
   memcpy(&(dpb[i]), passwd, len);
   i += len;
 
   if (charset != nullptr) {
     dpb[i++] = isc_dpb_lc_ctype;
-    len = strlen(charset);
+    len = static_cast<int>(strlen(charset));
     dpb[i++] = static_cast<char>(len);
     memcpy(&(dpb[i]), charset, len);
     i += len;
@@ -1243,7 +1243,7 @@ HB_FUNC(FBLINEPROCESSED5)
   HB_SIZE lLen, lDec;
 
   if (session) {
-    cols = hb_arrayLen(pFields);
+    cols = static_cast<int>(hb_arrayLen(pFields));
 
     for (icol = 1; icol <= cols; icol++) {
       // HB_LONG lType;
@@ -1379,7 +1379,7 @@ HB_FUNC(FBLINEPROCESSED5)
             // sr_TraceLog("fb.log","valor float = %lf data %s\n",*static_cast<float ISC_FAR*>(var->sqldata),data);
             // FBFieldGet(hb_arrayGetItemPtr(pFields, icol), temp, static_cast<char*>(data), strlen(data), bQueryOnly,
             // ulSystemID, bTranslate);
-            hb_itemPutNDLen(temp, *reinterpret_cast<float ISC_FAR *>(var->sqldata), lLen, lDec);
+            hb_itemPutNDLen(temp, *reinterpret_cast<float ISC_FAR *>(var->sqldata), static_cast<int>(lLen), static_cast<int>(lDec));
             hb_arraySetForward(pRet, icol, temp);
             break;
           case IB_SQL_DOUBLE:
@@ -1387,7 +1387,7 @@ HB_FUNC(FBLINEPROCESSED5)
             // sr_TraceLog("fb.log","valor double = %lf data %s\n",*static_cast<float ISC_FAR*>(var->sqldata),data);
             // FBFieldGet(hb_arrayGetItemPtr(pFields, icol), temp, static_cast<char*>(data), strlen(data), bQueryOnly,
             // ulSystemID, bTranslate);
-            hb_itemPutNDLen(temp, *reinterpret_cast<double ISC_FAR *>(var->sqldata), lLen, lDec);
+            hb_itemPutNDLen(temp, *reinterpret_cast<double ISC_FAR *>(var->sqldata), static_cast<int>(lLen), static_cast<int>(lDec));
             hb_arraySetForward(pRet, icol, temp);
             break;
           case IB_SQL_BLOB:
