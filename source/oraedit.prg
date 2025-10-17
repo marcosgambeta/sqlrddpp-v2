@@ -157,12 +157,12 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    //s_hHashData := hb_hash()
    SET SERVER LOCAL
    SR_SetRDDTemp("ADT")
-   IF Empty(axColumns) .OR. !HB_ISARRAY(axColumns)
+   IF Empty(axColumns) .OR. !HB_IsArray(axColumns)
       cCols := " * "
    ELSE
       FOR EACH i IN axColumns
          IF "||" $ I
-            cTmp := "TMP" + strzero(nApeStart++, 3)
+            cTmp := "TMP" + StrZero(nApeStart++, 3)
             cCols += i + " as " + cTmp + ","
             AAdd(atempcols, {cTmp, hb_atokens(i, "||"), i})
          ELSE
@@ -192,7 +192,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    cSql := "Select  " + cCols + "  from " + cTable
    cCount := "select count(*) from " + cTable
 
-   IF !Empty(cWhere) .AND. HB_ISARRAY(aVarSust)
+   IF !Empty(cWhere) .AND. HB_IsArray(aVarSust)
 
       FOR i := 1 TO Len(aVarSust)
          cBind := ":" + AllTrim(Str(i))
@@ -235,7 +235,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    ENDIF
 
    cSql :=  "select * from ( select a.*, rownum r from ( " + cSql + ") a where rownum <= :HigerBound  ) where r >= :LowerBound"
-   sr_getconnection():exec(ccount, , .T., @aret)
+   SR_GetConnection():Exec(ccount, , .T., @aret)
    IF Len(aRet) > 0
       IF aret[1, 1] < 100
          nHigerBound := aret[1, 1]
@@ -251,7 +251,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       nLowerBound :=1
       nStep := 100
    ENDIF
-   fclose(HB_FTEMPCREATE(".", "tmp", , @cFile))
+   FClose(HB_FTEMPCREATE(".", "tmp", , @cFile))
    nRet := DE_CONT
    lAppend := .F.
    s_hHashData[s_nAliasTmp] := hb_hash()
@@ -262,7 +262,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       s_hHashData[s_nAliasTmp] := hb_hash()
       s_hHashData[s_nAliasTmp]["cFile"] := StrTran(cfile, ".tmp", "")
    ELSE
-      cAlias := "tmpedit" + strzero(s_nAliasTmp, 3)
+      cAlias := "tmpedit" + StrZero(s_nAliasTmp, 3)
       s_nAliasTmp++
       s_hHashData[s_nAliasTmp] := hb_hash()
       s_hHashData[s_nAliasTmp]["cFile"] := StrTran(cfile, ".tmp", "")
@@ -271,19 +271,19 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    refreshFullData(csql, cAlias, cfile, nHigerBound, nLowerBound, nStep)
 
    createkeyfrompk(calias, ctable, lDescIndex) //cria o indice temporatio em cima da pk
-   cFiletoDelete := (calias)->(dbinfo(10))
+   cFiletoDelete := (calias)->(DBInfo(10))
    nLowerBound += nHigerBound
 
    IF !Used()
 #ifdef HB_C52_STRICT
-      dbgobottom() /* Clipper compliance: call dbgobotom() to forces error message. */
+      DBGoBottom() /* Clipper compliance: call dbgobotom() to forces error message. */
 #else
       /* Call Errorsys() with error 2001 if not database in use. */
       _SR_Throw(ErrorNew("DBCMD", 0, 2001, procname(), "Workarea not in use"))
 #endif
-   ELSEIF eof() .AND. Lastrec() > 0
+   ELSEIF Eof() .AND. LastRec() > 0
       /* DbEdit() moves cursor to the bottom record if eof() is reached at init. */
-      dbGoBottom()
+      DBGoBottom()
    ENDIF
 
    DEFAULT nTop TO 0
@@ -299,7 +299,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    DEFAULT acColumnSep  TO " " + Chr(179) + " "
    DEFAULT acColumnFootings TO ""
 
-   IF Empty(axColumns) .OR. !HB_ISARRAY(axColumns)
+   IF Empty(axColumns) .OR. !HB_IsArray(axColumns)
 
       axColumns := Array(FCount())
 
@@ -384,13 +384,13 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       _SR_Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(bPostBlock) + ">", Procname() + " <bPostBlockBlock>"))
    ENDIF
 
-   IF HB_ISBLOCK(bPreBlock)
+   IF HB_IsBlock(bPreBlock)
       i := bPreBlock
       bPreBlock := Array(Len(axColumns))
       AFill(bPreBlock, i)
    END
 
-   IF HB_ISBLOCK(bPostBlock)
+   IF HB_IsBlock(bPostBlock)
       i := bPostBlock
       bPostBlock := Array(Len(axColumns))
       aFill(bPostBlock, i)
@@ -399,7 +399,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    // Save previous cursor shape and position.
    nCursor := SetCursor(SC_NONE)
 
-   IIf(HB_ISNIL(acFootingSep) .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
+   IIf(HB_IsNil(acFootingSep) .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
 
    /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
    DispBegin()
@@ -414,15 +414,15 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    oTBR:SkipBlock := {|x|dbe_Skipper(x, oTBR, calias)}
    //oTBR:SkipBlock := {|x|Skipped(x, lappend)}
 
-   IF HB_ISSTRING(acHeadingSep)
+   IF HB_IsString(acHeadingSep)
       oTBR:headSep := acHeadingSep
    END
 
-   IF HB_ISSTRING(acFootingSep)
+   IF HB_IsString(acFootingSep)
       oTBR:footSep := acFootingSep
    END
 
-   IF HB_ISSTRING(acColumnSep)
+   IF HB_IsString(acColumnSep)
      oTBR:colSep := acColumnSep
    END
 
@@ -447,65 +447,65 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
             ENDIF
          ENDIF
 
-         IF HB_ISARRAY(i)
-            bFunc := IIf(HB_ISBLOCK(i[1]), i[1], &("{||" + i[1] + "}"))
+         IF HB_IsArray(i)
+            bFunc := IIf(HB_IsBlock(i[1]), i[1], &("{||" + i[1] + "}"))
          ELSE
             IF !Empty(cTmp)
-               bFunc := IIf(HB_ISBLOCK(cTmp), cTmp, &("{||" + cTmp + "}"))
+               bFunc := IIf(HB_IsBlock(cTmp), cTmp, &("{||" + cTmp + "}"))
             ELSE
-               bFunc := IIf(HB_ISBLOCK(i), i, &("{||" + i + '}'))
+               bFunc := IIf(HB_IsBlock(i), i, &("{||" + i + '}'))
             ENDIF
          ENDIF
 
-         IF HB_ISMEMO(Eval(bFunc))
+         IF HB_IsMemo(Eval(bFunc))
             bFunc := {||"  <Memo>  "}
          ENDIF
 
          cHdr := i
 
-         IF HB_ISSTRING(acColumnHeaders)
+         IF HB_IsString(acColumnHeaders)
             cHdr := acColumnHeaders
-         ELSEIF HB_ISARRAY(acColumnHeaders) .AND. Len(acColumnHeaders) >= nIndex .AND. acColumnHeaders[nIndex] != NIL // handle empty column headers
+         ELSEIF HB_IsArray(acColumnHeaders) .AND. Len(acColumnHeaders) >= nIndex .AND. acColumnHeaders[nIndex] != NIL // handle empty column headers
             cHdr := acColumnHeaders[nIndex]
          ENDIF
 
-         IF HB_ISBLOCK(cHdr)
+         IF HB_IsBlock(cHdr)
             cHdr := "<block>"
          ENDIF
 
          oTBC := TBColumnNew(cHdr, bFunc)
 
-         IF HB_ISARRAY(i)
+         IF HB_IsArray(i)
             oTBC:colorBlock := i[2]
          ENDIF
 
-         IF HB_ISARRAY(acColumnSep)
+         IF HB_IsArray(acColumnSep)
             oTBC:colSep := acColumnSep[nIndex]
          ENDIF
 
-         IF HB_ISARRAY(acHeadingSep)
+         IF HB_IsArray(acHeadingSep)
             oTBC:headSep := acHeadingSep[nIndex]
          ENDIF
 
-         IF HB_ISARRAY(acFootingSep)
+         IF HB_IsArray(acFootingSep)
             oTBC:footSep := acFootingSep[nIndex]
          ENDIF
 
-         IF HB_ISARRAY(acColumnFootings)
+         IF HB_IsArray(acColumnFootings)
             oTBC:footing := acColumnFootings[nIndex]
-         ELSEIF HB_ISSTRING(acColumnFootings)
+         ELSEIF HB_IsString(acColumnFootings)
             oTBC:footing := acColumnFootings
          ENDIF
 
-         IF HB_ISARRAY(acColumnSayPictures) .AND. Len(acColumnSayPictures) >= nIndex
+         IF HB_IsArray(acColumnSayPictures) .AND. Len(acColumnSayPictures) >= nIndex
             oTBC:picture := acColumnSayPictures[nIndex]
-         ELSEIF HB_ISSTRING(acColumnSayPictures)
+         ELSEIF HB_IsString(acColumnSayPictures)
             oTBC:picture := acColumnSayPictures
          ENDIF
 
-         IF HB_ISARRAY(bPreBlock)
+         IF HB_IsArray(bPreBlock)
 
-            IF HB_ISLOGICAL(bPreBlock[nIndex])
+            IF HB_IsLogical(bPreBlock[nIndex])
                bPreBlock[nIndex] := IIf(bPreBlock[nIndex], {||.T.}, {||.F.})
             ENDIF
 
@@ -513,9 +513,9 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
 
          ENDIF
 
-         IF HB_ISARRAY(bPostBlock)
+         IF HB_IsArray(bPostBlock)
 
-            IF HB_ISLOGICAL(bPostBlock[nIndex])
+            IF HB_IsLogical(bPostBlock[nIndex])
                bPostBlock[nIndex] := IIf(bPostBlock[nIndex], {||.T.}, {||.F.})
             ENDIF
 
@@ -537,9 +537,9 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    ENDIF
 
    IF Empty(xUserFunc)
-      bFunc := {||IIf(HB_ISNUMERIC(nKey) .AND. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
+      bFunc := {||IIf(HB_IsNumeric(nKey) .AND. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
    ELSEIF !HB_IsLogical(xUserFunc)
-      bFunc := IIf(HB_ISBLOCK(xUserFunc), xUserFunc, &("{|x, y, z|" + xUserFunc + "(x,y,z)}"))
+      bFunc := IIf(HB_IsBlock(xUserFunc), xUserFunc, &("{|x, y, z|" + xUserFunc + "(x,y,z)}"))
       oTBR:setKey(K_ESC, NIL)
    ENDIF
 
@@ -585,18 +585,18 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       ENDIF
 
       oTBR:ForceStable()
-      IF (eof() .OR. s_hHashData[s_nAliasTmp]["eof"])
+      IF (Eof() .OR. s_hHashData[s_nAliasTmp]["eof"])
 
-         nRecno := recno()
+         nRecno := RecNo()
 
-         sr_getconnection():exec(ccount, , .T., @aret)
+         SR_GetConnection():Exec(ccount, , .T., @aret)
          IF Len(aRet) >0
-            IF (calias)->(lastrec()) < aret[1, 1]
+            IF (calias)->(LastRec()) < aret[1, 1]
                nHigerBound += nStep
                refreshFullData(csql, cAlias, cfile, nHigerBound, nLowerBound, nStep)
                nLowerBound += nStep
                otbr:refreshall()
-               dbgoto(nrecno)
+               DBGoTo(nrecno)
                oTbr:forcestable()
                oTbr:down():forcestable()
             ENDIF
@@ -650,7 +650,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       //   oTBR:Cargo := .T.
       //   lAppend := .T.
       //
-      //   IF !eof() .OR. !dbe_emptydb()
+      //   IF !Eof() .OR. !dbe_emptydb()
       //      oTBR:Down()
       //   ENDIF
       //
@@ -680,7 +680,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
             EXIT
          ENDIF
 
-         IF HB_ISBLOCK(SetKey(nKey))
+         IF HB_IsBlock(SetKey(nKey))
             Eval(SetKey(nKey), ProcName(1), ProcLine(1), "")
          ENDIF
 
@@ -693,21 +693,21 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    SetCursor(nCursor)
    SetPos(row(), 0)
    IF Select(cAlias ) > 0
-      (cAlias)->(dbclosearea())
+      (cAlias)->(DBCloseArea())
    ENDIF
    IF nOldArea > 0
       Select(nOldArea)
    ENDIF
    IF file(s_hHashData[s_nAliasTmp]["cFile"] + "sqllog.dbf")
-      ferase(s_hHashData[s_nAliasTmp]["cFile"] + "sqllog.dbf")
-      ferase(s_hHashData[s_nAliasTmp]["cFile"] + "sqllog.dbt")
+      FErase(s_hHashData[s_nAliasTmp]["cFile"] + "sqllog.dbf")
+      FErase(s_hHashData[s_nAliasTmp]["cFile"] + "sqllog.dbt")
    ENDIF
    IF s_nAliasTmp > 0
       s_nAliasTmp--
    ENDIF
-   ferase(cFiletoDelete)
+   FErase(cFiletoDelete)
    IF file(StrTran(cFiletoDelete, ".tmp", ".adi"))
-      ferase(StrTran(cFiletoDelete, ".tmp", ".adi"))
+      FErase(StrTran(cFiletoDelete, ".tmp", ".adi"))
    ENDIF
 
 /* Clipper's NG says that DBEdit always returns NIL, but doesn't. */
@@ -794,11 +794,11 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
 
       IF nKey == K_DEL
          IF IsPrimaryKeyDeleted(cAlias, cTable)
-            (calias)->(rlock())
-            (calias)->(dbdelete())
-            (calias)->(dbunlock())
+            (calias)->(RLock())
+            (calias)->(DBDelete())
+            (calias)->(DBUnlock())
          ENDIF
-         sr_getconnection():Exec(cCount, , .T., @aret)
+         SR_GetConnection():Exec(cCount, , .T., @aret)
       ELSEIF nKey == K_INS
 
          //nHigerBound++
@@ -807,7 +807,7 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
          //nLastRec := (cAlias)->(LastRec())
          insertupdated(cAlias, cTable)
          otbr:refreshall()
-         //cSql := sr_getconnection():cLastcomm
+         //cSql := SR_GetConnection():cLastcomm
          //IF Upper(ctable) $ Upper(cSql) .AND. "INSERT" $ Upper(cSql )
          //   cValues := SubStr(cSql, At("VALUES", Upper(cSql)))
          //   cSql := StrTran(csql, cvalues, "")
@@ -820,31 +820,31 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
          //   cvalues :=StrTran(cvalues, ")", "")
          //   aField := hb_atokens(csql, ",")
          //   aVal := hb_atokens(cvalues, ",")
-         //   (calias)->(dbappend())
+         //   (calias)->(DBAppend())
          //   FOR i := 1 TO Len(afield)
          //      BEGIN SEQUENCE WITH __BreakBlock()
-         //         (calias)->(fieldput((calias)->(fieldpos(aField[i])), aval[i]))
+         //         (calias)->(FieldPut((calias)->(FieldPos(aField[i])), aval[i]))
          //      RECOVER
          //      END SEQUENCE
          //   NEXT i
          //ENDIF
          //
-         sr_getconnection():Exec(cCount, , .T., @aret)
+         SR_GetConnection():Exec(cCount, , .T., @aret)
          //
       ELSE
          IF nKey == K_ENTER
             GETREFRESHCURVALUE(cAlias, cTable)
             //aValues := GetCurValue(calias)
          ENDIF
-         sr_getconnection():Exec(cCount, , .T., @aret)
+         SR_GetConnection():Exec(cCount, , .T., @aret)
       ENDIF
 
    ENDIF
    // A change was occurred on UDF (append, delete or skip).
-   lChanged := (nLastRec != (cAlias)->(lastrec()) .OR. Deleted() != lDeleted .OR. nRec != Recno())
+   lChanged := (nLastRec != (cAlias)->(LastRec()) .OR. Deleted() != lDeleted .OR. nRec != RecNo())
 
    IF Len(aret ) > 0 .AND. nRet == DE_REFRESH
-      lChanged := lChanged .OR. reccount() != aret[1, 1]
+      lChanged := lChanged .OR. RecCount() != aret[1, 1]
    ENDIF
    IF nRet == DE_ABORT .OR. nRet = DE_APPEND
       RETURN nRet
@@ -868,36 +868,36 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
          //IF (Set(_SET_DELETED) .AND. Deleted()) .OR. (!Empty(dbfilter()) .AND. !&(dbFilter()))
          //   dbSkip()
          //ENDIF
-         //IF EOF()
+         //IF Eof()
          //   dbGoBottom()
          //ENDIF
          //
          //otbr:forceStable()
          //
 
-      ELSEIF (calias)->(LastRec()) < nLastRec .OR. aret[1, 1] < (calias)->(reccount()) // pack
+      ELSEIF (calias)->(LastRec()) < nLastRec .OR. aret[1, 1] < (calias)->(RecCount()) // pack
 
          oTBR:RowPos := 1
 
-      ELSEIF (calias)->(Deleted()) .AND. (cAlias)->(LastRec()) != 0 .OR. aret[1, 1] <= (calias)->(reccount()) // deleted
+      ELSEIF (calias)->(Deleted()) .AND. (cAlias)->(LastRec()) != 0 .OR. aret[1, 1] <= (calias)->(RecCount()) // deleted
 
          IF SET(_SET_DELETED)
-            DO WHILE !eof() .AND. deleted()
-               dbSkip()
+            DO WHILE !Eof() .AND. deleted()
+               DBSkip()
             ENDDO
          ELSE
             dbe_syncpos(oTBR)
          ENDIF
 
-      ELSEIF nRec != Recno() // moved.
+      ELSEIF nRec != RecNo() // moved.
 
          dbe_syncpos(oTBR)
 
       ENDIF
 
-      IF (eof() .AND. (cAlias)->(LastRec()) > 0)
+      IF (Eof() .AND. (cAlias)->(LastRec()) > 0)
 
-         dbskip(-1)
+         DBSkip(-1)
 
          oTBR:Up():forceStable()
          //s_hHashData[calias]["eof"] := .F.
@@ -911,7 +911,7 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
       nRet := DE_REFRESH
 
    ENDIF
-   IF eof()
+   IF Eof()
       //dbskip(-1)
 
       //oTBR:Up():forceStable()
@@ -919,7 +919,7 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
       //nHigerBound += nStep
       //refreshFullData(csql, cAlias, cfile, nHigerBound, nLowerBound, nStep)
       //nLowerBound += nStep
-   ELSEIF bof()
+   ELSEIF Bof()
       //IF nHigerBound > nStep
       //   nHigerBound -= nStep
       //   nLowerBound -= nStep
@@ -959,24 +959,24 @@ STATIC FUNCTION dbe_Skipper(nSkip, oTb, calias)
 
    lEof := .F.
    DO CASE
-   CASE (nSkip = 0 .OR. lastrec() = 0)
+   CASE (nSkip = 0 .OR. LastRec() = 0)
       // Skip 0 (significant on a network)
-      dbSkip(0)
-   CASE (nSkip > 0 .AND. !eof())
+      DBSkip(0)
+   CASE (nSkip > 0 .AND. !Eof())
       DO WHILE (i < nSkip) // Skip Foward
-         dbskip(1)
+         DBSkip(1)
          i++
-         IF eof() .AND. !lAppend
+         IF Eof() .AND. !lAppend
             s_hHashData[s_nAliastmp]["eof"] := .T.
-            dbskip(-1)
+            DBSkip(-1)
             i--
             EXIT
          ENDIF
       ENDDO
    CASE (nSkip < 0)
       DO WHILE (i > nSkip) // Skip backward
-         dbskip(-1)
-         IF bof()
+         DBSkip(-1)
+         IF Bof()
             EXIT
          ENDIF
          i--
@@ -1022,10 +1022,10 @@ STATIC FUNCTION dbe_emptydb()
       RETURN .T.
    ENDIF
 
-   IF !Empty(dbFilter())
-      lEmpty := (Eof() .OR. Recno() > Lastrec())
+   IF !Empty(DBFilter())
+      lEmpty := (Eof() .OR. RecNo() > LastRec())
    ELSEIF IndexOrd() == 0
-      lEmpty := ((Eof() .OR. Recno() > LastRec()) .AND. Bof())
+      lEmpty := ((Eof() .OR. RecNo() > LastRec()) .AND. Bof())
    ELSE
       //lEmpty := (OrdKeyCount() == 0) // this code decrease dbedit's speed at large table.
       lEmpty := (OrdKeyNo() == 0)
@@ -1069,7 +1069,7 @@ RETURN nRet
 STATIC FUNCTION dbe_Return(n)
 //--------------------------------//
 
-   IF !hb_isnumeric(n)
+   IF !HB_IsNumeric(n)
       n := DE_CONT
    ELSEIF n < DE_ABORT .OR. n > DE_APPEND
       n := DE_CONT
@@ -1102,7 +1102,7 @@ RETURN (AScan(aKeys, nKey) != 0)
 STATIC FUNCTION dbe_syncpos(oTb)
 //------------------------------//
 
-   LOCAL nRec := Recno()
+   LOCAL nRec := RecNo()
    LOCAL nKeyNo := 0
    LOCAL nDel := 0
    LOCAL lDeleted := .F.
@@ -1110,24 +1110,24 @@ STATIC FUNCTION dbe_syncpos(oTb)
    IF IndexOrd() != 0
 
       nKeyNo := OrdKeyNo()
-      dbSkip(-1)
+      DBSkip(-1)
 
-      IF bof()
+      IF Bof()
          oTb:RowPos := 1
       ELSE
          lDeleted := Set(_SET_DELETED, .F.)
          IF !lDeleted
-            dbGoto(nRec)
+            DBGoTo(nRec)
             oTb:RowPos := nKeyNo
          ELSE
-            dbGotop()
-            DO WHILE !eof() .AND. recno() != nRec
+            DBGoTop()
+            DO WHILE !Eof() .AND. RecNo() != nRec
                IF deleted()
                   nDel++
                ENDIF
-               dbskip()
+               DBSkip()
             ENDDO
-            dbGoto(nRec)
+            DBGoTo(nRec)
             oTb:RowPos := nKeyNo - nDel
          ENDIF
          Set(_SET_DELETED, lDeleted)
@@ -1149,9 +1149,9 @@ FUNCTION GetCurValue(calias)
    LOCAL aTemp := {}
 
    FOR n := 1 TO (cAlias)->(fcount())
-      AAdd(aTemp,(cAlias)->(fieldget(n)))
+      AAdd(aTemp,(cAlias)->(FieldGet(n)))
    NEXT n
-   AAdd(aTemp,(calias)->(recno()))
+   AAdd(aTemp,(calias)->(RecNo()))
 
 RETURN aTemp
 
@@ -1162,7 +1162,7 @@ STATIC FUNCTION refreshFullData(csql, cAlias, cfile, nHigh, nLow, nStep)
    LOCAL nBeforeTotRec := 0
    LOCAL nAfterRec := 0
 
-   DEFAULT cFile TO (calias)->(dbinfo(10))
+   DEFAULT cFile TO (calias)->(DBInfo(10))
 
    //IF Select(caLias) > 0
    //   ZAP
@@ -1170,27 +1170,27 @@ STATIC FUNCTION refreshFullData(csql, cAlias, cfile, nHigh, nLow, nStep)
    //cSql := StrTran(csql, ":HigerBound", Str(nHigh))
    //cSql := StrTran(csql, ":LowerBound", Str(nLow))
    //
-   //sr_getconnection():exec(cSql, , .T., , cfile, cAlias)
-   //(calias)->(dbgotop())
-   nBeforeTotRec := (calias)->(reccount())
+   //SR_GetConnection():Exec(cSql, , .T., , cfile, cAlias)
+   //(calias)->(DBGoTop())
+   nBeforeTotRec := (calias)->(RecCount())
    IF Select(caLias) > 0
-      IF (calias)->(eof())
+      IF (calias)->(Eof())
          nRecno := nBeforeTotRec
       ELSE
-         nRecno := (calias)->(recno())
+         nRecno := (calias)->(RecNo())
       ENDIF
    ENDIF
    cSql := StrTran(csql, ":HigerBound", Str(nHigh))
    cSql := StrTran(csql, ":LowerBound", Str(nLow))
 
-   sr_getconnection():exec(cSql, , .T., , cfile, cAlias)
-   nAfterRec := (calias)->(reccount())
+   SR_GetConnection():Exec(cSql, , .T., , cfile, cAlias)
+   nAfterRec := (calias)->(RecCount())
 
    IF nAfterRec > nrecno .AND. nBeforeTotRec<nAfterRec
       IF nrecno == 0
-         (calias)->(dbgotop())
+         (calias)->(DBGoTop())
       ELSE
-         (calias)->(dbgoto(nrecno + 1))
+         (calias)->(DBGoTo(nrecno + 1))
       ENDIF
    ENDIF
 
@@ -1208,7 +1208,7 @@ FUNCTION GETPRIMARYKEY(cTable)
    ELSE
       CSQL :=  "SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner FROM all_constraints cons, all_cons_columns cols WHERE cols.table_name = " + sr_cdbvalue(Upper(AllTrim(cTable)) ) + " AND cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner ORDER BY cols.table_name, cols.position"
    ENDIF
-   sr_getconnection():exec(cSql, , .T., @aret)
+   SR_GetConnection():Exec(cSql, , .T., @aret)
    IF Len(aRet) > 0
       FOR EACH aTemp IN aRet
          AAdd(aFields, AllTrim(aTemp[2]))
@@ -1219,14 +1219,14 @@ RETURN aFields
 
 FUNCTION GETREFRESHCURVALUE(calias, ctable)
 
-   //LOCAL cTable := (calias)->(dbinfo(10))
+   //LOCAL cTable := (calias)->(DBInfo(10))
    LOCAL aFields := GETPRIMARYKEY(cTable)
    LOCAL aFields2
    LOCAL aTemp
    LOCAL i := 1
    LOCAL cSql := ""
    LOCAL aret := {}
-   LOCAL adb := (calias)->(dbstruct())
+   LOCAL adb := (calias)->(DBStruct())
    LOCAL nPos
    LOCAL ckey
    LOCAL aTmp
@@ -1236,7 +1236,7 @@ FUNCTION GETREFRESHCURVALUE(calias, ctable)
       cSql += " where "
 
       FOR EACH aTemp IN aFields
-         cKey := (calias)->(fieldGet((cAlias)->(fieldpos(aTemp))))
+         cKey := (calias)->(FieldGet((cAlias)->(FieldPos(aTemp))))
          IF Empty(ckey)
             cSql += " " + aTemp  + " is null "
          ELSE
@@ -1246,21 +1246,21 @@ FUNCTION GETREFRESHCURVALUE(calias, ctable)
       NEXT
       cSql := SubStr(cSql, 1, Len(csql) - 4)
 
-      sr_getconnection():exec(cSql, , .T., @aret)
-      aFields2 := sr_getconnection():aFields
+      SR_GetConnection():Exec(cSql, , .T., @aret)
+      aFields2 := SR_GetConnection():aFields
       IF Len(aret) > 0
          (calias)->(rlock())
          aTemp := aret[1]
          FOR EACH aTmp IN aFields2
             nPos := AScan(adb,{|x|x[1] == aFields2[i, 1]})
             IF nPos > 0
-               (cAlias)->(fieldput((cAlias)->(fieldpos(adb[nPos, 1])), aTemp[i]))
+               (cAlias)->(FieldPut((cAlias)->(FieldPos(adb[nPos, 1])), aTemp[i]))
             ENDIF
             i++
          NEXT
-         (calias)->(dbunlock())
-         nrecno := (calias)->(recno())
-         (calias)->(dbgoto(nrecno))
+         (calias)->(DBUnlock())
+         nrecno := (calias)->(RecNo())
+         (calias)->(DBGoTo(nrecno))
       ENDIF
    ENDIF
 
@@ -1268,7 +1268,7 @@ RETURN NIL
 
 FUNCTION GETREFRESHCURINSVALUE(calias, ctable, calias2)
 
-   //LOCAL cTable := (calias)->(dbinfo(10))
+   //LOCAL cTable := (calias)->(DBInfo(10))
    LOCAL aFields := GETPRIMARYKEY(cTable)
    LOCAL aFields2
    LOCAL aTemp
@@ -1277,7 +1277,7 @@ FUNCTION GETREFRESHCURINSVALUE(calias, ctable, calias2)
    LOCAL aret := {}
    LOCAL nrec
    LOCAL uDat
-   LOCAL cfile := (calias2)->(dbinfo(10))
+   LOCAL cfile := (calias2)->(DBInfo(10))
    LOCAL cfield
    LOCAL aTmpField
    LOCAL nposf
@@ -1288,37 +1288,37 @@ FUNCTION GETREFRESHCURINSVALUE(calias, ctable, calias2)
       cSql += " where "
 
       FOR EACH aTemp IN aFields
-         cSql += " " + aTemp  + " = " + sr_cdbvalue((calias)->(fieldGet((cAlias)->(fieldpos(aTemp)))))
+         cSql += " " + aTemp  + " = " + sr_cdbvalue((calias)->(FieldGet((cAlias)->(FieldPos(aTemp)))))
          cSql += " AND "
       NEXT
 
       cSql := SubStr(cSql, 1, Len(csql) - 4)
       //corrigido neste ponto
-      //sr_getconnection():exec(cSql, , .T., , cfile, cAlias2, 1)
-      //(calias2)->(dbgobottom())
+      //SR_GetConnection():Exec(cSql, , .T., , cfile, cAlias2, 1)
+      //(calias2)->(DBGoBottom())
       //endif
 
-      sr_getconnection():exec(cSql, , .T., @aret)
-      aFields2 := sr_getconnection():aFields
+      SR_GetConnection():Exec(cSql, , .T., @aret)
+      aFields2 := SR_GetConnection():aFields
 
       IF Len(aret) > 0
    
          //FOR EACH aTemp IN aRet
-         (calias2)->(dbappend())
+         (calias2)->(DBAppend())
          //tracelog(valtoprg(atemp), aFields2[i, 1])
          i := 1
          aTemp := aret[1]
          FOR EACH aTmpField IN aFields2
             cField := aTmpField[1]
-            nposf := (cAlias2)->(fieldpos(cField))
-            (cAlias2)->(fieldput(nposf, aTemp[i]))
+            nposf := (cAlias2)->(FieldPos(cField))
+            (cAlias2)->(FieldPut(nposf, aTemp[i]))
             ++i
          NEXT
-         (calias2)->(dbcommit())
-         (calias2)->(dbunlock())
+         (calias2)->(DBCommit())
+         (calias2)->(DBUnlock())
          //NEXT
    
-         //nrec := (cAlias2)->(recno())
+         //nrec := (cAlias2)->(RecNo())
          //(calias2)->(dbgoto(nrec))
    
       ENDIF
@@ -1342,8 +1342,8 @@ FUNCTION IsPrimaryKeyDeleted(calias, cTable)
       cSql := "select * from " + ctable
       cSql += " where "
       FOR EACH aTemp IN aFields
-         nFieldPos := (cAlias)->(fieldpos(aTemp))
-         xval := (calias)->(fieldGet(nfieldPos))
+         nFieldPos := (cAlias)->(FieldPos(aTemp))
+         xval := (calias)->(FieldGet(nfieldPos))
          IF Empty(xval)
             cSql += " " + aTemp + " is null "
          ELSE
@@ -1353,7 +1353,7 @@ FUNCTION IsPrimaryKeyDeleted(calias, cTable)
       NEXT
       cSql := SubStr(cSql, 1, Len(csql) - 4)
 
-      sr_getconnection():exec(cSql, , .T., @aret)
+      SR_GetConnection():Exec(cSql, , .T., @aret)
       IF Len(aRet ) == 0
          RETURN .T.
       ENDIF
@@ -1366,14 +1366,14 @@ FUNCTION insertupdated(calias, ctable)
    LOCAL aFields := GETPRIMARYKEY(cTable)
    LOCAL cFields := ""
    LOCAL cDesc := ""
-   LOCAL ctemp := (calias)->(dbinfo(10))
+   LOCAL ctemp := (calias)->(DBInfo(10))
    LOCAL cFileDrive := SubStr(cTemp, 1, RAt("\", cTemp) - 2)
    LOCAL cFile := SubStr(cTemp, RAt("\", cTemp) + 1)
    LOCAL aVal
    LOCAL cSqlTmp := ""
    LOCAL aTemp
    LOCAL atemp2 := {}
-   LOCAL adb := (calias)->(dbstruct())
+   LOCAL adb := (calias)->(DBStruct())
    LOCAL nPos
    LOCAL i := 1
    LOCAL nrec
@@ -1411,10 +1411,10 @@ FUNCTION insertupdated(calias, ctable)
          //cvalues := StrTran(cvalues, "'", "")
          aField := hb_atokens(csql, ",")
          aVal := hb_atokens(cvalues, ",")
-         //(calias)->(dbappend())
+         //(calias)->(DBAppend())
          //FOR i := 1 TO Len(afield)
          //   BEGIN SEQUENCE WITH __BreakBlock()
-         //      (calias)->(fieldput((calias)->(fieldpos(aField[i])), aval[i]))
+         //      (calias)->(FieldPut((calias)->(FieldPos(aField[i])), aval[i]))
          //   RECOVER
          //   END SEQUENCE
          //NEXT i
@@ -1430,7 +1430,7 @@ FUNCTION insertupdated(calias, ctable)
                ENDIF
                IF HB_IsChar(aval[npos])
                   cSql += " " + aTemp  + " = " +  aVal[nPos]
-               ELSEIF  HB_ISNUMERIC(aval[npos]) .OR. HB_ISDATE(aval[npos])
+               ELSEIF  HB_IsNumeric(aval[npos]) .OR. HB_IsDate(aval[npos])
                   cSql += " " + aTemp  + " = " +  sr_cdbvalue(aVal[nPos])
                ENDIF
                cSql += " AND "
@@ -1441,25 +1441,25 @@ FUNCTION insertupdated(calias, ctable)
          csql := "select " + cfields + " from " + ctable + " where rownum <4  order by " + cDesc
       ENDIF
       USE (csql) NEW alias "INSSQLTMP" VIA "SQLRDD"
-      IF INSSQLTMP->(reccount()) > 0
+      IF INSSQLTMP->(RecCount()) > 0
 
-         inssqltmp->(dbgotop())
-         DO WHILE !inssqltmp->(eof())
+         inssqltmp->(DBGoTop())
+         DO WHILE !inssqltmp->(Eof())
             cSqlTmp := ""
             i := 1
             FOR EACH aTemp IN aFields
                nPos := AScan(adb,{|x|Upper(x[1]) == aTemp})
                IF nPos > 0
                   IF inssqltmp->(fieldtype(i)) == "C"
-                     cSqlTmp += inssqltmp->(fieldget(i))
+                     cSqlTmp += inssqltmp->(Fieldget(i))
                   ELSEIF inssqltmp->(fieldtype(i)) == "N"
                      IF adb[npos, 4] > 0
-                        cSqlTmp += Str(inssqltmp->(fieldget(i)), adb[npos, 3], adb[npos, 4])
+                        cSqlTmp += Str(inssqltmp->(FieldGet(i)), adb[npos, 3], adb[npos, 4])
                      ELSE
-                        cSqlTmp += Str(inssqltmp->(fieldget(i)), adb[npos, 3])
+                        cSqlTmp += Str(inssqltmp->(FieldGet(i)), adb[npos, 3])
                      ENDIF
                   ELSEIF inssqltmp->(fieldtype(i)) == "D"
-                     cSqlTmp += dtos(inssqltmp->(fieldget(i)))
+                     cSqlTmp += DToS(inssqltmp->(FieldGet(i)))
                   ENDIF
                ENDIF
                i++
@@ -1467,26 +1467,26 @@ FUNCTION insertupdated(calias, ctable)
 
             //USE (cSqlTmp) NEW Alias "INSSQLTMP2" VIA "ADSADT"
 
-            IF !(calias)->(dbseek(csqltmp))
+            IF !(calias)->(DBSeek(csqltmp))
                GETREFRESHCURINSVALUE("INSSQLTMP", ctable, calias)
             ENDIF
 
             //endif
-            INSSQLTMP->(dbskip())
+            INSSQLTMP->(DBSkip())
          ENDDO
       ENDIF
-      INSSQLTMP->(dbclosearea())
+      INSSQLTMP->(DBCloseArea())
    ENDIF
 
-   //(calias)->(dbgoto((calias)->(lastrec())))
+   //(calias)->(DBGoTo((calias)->(LastRec())))
    Select(calias)
 
 RETURN NIL
 
-//(calias)->(dbappend())
+//(calias)->(DBAppend())
 //FOR i := 1 TO Len(afield)
 //   BEGIN SEQUENCE WITH __BreakBlock()
-//      (calias)->(fieldput((calias)->(fieldpos(aField[i])), aval[i]))
+//      (calias)->(FieldPut((calias)->(FieldPos(aField[i])), aval[i]))
 //   RECOVER
 //   END SEQUENCE
 //NEXT i
@@ -1497,7 +1497,7 @@ FUNCTION createkeyfrompk(calias, ctable, lDescIndex)
    LOCAL aTemp
    LOCAL ckey := ""
    LOCAL i := 1
-   LOCAL aDb := (calias)->(dbstruct())
+   LOCAL aDb := (calias)->(DBStruct())
    LOCAL lnumtostr := .F.
    LOCAL lDatetoStr := .F.
    LOCAL nPos
@@ -1554,20 +1554,20 @@ STATIC FUNCTION Skipped(nRecs, lAppend)
 
    IF LastRec() != 0
       IF nRecs == 0
-         IF EOF() .AND. !lAppend
-            dbSkip(-1)
+         IF Eof() .AND. !lAppend
+            DBSkip(-1)
             nSkipped := -1
          ELSE
-            dbSkip(0)
+            DBSkip(0)
          ENDIF
       ELSEIF nRecs > 0 .AND. RecNo() != LastRec() + 1
          DO WHILE nSkipped < nRecs
-            dbSkip()
+            DBSkip()
             IF Eof()
                IF lAppend
                   nSkipped++
                ELSE
-                  dbSkip(-1)
+                  DBSkip(-1)
                ENDIF
                EXIT
             ENDIF
@@ -1575,7 +1575,7 @@ STATIC FUNCTION Skipped(nRecs, lAppend)
          ENDDO
       ELSEIF nRecs < 0
          DO WHILE nSkipped > nRecs
-            dbSkip(-1)
+            DBSkip(-1)
             IF Bof()
                EXIT
             ENDIF
@@ -1598,24 +1598,24 @@ FUNCTION SR_WriteDbLog(cComm, oCnn)
    BEGIN SEQUENCE WITH __BreakBlock()
 
       IF !sr_phFile(cpre + "sqllog.dbf")
-         dbCreate(cpre + "sqllog.dbf", s_TRACE_STRUCT, "DBFNTX")
+         DBCreate(cpre + "sqllog.dbf", s_TRACE_STRUCT, "DBFNTX")
       ENDIF
 
       DO WHILE .T.
-         dbUseArea(.T., "DBFNTX", cpre + "sqllog.dbf", "SQLLOG", .T., .F.)
+         DBUseArea(.T., "DBFNTX", cpre + "sqllog.dbf", "SQLLOG", .T., .F.)
          IF !NetErr()
             EXIT
          ENDIF
          hb_idleSleep(500 / 1000)
       ENDDO
       IF "INSERT" $ Upper(cComm)
-         SQLLOG->(dbAppend())
+         SQLLOG->(DBAppend())
          REPLACE SQLLOG->DATA      WITH Date()
          REPLACE SQLLOG->HORA      WITH Time()
          REPLACE SQLLOG->COMANDO   WITH cComm
          REPLACE SQLLOg->PROCESSED WITH .F.
       ENDIF
-      SQLLOG->(dbCloseArea())
+      SQLLOG->(DBCloseArea())
 
    RECOVER
 
@@ -1632,28 +1632,28 @@ FUNCTION GetLastInsertCommand(cTable)
    LOCAL cPre := s_hHashData[s_nAliasTmp]["cFile"]
 
    IF !sr_phFile(cpre + "sqllog.dbf")
-      dbCreate(cpre + "sqllog.dbf", s_TRACE_STRUCT, "DBFNTX")
+      DBCreate(cpre + "sqllog.dbf", s_TRACE_STRUCT, "DBFNTX")
    ENDIF
    DO WHILE .T.
-      dbUseArea(.T., "DBFNTX", cpre + "sqllog.dbf", "SQLLOG", .T., .F.)
+      DBUseArea(.T., "DBFNTX", cpre + "sqllog.dbf", "SQLLOG", .T., .F.)
       IF !NetErr()
          EXIT
       ENDIF
       hb_idleSleep(500 / 1000)
    ENDDO
 
-   SQLLOG->(dbgobottom())
-   DO WHILE !SQLLOG->(BOF())
+   SQLLOG->(DBGoBottom())
+   DO WHILE !SQLLOG->(Bof())
       IF !SQLLOG->PROCESSED .AND. Upper(CTABLE) $ Upper(SQLLOG->COMANDO)
          CRET := SQLLOG->COMANDO
-         SQLLOG->(RLOCK())
+         SQLLOG->(RLock())
          REPLACE SQLLOg->PROCESSED WITH .T.
-         SQLLOG->(DBUNLOCK())
+         SQLLOG->(DBUnlock())
          EXIT
       ENDIF
-      SQLLOG->(DBSKIP(-1))
+      SQLLOG->(DBSkip(-1))
    ENDDO
-   SQLLOG->(dbCloseArea())
+   SQLLOG->(DBCloseArea())
    DBSelectArea(nAlAtual)
 
 RETURN CRET
