@@ -2086,8 +2086,8 @@ static const char *mxml_error_desc(MXML_ERROR_CODE code)
 // document is created empty.
 HB_FUNC(SRXML_DATAREAD)
 {
-  PHB_ITEM pParam = hb_param(2, Harbour::Item::ANY);
-  PHB_ITEM pDoc = hb_param(1, Harbour::Item::OBJECT);
+  auto pParam = hb_param(2, Harbour::Item::ANY);
+  auto pDoc = hb_param(1, Harbour::Item::OBJECT);
   int iStyle = hb_parni(3);
   PHB_ITEM pRoot;
   MXML_REFIL refil;
@@ -2118,7 +2118,7 @@ HB_FUNC(SRXML_DATAREAD)
 // Returns a descriptive string telling what the error number is meaning.
 HB_FUNC(SR_XMLERRORDESC)
 {
-  PHB_ITEM pNum = hb_param(1, Harbour::Item::NUMERIC);
+  auto pNum = hb_param(1, Harbour::Item::NUMERIC);
 
   if (pNum) {
     hb_retc(mxml_error_desc((MXML_ERROR_CODE)hb_itemGetNI(pNum)));
@@ -2131,8 +2131,8 @@ HB_FUNC(SR_XMLERRORDESC)
 // Writes an XML document to a string.
 HB_FUNC(SRXML_NODE_TO_STRING)
 {
-  PHB_ITEM pNode = hb_param(1, Harbour::Item::OBJECT);
-  PHB_ITEM pStyle = hb_param(2, Harbour::Item::NUMERIC);
+  auto pNode = hb_param(1, Harbour::Item::OBJECT);
+  auto pStyle = hb_param(2, Harbour::Item::NUMERIC);
   MXML_SGS *sgs;
   MXML_OUTPUT out;
   int iStyle;
@@ -2163,9 +2163,9 @@ HB_FUNC(SRXML_NODE_TO_STRING)
 // Writes an XML document to a file; returns the HB_XML status.
 HB_FUNC(SRXML_NODE_WRITE)
 {
-  PHB_ITEM pNode = hb_param(1, Harbour::Item::OBJECT);
-  PHB_ITEM pHandle = hb_param(2, Harbour::Item::NUMERIC);
-  PHB_ITEM pStyle = hb_param(3, Harbour::Item::NUMERIC);
+  auto pNode = hb_param(1, Harbour::Item::OBJECT);
+  auto pHandle = hb_param(2, Harbour::Item::NUMERIC);
+  auto pStyle = hb_param(3, Harbour::Item::NUMERIC);
   MXML_OUTPUT out;
   int iStyle, iRet;
 
