@@ -44,6 +44,9 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+#ifndef SQLODBC_CH
+#define SQLODBC_CH
+
 // TODO: revise and remove duplicates
 
 #ifndef SQL_ERRCODES
@@ -302,3 +305,5 @@
    //#define SQL_FAKE_NUM                        -102
 
 #endif
+
+#endif // SQLODBC_CH

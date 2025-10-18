@@ -40,7 +40,6 @@
 // $END_LICENSE$
 
 #ifndef ORACLE_CH
-
 #define ORACLE_CH
 
 #define OCI_SUCCESS 0                      /* maps to SQL_SUCCESS of SAG CLI */
@@ -61,4 +60,4 @@
 #define SQL_SUCCESS_WITH_INFO               OCI_SUCCESS_WITH_INFO
 #define SQL_DROP                            OCI_SUCCESS_WITH_INFO
 
-#endif
+#endif // ORACLE_CH

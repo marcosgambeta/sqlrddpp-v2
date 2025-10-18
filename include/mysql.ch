@@ -40,9 +40,7 @@
 // $END_LICENSE$
 
 #ifndef MYSQL_CH
-
 #define MYSQL_CH
-
 
 // MySQL field types
 
@@ -91,4 +89,4 @@
 #define  ZEROFILL_FLAG           64		/* Field is zerofill */
 #define  BINARY_FLAG             128
 
-#endif
+#endif // MYSQL_CH
