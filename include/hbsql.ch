@@ -48,7 +48,7 @@
 #ifndef HBSQL_CH
 #define HBSQL_CH
 
-/* pCode Instruction Set */
+// pCode Instruction Set
 
 #define SQL_PCODE_VERSION                    1
 
@@ -67,7 +67,6 @@
 #define SQL_PCODE_COLUMN_NAME_BINDVAR        11
 #define SQL_PCODE_COLUMN_NAME_PARAM          12
 #define SQL_PCODE_COLUMN_PARAM_NOTNULL       13
-
 
 #define SQL_PCODE_LOCK                       20
 #define SQL_PCODE_NOLOCK                     21
@@ -147,7 +146,7 @@
 #define SQL_PCODE_OPERATOR_LEFT_OUTER_JOIN   1101
 #define SQL_PCODE_OPERATOR_RIGHT_OUTER_JOIN  1102
 
-/* Error Messages */
+// Error Messages
 
 #define SQL_PARSER_ERROR_PARSE               1
 
@@ -169,7 +168,7 @@
 #define SQL_SINTAX_ERROR_OUTER_JOIN          400
 #define SQL_SINTAX_ERROR_OUTER_JOIN_OR       401
 
-/* Supported Database Engines */
+// Supported Database Engines
 
 #ifndef SYSTEMID_UNKNOW
    #define SYSTEMID_UNKNOW                0
@@ -197,7 +196,7 @@
    #define SYSTEMID_FIREBR5              22
 #endif
 
-/* Context Analisys Constants */
+// Context Analisys Constants
 
 #define SQL_CONTEXT_RESET                 0
 
