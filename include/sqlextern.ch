@@ -1,8 +1,7 @@
-/*
- * SQLRDD Externals
- * Copyright (c) 2003 - Marcelo Lombardo  <marcelo@xharbour.com.br>
- *
- */
+//
+// SQLRDD Externals
+// Copyright (c) 2003 - Marcelo Lombardo  <marcelo@xharbour.com.br>
+//
 
 /*
  * This program is free software; you can redistribute it and/or modify

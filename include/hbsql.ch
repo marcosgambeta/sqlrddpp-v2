@@ -1,9 +1,8 @@
-/*
- * SQLPARSER
- * PRG level pCode Header for SQL Parser (used from C also)
- * Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
- *
- */
+//
+// SQLPARSER
+// PRG level pCode Header for SQL Parser (used from C also)
+// Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
+//
 
 /*
  * This program is free software; you can redistribute it and/or modify

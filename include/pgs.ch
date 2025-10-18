@@ -1,8 +1,7 @@
-/*
- * SQLRDD Postgres native constants
- * Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
- *
- */
+//
+// SQLRDD Postgres native constants
+// Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
+//
 
 /*
  * This program is free software; you can redistribute it and/or modify

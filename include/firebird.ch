@@ -1,8 +1,7 @@
-/*
- * SQLRDD Firebird native constants
- * Copyright (c) 2004 - Marcelo Lombardo  <lombardo@uol.com.br>
- *
- */
+//
+// SQLRDD Firebird native constants
+// Copyright (c) 2004 - Marcelo Lombardo  <lombardo@uol.com.br>
+//
 
 /*
  * This program is free software; you can redistribute it and/or modify
