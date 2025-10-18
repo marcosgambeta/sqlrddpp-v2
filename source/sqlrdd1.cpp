@@ -3088,18 +3088,12 @@ static HB_ERRCODE sqlRddInfo(LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConne
 
 static bool ProcessFields(SQLAREAP thiswa)
 {
-  DBFIELDINFO field;
-  HB_LONG numFields;
-  HB_BYTE *fieldType;
-  HB_USHORT i;
-  PHB_ITEM thisfield;
-
   if (hb_itemType(thiswa->aStruct) != Harbour::Item::ARRAY) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Invalid structure array"));
     return false;
   }
 
-  numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
+  HB_LONG numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));
@@ -3108,7 +3102,11 @@ static bool ProcessFields(SQLAREAP thiswa)
 
   SELF_SETFIELDEXTENT(&thiswa->area, static_cast<HB_USHORT>(numFields));
 
-  for (i = 1; i <= static_cast<HB_USHORT>(numFields); i++) {
+  DBFIELDINFO field;
+  HB_BYTE *fieldType;
+  PHB_ITEM thisfield;
+
+  for (HB_USHORT i = 1; i <= static_cast<HB_USHORT>(numFields); i++) {
     thisfield = hb_itemArrayGet(thiswa->aStruct, i);
 
     if (hb_itemType(thisfield) != Harbour::Item::ARRAY) {
@@ -3183,6 +3181,7 @@ static bool ProcessFields(SQLAREAP thiswa)
     hb_itemRelease(thisfield);
     hb_xfree((void *)field.atomName);
   }
+
   return true;
 }
 
@@ -3190,23 +3189,21 @@ static bool ProcessFields(SQLAREAP thiswa)
 
 static bool SetFields(SQLAREAP thiswa)
 {
-  HB_LONG numFields;
-  HB_USHORT i;
-  PHB_ITEM thisfield;
-
   if (hb_itemType(thiswa->aStruct) != Harbour::Item::ARRAY) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Invalid structure array"));
     return false;
   }
 
-  numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
+  HB_LONG numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));
     return false;
   }
 
-  for (i = 1; i <= static_cast<HB_USHORT>(numFields); i++) {
+  PHB_ITEM thisfield;
+
+  for (HB_USHORT i = 1; i <= static_cast<HB_USHORT>(numFields); i++) {
     thisfield = hb_itemArrayGet(thiswa->aStruct, i);
 
     if (hb_itemType(thisfield) != Harbour::Item::ARRAY) {
@@ -3217,6 +3214,7 @@ static bool SetFields(SQLAREAP thiswa)
     thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(5)));
     hb_itemRelease(thisfield);
   }
+
   return true;
 }
 
