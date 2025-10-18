@@ -401,7 +401,6 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBu
       }
       break;
     }
-
 #ifdef SQLRDD_TOPCONN
     case SQL_FAKE_DATE: {
       hb_itemPutDS(pItem, bBuffer);

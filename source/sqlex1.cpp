@@ -216,35 +216,41 @@ void setResultSetLimit(SQLEXAREAP thiswa, int iRows)
   switch (thiswa->nSystemID) {
   case SYSTEMID_MSSQL7:
   case SYSTEMID_CACHE:
-  case SYSTEMID_SYBASE:
+  case SYSTEMID_SYBASE: {
     fmt1 = "TOP %i";
     fmt2 = "";
     break;
+  }
   case SYSTEMID_FIREBR:
   case SYSTEMID_FIREBR3:
   case SYSTEMID_FIREBR4:
   case SYSTEMID_FIREBR5:
-  case SYSTEMID_INFORM:
+  case SYSTEMID_INFORM: {
     fmt1 = "FIRST %i";
     fmt2 = "";
     break;
-  case SYSTEMID_ORACLE:
+  }
+  case SYSTEMID_ORACLE: {
     fmt1 = "";
     fmt2 = "";
     break;
+  }
   case SYSTEMID_POSTGR:
   case SYSTEMID_MYSQL:
-  case SYSTEMID_MARIADB:
+  case SYSTEMID_MARIADB: {
     fmt1 = "";
     fmt2 = "LIMIT %i";
     break;
-  case SYSTEMID_IBMDB2:
+  }
+  case SYSTEMID_IBMDB2: {
     fmt1 = "";
     fmt2 = "fetch first %i rows only";
     break;
-  default:
+  }
+  default: {
     fmt1 = "";
     fmt2 = "";
+  }
   }
   sprintf(thiswa->sLimit1, fmt1.c_str(), iRows);
   sprintf(thiswa->sLimit2, fmt2.c_str(), iRows);
@@ -1188,7 +1194,6 @@ void SetCurrRecordStructure(SQLEXAREAP thiswa)
       BindStructure->iCType = SQL_C_TYPE_TIMESTAMP;
       break;
     }
-
     case 'D': {
       // BindStructure->iCType = lType; // DATE or TIMESTAMP
       // Corrigido 27/12/2013 09:53 - lpereira

@@ -1651,62 +1651,62 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
 
   switch (uiIndex) {
   case DBI_ISDBF:
-  case DBI_CANPUTREC:
+  case DBI_CANPUTREC: {
     hb_itemPutL(pItem, false);
     break;
-
-  case DBI_GETHEADERSIZE:
+  }
+  case DBI_GETHEADERSIZE: {
     hb_itemPutNL(pItem, 0);
     break;
-
-  case DBI_LASTUPDATE:
+  }
+  case DBI_LASTUPDATE: {
     hb_itemPutD(pItem, 2003, 12, 31);
     break;
-
+  }
   case DBI_GETDELIMITER:
-  case DBI_SETDELIMITER:
+  case DBI_SETDELIMITER: {
     break;
-
-  case DBI_GETRECSIZE:
+  }
+  case DBI_GETRECSIZE: {
     hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLRECSIZE, 0);
     hb_itemPutNI(pItem, hb_itemGetNI(hb_stackReturnItem()));
     break;
-
-  case DBI_GETLOCKARRAY:
+  }
+  case DBI_GETLOCKARRAY: {
     hb_itemCopy(pItem, thiswa->aLocked);
     break;
-
-  case DBI_TABLEEXT:
+  }
+  case DBI_TABLEEXT: {
     hb_itemPutC(pItem, "");
     break;
-
-  case DBI_MEMOEXT:
+  }
+  case DBI_MEMOEXT: {
     hb_itemPutC(pItem, "");
     break;
-
-  case DBI_MEMOBLOCKSIZE:
+  }
+  case DBI_MEMOBLOCKSIZE: {
     hb_itemPutNI(pItem, 0);
     break;
-
-  case DBI_FULLPATH:
+  }
+  case DBI_FULLPATH: {
     hb_itemPutC(pItem, thiswa->szDataFileName);
     break;
-
-  case DBI_FILEHANDLE:
+  }
+  case DBI_FILEHANDLE: {
     hb_itemPutNL(pItem, 0);
     break;
-
-  case DBI_BOF:
+  }
+  case DBI_BOF: {
     SELF_BOF(&thiswa->area, &flag);
     hb_itemPutL(pItem, flag);
     break;
-
-  case DBI_EOF:
+  }
+  case DBI_EOF: {
     SELF_EOF(&thiswa->area, &flag);
     hb_itemPutL(pItem, flag);
     break;
-
-  case DBI_ISFLOCK:
+  }
+  case DBI_ISFLOCK: {
     if (HB_IS_OBJECT(thiswa->oWorkArea)) {
       hb_objSendMsg(thiswa->oWorkArea, "LTABLELOCKED", 0);
     } else {
@@ -1715,16 +1715,16 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
     }
     hb_itemMove(pItem, hb_stackReturnItem());
     break;
-
-  case DBI_MEMOHANDLE:
+  }
+  case DBI_MEMOHANDLE: {
     hb_itemPutNL(pItem, 0);
     break;
-
-  case DBI_RDD_BUILD:
+  }
+  case DBI_RDD_BUILD: {
     hb_itemPutNL(pItem, HB_SQLRDD_BUILD);
     break;
-
-  case DBI_RDD_VERSION:
+  }
+  case DBI_RDD_VERSION: {
     if (HB_IS_OBJECT(thiswa->oWorkArea)) {
       hb_objSendMsg(thiswa->oWorkArea, "OSQL", 0);
       hb_objSendMsg(hb_stackReturnItem(), "CMGMNTVERS", 0);
@@ -1734,8 +1734,8 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
     }
     hb_itemMove(pItem, hb_stackReturnItem());
     break;
-
-  case DBI_DB_VERSION:
+  }
+  case DBI_DB_VERSION: {
     if (HB_IS_OBJECT(thiswa->oWorkArea)) {
       hb_objSendMsg(thiswa->oWorkArea, "OSQL", 0);
       hb_objSendMsg(hb_stackReturnItem(), "NSYSTEMID", 0);
@@ -1745,20 +1745,20 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
     }
     hb_itemMove(pItem, hb_stackReturnItem());
     break;
-
-  case DBI_INTERNAL_OBJECT:
+  }
+  case DBI_INTERNAL_OBJECT: {
     hb_itemCopy(pItem, thiswa->oWorkArea);
     break;
-
-  case DBI_ISREADONLY:
+  }
+  case DBI_ISREADONLY: {
     hb_itemPutL(pItem, thiswa->readonly);
     break;
-
-  case DBI_SHARED:
+  }
+  case DBI_SHARED: {
     hb_itemPutL(pItem, thiswa->shared);
     break;
-
-  case DBI_CPCONVERTTO:
+  }
+  case DBI_CPCONVERTTO: {
     if (HB_IS_STRING(pItem)) {
       PHB_CODEPAGE cdpage = hb_cdpFind(hb_itemGetCPtr(pItem));
       if (cdpage) {
@@ -1771,6 +1771,7 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
       hb_itemPutC(pItem, "");
     }
     break;
+  }
   }
   return Harbour::SUCCESS;
 }
@@ -2495,9 +2496,10 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
   HB_TRACE(HB_TR_DEBUG, ("sqlOrderInfo(%p, %hu, %p)", thiswa, uiIndex, pInfo));
 
   switch (uiIndex) {
-  case DBOI_BAGEXT:
+  case DBOI_BAGEXT: {
     hb_itemPutC(pInfo->itmResult, "");
     return Harbour::SUCCESS;
+  }
   }
 
   lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
@@ -2510,12 +2512,12 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
       hb_itemPutNL(pInfo->itmResult, ulRecCount);
       break;
     }
-    case DBOI_KEYCOUNT:
+    case DBOI_KEYCOUNT: {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLKEYCOUNT, 0);
       hb_itemPutNL(pInfo->itmResult, hb_itemGetNL(hb_stackReturnItem()));
       break;
-
-    case DBOI_CONDITION:
+    }
+    case DBOI_CONDITION: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         pTemp = hb_itemArrayGet(pTag, FOR_CLAUSE);
@@ -2526,8 +2528,8 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemPutC(pInfo->itmResult, "");
       }
       break;
-
-    case DBOI_EXPRESSION:
+    }
+    case DBOI_EXPRESSION: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
 
       if (pTag) {
@@ -2539,12 +2541,12 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemPutC(pInfo->itmResult, "");
       }
       break;
-
-    case DBOI_NUMBER:
+    }
+    case DBOI_NUMBER: {
       hb_itemPutNILen(pInfo->itmResult, hb_arrayGetNI(thiswa->aInfo, AINFO_INDEXORD), 3);
       break;
-
-    case DBOI_BAGNAME:
+    }
+    case DBOI_BAGNAME: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         pTemp = hb_itemArrayGet(pTag, ORDER_NAME);
@@ -2555,8 +2557,8 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemPutC(pInfo->itmResult, "");
       }
       break;
-
-    case DBOI_NAME:
+    }
+    case DBOI_NAME: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         pTemp = hb_itemArrayGet(pTag, ORDER_TAG);
@@ -2567,11 +2569,13 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemPutC(pInfo->itmResult, "");
       }
       break;
+    }
     case DBOI_POSITION:
-    case DBOI_KEYNORAW:
+    case DBOI_KEYNORAW: {
       hb_itemPutND(pInfo->itmResult, 0);
       break;
-    case DBOI_ISCOND:
+    }
+    case DBOI_ISCOND: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         pTemp = hb_itemArrayGet(pTag, FOR_CLAUSE);
@@ -2582,7 +2586,8 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemPutL(pInfo->itmResult, 0);
       }
       break;
-    case DBOI_ISDESC:
+    }
+    case DBOI_ISDESC: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         hb_itemPutL(pInfo->itmResult, hb_arrayGetL(pTag, DESCEND_INDEX_ORDER));
@@ -2601,7 +2606,8 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemPutL(pInfo->itmResult, false);
       }
       break;
-    case DBOI_UNIQUE:
+    }
+    case DBOI_UNIQUE: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         hb_itemPutL(pInfo->itmResult, hb_arrayGetL(pTag, AORDER_UNIQUE));
@@ -2610,10 +2616,12 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemPutL(pInfo->itmResult, false);
       }
       break;
-    case DBOI_CUSTOM:
+    }
+    case DBOI_CUSTOM: {
       hb_itemPutL(pInfo->itmResult, false);
       break;
-    case DBOI_SCOPETOP:
+    }
+    case DBOI_SCOPETOP: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         if (pInfo->itmResult) {
@@ -2629,7 +2637,8 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemClear(pInfo->itmResult);
       }
       break;
-    case DBOI_SCOPEBOTTOM:
+    }
+    case DBOI_SCOPEBOTTOM: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         if (pInfo->itmResult) {
@@ -2645,20 +2654,22 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemClear(pInfo->itmResult);
       }
       break;
-
-    case DBOI_SCOPETOPCLEAR:
+    }
+    case DBOI_SCOPETOPCLEAR: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         sqlSetServerSideIndexScope(static_cast<SQLAREAP>(thiswa), 0, nullptr);
       }
       break;
-    case DBOI_SCOPEBOTTOMCLEAR:
+    }
+    case DBOI_SCOPEBOTTOMCLEAR: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         sqlSetServerSideIndexScope(static_cast<SQLAREAP>(thiswa), 1, nullptr);
       }
       break;
-    case DBOI_SCOPESET:
+    }
+    case DBOI_SCOPESET: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         if (pInfo->itmResult) {
@@ -2674,13 +2685,16 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemClear(pInfo->itmResult);
       }
       break;
-    case DBOI_KEYADD:
+    }
+    case DBOI_KEYADD: {
       hb_itemPutL(pInfo->itmResult, false);
       break;
-    case DBOI_KEYDELETE:
+    }
+    case DBOI_KEYDELETE: {
       hb_itemPutL(pInfo->itmResult, false);
       break;
-    case DBOI_KEYVAL:
+    }
+    case DBOI_KEYVAL: {
       pTag = loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
         if (thiswa->firstinteract) {
@@ -2699,10 +2713,11 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
         hb_itemClear(pInfo->itmResult);
       }
       break;
-
-    case DBOI_ORDERCOUNT:
+    }
+    case DBOI_ORDERCOUNT: {
       hb_itemPutNI(pInfo->itmResult, lIndexes);
       break;
+    }
     }
   } else {
     switch (uiIndex) {
@@ -2712,36 +2727,42 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
       hb_itemPutND(pInfo->itmResult, ulRecCount);
       break;
     }
-    case DBOI_KEYCOUNT:
+    case DBOI_KEYCOUNT: {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLKEYCOUNT, 0);
       hb_itemPutND(pInfo->itmResult, hb_itemGetND(hb_stackReturnItem()));
       break;
+    }
     case DBOI_POSITION:
-    case DBOI_KEYNORAW:
+    case DBOI_KEYNORAW: {
       hb_itemPutND(pInfo->itmResult, 0);
       SELF_RECID(&thiswa->area, pInfo->itmResult);
       break;
+    }
     case DBOI_ISCOND:
     case DBOI_ISDESC:
     case DBOI_UNIQUE:
     case DBOI_CUSTOM:
     case DBOI_KEYADD:
-    case DBOI_KEYDELETE:
+    case DBOI_KEYDELETE: {
       hb_itemPutL(pInfo->itmResult, false);
       break;
+    }
     case DBOI_KEYVAL:
     case DBOI_SCOPETOP:
     case DBOI_SCOPEBOTTOM:
     case DBOI_SCOPETOPCLEAR:
-    case DBOI_SCOPEBOTTOMCLEAR:
+    case DBOI_SCOPEBOTTOMCLEAR: {
       hb_itemClear(pInfo->itmResult);
       break;
+    }
     case DBOI_ORDERCOUNT:
-    case DBOI_NUMBER:
+    case DBOI_NUMBER: {
       hb_itemPutNI(pInfo->itmResult, 0);
       break;
-    default:
+    }
+    default: {
       hb_itemPutC(pInfo->itmResult, "");
+    }
     }
   }
 
@@ -2930,27 +2951,27 @@ static HB_ERRCODE sqlLock(SQLAREAP thiswa, LPDBLOCKINFO pLockInfo)
     auto pMethod = hb_itemPutNI(nullptr, pLockInfo->uiMethod);
 
     switch (pLockInfo->uiMethod) {
-    case DBLM_EXCLUSIVE:
+    case DBLM_EXCLUSIVE: {
       pRecord = hb_itemNew(nullptr);
       hb_arrayGet(thiswa->aInfo, AINFO_RECNO, pRecord);
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 2, pMethod, pRecord);
       hb_itemRelease(pRecord);
-
       pLockInfo->fResult = static_cast<HB_USHORT>(hb_itemGetL(hb_stackReturnItem()));
       break;
-
-    case DBLM_MULTIPLE:
+    }
+    case DBLM_MULTIPLE: {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 2, pMethod, pLockInfo->itmRecID);
       pLockInfo->fResult = static_cast<HB_USHORT>(hb_itemGetL(hb_stackReturnItem()));
       break;
-
-    case DBLM_FILE:
+    }
+    case DBLM_FILE: {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 1, pMethod);
       pLockInfo->fResult = static_cast<HB_USHORT>(hb_itemGetL(hb_stackReturnItem()));
       break;
-
-    default:
+    }
+    default: {
       pLockInfo->fResult = false;
+    }
     }
     hb_itemRelease(pMethod);
   } else {
@@ -3065,16 +3086,16 @@ static HB_ERRCODE sqlRddInfo(LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConne
     hb_itemPutC(pItem, nullptr);
     break;
   }
-
   case RDDI_MULTITAG:
   case RDDI_SORTRECNO:
   case RDDI_STRUCTORD:
-  case RDDI_MULTIKEY:
+  case RDDI_MULTIKEY: {
     hb_itemPutL(pItem, true);
     break;
-
-  default:
+  }
+  default: {
     return SUPER_RDDINFO(pRDD, uiIndex, ulConnect, pItem);
+  }
   }
 
   return Harbour::SUCCESS;
@@ -3129,43 +3150,50 @@ static bool ProcessFields(SQLAREAP thiswa)
 
     switch (*fieldType) {
     case 'c':
-    case 'C':
+    case 'C': {
       field.uiType = Harbour::DB::Field::STRING;
       break;
+    }
     case 'm':
-    case 'M':
+    case 'M': {
       field.uiType = Harbour::DB::Field::MEMO;
       break;
+    }
     case 'n':
-    case 'N':
+    case 'N': {
       field.uiType = Harbour::DB::Field::LONG;
       field.uiDec = static_cast<HB_USHORT>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(4)));
       break;
+    }
     case 'l':
-    case 'L':
+    case 'L': {
       field.uiType = Harbour::DB::Field::LOGICAL;
       break;
+    }
     case 'd':
-    case 'D':
+    case 'D': {
       field.uiType = Harbour::DB::Field::DATE;
       break;
+    }
     case 'v':
-    case 'V':
+    case 'V': {
       field.uiType = Harbour::DB::Field::ANY;
       break;
+    }
     // new field type
     case 't':
-    case 'T':
+    case 'T': {
       if (field.uiLen == 4) {
         field.uiType = Harbour::DB::Field::TIME;
       } else {
         field.uiType = Harbour::DB::Field::TIMESTAMP;
       }
-
       break;
-    default:
+    }
+    default: {
       field.uiType = Harbour::Item::NIL;
       break;
+    }
     }
 
     if (field.uiType == Harbour::Item::NIL) {

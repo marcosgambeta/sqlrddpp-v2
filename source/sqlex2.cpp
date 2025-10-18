@@ -101,17 +101,19 @@ char *QualifyName(char *szName, SQLEXAREAP thiswa)
     case SYSTEMID_FIREBR4:
     case SYSTEMID_FIREBR5:
     case SYSTEMID_IBMDB2:
-    case SYSTEMID_ADABAS:
+    case SYSTEMID_ADABAS: {
       szName[i] = static_cast<char>(toupper(static_cast<HB_BYTE>(szName[i])));
       break;
+    }
     case SYSTEMID_INGRES:
     case SYSTEMID_POSTGR:
     case SYSTEMID_MYSQL:
     case SYSTEMID_MARIADB:
     case SYSTEMID_OTERRO:
-    case SYSTEMID_INFORM:
+    case SYSTEMID_INFORM: {
       szName[i] = static_cast<char>(tolower(static_cast<HB_BYTE>(szName[i])));
       break;
+    }
     }
   }
   return szName;
@@ -309,7 +311,6 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
       InsertRecord->iCType = SQL_C_DOUBLE;
       break;
     }
-
     case 'D': {
       // Corrigido 27/12/2013 09:53 - lpereira
       // Estava atribuindo o valor de SYSTEMID_ORACLE para thiswa->nSystemID.
@@ -666,7 +667,8 @@ HB_ERRCODE ExecuteInsertStmt(SQLEXAREAP thiswa)
     break;
   }
   case SYSTEMID_CACHE:
-  case SYSTEMID_INFORM:
+  case SYSTEMID_INFORM: {
+  }
   default: {
     ;
   }

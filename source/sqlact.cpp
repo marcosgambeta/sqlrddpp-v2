@@ -363,36 +363,44 @@ static HB_SIZE escape_mysql(char *to, const char *from, HB_SIZE length)
   const char *end;
   for (end = from + length; from != end; from++) {
     switch (*from) {
-    case 0: /* Must be escaped for 'mysql' */
+    case 0: { /* Must be escaped for 'mysql' */
       *to++ = '\\';
       *to++ = '0';
       break;
-    case '\n': /* Must be escaped for logs */
+    }
+    case '\n': { /* Must be escaped for logs */
       *to++ = '\\';
       *to++ = 'n';
       break;
-    case '\r':
+    }
+    case '\r': {
       *to++ = '\\';
       *to++ = 'r';
       break;
-    case '\\':
+    }
+    case '\\': {
       *to++ = '\\';
       *to++ = '\\';
       break;
-    case '\'':
+    }
+    case '\'': {
       *to++ = '\\';
       *to++ = '\'';
       break;
-    case '"': /* Better safe than sorry */
+    }
+    case '"': { /* Better safe than sorry */
       *to++ = '\\';
       *to++ = '"';
       break;
-    case '\032': /* This gives problems on Win32 */
+    }
+    case '\032': { /* This gives problems on Win32 */
       *to++ = '\\';
       *to++ = 'Z';
       break;
-    default:
+    }
+    default: {
       *to++ = *from;
+    }
     }
   }
   *to = 0;
@@ -405,12 +413,14 @@ static HB_SIZE escape_single(char *to, const char *from, HB_SIZE length)
   const char *end;
   for (end = from + length; from != end; from++) {
     switch (*from) {
-    case '\'':
+    case '\'': {
       *to++ = '\'';
       *to++ = '\'';
       break;
-    default:
+    }
+    default: {
       *to++ = *from;
+    }
     }
   }
   *to = 0;
@@ -423,15 +433,18 @@ static HB_SIZE escape_firebird(char *to, const char *from, HB_SIZE length)
   const char *end;
   for (end = from + length; from != end; from++) {
     switch (*from) {
-    case '\'':
+    case '\'': {
       *to++ = '\'';
       *to++ = '\'';
       break;
-    case 0:
+    }
+    case 0: {
       *to++ = ' ';
       break;
-    default:
+    }
+    default: {
       *to++ = *from;
+    }
     }
   }
   *to = 0;
@@ -444,15 +457,18 @@ static HB_SIZE escape_db2(char *to, const char *from, HB_SIZE length)
   const char *end;
   for (end = from + length; from != end; from++) {
     switch (*from) {
-    case '\'':
+    case '\'': {
       *to++ = '\'';
       *to++ = '\'';
       break;
-    case 0:
+    }
+    case 0: {
       *to++ = ' ';
       break;
-    default:
+    }
+    default: {
       *to++ = *from;
+    }
     }
   }
   *to = 0;
@@ -465,18 +481,22 @@ static HB_SIZE escape_pgs(char *to, const char *from, HB_SIZE length)
   const char *end;
   for (end = from + length; from != end; from++) {
     switch (*from) {
-    case '\'':
+    case '\'': {
       *to++ = '\'';
       *to++ = '\'';
       break;
-    case '\\':
+    }
+    case '\\': {
       *to++ = '\\';
       *to++ = '\\';
       break;
-    case 0:
+    }
+    case 0: {
       break;
-    default:
+    }
+    default: {
       *to++ = *from;
+    }
     }
   }
   *to = 0;
@@ -489,14 +509,17 @@ static HB_SIZE escape_oci(char *to, const char *from, HB_SIZE length)
   const char *end;
   for (end = from + length; from != end; from++) {
     switch (*from) {
-    case '\'':
+    case '\'': {
       *to++ = '\'';
       *to++ = '\'';
       break;
-    case 0:
+    }
+    case 0: {
       break;
-    default:
+    }
+    default: {
       *to++ = *from;
+    }
     }
   }
   *to = 0;
@@ -524,34 +547,40 @@ HB_FUNC(SR_ESCAPESTRING)
     if (ToBuffer) {
       switch (idatabase) {
       case SYSTEMID_MYSQL:
-      case SYSTEMID_MARIADB:
+      case SYSTEMID_MARIADB: {
         iSize = escape_mysql(ToBuffer, FromBuffer, iSize);
         break;
+      }
       case SYSTEMID_FIREBR:
       case SYSTEMID_FIREBR3:
       case SYSTEMID_FIREBR4:
-      case SYSTEMID_FIREBR5:
+      case SYSTEMID_FIREBR5: {
         iSize = escape_firebird(ToBuffer, FromBuffer, iSize);
         break;
+      }
       case SYSTEMID_ORACLE:
-      case SYSTEMID_CACHE:
+      case SYSTEMID_CACHE: {
         iSize = escape_oci(ToBuffer, FromBuffer, iSize);
         break;
+      }
       case SYSTEMID_MSSQL7:
       case SYSTEMID_INGRES:
       case SYSTEMID_SYBASE:
       case SYSTEMID_ADABAS:
       case SYSTEMID_INFORM:
       case SYSTEMID_OTERRO:
-      case SYSTEMID_PERVASIVE:
+      case SYSTEMID_PERVASIVE: {
         iSize = escape_single(ToBuffer, FromBuffer, iSize);
         break;
-      case SYSTEMID_POSTGR:
+      }
+      case SYSTEMID_POSTGR: {
         iSize = escape_pgs(ToBuffer, FromBuffer, iSize);
         break;
-      case SYSTEMID_IBMDB2:
+      }
+      case SYSTEMID_IBMDB2: {
         iSize = escape_db2(ToBuffer, FromBuffer, iSize);
         break;
+      }
       }
     }
     hb_retclen_buffer(static_cast<char *>(ToBuffer), iSize);
@@ -569,34 +598,40 @@ char *QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase
 
   switch (idatabase) {
   case SYSTEMID_MYSQL:
-  case SYSTEMID_MARIADB:
+  case SYSTEMID_MARIADB: {
     iSize = escape_mysql(ToBuffer, FromBuffer, iSize);
     break;
+  }
   case SYSTEMID_FIREBR:
   case SYSTEMID_FIREBR3:
   case SYSTEMID_FIREBR4:
-  case SYSTEMID_FIREBR5:
+  case SYSTEMID_FIREBR5: {
     iSize = escape_firebird(ToBuffer, FromBuffer, iSize);
     break;
+  }
   case SYSTEMID_ORACLE:
-  case SYSTEMID_CACHE:
+  case SYSTEMID_CACHE: {
     iSize = escape_oci(ToBuffer, FromBuffer, iSize);
     break;
+  }
   case SYSTEMID_MSSQL7:
   case SYSTEMID_INGRES:
   case SYSTEMID_SYBASE:
   case SYSTEMID_ADABAS:
   case SYSTEMID_INFORM:
   case SYSTEMID_OTERRO:
-  case SYSTEMID_PERVASIVE:
+  case SYSTEMID_PERVASIVE: {
     iSize = escape_single(ToBuffer, FromBuffer, iSize);
     break;
-  case SYSTEMID_POSTGR:
+  }
+  case SYSTEMID_POSTGR: {
     iSize = escape_pgs(ToBuffer, FromBuffer, iSize);
     break;
-  case SYSTEMID_IBMDB2:
+  }
+  case SYSTEMID_IBMDB2: {
     iSize = escape_db2(ToBuffer, FromBuffer, iSize);
     break;
+  }
   }
 
   iSize++;
@@ -853,49 +888,55 @@ HB_FUNC(SR_DBQUALIFY)
     case SYSTEMID_FIREBR4:
     case SYSTEMID_FIREBR5:
     case SYSTEMID_IBMDB2:
-    case SYSTEMID_ADABAS:
+    case SYSTEMID_ADABAS: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<char>(toupper(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       szOut[i + 1] = '"';
       break;
+    }
     case SYSTEMID_INGRES:
-    case SYSTEMID_POSTGR:
+    case SYSTEMID_POSTGR: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       szOut[i + 1] = '"';
       break;
-    case SYSTEMID_MSSQL7:
+    }
+    case SYSTEMID_MSSQL7: {
       szOut[0] = '[';
       for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<HB_BYTE>(pszBuffer[i]);
       }
       szOut[i + 1] = ']';
       break;
+    }
     case SYSTEMID_MYSQL:
     case SYSTEMID_OTERRO:
-    case SYSTEMID_MARIADB:
+    case SYSTEMID_MARIADB: {
       szOut[0] = '`';
       for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       szOut[i + 1] = '`';
       break;
-    case SYSTEMID_INFORM:
+    }
+    case SYSTEMID_INFORM: {
       for (i = 0; i < ulLen; i++) {
         szOut[i] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       ulLen -= 2;
       break;
-    default:
+    }
+    default: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<HB_BYTE>(pszBuffer[i]);
       }
       szOut[i + 1] = '"';
+    }
     }
     hb_retclen_buffer(szOut, ulLen + 2);
   } else {
@@ -1076,18 +1117,18 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
       hb_dateDecStr(sDate, hb_itemGetDL(pFieldData));
       sValue = static_cast<char*>(hb_xgrab(30));
       switch( nSystemID ) {
-         case SYSTEMID_ORACLE: {
-            if( !bMemo ) {
-               sprintf(sValue, "TO_DATE(\'%s\',\'YYYYMMDD\')", sDate);
-               return sValue;
-            }
-         }
-         default: {
-            if( !bMemo ) {
-               sprintf(sValue, "\'%s\'", sDate);
-               return sValue;
-            }
-         }
+      case SYSTEMID_ORACLE: {
+        if( !bMemo ) {
+          sprintf(sValue, "TO_DATE(\'%s\',\'YYYYMMDD\')", sDate);
+          return sValue;
+        }
+      }
+      default: {
+        if( !bMemo ) {
+          sprintf(sValue, "\'%s\'", sDate);
+          return sValue;
+        }
+      }
       }
    } else if( HB_IS_LOGICAL(pFieldData) ) {
       sValue = static_cast<char*>(hb_xgrab(6));

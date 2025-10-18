@@ -77,16 +77,16 @@ static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 #if 0
 void startsqlExOraSymbols()
 {
-   HB_THREAD_STUB
+  HB_THREAD_STUB
 
-   if( s_pSym_SOLVERESTRICTORS == nullptr ) {
+  if (s_pSym_SOLVERESTRICTORS == nullptr) {
 
-      s_pSym_SOLVERESTRICTORS = hb_dynsymFindName("SOLVERESTRICTORS");
+    s_pSym_SOLVERESTRICTORS = hb_dynsymFindName("SOLVERESTRICTORS");
 
-      if( s_pSym_SOLVERESTRICTORS == nullptr ) {
-         printf("Could not find Symbol %s\n", "SOLVERESTRICTORS");
-      }
-   }
+    if (s_pSym_SOLVERESTRICTORS == nullptr) {
+      printf("Could not find Symbol %s\n", "SOLVERESTRICTORS");
+    }
+  }
 }
 #endif
 
@@ -111,14 +111,14 @@ HB_EXTERN_END
 /*------------------------------------------------------------------------*/
 
 #if 0
-static char * sqlSolveRestrictors(SQLEXORAAREAP thiswa)
+static char *sqlSolveRestrictors(SQLEXORAAREAP thiswa)
 {
-   if( s_pSym_SOLVERESTRICTORS ) {
-      hb_objSendMessage(thiswa->sqlarea.oWorkArea, s_pSym_SOLVERESTRICTORS, 0);
-      return hb_itemGetCPtr(hb_stackReturnItem());
-   } else {
-      return "";
-   }
+  if (s_pSym_SOLVERESTRICTORS) {
+    hb_objSendMessage(thiswa->sqlarea.oWorkArea, s_pSym_SOLVERESTRICTORS, 0);
+    return hb_itemGetCPtr(hb_stackReturnItem());
+  } else {
+    return "";
+  }
 }
 #endif
 
@@ -194,34 +194,40 @@ void setResultSetLimitOra(SQLEXORAAREAP thiswa, int iRows)
   switch (thiswa->nSystemID) {
   case SYSTEMID_MSSQL7:
   case SYSTEMID_CACHE:
-  case SYSTEMID_SYBASE:
+  case SYSTEMID_SYBASE: {
     fmt1 = "TOP %i";
     fmt2 = "";
     break;
+  }
   case SYSTEMID_FIREBR:
   case SYSTEMID_FIREBR3:
   case SYSTEMID_FIREBR4:
   case SYSTEMID_FIREBR5:
-  case SYSTEMID_INFORM:
+  case SYSTEMID_INFORM: {
     fmt1 = "FIRST %i";
     fmt2 = "";
     break;
-  case SYSTEMID_ORACLE:
+  }
+  case SYSTEMID_ORACLE: {
     fmt1 = "";
     fmt2 = "";
     break;
+  }
   case SYSTEMID_POSTGR:
-  case SYSTEMID_MYSQL:
+  case SYSTEMID_MYSQL: {
     fmt1 = "";
     fmt2 = "LIMIT %i";
     break;
-  case SYSTEMID_IBMDB2:
+  }
+  case SYSTEMID_IBMDB2: {
     fmt1 = "";
     fmt2 = "fetch first %i rows only";
     break;
-  default:
+  }
+  default: {
     fmt1 = "";
     fmt2 = "";
+  }
   }
   sprintf(thiswa->sLimit1, static_cast<const char *>(fmt1), iRows);
   sprintf(thiswa->sLimit2, static_cast<const char *>(fmt2), iRows);
@@ -1203,7 +1209,6 @@ void SetCurrRecordStructureOra(SQLEXORAAREAP thiswa)
       BindStructure->iCType = SQL_C_TYPE_TIMESTAMP;
       break;
     }
-
     case 'D': {
       BindStructure->iCType = SQL_C_TYPE_DATE; // May be DATE or TIMESTAMP
       break;
@@ -4182,186 +4187,184 @@ static int sqlKeyCompareEx(SQLEXORAAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 }
 
 #if 0
-void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate, OCI_Resultset * rs)
+void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOnly, HB_ULONG ulSystemID,
+                   HB_BOOL bTranslate, OCI_Resultset *rs)
 {
-   PHB_ITEM pTemp;
-   unsigned int uiLen;
+  PHB_ITEM pTemp;
+  unsigned int uiLen;
 
-   HB_SYMBOL_UNUSED(bQueryOnly);
-   HB_SYMBOL_UNUSED(ulSystemID);
+  HB_SYMBOL_UNUSED(bQueryOnly);
+  HB_SYMBOL_UNUSED(ulSystemID);
 
-   auto lType = hb_arrayGetNL(pField, 6);
-   auto lLen = hb_arrayGetNL(pField, 3);
-   auto lDec = hb_arrayGetNL(pField, 4);
+  auto lType = hb_arrayGetNL(pField, 6);
+  auto lLen = hb_arrayGetNL(pField, 3);
+  auto lDec = hb_arrayGetNL(pField, 4);
 
-   // if( lLenBuff <= 0 ) // database content is NULL
-   if( OCI_IsNull(rs, iField) ) {
-      switch( lType ) {
-         case SQL_CHAR: {
-            auto szResult = static_cast<char*>(hb_xgrabDebug(__LINE__, __FILE__, lLen + 1));
-            hb_xmemset(szResult, ' ', lLen);
-            hb_itemPutCLPtr(pItem, szResult, static_cast<HB_SIZE>(lLen));
-            break;
-         }
-         case SQL_NUMERIC:
-         case SQL_FAKE_NUM: {
-            char szResult[2] = {' ', '\0'};
-            sr_escapeNumber(szResult, static_cast<HB_SIZE>(lLen), static_cast<HB_SIZE>(lDec), pItem);
-            // hb_itemPutNL(pItem, 0);
-            break;
-         }
-         case SQL_DATE: {
-            char dt[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'};
-            hb_itemPutDS(pItem, dt);
-            break;
-         }
-         case SQL_LONGVARCHAR: {
-            hb_itemPutCL(pItem, "", 0);
-            break;
-         }
-         case SQL_BIT: {
-            hb_itemPutL(pItem, false);
-            break;
-         }
-
+  // if( lLenBuff <= 0 ) // database content is NULL
+  if (OCI_IsNull(rs, iField)) {
+    switch (lType) {
+    case SQL_CHAR: {
+      auto szResult = static_cast<char *>(hb_xgrabDebug(__LINE__, __FILE__, lLen + 1));
+      hb_xmemset(szResult, ' ', lLen);
+      hb_itemPutCLPtr(pItem, szResult, static_cast<HB_SIZE>(lLen));
+      break;
+    }
+    case SQL_NUMERIC:
+    case SQL_FAKE_NUM: {
+      char szResult[2] = {' ', '\0'};
+      sr_escapeNumber(szResult, static_cast<HB_SIZE>(lLen), static_cast<HB_SIZE>(lDec), pItem);
+      // hb_itemPutNL(pItem, 0);
+      break;
+    }
+    case SQL_DATE: {
+      char dt[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'};
+      hb_itemPutDS(pItem, dt);
+      break;
+    }
+    case SQL_LONGVARCHAR: {
+      hb_itemPutCL(pItem, "", 0);
+      break;
+    }
+    case SQL_BIT: {
+      hb_itemPutL(pItem, false);
+      break;
+    }
 #ifdef SQLRDD_TOPCONN
-         case SQL_FAKE_DATE: {
-            hb_itemPutDS(pItem, bBuffer);
-            break;
-         }
+    case SQL_FAKE_DATE: {
+      hb_itemPutDS(pItem, bBuffer);
+      break;
+    }
 #endif
-         case SQL_DATETIME: {
-            hb_itemPutTDT(pItem, 0, 0);
-            break;
-         }
+    case SQL_DATETIME: {
+      hb_itemPutTDT(pItem, 0, 0);
+      break;
+    }
+    default: {
+      sr_TraceLog("oci.log", "Invalid data type detected: %i\n", lType);
+    }
+    }
+  } else {
+    switch (lType) {
+    case SQL_CHAR: {
+      HB_SIZE lPos;
+      auto szResult = static_cast<char *>(hb_xgrabDebug(__LINE__, __FILE__, lLen + 1));
+      memset(szResult, ' ', lLen);
+      uiLen = OCI_GetDataLength(rs, iField);
+      hb_xmemcpy(szResult, static_cast<char *>(OCI_GetString(rs, iField)), uiLen);
+      // hb_itemPutCLPtr(pItem, szResult, static_cast<HB_ULONG>(uiLen));
+      hb_itemPutCLPtr(pItem, szResult, static_cast<HB_SIZE>(lLen));
+      break;
+    }
+    case SQL_NUMERIC: {
+      auto bBuffer = static_cast<char *>(OCI_GetString(rs, iField));
+      sr_escapeNumber(bBuffer, static_cast<HB_SIZE>(lLen), static_cast<HB_SIZE>(lDec), pItem);
+      break;
+    }
+    case SQL_DATE: {
+      char dt[9];
+      auto bBuffer = static_cast<char *>(OCI_GetString(rs, iField));
 
-         default: {
-            sr_TraceLog("oci.log", "Invalid data type detected: %i\n", lType);
-         }
+      dt[0] = bBuffer[0];
+      dt[1] = bBuffer[1];
+      dt[2] = bBuffer[2];
+      dt[3] = bBuffer[3];
+      dt[4] = bBuffer[4];
+      dt[5] = bBuffer[5];
+      dt[6] = bBuffer[6];
+      dt[7] = bBuffer[7];
+      dt[8] = '\0';
+
+      if (strcmp(dt, "19000101") == 0) {
+        dt[0] = ' ';
+        dt[1] = ' ';
+        dt[2] = ' ';
+        dt[3] = ' ';
+        dt[4] = ' ';
+        dt[5] = ' ';
+        dt[6] = ' ';
+        dt[7] = ' ';
+        dt[8] = '\0';
       }
-   } else {
-      switch( lType ) {
-         case SQL_CHAR: {
-            HB_SIZE lPos;
-            auto szResult = static_cast<char*>(hb_xgrabDebug(__LINE__, __FILE__, lLen + 1));
-            memset(szResult, ' ', lLen);
-            uiLen = OCI_GetDataLength(rs, iField);
-            hb_xmemcpy(szResult, static_cast<char*>(OCI_GetString(rs, iField)), uiLen);
-            // hb_itemPutCLPtr(pItem, szResult, static_cast<HB_ULONG>(uiLen));
-            hb_itemPutCLPtr(pItem, szResult, static_cast<HB_SIZE>(lLen));
-            break;
-         }
-         case SQL_NUMERIC: {
-            auto bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
-            sr_escapeNumber(bBuffer, static_cast<HB_SIZE>(lLen), static_cast<HB_SIZE>(lDec), pItem);
-            break;
-         }
-         case SQL_DATE: {
-            char dt[9];
-            auto bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
+      hb_itemPutDS(pItem, dt);
+      break;
+    }
+    case SQL_LONGVARCHAR: {
+      auto bBuffer = static_cast<char *>(OCI_GetString(rs, iField));
+      HB_ULONG lLenBuff = strlen(bBuffer);
+      if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
+          (sr_lSerializeArrayAsJson())) {
+        if (s_pSym_SR_FROMJSON == nullptr) {
+          s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
+          if (s_pSym_SR_FROMJSON == nullptr) {
+            printf("Could not find Symbol HB_JSONDECODE\n");
+          }
+        }
+        hb_vmPushDynSym(s_pSym_SR_FROMJSON);
+        hb_vmPushNil();
+        hb_vmPushString(bBuffer, lLenBuff);
+        pTemp = hb_itemNew(nullptr);
+        hb_vmPush(pTemp);
+        hb_vmDo(2);
 
-            dt[0] = bBuffer[0];
-            dt[1] = bBuffer[1];
-            dt[2] = bBuffer[2];
-            dt[3] = bBuffer[3];
-            dt[4] = bBuffer[4];
-            dt[5] = bBuffer[5];
-            dt[6] = bBuffer[6];
-            dt[7] = bBuffer[7];
-            dt[8] = '\0';
+        hb_itemMove(pItem, pTemp);
+        hb_itemRelease(pTemp);
 
-            if( strcmp(dt, "19000101")  == 0 ) {
-               dt[0] = ' ';
-               dt[1] = ' ';
-               dt[2] = ' ';
-               dt[3] = ' ';
-               dt[4] = ' ';
-               dt[5] = ' ';
-               dt[6] = ' ';
-               dt[7] = ' ';
-               dt[8] = '\0';
-            }
-            hb_itemPutDS(pItem, dt);
-            break;
-         }
-         case SQL_LONGVARCHAR: {
-            auto bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
-            HB_ULONG lLenBuff = strlen(bBuffer);
-            if( lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2) ) && (sr_lSerializeArrayAsJson()) ) {
-               if( s_pSym_SR_FROMJSON == nullptr ) {
-                  s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-                  if( s_pSym_SR_FROMJSON  == nullptr ) {
-                     printf("Could not find Symbol HB_JSONDECODE\n");
-                  }
-               }
-               hb_vmPushDynSym(s_pSym_SR_FROMJSON);
-               hb_vmPushNil();
-               hb_vmPushString(bBuffer, lLenBuff);
-               pTemp = hb_itemNew(nullptr);
-               hb_vmPush(pTemp);
-               hb_vmDo(2);
+      } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
+        if (s_pSym_SR_DESERIALIZE == nullptr) {
+          s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
+          if (s_pSym_SR_DESERIALIZE == nullptr) {
+            printf("Could not find Symbol SR_DESERIALIZE\n");
+          }
+        }
+        hb_vmPushDynSym(s_pSym_SR_DESERIALIZE);
+        hb_vmPushNil();
+        hb_vmPushString(bBuffer, lLenBuff);
+        hb_vmDo(1);
 
-               hb_itemMove(pItem, pTemp);
-               hb_itemRelease(pTemp);
+        pTemp = hb_itemNew(nullptr);
+        hb_itemMove(pTemp, hb_stackReturnItem());
 
-            } else if( lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString()) ) {
-               if( s_pSym_SR_DESERIALIZE == nullptr ) {
-                  s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-                  if( s_pSym_SR_DESERIALIZE  == nullptr ) {
-                     printf("Could not find Symbol SR_DESERIALIZE\n");
-                  }
-               }
-               hb_vmPushDynSym(s_pSym_SR_DESERIALIZE);
-               hb_vmPushNil();
-               hb_vmPushString(bBuffer, lLenBuff);
-               hb_vmDo(1);
-
-               pTemp = hb_itemNew(nullptr);
-               hb_itemMove(pTemp, hb_stackReturnItem());
-
-               if( HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate ) {
-                  auto pLangItem = hb_itemNew(nullptr);
-                  HB_ULONG ulPos;
-                  if(    hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos)
-                      || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos)
-                      || hb_hashScan(pTemp, sr_getRootLang(pLangItem), &ulPos) ) {
-                     hb_itemCopy(pItem, hb_hashGetValueAt(pTemp, ulPos));
-                  }
-                  hb_itemRelease(pLangItem);
-               } else {
-                  hb_itemMove(pItem, pTemp);
-               }
-               hb_itemRelease(pTemp);
-            } else {
-               hb_itemPutCL(pItem, bBuffer, static_cast<HB_ULONG>(lLenBuff));
-            }
-            break;
-         }
-         case SQL_BIT: {
-            // hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
-            hb_itemPutL(pItem, OCI_GetBigInt(rs,iField) == 1 ? true : false);
-            break;
-         }
-
+        if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
+          auto pLangItem = hb_itemNew(nullptr);
+          HB_ULONG ulPos;
+          if (hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos) ||
+              hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos) ||
+              hb_hashScan(pTemp, sr_getRootLang(pLangItem), &ulPos)) {
+            hb_itemCopy(pItem, hb_hashGetValueAt(pTemp, ulPos));
+          }
+          hb_itemRelease(pLangItem);
+        } else {
+          hb_itemMove(pItem, pTemp);
+        }
+        hb_itemRelease(pTemp);
+      } else {
+        hb_itemPutCL(pItem, bBuffer, static_cast<HB_ULONG>(lLenBuff));
+      }
+      break;
+    }
+    case SQL_BIT: {
+      // hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
+      hb_itemPutL(pItem, OCI_GetBigInt(rs, iField) == 1 ? true : false);
+      break;
+    }
 #ifdef SQLRDD_TOPCONN
-         case SQL_FAKE_DATE: {
-            hb_itemPutDS(pItem, bBuffer);
-            break;
-         }
+    case SQL_FAKE_DATE: {
+      hb_itemPutDS(pItem, bBuffer);
+      break;
+    }
 #endif
-         case SQL_DATETIME: {
-            auto bBuffer = static_cast<char*>(OCI_GetString(rs, iField));
-            long lJulian, lMilliSec;
-            hb_timeStampStrGetDT(bBuffer, &lJulian, &lMilliSec);
-            hb_itemPutTDT(pItem, lJulian, lMilliSec);
-            break;
-         }
-
-         default: {
-            sr_TraceLog("oci.log", "Invalid data type detected: %i\n", lType);
-         }
-      }
-   }
+    case SQL_DATETIME: {
+      auto bBuffer = static_cast<char *>(OCI_GetString(rs, iField));
+      long lJulian, lMilliSec;
+      hb_timeStampStrGetDT(bBuffer, &lJulian, &lMilliSec);
+      hb_itemPutTDT(pItem, lJulian, lMilliSec);
+      break;
+    }
+    default: {
+      sr_TraceLog("oci.log", "Invalid data type detected: %i\n", lType);
+    }
+    }
+  }
 }
 #endif
 

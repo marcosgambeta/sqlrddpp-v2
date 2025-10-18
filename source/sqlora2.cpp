@@ -757,12 +757,12 @@ void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryO
       hb_itemPutL(pItem, OCI_GetBigInt(rs, iField) == 1 ? true : false);
       break;
     }
-      // #ifdef SQLRDD_TOPCONN
-      //         case SQL_FAKE_DATE: {
-      //            hb_itemPutDS(pItem, bBuffer);
-      //            break;
-      //         }
-      // #endif
+// #ifdef SQLRDD_TOPCONN
+//     case SQL_FAKE_DATE: {
+//       hb_itemPutDS(pItem, bBuffer);
+//       break;
+//     }
+// #endif
     case SQL_DATETIME: {
       OCI_Timestamp *pTime = OCI_GetTimestamp(rs, iField);
       // hb_retdts(bBuffer);
@@ -850,7 +850,7 @@ int SQLO2_sqldtype(int type)
   int isqltype;
 
   switch (type) {
-  case OCI_CDT_TEXT:
+  case OCI_CDT_TEXT: {
     // case SQLOT_STR:
     // case SQLOT_VCS:
     // case SQLOT_NON:
@@ -873,20 +873,26 @@ int SQLO2_sqldtype(int type)
     // case SQLOT_VST:
     isqltype = SQL_CHAR;
     break;
-  case OCI_CDT_LOB:
+  }
+  case OCI_CDT_LOB: {
     isqltype = SQL_LONGVARCHAR;
     break;
-  case OCI_CDT_NUMERIC:
+  }
+  case OCI_CDT_NUMERIC: {
     isqltype = SQL_NUMERIC;
     break;
-  case OCI_CDT_DATETIME:
+  }
+  case OCI_CDT_DATETIME: {
     isqltype = SQL_DATE;
     break;
-  case OCI_CDT_TIMESTAMP:
+  }
+  case OCI_CDT_TIMESTAMP: {
     isqltype = SQL_DATETIME;
     break;
-  default:
+  }
+  default: {
     isqltype = 0;
+  }
   }
   return isqltype;
 }

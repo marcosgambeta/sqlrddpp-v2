@@ -216,11 +216,13 @@ HB_FUNC(SQLO_EXECDIRECT)
     switch (session->status) {
     case SQLO_SUCCESS_WITH_INFO:
     case SQLO_SUCCESS:
-    case SQLO_NO_DATA:
+    case SQLO_NO_DATA: {
       hb_retni(SQL_SUCCESS);
       break;
-    default:
+    }
+    default: {
       hb_retni(SQL_ERROR);
+    }
     }
   } else {
     hb_retni(SQL_ERROR);
@@ -297,17 +299,19 @@ int sqlo_sqldtype(HB_USHORT type)
   case SQLOT_REF:
   case SQLOT_TIME:
   case SQLOT_TIME_TZ:
-  case SQLOT_VST:
+  case SQLOT_VST: {
     isqltype = SQL_CHAR;
     break;
+  }
   case SQLOT_CLOB:
   case SQLOT_BLOB:
   case SQLOT_BFILEE:
   case SQLOT_CFILEE:
   case SQLOT_RSET:
-  case SQLOT_NCO:
+  case SQLOT_NCO: {
     isqltype = SQL_LONGVARCHAR;
     break;
+  }
   case SQLOT_NUM:
   case SQLOT_UIN:
   case SQLOT_INT:
@@ -317,21 +321,25 @@ int sqlo_sqldtype(HB_USHORT type)
   case SQLOT_LNG:
   case SQLOT_RID:
   case SQLOT_INTERVAL_YM:
-  case SQLOT_INTERVAL_DS:
+  case SQLOT_INTERVAL_DS: {
     isqltype = SQL_NUMERIC;
     break;
+  }
   case SQLOT_DAT:
   case SQLOT_ODT:
-  case SQLOT_DATE:
+  case SQLOT_DATE: {
     isqltype = SQL_DATE;
     break;
+  }
   case SQLOT_TIMESTAMP:
   case SQLOT_TIMESTAMP_TZ:
-  case SQLOT_TIMESTAMP_LTZ:
+  case SQLOT_TIMESTAMP_LTZ: {
     isqltype = SQL_DATETIME;
     break;
-  default:
+  }
+  default: {
     isqltype = 0;
+  }  
   }
   return isqltype;
 }
@@ -507,7 +515,6 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
       hb_itemPutL(pItem, false);
       break;
     }
-
 #ifdef SQLRDD_TOPCONN
     case SQL_FAKE_DATE: {
       hb_itemPutDS(pItem, bBuffer);
@@ -518,9 +525,9 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
       hb_itemPutTDT(pItem, 0, 0);
       break;
     }
-
-    default:
+    default: {
       sr_TraceLog("oci.log", "Invalid data type detected: %i\n", lType);
+    }
     }
   } else {
     switch (lType) {
@@ -609,7 +616,6 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
       hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
       break;
     }
-
 #ifdef SQLRDD_TOPCONN
     case SQL_FAKE_DATE: {
       hb_itemPutDS(pItem, bBuffer);
@@ -622,9 +628,9 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
       hb_itemPutTDT(pItem, lJulian, lMilliSec);
       break;
     }
-
-    default:
+    default: {
       sr_TraceLog("oci.log", "Invalid data type detected: %i\n", lType);
+    }
     }
   }
 }
@@ -805,7 +811,8 @@ HB_FUNC(ORACLEINBINDPARAM)
     switch (Stmt->pLink[iPos].iType) {
     case 6: {
       ret = sqlo_bind_ref_cursor(Stmt->stmtParam, ":c1", &Stmt->stmtParamRes);
-    } break;
+      break;
+    }
     case 4: {
       if (HB_ISNUM(6)) {
         Stmt->pLink[iPos].dValue = hb_parnd(6);
@@ -813,7 +820,8 @@ HB_FUNC(ORACLEINBINDPARAM)
 
       ret = sqlo_bind_by_pos(lStmt ? Stmt->stmt : Stmt->stmtParam, iParamNum, SQLOT_FLT, &Stmt->pLink[iPos].dValue,
                              sizeof(double), &Stmt->pLink[iPos].sVal, 0);
-    } break;
+      break;
+    }
     case 2: {
       if (HB_ISNUM(6)) {
         Stmt->pLink[iPos].ulValue = hb_parnl(6);
@@ -821,7 +829,8 @@ HB_FUNC(ORACLEINBINDPARAM)
 
       ret = sqlo_bind_by_pos(lStmt ? Stmt->stmt : Stmt->stmtParam, iParamNum, SQLOT_INT, &Stmt->pLink[iPos].ulValue,
                              sizeof(HB_ULONG), &Stmt->pLink[iPos].sVal, 0);
-    } break;
+      break;
+    }
     case 3: {
       if (HB_ISNUM(6)) {
         Stmt->pLink[iPos].iValue = hb_parl(6);
@@ -829,8 +838,8 @@ HB_FUNC(ORACLEINBINDPARAM)
 
       ret = sqlo_bind_by_pos(lStmt ? Stmt->stmt : Stmt->stmtParam, iParamNum, SQLOT_INT, &Stmt->pLink[iPos].iValue,
                              sizeof(HB_ULONG), &Stmt->pLink[iPos].sVal, 0);
-    } break;
-
+      break;
+    }
     case 8: {
       if (HB_ISDATE(6)) {
         int iYear, iMonth, iDay;
@@ -848,8 +857,8 @@ HB_FUNC(ORACLEINBINDPARAM)
 
       ret = sqlo_bind_by_pos(lStmt ? Stmt->stmt : Stmt->stmtParam, iParamNum, SQLOT_DAT, &Stmt->pLink[iPos].sDate,
                              sizeof(Stmt->pLink[iPos].sDate), &Stmt->pLink[iPos].sVal, 0);
-    } break;
-
+      break;
+    }
     case 9: {
       if (HB_ISDATETIME(6)) {
         int iYear, iMonth, iDay;
@@ -874,15 +883,16 @@ HB_FUNC(ORACLEINBINDPARAM)
 
       ret = sqlo_bind_by_pos(lStmt ? Stmt->stmt : Stmt->stmtParam, iParamNum, SQLOT_DAT, &Stmt->pLink[iPos].sDate,
                              sizeof(Stmt->pLink[iPos].sDate), &Stmt->pLink[iPos].sVal, 0);
-    } break;
+      break;
+    }
     case 1: {
       if (HB_ISCHAR(6)) {
         sprintf(Stmt->pLink[iPos].sValue, hb_parcx(6), hb_parclen(6));
       }
       ret = sqlo_bind_by_pos(lStmt ? Stmt->stmt : Stmt->stmtParam, iParamNum, SQLOT_AFC, &Stmt->pLink[iPos].sValue,
                              iFieldSize, &Stmt->pLink[iPos].sVal, 0);
-    } break;
-
+      break;
+    }
     default: {
       if (iFieldSize == 0) {
         iFieldSize = 1;
@@ -896,7 +906,8 @@ HB_FUNC(ORACLEINBINDPARAM)
 
       ret = sqlo_bind_by_pos(lStmt ? Stmt->stmt : Stmt->stmtParam, iParamNum, SQLOT_STR, Stmt->pLink[iPos].col_name,
                              iFieldSize + 1, &Stmt->pLink[iPos].sVal, 0);
-    } break;
+     break;
+    }
     }
   }
 
@@ -908,7 +919,6 @@ usage : ORACLEGETBINDDATA(hDbc,nParameterNumber)
 */
 HB_FUNC(ORACLEGETBINDDATA)
 {
-
   auto p = static_cast<POCI_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
   int iPos;
 

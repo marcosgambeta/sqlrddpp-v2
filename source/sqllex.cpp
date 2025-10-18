@@ -334,7 +334,7 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
   if (isalpha(*queryPtr) || *queryPtr == '_') {
     switch (queryPtr[0]) {
     case 'a':
-    case 'A':
+    case 'A': {
       if (queryPtr + 3 <= queryEnd && (queryPtr[1] == 'l' || queryPtr[1] == 'L') &&
           (queryPtr[2] == 'l' || queryPtr[2] == 'L') && (queryPtr + 3 == queryEnd || !isalnum_(queryPtr[3]))) {
         stmt->queryPtr = queryPtr + 3;
@@ -366,16 +366,18 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return AVG;
       }
       break;
+    }
     case 'b':
-    case 'B':
+    case 'B': {
       if (queryPtr + 2 <= queryEnd && (queryPtr[1] == 'y' || queryPtr[1] == 'Y') &&
           (queryPtr + 2 == queryEnd || !isalnum_(queryPtr[2]))) {
         stmt->queryPtr = queryPtr + 2;
         return BY;
       }
       break;
+    }
     case 'c':
-    case 'C':
+    case 'C': {
       if (queryPtr + 6 <= queryEnd && (queryPtr[1] == 'o' || queryPtr[1] == 'O') &&
           (queryPtr[2] == 'u' || queryPtr[2] == 'U') && (queryPtr[3] == 'n' || queryPtr[3] == 'N') &&
           (queryPtr[4] == 't' || queryPtr[4] == 'T') && (queryPtr[5] == '(') && (queryPtr + 6 != queryEnd)) {
@@ -391,8 +393,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return OPERATOR;
       }
       break;
+    }
     case 'd':
-    case 'D':
+    case 'D': {
       if (queryPtr + 4 <= queryEnd && (queryPtr[1] == 'e' || queryPtr[1] == 'E') &&
           (queryPtr[2] == 's' || queryPtr[2] == 'S') && (queryPtr[3] == 'c' || queryPtr[3] == 'C') &&
           (queryPtr + 4 == queryEnd || !isalnum_(queryPtr[4]))) {
@@ -421,8 +424,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return CURRENT_DATE;
       }
       break;
+    }
     case 'f':
-    case 'F':
+    case 'F': {
       if (queryPtr + 4 <= queryEnd && (queryPtr[1] == 'r' || queryPtr[1] == 'R') &&
           (queryPtr[2] == 'o' || queryPtr[2] == 'O') && (queryPtr[3] == 'm' || queryPtr[3] == 'M') &&
           (queryPtr + 4 == queryEnd || !isalnum_(queryPtr[4]))) {
@@ -430,8 +434,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return FROM;
       }
       break;
+    }
     case 'g':
-    case 'G':
+    case 'G': {
       if (queryPtr + 4 <= queryEnd && (queryPtr[1] == 'r' || queryPtr[1] == 'R') &&
           (queryPtr[2] == 'o' || queryPtr[2] == 'O') && (queryPtr[3] == 'u' || queryPtr[3] == 'U') &&
           (queryPtr[4] == 'p' || queryPtr[4] == 'P') && (queryPtr + 5 == queryEnd || !isalnum_(queryPtr[5]))) {
@@ -439,8 +444,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return GROUP;
       }
       break;
+    }
     case 'i':
-    case 'I':
+    case 'I': {
       if (queryPtr + 7 <= queryEnd && (queryPtr[1] == 's' || queryPtr[1] == 'S') &&
           (queryPtr[2] == 'n' || queryPtr[2] == 'N') && (queryPtr[3] == 'u' || queryPtr[3] == 'U') &&
           (queryPtr[4] == 'l' || queryPtr[4] == 'L') && (queryPtr[5] == 'l' || queryPtr[5] == 'L') &&
@@ -472,8 +478,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return INSERT;
       }
       break;
+    }
     case 'j':
-    case 'J':
+    case 'J': {
       if (queryPtr + 4 <= queryEnd && (queryPtr[1] == 'o' || queryPtr[1] == 'O') &&
           (queryPtr[2] == 'i' || queryPtr[2] == 'I') && (queryPtr[3] == 'n' || queryPtr[3] == 'N') &&
           (queryPtr + 4 == queryEnd || !isalnum_(queryPtr[4]))) {
@@ -481,11 +488,13 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return JOIN;
       }
       break;
+    }
     case 'k':
-    case 'K':
+    case 'K': {
       break;
+    }
     case 'l':
-    case 'L':
+    case 'L': {
       if (queryPtr + 4 <= queryEnd && (queryPtr[1] == 'e' || queryPtr[1] == 'E') &&
           (queryPtr[2] == 'f' || queryPtr[2] == 'F') && (queryPtr[3] == 't' || queryPtr[3] == 'T') &&
           (queryPtr + 4 == queryEnd || !isalnum_(queryPtr[4]))) {
@@ -511,8 +520,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return LIMIT;
       }
       break;
+    }
     case 'm':
-    case 'M':
+    case 'M': {
       if (queryPtr + 4 <= queryEnd && (queryPtr[1] == 'a' || queryPtr[1] == 'A') &&
           (queryPtr[2] == 'x' || queryPtr[2] == 'X') && (queryPtr[3] == '(') && (queryPtr + 4 != queryEnd)) {
         stmt->queryPtr = queryPtr + 4;
@@ -524,8 +534,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return MIN;
       }
       break;
+    }
     case 'n':
-    case 'N':
+    case 'N': {
       if (queryPtr + 3 <= queryEnd && (queryPtr[1] == 'o' || queryPtr[1] == 'O') &&
           (queryPtr[2] == 't' || queryPtr[2] == 'T') && (queryPtr + 3 == queryEnd || !isalnum_(queryPtr[3]))) {
         stmt->queryPtr = queryPtr + 3;
@@ -538,8 +549,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return NULLVAL;
       }
       break;
+    }
     case 'o':
-    case 'O':
+    case 'O': {
       if (queryPtr + 2 <= queryEnd && (queryPtr[1] == 'r' || queryPtr[1] == 'R') &&
           (queryPtr + 2 == queryEnd || !isalnum_(queryPtr[2]))) {
         stmt->queryPtr = queryPtr + 2;
@@ -558,8 +570,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return OUTER;
       }
       break;
+    }
     case 'p':
-    case 'P':
+    case 'P': {
       if (queryPtr + 6 <= queryEnd && (queryPtr[1] == 'o' || queryPtr[1] == 'O') &&
           (queryPtr[2] == 'w' || queryPtr[2] == 'W') && (queryPtr[3] == 'e' || queryPtr[3] == 'E') &&
           (queryPtr[4] == 'r' || queryPtr[4] == 'R') && (queryPtr[5] == '(') && (queryPtr + 6 != queryEnd)) {
@@ -567,8 +580,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return POWER;
       }
       break;
+    }
     case 'r':
-    case 'R':
+    case 'R': {
       if (queryPtr + 6 <= queryEnd && (queryPtr[1] == 'o' || queryPtr[1] == 'O') &&
           (queryPtr[2] == 'u' || queryPtr[2] == 'U') && (queryPtr[3] == 'n' || queryPtr[3] == 'N') &&
           (queryPtr[4] == 'd' || queryPtr[4] == 'D') && (queryPtr[5] == '(') && (queryPtr + 6 != queryEnd)) {
@@ -583,8 +597,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return RIGHT;
       }
       break;
+    }
     case 's':
-    case 'S':
+    case 'S': {
       if (queryPtr + 3 <= queryEnd && (queryPtr[1] == 'e' || queryPtr[1] == 'E') &&
           (queryPtr[2] == 't' || queryPtr[2] == 'T') && (queryPtr + 3 == queryEnd || !isalnum_(queryPtr[3]))) {
         stmt->queryPtr = queryPtr + 3;
@@ -610,8 +625,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return SUM;
       }
       break;
+    }
     case 't':
-    case 'T':
+    case 'T': {
       if (queryPtr + 5 <= queryEnd && (queryPtr[1] == 'r' || queryPtr[1] == 'R') &&
           (queryPtr[2] == 'i' || queryPtr[2] == 'I') && (queryPtr[3] == 'm' || queryPtr[3] == 'M') &&
           (queryPtr[4] == '(') && (queryPtr + 5 != queryEnd)) {
@@ -619,8 +635,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return TRIM;
       }
       break;
+    }
     case 'u':
-    case 'U':
+    case 'U': {
       if (queryPtr + 6 <= queryEnd && (queryPtr[1] == 'p' || queryPtr[1] == 'P') &&
           (queryPtr[2] == 'd' || queryPtr[2] == 'D') && (queryPtr[3] == 'a' || queryPtr[3] == 'A') &&
           (queryPtr[4] == 't' || queryPtr[4] == 'T') && (queryPtr[5] == 'e' || queryPtr[5] == 'E') &&
@@ -635,8 +652,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return UNION;
       }
       break;
+    }
     case 'v':
-    case 'V':
+    case 'V': {
       if (queryPtr + 6 <= queryEnd && (queryPtr[1] == 'a' || queryPtr[1] == 'A') &&
           (queryPtr[2] == 'l' || queryPtr[2] == 'L') && (queryPtr[3] == 'u' || queryPtr[3] == 'U') &&
           (queryPtr[4] == 'e' || queryPtr[4] == 'E') && (queryPtr[5] == 's' || queryPtr[5] == 'S') &&
@@ -645,8 +663,9 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return VALUES;
       }
       break;
+    }
     case 'w':
-    case 'W':
+    case 'W': {
       if (queryPtr + 5 <= queryEnd && (queryPtr[1] == 'h' || queryPtr[1] == 'H') &&
           (queryPtr[2] == 'e' || queryPtr[2] == 'E') && (queryPtr[3] == 'r' || queryPtr[3] == 'R') &&
           (queryPtr[4] == 'e' || queryPtr[4] == 'E') && (queryPtr + 5 == queryEnd || !isalnum_(queryPtr[5]))) {
@@ -654,6 +673,7 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         return WHERE;
       }
       break;
+    }  
     }
 
     while (queryPtr < queryEnd && isalnum_(*queryPtr)) {

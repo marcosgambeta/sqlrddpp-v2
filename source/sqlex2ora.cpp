@@ -638,7 +638,8 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
     break;
   }
   case SYSTEMID_CACHE:
-  case SYSTEMID_INFORM:
+  case SYSTEMID_INFORM: {
+  }
   default: {
     ;
   }
