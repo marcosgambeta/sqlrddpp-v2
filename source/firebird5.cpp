@@ -425,50 +425,64 @@ HB_FUNC(FBEXECUTE5) // FBExecute(hEnv, cCmd, nDialect)
     }
 
     switch (dtype) {
-    case IB_SQL_TEXT:
+    case IB_SQL_TEXT: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab((sizeof(char) * var->sqllen) + 1));
       break;
-    case IB_SQL_BOOLEAN:
+    }
+    case IB_SQL_BOOLEAN: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_UCHAR)));
       break;
-    case IB_SQL_VARYING:
+    }
+    case IB_SQL_VARYING: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab((sizeof(char) * var->sqllen) + 3));
       break;
-    case IB_SQL_LONG:
+    }
+    case IB_SQL_LONG: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(long)));
       break;
-    case IB_SQL_SHORT:
+    }
+    case IB_SQL_SHORT: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(short)));
       break;
-    case IB_SQL_FLOAT:
+    }
+    case IB_SQL_FLOAT: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(float)));
       break;
-    case IB_SQL_DOUBLE:
+    }
+    case IB_SQL_DOUBLE: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(double)));
       break;
-    case IB_SQL_D_FLOAT:
+    }
+    case IB_SQL_D_FLOAT: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(float) * 2));
       break;
-    case IB_SQL_TIMESTAMP:
+    }
+    case IB_SQL_TIMESTAMP: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_TIMESTAMP)));
       break;
+    }
     case IB_SQL_ARRAY:
     case IB_SQL_QUAD:
-    case IB_SQL_BLOB:
+    case IB_SQL_BLOB: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_QUAD)));
       break;
-    case IB_SQL_TYPE_TIME:
+    }
+    case IB_SQL_TYPE_TIME: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_TIME)));
       break;
-    case IB_SQL_TYPE_DATE:
+    }
+    case IB_SQL_TYPE_DATE: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_DATE)));
       break;
-    case IB_SQL_INT64:
+    }
+    case IB_SQL_INT64: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_INT64) * var->sqllen));
       break;
-    default:
+    }
+    default: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(char) * var->sqllen));
       break;
+    }
     }
     var->sqlind = static_cast<short *>(hb_xgrab(sizeof(short)));
   }
@@ -560,23 +574,26 @@ HB_FUNC(FBDESCRIBECOL5) // FBDescribeCol(hStmt, nCol, @cName, @nType, @nLen, @nD
 
     switch (dtype) {
     case IB_SQL_TEXT:
-    case IB_SQL_VARYING:
+    case IB_SQL_VARYING: {
       rettype = SQL_CHAR;
       hb_storni(var->sqllen, 5);
       hb_storni(var->sqlscale, 6);
       break;
-    case IB_SQL_TYPE_TIME:
+    }
+    case IB_SQL_TYPE_TIME: {
       rettype = SQL_TIME;
       hb_storni(4L, 5);
       hb_storni(0, 6);
       break;
-    case IB_SQL_TIMESTAMP:
+    }
+    case IB_SQL_TIMESTAMP: {
       // rettype = SQL_CHAR;
       rettype = SQL_DATETIME;
       hb_storni(8L, 5);
       hb_storni(0, 6);
       break;
-    case IB_SQL_SHORT:
+    }
+    case IB_SQL_SHORT: {
       if (!sr_fShortasNum()) {
         rettype = SQL_SMALLINT;
         hb_storni(var->sqllen, 1);
@@ -587,41 +604,48 @@ HB_FUNC(FBDESCRIBECOL5) // FBDescribeCol(hStmt, nCol, @cName, @nType, @nLen, @nD
         hb_storni(var->sqlscale, 0);
       }
       break;
+      }
     case IB_SQL_LONG:
-    case IB_SQL_INT64:
+    case IB_SQL_INT64: {
       rettype = SQL_NUMERIC;
       hb_storni(20, 5);
       hb_storni(-var->sqlscale, 6);
       break;
+    }
     case IB_SQL_FLOAT:
     case IB_SQL_DOUBLE:
-    case IB_SQL_D_FLOAT:
+    case IB_SQL_D_FLOAT: {
       rettype = SQL_DOUBLE;
       hb_storni(23, 5);
       hb_storni(3, 6);
       break;
+    }
     case IB_SQL_BLOB:
     case IB_SQL_ARRAY:
-    case IB_SQL_QUAD:
+    case IB_SQL_QUAD: {
       rettype = SQL_LONGVARCHAR;
       hb_storni(10L, 5);
       hb_storni(0L, 6);
       break;
-    case IB_SQL_TYPE_DATE:
+    }
+    case IB_SQL_TYPE_DATE: {
       rettype = SQL_DATE;
       hb_storni(8L, 5);
       hb_storni(0L, 6);
       break;
-    case IB_SQL_BOOLEAN:
+    }
+    case IB_SQL_BOOLEAN: {
       rettype = SQL_BIT;
       hb_storni(1L, 5);
       hb_storni(0L, 6);
       break;
-    default:
+    }
+    default: {
       rettype = SQL_CHAR;
       hb_storni(var->sqllen, 5);
       hb_storni(var->sqlscale, 6);
       break;
+    }
     }
     // hb_storclen(static_cast<char*>(var->sqlname), var->sqlname_length, 3);
 
@@ -724,21 +748,21 @@ HB_FUNC(FBGETDATA5) // FBGetData(hEnv, nField, @uData)
       dtype = ((static_cast<XSQLVAR *>(var))->sqltype & ~1);
 
       switch (dtype) {
-      case IB_SQL_TEXT:
+      case IB_SQL_TEXT: {
         hb_storclen(static_cast<char *>(var->sqldata), var->sqllen, 3);
         break;
-
-      case IB_SQL_BOOLEAN:
+      }
+      case IB_SQL_BOOLEAN: {
         hb_storl(var->sqldata[0] == FB_TRUE ? true : false, 3);
         break;
-
-      case IB_SQL_VARYING:
+      }
+      case IB_SQL_VARYING: {
         vary = reinterpret_cast<VARY *>(var->sqldata);
         vary->vary_string[vary->vary_length] = '\0';
         hb_storc(static_cast<char *>(vary->vary_string), 3);
         break;
-
-      case IB_SQL_TIMESTAMP:
+      }
+      case IB_SQL_TIMESTAMP: {
         isc_decode_timestamp(reinterpret_cast<ISC_TIMESTAMP ISC_FAR *>(var->sqldata), &times);
         hb_snprintf(date_s, sizeof(date_s), "%04d-%02d-%02d %02d:%02d:%02d.%04d", times.tm_year + 1900,
                     times.tm_mon + 1, times.tm_mday, times.tm_hour, times.tm_min, times.tm_sec,
@@ -749,7 +773,7 @@ HB_FUNC(FBGETDATA5) // FBGetData(hEnv, nField, @uData)
           hb_stortdt(lJulian, lMilliSec, 3);
         }
         break;
-
+      }
       case IB_SQL_TYPE_TIME: {
         long lMilliSec;
         isc_decode_sql_time(reinterpret_cast<ISC_TIME ISC_FAR *>(var->sqldata), &times);
@@ -761,25 +785,27 @@ HB_FUNC(FBGETDATA5) // FBGetData(hEnv, nField, @uData)
         hb_stortdt(0, lMilliSec, 3); // TOCHECK:
         break;
       }
-
       case IB_SQL_LONG:
       case IB_SQL_INT64:
       case IB_SQL_SHORT: {
         ISC_INT64 value = 0;
         short field_width = 0, dscale;
         switch (dtype) {
-        case IB_SQL_SHORT:
+        case IB_SQL_SHORT: {
           value = static_cast<ISC_INT64>(*reinterpret_cast<short ISC_FAR *>(var->sqldata));
           field_width = 6;
           break;
-        case IB_SQL_LONG:
+        }
+        case IB_SQL_LONG: {
           value = static_cast<ISC_INT64>(*reinterpret_cast<long ISC_FAR *>(var->sqldata));
           field_width = 11;
           break;
-        case IB_SQL_INT64:
+        }
+        case IB_SQL_INT64: {
           value = static_cast<ISC_INT64>(*reinterpret_cast<ISC_INT64 ISC_FAR *>(var->sqldata));
           field_width = 21;
           break;
+        }
         }
 
         dscale = var->sqlscale;
@@ -814,20 +840,19 @@ HB_FUNC(FBGETDATA5) // FBGetData(hEnv, nField, @uData)
         hb_storc(data, 3);
         break;
       }
-
-      case IB_SQL_FLOAT:
+      case IB_SQL_FLOAT: {
         hb_snprintf(data, sizeof(data), "%15g ", *reinterpret_cast<float ISC_FAR *>(var->sqldata));
         hb_storc(data, 3);
         break;
-
-      case IB_SQL_DOUBLE:
+      }
+      case IB_SQL_DOUBLE: {
         hb_snprintf(data, sizeof(data), "%24f ", *reinterpret_cast<double ISC_FAR *>(var->sqldata));
         hb_storc(data, 3);
         break;
-
+      }
       case IB_SQL_BLOB:
       case IB_SQL_ARRAY:
-      case IB_SQL_QUAD:
+      case IB_SQL_QUAD: {
         blob_id = reinterpret_cast<ISC_QUAD *>(var->sqldata);
         if (isc_open_blob2(session->status, &(session->db), &(session->transac), &blob_handle, blob_id, 0, nullptr)) {
           ERRORLOGANDEXIT(session, "FBGETDATA1");
@@ -841,17 +866,21 @@ HB_FUNC(FBGETDATA5) // FBGetData(hEnv, nField, @uData)
           length = static_cast<short>(isc_vax_integer(resp, 2));
           resp += 2;
           switch (item) {
-          case isc_info_blob_total_length:
+          case isc_info_blob_total_length: {
             blob_size = isc_vax_integer(resp, length);
             break;
-          case isc_info_blob_num_segments:
+          }
+          case isc_info_blob_num_segments: {
             num_segments = isc_vax_integer(resp, length);
             break;
-          case isc_info_truncated:
+          }
+          case isc_info_truncated: {
             bEnd = true;
             break;
-          default:
+          }
+          default: {
             break;
+          }
           }
           if (bEnd) {
             break;
@@ -877,16 +906,17 @@ HB_FUNC(FBGETDATA5) // FBGetData(hEnv, nField, @uData)
 
         hb_storclen_buffer(read_blob, blob_size, 3);
         break;
-
-      case IB_SQL_TYPE_DATE:
+      }
+      case IB_SQL_TYPE_DATE: {
         isc_decode_sql_date(reinterpret_cast<ISC_DATE ISC_FAR *>(var->sqldata), &times);
         hb_snprintf(data, sizeof(data), "%04d-%02d-%02d", times.tm_year + 1900, times.tm_mon + 1, times.tm_mday);
         hb_storc(data, 3);
         break;
-
-      default:
+      }
+      default: {
         sr_TraceLog(LOGFILE, "Unsupported data type returned in query: %i\n", dtype);
         break;
+      }
       }
     }
     hb_retni(SQL_SUCCESS);
@@ -1267,11 +1297,12 @@ HB_FUNC(FBLINEPROCESSED5)
         } else {
           dtype = ((static_cast<XSQLVAR *>(var))->sqltype & ~1);
           switch (dtype) {
-          case IB_SQL_TEXT:
+          case IB_SQL_TEXT: {
             FBFieldGet5(hb_arrayGetItemPtr(pFields, icol), temp, static_cast<char *>(var->sqldata), var->sqllen,
                         bQueryOnly, ulSystemID, bTranslate);
             hb_arraySetForward(pRet, icol, temp);
             break;
+          }
           case IB_SQL_BOOLEAN: {
             // ISC_UCHAR udata = *static_cast<ISC_UCHAR ISC_FAR*>(var->sqldata);
             // hb_itemPutL(temp, udata == static_cast<ISC_UCHAR>("T") || udata == static_cast<ISC_UCHAR>("t") || udata
@@ -1280,14 +1311,15 @@ HB_FUNC(FBLINEPROCESSED5)
             hb_arraySetForward(pRet, icol, temp);
             break;
           }
-          case IB_SQL_VARYING:
+          case IB_SQL_VARYING: {
             vary = reinterpret_cast<VARY *>(var->sqldata);
             vary->vary_string[vary->vary_length] = '\0';
             FBFieldGet5(hb_arrayGetItemPtr(pFields, icol), temp, static_cast<char *>(vary->vary_string),
                         strlen(vary->vary_string), bQueryOnly, ulSystemID, bTranslate);
             hb_arraySetForward(pRet, icol, temp);
             break;
-          case IB_SQL_TIMESTAMP:
+          }
+          case IB_SQL_TIMESTAMP: {
             isc_decode_timestamp(reinterpret_cast<ISC_TIMESTAMP ISC_FAR *>(var->sqldata), &times);
             hb_snprintf(date_s, sizeof(date_s), "%04d-%02d-%02d %02d:%02d:%02d.%04d", times.tm_year + 1900,
                         times.tm_mon + 1, times.tm_mday, times.tm_hour, times.tm_min, times.tm_sec,
@@ -1297,7 +1329,8 @@ HB_FUNC(FBLINEPROCESSED5)
                         bQueryOnly, ulSystemID, bTranslate);
             hb_arraySetForward(pRet, icol, temp);
             break;
-          case IB_SQL_TYPE_TIME:
+          }
+          case IB_SQL_TYPE_TIME: {
             isc_decode_sql_time(reinterpret_cast<ISC_TIME ISC_FAR *>(var->sqldata), &times);
             hb_snprintf(date_s, sizeof(date_s), "%02d:%02d:%02d.%04d", times.tm_hour, times.tm_min, times.tm_sec,
                         static_cast<int>((*(reinterpret_cast<ISC_TIME *>(var->sqldata))) % 10000));
@@ -1305,6 +1338,7 @@ HB_FUNC(FBLINEPROCESSED5)
                         bQueryOnly, ulSystemID, bTranslate);
             hb_arraySetForward(pRet, icol, temp);
             break;
+          }
           case IB_SQL_LONG:
           case IB_SQL_INT64:
           case IB_SQL_SHORT: {
@@ -1312,18 +1346,21 @@ HB_FUNC(FBLINEPROCESSED5)
             short field_width = 0, dscale;
             value = 0;
             switch (dtype) {
-            case IB_SQL_SHORT:
+            case IB_SQL_SHORT: {
               value = static_cast<ISC_INT64>(*reinterpret_cast<short ISC_FAR *>(var->sqldata));
               field_width = 6;
               break;
-            case IB_SQL_LONG:
+            }
+            case IB_SQL_LONG: {
               value = static_cast<ISC_INT64>(*reinterpret_cast<long ISC_FAR *>(var->sqldata));
               field_width = 11;
               break;
-            case IB_SQL_INT64:
+            }
+            case IB_SQL_INT64: {
               value = static_cast<ISC_INT64>(*reinterpret_cast<ISC_INT64 ISC_FAR *>(var->sqldata));
               field_width = 21;
               break;
+            }
             }
 
             dscale = var->sqlscale;
@@ -1374,7 +1411,7 @@ HB_FUNC(FBLINEPROCESSED5)
             hb_arraySetForward(pRet, icol, temp);
             break;
           }
-          case IB_SQL_FLOAT:
+          case IB_SQL_FLOAT: {
             // hb_snprintf(data, sizeof(data), "%15g ", *static_cast<float ISC_FAR*>(var->sqldata));
             // sr_TraceLog("fb.log","valor float = %lf data %s\n",*static_cast<float ISC_FAR*>(var->sqldata),data);
             // FBFieldGet(hb_arrayGetItemPtr(pFields, icol), temp, static_cast<char*>(data), strlen(data), bQueryOnly,
@@ -1382,7 +1419,8 @@ HB_FUNC(FBLINEPROCESSED5)
             hb_itemPutNDLen(temp, *reinterpret_cast<float ISC_FAR *>(var->sqldata), static_cast<int>(lLen), static_cast<int>(lDec));
             hb_arraySetForward(pRet, icol, temp);
             break;
-          case IB_SQL_DOUBLE:
+          }
+          case IB_SQL_DOUBLE: {
             // hb_snprintf(data, sizeof(data), "%24f ", *static_cast<double ISC_FAR*>(var->sqldata));
             // sr_TraceLog("fb.log","valor double = %lf data %s\n",*static_cast<float ISC_FAR*>(var->sqldata),data);
             // FBFieldGet(hb_arrayGetItemPtr(pFields, icol), temp, static_cast<char*>(data), strlen(data), bQueryOnly,
@@ -1390,9 +1428,10 @@ HB_FUNC(FBLINEPROCESSED5)
             hb_itemPutNDLen(temp, *reinterpret_cast<double ISC_FAR *>(var->sqldata), static_cast<int>(lLen), static_cast<int>(lDec));
             hb_arraySetForward(pRet, icol, temp);
             break;
+          }
           case IB_SQL_BLOB:
           case IB_SQL_ARRAY:
-          case IB_SQL_QUAD:
+          case IB_SQL_QUAD: {
             blob_id = reinterpret_cast<ISC_QUAD *>(var->sqldata);
             if (isc_open_blob2(session->status, &(session->db), &(session->transac), &blob_handle, blob_id, 0,
                                nullptr)) {
@@ -1407,17 +1446,21 @@ HB_FUNC(FBLINEPROCESSED5)
               length = static_cast<short>(isc_vax_integer(resp, 2));
               resp += 2;
               switch (item) {
-              case isc_info_blob_total_length:
+              case isc_info_blob_total_length: {
                 blob_size = isc_vax_integer(resp, length);
                 break;
-              case isc_info_blob_num_segments:
+              }
+              case isc_info_blob_num_segments: {
                 num_segments = isc_vax_integer(resp, length);
                 break;
-              case isc_info_truncated:
+              }
+              case isc_info_truncated: {
                 bEnd = true;
                 break;
-              default:
+              }
+              default: {
                 break;
+              }
               }
               if (bEnd) {
                 break;
@@ -1449,7 +1492,8 @@ HB_FUNC(FBLINEPROCESSED5)
             hb_storclen_buffer(read_blob, blob_size, 3);
             hb_xfree(read_blob);
             break;
-          case IB_SQL_TYPE_DATE:
+          }
+          case IB_SQL_TYPE_DATE: {
             isc_decode_sql_date(reinterpret_cast<ISC_DATE ISC_FAR *>(var->sqldata), &times);
             hb_snprintf(date_s, sizeof(date_s), "%04d-%02d-%02d", times.tm_year + 1900, times.tm_mon + 1,
                         times.tm_mday);
@@ -1458,9 +1502,11 @@ HB_FUNC(FBLINEPROCESSED5)
                         ulSystemID, bTranslate);
             hb_arraySetForward(pRet, icol, temp);
             break;
-          default:
+          }
+          default: {
             sr_TraceLog(LOGFILE, "Unsupported data type returned in query: %i\n", dtype);
             break;
+          }
           }
         }
       }
