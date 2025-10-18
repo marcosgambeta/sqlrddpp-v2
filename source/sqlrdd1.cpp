@@ -77,8 +77,8 @@ static RDDFUNCS sqlrddSuper;
 
 void startSQLRDDSymbols(void);
 
-static HB_BOOL ProcessFields(SQLAREAP ThisDb);
-static HB_BOOL SetFields(SQLAREAP ThisDb);
+static bool ProcessFields(SQLAREAP ThisDb);
+static bool SetFields(SQLAREAP ThisDb);
 
 /*
 static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder);
@@ -3086,7 +3086,7 @@ static HB_ERRCODE sqlRddInfo(LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConne
 
 /*------------------------------------------------------------------------*/
 
-static HB_BOOL ProcessFields(SQLAREAP thiswa)
+static bool ProcessFields(SQLAREAP thiswa)
 {
   DBFIELDINFO field;
   HB_LONG numFields;
@@ -3188,7 +3188,7 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-static HB_BOOL SetFields(SQLAREAP thiswa)
+static bool SetFields(SQLAREAP thiswa)
 {
   HB_LONG numFields;
   HB_USHORT i;
