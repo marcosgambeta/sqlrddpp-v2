@@ -24,7 +24,7 @@ PROCEDURE Main()
    LOCAL oTB
    LOCAL nKey
 
-   setMode(25, 80)
+   SetMode(25, maxcol() + 1)
 
    rddSetDefault("SQLRDD")
 
@@ -34,7 +34,7 @@ PROCEDURE Main()
       alert("Connection error. See sqlerror.log for details.")
       QUIT
    ENDIF
-   
+
    sr_StartLog(nConnection)
 
    IF !sr_ExistTable("test")
