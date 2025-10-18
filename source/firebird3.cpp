@@ -993,7 +993,7 @@ HB_FUNC(FBCREATEDB3)
   sql += "' ";
   if (page) {
     sql += "PAGE_SIZE = ";
-    sql += page;
+    sql += std::to_string(page);
     sql += " ";
   }
   if (charset) {

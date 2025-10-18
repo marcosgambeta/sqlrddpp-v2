@@ -1005,7 +1005,7 @@ HB_FUNC(FBCREATEDB4)
   sql += "' ";
   if (page) {
     sql += "PAGE_SIZE = ";
-    sql += page;
+    sql += std::to_string(page);
     sql += " ";
   }
   if (charset) {
