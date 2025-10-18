@@ -90,6 +90,35 @@ hbmk2 <filename> sqlrddpp-v2.hbc -llibpq
 hbmk2 <filename> sqlrddpp-v2.hbc -lfbclient
 ```
 
+## Problemas na utilização
+
+Caso tenha problemas na utilização deste projeto, informe na seção 'Issues':
+
+https://github.com/marcosgambeta/sqlrddpp-v2/issues  
+
+## Contato com o desenvolvedor
+
+Envie sua mensagem usando uma das opções abaixo:
+
+E-mail:  
+marcosgambeta@outlook.com
+
+Telegram:  
+https://t.me/marcosgambeta
+
+## Informações e conteúdo extra
+
+Acompanhe o blog abaixo para mais informações e conteúdo extra:
+
+https://magsoftinfo.com/blog/
+
+## Donativos
+
+Se este projeto for útil para você e desejar apoiar seu desenvolvimento através de donativos,
+basta utilizar a chave Pix abaixo:
+
+marcosgambeta@outlook.com
+
 ## Links
 
 SQLRDD para xHarbour e Harbour  
