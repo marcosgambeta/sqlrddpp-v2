@@ -411,13 +411,13 @@ static PHB_ITEM mxml_node_new(PHB_ITEM pDoc)
   hb_vmDo(0);
 
   // The node is in the return
-  hb_objSendMsg(hb_param(-1, HB_IT_ANY), "NEW", 0);
-  pNode = hb_itemNew(hb_param(-1, HB_IT_ANY));
+  hb_objSendMsg(hb_param(-1, Harbour::Item::ANY), "NEW", 0);
+  pNode = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
 
   // Sets also current node line begin value, if the node is from a document
   if (pDoc != SR_NULLPTR) {
     hb_objSendMsg(pDoc, "NLINE", 0);
-    hb_objSendMsg(pNode, "_NBEGINLINE", 1, hb_param(-1, HB_IT_ANY));
+    hb_objSendMsg(pNode, "_NBEGINLINE", 1, hb_param(-1, Harbour::Item::ANY));
   }
   // Else, leaves nBeginLine at 0
 
@@ -436,13 +436,13 @@ static void mxml_node_unlink(PHB_ITEM pNode)
   pNil = hb_itemNew(SR_NULLPTR);
 
   hb_objSendMsg(pNode, "OPREV", 0);
-  pPrev = hb_itemNew(hb_param(-1, HB_IT_ANY));
+  pPrev = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
 
   hb_objSendMsg(pNode, "ONEXT", 0);
-  pNext = hb_itemNew(hb_param(-1, HB_IT_ANY));
+  pNext = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
 
   hb_objSendMsg(pNode, "OPARENT", 0);
-  pParent = hb_itemNew(hb_param(-1, HB_IT_ANY));
+  pParent = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
 
   // Detaching from previous
   if (!HB_IS_NIL(pPrev)) {
@@ -473,7 +473,7 @@ static void mxml_node_unlink(PHB_ITEM pNode)
 
 HB_FUNC(SRXML_NODE_UNLINK)
 {
-  mxml_node_unlink(hb_param(1, HB_IT_OBJECT));
+  mxml_node_unlink(hb_param(1, Harbour::Item::OBJECT));
 }
 
 // ---
@@ -485,13 +485,13 @@ static void mxml_node_insert_before(PHB_ITEM pTg, PHB_ITEM pNode)
 
   // Move tg->prev into node->prev
   hb_objSendMsg(pTg, "OPREV", 0);
-  pPrev = hb_itemNew(hb_param(-1, HB_IT_ANY));
-  hb_objSendMsg(pNode, "_OPREV", 1, hb_param(-1, HB_IT_ANY));
+  pPrev = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
+  hb_objSendMsg(pNode, "_OPREV", 1, hb_param(-1, Harbour::Item::ANY));
 
   // if the previous is not null, and if his next was tg, we must update to node
   if (!HB_IS_NIL(pPrev)) {
     hb_objSendMsg(pPrev, "ONEXT", 0);
-    if (hb_arrayId(hb_param(-1, HB_IT_ANY)) == hb_arrayId(pTg)) {
+    if (hb_arrayId(hb_param(-1, Harbour::Item::ANY)) == hb_arrayId(pTg)) {
       hb_objSendMsg(pPrev, "_ONEXT", 1, pNode);
     }
   }
@@ -505,13 +505,13 @@ static void mxml_node_insert_before(PHB_ITEM pTg, PHB_ITEM pNode)
 
   // pNode->parent is the same as tg
   hb_objSendMsg(pTg, "OPARENT", 0);
-  pParent = hb_itemNew(hb_param(-1, HB_IT_ANY));
+  pParent = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
   hb_objSendMsg(pNode, "_OPARENT", 1, pParent);
 
   // if the parent is not null, and if it's child was tg, we must update to node
   if (!HB_IS_NIL(pParent)) {
     hb_objSendMsg(pParent, "OCHILD", 0);
-    if (hb_arrayId(hb_param(-1, HB_IT_ANY)) == hb_arrayId(pTg)) {
+    if (hb_arrayId(hb_param(-1, Harbour::Item::ANY)) == hb_arrayId(pTg)) {
       hb_objSendMsg(pParent, "_OCHILD", 1, pNode);
     }
   }
@@ -521,14 +521,14 @@ static void mxml_node_insert_before(PHB_ITEM pTg, PHB_ITEM pNode)
 
 HB_FUNC(SRXML_NODE_INSERT_BEFORE)
 {
-  mxml_node_insert_before(hb_param(1, HB_IT_OBJECT), hb_param(2, HB_IT_OBJECT));
+  mxml_node_insert_before(hb_param(1, Harbour::Item::OBJECT), hb_param(2, Harbour::Item::OBJECT));
 }
 
 static void mxml_node_insert_after(PHB_ITEM pTg, PHB_ITEM pNode)
 {
   // Move tg->next into node->next
   hb_objSendMsg(pTg, "ONEXT", 0);
-  hb_objSendMsg(pNode, "_ONEXT", 1, hb_param(-1, HB_IT_ANY));
+  hb_objSendMsg(pNode, "_ONEXT", 1, hb_param(-1, Harbour::Item::ANY));
 
   // tg->NEXT is now pnode!
   hb_objSendMsg(pTg, "_ONEXT", 1, pNode);
@@ -538,12 +538,12 @@ static void mxml_node_insert_after(PHB_ITEM pTg, PHB_ITEM pNode)
 
   // pNode->parent is the same as tg
   hb_objSendMsg(pTg, "OPARENT", 0);
-  hb_objSendMsg(pNode, "_OPARENT", 1, hb_param(-1, HB_IT_ANY));
+  hb_objSendMsg(pNode, "_OPARENT", 1, hb_param(-1, Harbour::Item::ANY));
 }
 
 HB_FUNC(SRXML_NODE_INSERT_AFTER)
 {
-  mxml_node_insert_after(hb_param(1, HB_IT_OBJECT), hb_param(2, HB_IT_OBJECT));
+  mxml_node_insert_after(hb_param(1, Harbour::Item::OBJECT), hb_param(2, Harbour::Item::OBJECT));
 }
 
 // Creates a new tree level, so that the given node is added between
@@ -554,7 +554,7 @@ static void mxml_node_insert_below(PHB_ITEM pTg, PHB_ITEM pNode)
 
   // Move tg->child into node->child
   hb_objSendMsg(pTg, "OCHILD", 0);
-  pChild = hb_itemNew(hb_param(-1, HB_IT_ANY));
+  pChild = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
   hb_objSendMsg(pNode, "_OCHILD", 1, pChild);
 
   // Parent of pNode is now TG
@@ -564,14 +564,14 @@ static void mxml_node_insert_below(PHB_ITEM pTg, PHB_ITEM pNode)
   while (!HB_IS_NIL(pChild)) {
     hb_objSendMsg(pChild, "_OPARENT", 1, pNode);
     hb_objSendMsg(pChild, "ONEXT", 0);
-    hb_itemMove(pChild, hb_param(-1, HB_IT_ANY));
+    hb_itemMove(pChild, hb_param(-1, Harbour::Item::ANY));
   }
   hb_itemRelease(pChild);
 }
 
 HB_FUNC(SRXML_NODE_INSERT_BELOW)
 {
-  mxml_node_insert_below(hb_param(1, HB_IT_OBJECT), hb_param(2, HB_IT_OBJECT));
+  mxml_node_insert_below(hb_param(1, Harbour::Item::OBJECT), hb_param(2, Harbour::Item::OBJECT));
 }
 
 // Adds a node to the bottom of the children list of tg.
@@ -584,16 +584,16 @@ static void mxml_node_add_below(PHB_ITEM pTg, PHB_ITEM pNode)
 
   // Get the TG child
   hb_objSendMsg(pTg, "OCHILD", 0);
-  pChild = hb_itemNew(hb_param(-1, HB_IT_ANY));
+  pChild = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
 
   if (!HB_IS_NIL(pChild)) {
     // Scanning up to the last child
     for (;;) {
       hb_objSendMsg(pChild, "ONEXT", 0);
-      if (HB_IS_NIL(hb_param(-1, HB_IT_ANY))) {
+      if (HB_IS_NIL(hb_param(-1, Harbour::Item::ANY))) {
         break;
       }
-      hb_itemMove(pChild, hb_param(-1, HB_IT_ANY));
+      hb_itemMove(pChild, hb_param(-1, Harbour::Item::ANY));
     }
     // linking the child with pnode
     hb_objSendMsg(pChild, "_ONEXT", 1, pNode);
@@ -607,7 +607,7 @@ static void mxml_node_add_below(PHB_ITEM pTg, PHB_ITEM pNode)
 
 HB_FUNC(SRXML_NODE_ADD_BELOW)
 {
-  mxml_node_add_below(hb_param(1, HB_IT_OBJECT), hb_param(2, HB_IT_OBJECT));
+  mxml_node_add_below(hb_param(1, Harbour::Item::OBJECT), hb_param(2, Harbour::Item::OBJECT));
 }
 
 // Clones a node, but it does not sets the parent, nor the siblings;
@@ -620,19 +620,19 @@ static PHB_ITEM mxml_node_clone(PHB_ITEM pTg)
 
   // sets clone type
   hb_objSendMsg(pTg, "NTYPE", 0);
-  hb_objSendMsg(pNode, "_NTYPE", 1, hb_param(-1, HB_IT_ANY));
+  hb_objSendMsg(pNode, "_NTYPE", 1, hb_param(-1, Harbour::Item::ANY));
 
   // sets clone name
   hb_objSendMsg(pTg, "CNAME", 0);
-  hb_objSendMsg(pNode, "_CNAME", 1, hb_param(-1, HB_IT_ANY));
+  hb_objSendMsg(pNode, "_CNAME", 1, hb_param(-1, Harbour::Item::ANY));
 
   // sets clone data
   hb_objSendMsg(pTg, "CDATA", 0);
-  hb_objSendMsg(pNode, "_CDATA", 1, hb_param(-1, HB_IT_ANY));
+  hb_objSendMsg(pNode, "_CDATA", 1, hb_param(-1, Harbour::Item::ANY));
 
   // clone attributes
   hb_objSendMsg(pTg, "AATTRIBUTES", 0);
-  pArrayClone = hb_arrayClone(hb_param(-1, HB_IT_ANY));
+  pArrayClone = hb_arrayClone(hb_param(-1, Harbour::Item::ANY));
   hb_objSendMsg(pNode, "_AATTRIBUTES", 1, pArrayClone);
   hb_itemRelease(pArrayClone);
 
@@ -641,7 +641,7 @@ static PHB_ITEM mxml_node_clone(PHB_ITEM pTg)
 
 HB_FUNC(SRXML_NODE_CLONE)
 {
-  hb_itemReturnRelease(mxml_node_clone(hb_param(1, HB_IT_OBJECT)));
+  hb_itemReturnRelease(mxml_node_clone(hb_param(1, Harbour::Item::OBJECT)));
 }
 
 // Clones a node and all its subtree, but it does not sets the parent, nor the siblings;
@@ -653,7 +653,7 @@ static PHB_ITEM mxml_node_clone_tree(PHB_ITEM pTg)
 
   // Get the TG child
   hb_objSendMsg(pTg, "OCHILD", 0);
-  pNode = hb_itemNew(hb_param(-1, HB_IT_ANY));
+  pNode = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
 
   while (!HB_IS_NIL(pNode)) {
     PHB_ITEM pSubTree;
@@ -667,7 +667,7 @@ static PHB_ITEM mxml_node_clone_tree(PHB_ITEM pTg)
 
     // go to the next node
     hb_objSendMsg(pNode, "ONEXT", 0);
-    hb_itemMove(pNode, hb_param(-1, HB_IT_ANY));
+    hb_itemMove(pNode, hb_param(-1, Harbour::Item::ANY));
   }
   hb_itemRelease(pNode);
 
@@ -676,7 +676,7 @@ static PHB_ITEM mxml_node_clone_tree(PHB_ITEM pTg)
 
 HB_FUNC(SRXML_NODE_CLONE_TREE)
 {
-  hb_itemReturnRelease(mxml_node_clone_tree(hb_param(1, HB_IT_OBJECT)));
+  hb_itemReturnRelease(mxml_node_clone_tree(hb_param(1, Harbour::Item::OBJECT)));
 }
 
 // reads a data node
@@ -1443,7 +1443,7 @@ static MXML_STATUS mxml_node_read(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc,
 
     // checking for data nodes
     hb_objSendMsg(pNode, "OCHILD", 0);
-    child_node = hb_itemNew(hb_param(-1, HB_IT_ANY));
+    child_node = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
 
     while (!HB_IS_NIL(child_node)) {
       hb_objSendMsg(child_node, "NTYPE", 0);
@@ -1459,12 +1459,12 @@ static MXML_STATUS mxml_node_read(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc,
         }
       }
       hb_objSendMsg(child_node, "ONEXT", 0);
-      hb_itemMove(child_node, hb_param(-1, HB_IT_ANY));
+      hb_itemMove(child_node, hb_param(-1, Harbour::Item::ANY));
     }
 
     if (data_node) {
       hb_objSendMsg(data_node, "CDATA", 0);
-      hb_objSendMsg(pNode, "_CDATA", 1, hb_param(-1, HB_IT_ANY));
+      hb_objSendMsg(pNode, "_CDATA", 1, hb_param(-1, Harbour::Item::ANY));
 
       mxml_node_unlink(data_node);
       // garbage will take care of destroying it
@@ -1533,14 +1533,14 @@ static MXML_STATUS mxml_node_write(MXML_OUTPUT *out, PHB_ITEM pNode, int style)
     mxml_output_string_len(out, hb_parc(-1), hb_parclen(-1));
 
     hb_objSendMsg(pNode, "AATTRIBUTES", 0);
-    mxml_node_write_attributes(out, hb_param(-1, HB_IT_ANY), style);
+    mxml_node_write_attributes(out, hb_param(-1, Harbour::Item::ANY), style);
 
     hb_objSendMsg(pNode, "CDATA", 0);
     // hb_itemCopy() should not be applied to strings, as it rises the
     // holders, and we don't want this
-    hb_itemMove(pItem, hb_param(-1, HB_IT_ANY));
+    hb_itemMove(pItem, hb_param(-1, Harbour::Item::ANY));
     hb_objSendMsg(pNode, "OCHILD", 0);
-    hb_itemMove(pChild, hb_param(-1, HB_IT_ANY));
+    hb_itemMove(pChild, hb_param(-1, Harbour::Item::ANY));
 
     if (HB_IS_NIL(pItem) && HB_IS_NIL(pChild)) {
       mxml_output_string_len(out, "/>", 2);
@@ -1561,7 +1561,7 @@ static MXML_STATUS mxml_node_write(MXML_OUTPUT *out, PHB_ITEM pNode, int style)
         while (!HB_IS_NIL(pChild)) {
           mxml_node_write(out, pChild, style);
           hb_objSendMsg(pChild, "ONEXT", 0);
-          hb_itemMove(pChild, hb_param(-1, HB_IT_ANY));
+          hb_itemMove(pChild, hb_param(-1, Harbour::Item::ANY));
         }
       }
 
@@ -1630,7 +1630,7 @@ static MXML_STATUS mxml_node_write(MXML_OUTPUT *out, PHB_ITEM pNode, int style)
 
     hb_objSendMsg(pNode, "CDATA", 0);
 
-    if (HB_IS_STRING(hb_param(-1, HB_IT_ANY))) {
+    if (HB_IS_STRING(hb_param(-1, Harbour::Item::ANY))) {
       mxml_output_char(out, ' ');
       mxml_output_string_len(out, hb_parcx(-1), hb_parclen(-1));
     }
@@ -1646,7 +1646,7 @@ static MXML_STATUS mxml_node_write(MXML_OUTPUT *out, PHB_ITEM pNode, int style)
     mxml_output_string_len(out, hb_parcx(-1), hb_parclen(-1));
     hb_objSendMsg(pNode, "CDATA", 0);
 
-    if (HB_IS_STRING(hb_param(-1, HB_IT_ANY))) {
+    if (HB_IS_STRING(hb_param(-1, Harbour::Item::ANY))) {
       mxml_output_char(out, ' ');
       mxml_output_string_len(out, hb_parcx(-1), hb_parclen(-1));
     }
@@ -1658,12 +1658,12 @@ static MXML_STATUS mxml_node_write(MXML_OUTPUT *out, PHB_ITEM pNode, int style)
   }
   case MXML_TYPE_DOCUMENT: {
     hb_objSendMsg(pNode, "OCHILD", 0);
-    hb_itemMove(pChild, hb_param(-1, HB_IT_ANY));
+    hb_itemMove(pChild, hb_param(-1, Harbour::Item::ANY));
 
     while (!HB_IS_NIL(pChild)) {
       mxml_node_write(out, pChild, style);
       hb_objSendMsg(pChild, "ONEXT", 0);
-      hb_itemMove(pChild, hb_param(-1, HB_IT_ANY));
+      hb_itemMove(pChild, hb_param(-1, Harbour::Item::ANY));
     }
     if (!(style & MXML_STYLE_NONEWLINE)) {
       mxml_output_string(out, hb_conNewLine());
@@ -2086,8 +2086,8 @@ static const char *mxml_error_desc(MXML_ERROR_CODE code)
 // document is created empty.
 HB_FUNC(SRXML_DATAREAD)
 {
-  PHB_ITEM pParam = hb_param(2, HB_IT_ANY);
-  PHB_ITEM pDoc = hb_param(1, HB_IT_OBJECT);
+  PHB_ITEM pParam = hb_param(2, Harbour::Item::ANY);
+  PHB_ITEM pDoc = hb_param(1, Harbour::Item::OBJECT);
   int iStyle = hb_parni(3);
   PHB_ITEM pRoot;
   MXML_REFIL refil;
@@ -2109,7 +2109,7 @@ HB_FUNC(SRXML_DATAREAD)
 
   // Now we can get the root node
   hb_objSendMsg(pDoc, "OROOT", 0);
-  pRoot = hb_itemNew(hb_param(-1, HB_IT_ANY));
+  pRoot = hb_itemNew(hb_param(-1, Harbour::Item::ANY));
   hb_retni(mxml_node_read(&refil, pRoot, pDoc, iStyle));
   hb_itemRelease(pRoot);
 }
@@ -2118,7 +2118,7 @@ HB_FUNC(SRXML_DATAREAD)
 // Returns a descriptive string telling what the error number is meaning.
 HB_FUNC(SR_XMLERRORDESC)
 {
-  PHB_ITEM pNum = hb_param(1, HB_IT_NUMERIC);
+  PHB_ITEM pNum = hb_param(1, Harbour::Item::NUMERIC);
 
   if (pNum) {
     hb_retc(mxml_error_desc((MXML_ERROR_CODE)hb_itemGetNI(pNum)));
@@ -2131,8 +2131,8 @@ HB_FUNC(SR_XMLERRORDESC)
 // Writes an XML document to a string.
 HB_FUNC(SRXML_NODE_TO_STRING)
 {
-  PHB_ITEM pNode = hb_param(1, HB_IT_OBJECT);
-  PHB_ITEM pStyle = hb_param(2, HB_IT_NUMERIC);
+  PHB_ITEM pNode = hb_param(1, Harbour::Item::OBJECT);
+  PHB_ITEM pStyle = hb_param(2, Harbour::Item::NUMERIC);
   MXML_SGS *sgs;
   MXML_OUTPUT out;
   int iStyle;
@@ -2163,9 +2163,9 @@ HB_FUNC(SRXML_NODE_TO_STRING)
 // Writes an XML document to a file; returns the HB_XML status.
 HB_FUNC(SRXML_NODE_WRITE)
 {
-  PHB_ITEM pNode = hb_param(1, HB_IT_OBJECT);
-  PHB_ITEM pHandle = hb_param(2, HB_IT_NUMERIC);
-  PHB_ITEM pStyle = hb_param(3, HB_IT_NUMERIC);
+  PHB_ITEM pNode = hb_param(1, Harbour::Item::OBJECT);
+  PHB_ITEM pHandle = hb_param(2, Harbour::Item::NUMERIC);
+  PHB_ITEM pStyle = hb_param(3, Harbour::Item::NUMERIC);
   MXML_OUTPUT out;
   int iStyle, iRet;
 
