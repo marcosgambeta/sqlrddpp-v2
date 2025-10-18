@@ -137,11 +137,10 @@ static void isSelect(PFB_SESSION session)
 {
   char acBuffer[9];
   char qType = isc_info_sql_stmt_type;
-  int iLength;
   isc_dsql_sql_info(session->status, &session->stmt, 1, &qType, sizeof(acBuffer), acBuffer);
   // if( isError(QT_TRANSLATE_NOOP("QIBaseResult", "Could not get query info"), QSqlError::StatementError) )
   //    return false;
-  iLength = isc_vax_integer(&acBuffer[1], 2);
+  int iLength = isc_vax_integer(&acBuffer[1], 2);
   session->queryType = isc_vax_integer(&acBuffer[3], static_cast<short>(iLength));
 }
 
