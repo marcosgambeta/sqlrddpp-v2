@@ -41,7 +41,7 @@
 
 #ifndef MYSQL_CH
 
-#define ifndef MYSQL_CH
+#define MYSQL_CH
 
 
 // MySQL field types
