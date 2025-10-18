@@ -98,7 +98,7 @@ HB_FUNC_EXTERN(SQLRDD);
 static HB_ISIZ s_pageReadSize = PAGE_READ_SIZE;
 static HB_SIZE s_bufferPoolSize = BUFFER_POOL_SIZE;
 
-static HB_BOOL CreateSkipStmtOra(SQLEXORAAREAP thiswa);
+static bool CreateSkipStmtOra(SQLEXORAAREAP thiswa);
 static int s_bOldReverseIndex = 0;
 static int sqlKeyCompareEx(SQLEXORAAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact);
 extern void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOnly, HB_ULONG ulSystemID,
@@ -2097,7 +2097,7 @@ HB_ERRCODE prepareRecordListQueryOra(SQLEXORAAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-static HB_BOOL CreateSkipStmtOra(SQLEXORAAREAP thiswa)
+static bool CreateSkipStmtOra(SQLEXORAAREAP thiswa)
 {
   PHB_ITEM pColumns, pIndexRef;
   INDEXBINDORAP IndexBind;
