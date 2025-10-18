@@ -73,7 +73,7 @@
 #define CLIENT_ALL_FLAGS2 (CLIENT_MULTI_RESULTS | CLIENT_MULTI_STATEMENTS)
 static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
-static int iConnectionCount = 0;
+static int s_iConnectionCount = 0;
 #define LOGFILE "mysql.log"
 struct _MYSQL_SESSION
 {
@@ -106,7 +106,7 @@ HB_FUNC(MYSCONNECT)
   session->ifetch = -2;
 
   if (session->dbh != nullptr) {
-    iConnectionCount++;
+    s_iConnectionCount++;
     mysql_options(session->dbh, MYSQL_OPT_CONNECT_TIMEOUT, reinterpret_cast<const char *>(&uiTimeout));
     if (lCompress) {
       mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr, CLIENT_ALL_FLAGS);
@@ -116,7 +116,7 @@ HB_FUNC(MYSCONNECT)
     hb_retptr(static_cast<void *>(session));
   } else {
     mysql_close(nullptr);
-    if (iConnectionCount == 0) {
+    if (s_iConnectionCount == 0) {
       mysql_library_end();
     }
     hb_retptr(nullptr);
@@ -131,10 +131,10 @@ HB_FUNC(MYSFINISH)
   mysql_close(session->dbh);
 
   hb_xfree(session);
-  if (iConnectionCount > 0) {
-    iConnectionCount--;
+  if (s_iConnectionCount > 0) {
+    s_iConnectionCount--;
   }
-  if (iConnectionCount == 0) {
+  if (s_iConnectionCount == 0) {
     mysql_library_end();
   }
   hb_ret();
