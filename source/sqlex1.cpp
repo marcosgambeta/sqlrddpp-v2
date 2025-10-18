@@ -118,7 +118,7 @@ HB_FUNC_EXTERN(SQLRDD);
 static int s_pageReadSize = PAGE_READ_SIZE;
 static int s_bufferPoolSize = BUFFER_POOL_SIZE;
 static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa);
-static int s_bOldReverseIndex = 0;
+static bool s_bOldReverseIndex = false;
 static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact);
 static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 // static bool _SqlExIsLogFirst = true; not used
