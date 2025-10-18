@@ -80,7 +80,7 @@
 #define AINFO_DETECT1_LASTRECNO       23
 #define AINFO_DETECT1_COUNT           24
 
-/* cache flags */
+// cache flags
 
 #define ORD_INVALID                    0
 #define ORD_DIR_FWD                    1
@@ -89,7 +89,7 @@
 
 #define SQL_NULL_HSTMT                 0
 
-/* aIndexMgmnt array structure */
+// aIndexMgmnt array structure
 
 #define INDEXMAN_SIZE                 14
 
@@ -108,7 +108,7 @@
 #define INDEXMAN_SYNTH_COLPOS          13
 #define INDEXMAN_FOR_COLPOS            14
 
-/* aIndex array structure */
+// aIndex array structure
 
 #define ORDER_ASCEND                   1
 #define ORDER_DESEND                   2
@@ -178,7 +178,7 @@
 #define ARRAY_BLOCK4      100
 #define ARRAY_BLOCK5      500
 
-/* dbCreate Record Array Structure */
+// dbCreate Record Array Structure
 #ifndef FIELD_INFO_SIZE
 #define FIELD_INFO_SIZE                11
 
@@ -187,10 +187,10 @@
 #define FIELD_LEN                       3
 #define FIELD_DEC                       4
 #define FIELD_NULLABLE                  5
-#define FIELD_DOMAIN                    6  /* Not used by dbCreate */
+#define FIELD_DOMAIN                    6  // Not used by dbCreate
 #define FIELD_MULTILANG                 7
-#define FIELD_ENUM                      8  /* Not used by dbCreate */
-#define FIELD_WAOFFSET                  9  /* Not used by dbCreate */
+#define FIELD_ENUM                      8  // Not used by dbCreate
+#define FIELD_WAOFFSET                  9  // Not used by dbCreate
 #define FIELD_PRIMARY_KEY              10
 #define FIELD_UNIQUE                   11
 
