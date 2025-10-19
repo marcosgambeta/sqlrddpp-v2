@@ -2912,7 +2912,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
   }
   if (HB_IS_STRING(itemTemp)) {
     char *bBuffer = const_cast<char *>(hb_itemGetCPtr(itemTemp)); // const char * to char *
-    HB_LONG lLenBuff = static_cast<HB_LONG>(hb_itemGetCLen(itemTemp));
+    auto lLenBuff = static_cast<HB_LONG>(hb_itemGetCLen(itemTemp));
     PHB_ITEM pTemp;
     if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
       if (s_pSym_SR_DESERIALIZE == nullptr) {

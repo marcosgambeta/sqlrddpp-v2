@@ -590,7 +590,7 @@ HB_FUNC(SR_ODBCLINEPROCESSED)
                          hb_paramError(3));
   }
 
-  int cols = static_cast<int>(hb_arrayLen(pFields));
+  auto cols = static_cast<int>(hb_arrayLen(pFields));
 
   if (cols <= 0) {
     hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
@@ -659,7 +659,7 @@ HB_FUNC(SR_ODBCGETLINES) // (::hStmt, nLenBuff, aFields, aCache, nSystemID, lTra
                          hb_paramError(3));
   }
 
-  int cols = static_cast<int>(hb_arrayLen(pFields));
+  auto cols = static_cast<int>(hb_arrayLen(pFields));
 
   if (cols <= 0) {
     hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
@@ -1085,7 +1085,7 @@ HB_FUNC(SR_ODBCWRITEMEMO)
   auto pArray = hb_param(5, Harbour::Item::ARRAY);
   auto hDbc = static_cast<SQLHDBC>(hb_parptr(1));
 
-  HB_ULONG uiLen = static_cast<HB_ULONG>(hb_arrayLen(pArray));
+  auto uiLen = static_cast<HB_ULONG>(hb_arrayLen(pArray));
 
   if (hDbc && uiLen > 0) {
 #if ODBCVER >= 0x0300

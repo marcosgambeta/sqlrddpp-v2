@@ -1521,7 +1521,7 @@ HB_FUNC(FB_MORERESULTS5)
   if (session && session->sqlda->sqld >= 1) {
     if (session->queryType == isc_info_sql_stmt_exec_procedure) {
       XSQLVAR *var = session->sqlda->sqlvar;
-      ISC_INT64 value = static_cast<ISC_INT64>(*reinterpret_cast<ISC_INT64 ISC_FAR *>(var->sqldata));
+      auto value = static_cast<ISC_INT64>(*reinterpret_cast<ISC_INT64 ISC_FAR *>(var->sqldata));
       hb_stornint(static_cast<ISC_INT64>(value), 2);
       hb_retni(SQL_SUCCESS);
       return;

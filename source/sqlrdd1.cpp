@@ -3114,7 +3114,7 @@ static bool ProcessFields(SQLAREAP thiswa)
     return false;
   }
 
-  HB_LONG numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
+  auto numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));
@@ -3222,7 +3222,7 @@ static bool SetFields(SQLAREAP thiswa)
     return false;
   }
 
-  HB_LONG numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
+  auto numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));
@@ -3485,7 +3485,7 @@ HB_CALL_ON_STARTUP_END(_hb_sqlrdd_rdd_init_)
 
 HB_FUNC(SR_SETFOUND)
 {
-  SQLAREAP pArea = static_cast<SQLAREAP>(hb_rddGetCurrentWorkAreaPointer());
+  auto pArea = static_cast<SQLAREAP>(hb_rddGetCurrentWorkAreaPointer());
 
   if (pArea) {
     auto pFound = hb_param(1, Harbour::Item::LOGICAL);

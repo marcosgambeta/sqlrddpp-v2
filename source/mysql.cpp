@@ -400,7 +400,7 @@ HB_FUNC(MYSLINEPROCESSED)
     hb_retni(SQL_INVALID_HANDLE);
   } else {
     if (session->ifetch >= -1) {
-      int cols = static_cast<int>(hb_arrayLen(pFields));
+      auto cols = static_cast<int>(hb_arrayLen(pFields));
 
       mysql_data_seek(session->stmt, session->ifetch);
       MYSQL_ROW thisrow = mysql_fetch_row(session->stmt);
