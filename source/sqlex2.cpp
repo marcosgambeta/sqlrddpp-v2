@@ -85,9 +85,9 @@ static PHB_DYNS s_pSym_Serial1 = nullptr; // Pointer to serialization function
 
 char *QualifyName(char *szName, SQLEXAREAP thiswa)
 {
-  int i, len;
+  int i;
 
-  len = static_cast<int>(strlen(szName));
+  auto len = static_cast<int>(strlen(szName));
 
   for (i = 0; i < len; i++) {
     if (szName[i] == '\0') {
@@ -128,7 +128,7 @@ static void ResolveSpecialCols(SQLEXAREAP thiswa)
   // TO DO: Creating a new Index should reset INSERT Stmt cos it may
   //        create a new field like INDKEY_???
 
-  int i, iIndexes;
+  int i;
   PHB_ITEM pIndex;
   PHB_ITEM pKeyVal;
   PHB_ITEM pIndIt;
@@ -144,7 +144,7 @@ static void ResolveSpecialCols(SQLEXAREAP thiswa)
   if (iOldArea != thiswa->area.uiArea) {
     hb_rddSelectWorkAreaNumber(thiswa->area.uiArea);
   }
-  iIndexes = static_cast<int>(hb_arrayLen(thiswa->pIndexMgmnt));
+  auto iIndexes = static_cast<int>(hb_arrayLen(thiswa->pIndexMgmnt));
 
   for (i = 1; i <= iIndexes; i++) {
     pIndex = hb_arrayGetItemPtr(thiswa->pIndexMgmnt, i);
@@ -214,7 +214,7 @@ void SetInsertRecordStructure(SQLEXAREAP thiswa)
 
 void CreateInsertStmt(SQLEXAREAP thiswa)
 {
-  int iCols, i;
+  int i;
   PHB_ITEM pFieldStruct, pFieldLen, pFieldDec;
   HB_LONG lFieldPosWA, lType;
   char *colName, *temp;
@@ -226,7 +226,7 @@ void CreateInsertStmt(SQLEXAREAP thiswa)
   COLUMNBINDP InsertRecord;
   HB_USHORT uiPos;
 
-  iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
+  auto iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
   if (!thiswa->InsertRecord) {
     SetInsertRecordStructure(thiswa);
@@ -424,11 +424,11 @@ HB_ERRCODE PrepareInsertStmt(SQLEXAREAP thiswa)
 
 HB_ERRCODE BindInsertColumns(SQLEXAREAP thiswa)
 {
-  int iCol, iCols, iBind;
+  int iCol, iBind;
   COLUMNBINDP InsertRecord;
   SQLRETURN res = SQL_ERROR;
 
-  iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
+  auto iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
   InsertRecord = thiswa->InsertRecord;
   iBind = 0;
 
@@ -445,9 +445,8 @@ HB_ERRCODE BindInsertColumns(SQLEXAREAP thiswa)
         break;
       }
       case SQL_C_BINARY: {
-        SQLINTEGER nInd;
         InsertRecord->lIndPtr = SQL_NTS;
-        nInd = static_cast<SQLINTEGER>(strlen(reinterpret_cast<const char *>(InsertRecord->asChar.value)));
+        auto nInd = static_cast<SQLINTEGER>(strlen(reinterpret_cast<const char *>(InsertRecord->asChar.value)));
         res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_CHAR,
                                SQL_LONGVARCHAR, InsertRecord->asChar.size_alloc, 0, InsertRecord->asChar.value, nInd,
                                &(InsertRecord->lIndPtr));
@@ -502,11 +501,11 @@ HB_ERRCODE BindInsertColumns(SQLEXAREAP thiswa)
 
 HB_ERRCODE FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate)
 {
-  int iCols, i;
+  int i;
   PHB_ITEM pFieldData, pTemp;
   COLUMNBINDP InsertRecord;
 
-  iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
+  auto iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
   if (bUpdate) {
     InsertRecord = thiswa->CurrRecord;
@@ -740,9 +739,8 @@ HB_ERRCODE CreateUpdateStmt(SQLEXAREAP thiswa)
         break;
       }
       case SQL_C_BINARY: {
-        SQLINTEGER nInd;
         CurrRecord->lIndPtr = SQL_NTS;
-        nInd = static_cast<SQLINTEGER>(strlen(reinterpret_cast<const char *>(CurrRecord->asChar.value)));
+        auto nInd = static_cast<SQLINTEGER>(strlen(reinterpret_cast<const char *>(CurrRecord->asChar.value)));
         res = SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_CHAR,
                                SQL_LONGVARCHAR, CurrRecord->asChar.size_alloc, 0, CurrRecord->asChar.value, nInd,
                                &(CurrRecord->lIndPtr));
