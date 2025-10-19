@@ -380,15 +380,10 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBu
 
 //-----------------------------------------------------------------------------//
 
+// MYSLINEPROCESSED(pSession, p2, aFields, lQueryOnly, nSystemID, lTranslate, aRet) -> numeric
 HB_FUNC(MYSLINEPROCESSED)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
-  int col, cols;
-  PHB_ITEM temp;
-  MYSQL_ROW thisrow;
-  HB_ULONG *lens;
-  HB_LONG lIndex;
-
   auto pFields = hb_param(3, Harbour::Item::ARRAY);
   bool bQueryOnly = hb_parl(4);
   HB_ULONG ulSystemID = hb_parnl(5);
@@ -405,13 +400,16 @@ HB_FUNC(MYSLINEPROCESSED)
     hb_retni(SQL_INVALID_HANDLE);
   } else {
     if (session->ifetch >= -1) {
-      cols = static_cast<int>(hb_arrayLen(pFields));
+      int cols = static_cast<int>(hb_arrayLen(pFields));
 
       mysql_data_seek(session->stmt, session->ifetch);
-      thisrow = mysql_fetch_row(session->stmt);
-      lens = mysql_fetch_lengths(session->stmt);
+      MYSQL_ROW thisrow = mysql_fetch_row(session->stmt);
+      HB_ULONG *lens = mysql_fetch_lengths(session->stmt);
 
-      for (col = 0; col < cols; col++) {
+      PHB_ITEM temp;
+      HB_LONG lIndex;
+
+      for (int col = 0; col < cols; col++) {
         temp = hb_itemNew(nullptr);
         lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, col + 1), FIELD_ENUM);
 
