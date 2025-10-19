@@ -205,7 +205,7 @@ HB_FUNC(FBCONNECT) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv)
     fb_log_status(session, "FBCONNECT");
     if (session->msgerror) {
       hb_xfree(session->msgerror);
-    }  
+    }
 
     hb_xfree(session->sqlda);
     hb_xfree(session);
@@ -222,8 +222,6 @@ HB_FUNC(FBCONNECT) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv)
 HB_FUNC(FBCLOSE) // FBClose(hEnv)
 {
   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
-  int i;
-  XSQLVAR *var;
 
   if (session) {
     if (session->transac) {
@@ -236,6 +234,9 @@ HB_FUNC(FBCLOSE) // FBClose(hEnv)
       ERRORLOGANDEXIT(session, "FBCLOSE");
     }
 
+    int i;
+    XSQLVAR *var;
+
     for (i = 0, var = session->sqlda->sqlvar; i < MAX_COLUMNS_IN_QUERY; i++, var++) {
       if (var->sqldata) {
         hb_xfree(var->sqldata);
@@ -244,7 +245,7 @@ HB_FUNC(FBCLOSE) // FBClose(hEnv)
     }
     if (session->msgerror) {
       hb_xfree(session->msgerror);
-    }  
+    }
 
     hb_xfree(session->sqlda);
     hb_xfree(session);

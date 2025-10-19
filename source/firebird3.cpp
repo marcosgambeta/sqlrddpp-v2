@@ -236,8 +236,6 @@ HB_FUNC(FBCONNECT3) // FBConnect(cDatabase, cUser, cPassword, [charset], @hEnv)
 HB_FUNC(FBCLOSE3) // FBClose(hEnv)
 {
   auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(1, Harbour::Item::POINTER)));
-  int i;
-  XSQLVAR *var;
 
   if (session) {
     if (session->transac) {
@@ -249,6 +247,9 @@ HB_FUNC(FBCLOSE3) // FBClose(hEnv)
     if (isc_detach_database(session->status, &(session->db))) {
       ERRORLOGANDEXIT(session, "FBCLOSE");
     }
+
+    int i;
+    XSQLVAR *var;
 
     for (i = 0, var = session->sqlda->sqlvar; i < MAX_COLUMNS_IN_QUERY; i++, var++) {
       if (var->sqldata) {
