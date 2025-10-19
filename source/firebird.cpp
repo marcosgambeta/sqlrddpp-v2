@@ -947,8 +947,6 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE l
   HB_SYMBOL_UNUSED(bQueryOnly);
   HB_SYMBOL_UNUSED(ulSystemID);
 
-  PHB_ITEM pTemp;
-
   auto lType = hb_arrayGetNL(pField, 6);
   HB_SIZE lLen = hb_arrayGetNL(pField, 3);
   HB_SIZE lDec = hb_arrayGetNL(pField, 4);
@@ -1035,6 +1033,7 @@ static void FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE l
       break;
     }
     case SQL_LONGVARCHAR: {
+      PHB_ITEM pTemp;
       if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
           (sr_lSerializeArrayAsJson())) {
         if (s_pSym_SR_FROMJSON == nullptr) {
