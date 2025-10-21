@@ -29,4 +29,34 @@
 #endif
 #endif
 
+namespace SQLRDD {
+  namespace RDBMS {
+    enum ID : int {
+      UNKNOW = 0,
+      ORACLE = 1,
+      MSSQL6 = 2,
+      MSSQL7 = 3,
+      SQLANY = 4,
+      SYBASE = 5,
+      ACCESS = 6,
+      INGRES = 7,
+      SQLBAS = 8,
+      ADABAS = 9,
+      INFORM = 10,
+      IBMDB2 = 11,
+      MYSQL = 12,
+      POSTGR = 13,
+      FIREBR = 14,
+      CACHE = 15,
+      OTERRO = 16,
+      PERVASIVE = 17,
+      AZURE = 18,
+      MARIADB = 19,
+      FIREBR3 = 20,
+      FIREBR4 = 21,
+      FIREBR5 = 22
+    };
+  }
+}
+
 #endif // SQLRDDPP_H
