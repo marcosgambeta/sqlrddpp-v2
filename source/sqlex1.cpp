@@ -68,6 +68,7 @@ Quick to do list, 2009 feb 23:
 #include <hbdbferr.h>
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"
+#include "sqlrddpp.h"
 #include <ctype.h>
 #include <assert.h>
 
@@ -161,8 +162,8 @@ HB_ULONG GetCurrentRecordNum(SQLEXAREAP thiswa)
 HB_BOOL IsItemNull(PHB_ITEM pFieldData, SQLEXAREAP thiswa)
 {
   if (SR_itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
-      (((thiswa->nSystemID == SYSTEMID_POSTGR) && HB_IS_DATE(pFieldData)) ||
-       ((thiswa->nSystemID != SYSTEMID_POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
+      (((thiswa->nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
+       ((thiswa->nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
     return true;
   }
   return false;
@@ -214,35 +215,35 @@ void setResultSetLimit(SQLEXAREAP thiswa, int iRows)
   }
 
   switch (thiswa->nSystemID) {
-  case SYSTEMID_MSSQL7:
-  case SYSTEMID_CACHE:
-  case SYSTEMID_SYBASE: {
+  case SQLRDD::RDBMS::MSSQL7:
+  case SQLRDD::RDBMS::CACHE:
+  case SQLRDD::RDBMS::SYBASE: {
     fmt1 = "TOP %i";
     fmt2 = "";
     break;
   }
-  case SYSTEMID_FIREBR:
-  case SYSTEMID_FIREBR3:
-  case SYSTEMID_FIREBR4:
-  case SYSTEMID_FIREBR5:
-  case SYSTEMID_INFORM: {
+  case SQLRDD::RDBMS::FIREBR:
+  case SQLRDD::RDBMS::FIREBR3:
+  case SQLRDD::RDBMS::FIREBR4:
+  case SQLRDD::RDBMS::FIREBR5:
+  case SQLRDD::RDBMS::INFORM: {
     fmt1 = "FIRST %i";
     fmt2 = "";
     break;
   }
-  case SYSTEMID_ORACLE: {
+  case SQLRDD::RDBMS::ORACLE: {
     fmt1 = "";
     fmt2 = "";
     break;
   }
-  case SYSTEMID_POSTGR:
-  case SYSTEMID_MYSQL:
-  case SYSTEMID_MARIADB: {
+  case SQLRDD::RDBMS::POSTGR:
+  case SQLRDD::RDBMS::MYSQL:
+  case SQLRDD::RDBMS::MARIADB: {
     fmt1 = "";
     fmt2 = "LIMIT %i";
     break;
   }
-  case SYSTEMID_IBMDB2: {
+  case SQLRDD::RDBMS::IBMDB2: {
     fmt1 = "";
     fmt2 = "fetch first %i rows only";
     break;
@@ -861,7 +862,7 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
             //                        0);
             res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_TYPE_TIMESTAMP,
                                    SQL_TYPE_TIMESTAMP, SQL_TIMESTAMP_LEN,
-                                   thiswa->nSystemID == SYSTEMID_MSSQL7 || thiswa->nSystemID == SYSTEMID_AZURE ? 3 : 0,
+                                   thiswa->nSystemID == SQLRDD::RDBMS::MSSQL7 || thiswa->nSystemID == SQLRDD::RDBMS::AZURE ? 3 : 0,
                                    &(BindStructure->asTimestamp), 0, 0);
             break;
           }
@@ -929,8 +930,8 @@ static void FeedCurrentRecordToBindings(SQLEXAREAP thiswa)
 
       // Check if column is NULL
 
-      if (SR_itemEmpty(pFieldData) && (((thiswa->nSystemID == SYSTEMID_POSTGR) && HB_IS_DATE(pFieldData)) ||
-                                       ((thiswa->nSystemID != SYSTEMID_POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
+      if (SR_itemEmpty(pFieldData) && (((thiswa->nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
+                                       ((thiswa->nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
         if (BindStructure->isNullable && BindStructure->isArgumentNull) {
           // It is STILL NULL, so no problem
           HSTMT hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
@@ -1197,9 +1198,9 @@ void SetCurrRecordStructure(SQLEXAREAP thiswa)
     case 'D': {
       // BindStructure->iCType = lType; // DATE or TIMESTAMP
       // Corrigido 27/12/2013 09:53 - lpereira
-      // Estava atribuindo o valor de SYSTEMID_ORACLE para thiswa->nSystemID.
-      // if( thiswa->nSystemID = SYSTEMID_ORACLE )
-      if (thiswa->nSystemID == SYSTEMID_ORACLE) {
+      // Estava atribuindo o valor de SQLRDD::RDBMS::ORACLE para thiswa->nSystemID.
+      // if( thiswa->nSystemID = SQLRDD::RDBMS::ORACLE )
+      if (thiswa->nSystemID == SQLRDD::RDBMS::ORACLE) {
         BindStructure->iCType = SQL_C_TYPE_TIMESTAMP; // May be DATE or TIMESTAMP
       } else {
         BindStructure->iCType = lType; // May be DATE or TIMESTAMP
