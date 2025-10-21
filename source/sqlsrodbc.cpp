@@ -46,6 +46,7 @@
 #include "compat.h"
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"
+#include "sqlrddpp.h"
 
 #if !defined(HB_OS_DOS) && !defined(HB_OS_OS2)
 #if defined(HB_OS_WIN_32) || defined(HB_OS_WIN)
@@ -345,7 +346,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBu
     case SQL_REAL:
     case SQL_BIGINT:
     case SQL_FAKE_NUM: {
-      if (cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE) {
+      if (cType[0] == 'L' && ulSystemID == SQLRDD::RDBMS::ORACLE) {
         hb_itemPutL(pItem, false);
       } else {
         char szResult[2] = {' ', '\0'};
@@ -361,16 +362,16 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBu
     }
     case SQL_TIMESTAMP:
     case SQL_TYPE_TIMESTAMP: {
-      if (ulSystemID == SYSTEMID_IBMDB2) {
+      if (ulSystemID == SQLRDD::RDBMS::IBMDB2) {
         // auto szResult = static_cast<char*>(hb_xgrab(26 + 1));
         // hb_xmemset(szResult, ' ', lLen);
         // hb_itemPutCLPtr(pItem, szResult, lLen);
         hb_itemPutTDT(pItem, 0, 0);
       } else {
-        if ((ulSystemID == SYSTEMID_POSTGR) || (ulSystemID == SYSTEMID_ORACLE) || (ulSystemID == SYSTEMID_FIREBR) ||
-            (ulSystemID == SYSTEMID_FIREBR3) || (ulSystemID == SYSTEMID_FIREBR4) || (ulSystemID == SYSTEMID_FIREBR5) ||
-            (ulSystemID == SYSTEMID_MYSQL) || (ulSystemID == SYSTEMID_MARIADB) ||
-            (ulSystemID == SYSTEMID_MSSQL7 && sr_lsql2008newTypes())) {
+        if ((ulSystemID == SQLRDD::RDBMS::POSTGR) || (ulSystemID == SQLRDD::RDBMS::ORACLE) || (ulSystemID == SQLRDD::RDBMS::FIREBR) ||
+            (ulSystemID == SQLRDD::RDBMS::FIREBR3) || (ulSystemID == SQLRDD::RDBMS::FIREBR4) || (ulSystemID == SQLRDD::RDBMS::FIREBR5) ||
+            (ulSystemID == SQLRDD::RDBMS::MYSQL) || (ulSystemID == SQLRDD::RDBMS::MARIADB) ||
+            (ulSystemID == SQLRDD::RDBMS::MSSQL7 && sr_lsql2008newTypes())) {
           hb_itemPutTDT(pItem, 0, 0);
         } else {
           char dt[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'};
@@ -436,7 +437,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBu
     case SQL_REAL:
     case SQL_BIGINT:
     case SQL_FAKE_NUM: {
-      if (cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE) {
+      if (cType[0] == 'L' && ulSystemID == SQLRDD::RDBMS::ORACLE) {
         hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
       } else {
         sr_escapeNumber(bBuffer, lLen, lDec, pItem);
@@ -448,7 +449,7 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBu
     case SQL_TYPE_TIMESTAMP:
     case SQL_TYPE_DATE: {
       char dt[9];
-      if (ulSystemID == SYSTEMID_OTERRO) { // TODO: switch ?
+      if (ulSystemID == SQLRDD::RDBMS::OTERRO) { // TODO: switch ?
         dt[0] = bBuffer[6];
         dt[1] = bBuffer[7];
         dt[2] = bBuffer[8];
@@ -457,17 +458,17 @@ void odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBu
         dt[5] = bBuffer[1];
         dt[6] = bBuffer[3];
         dt[7] = bBuffer[4];
-      } else if (ulSystemID == SYSTEMID_IBMDB2 && (lType == SQL_TIMESTAMP || lType == SQL_TYPE_TIMESTAMP)) {
+      } else if (ulSystemID == SQLRDD::RDBMS::IBMDB2 && (lType == SQL_TIMESTAMP || lType == SQL_TYPE_TIMESTAMP)) {
         // hb_itemPutCL(pItem, bBuffer, lLenBuff);
         long lJulian, lMilliSec;
         hb_timeStampStrRawGet(bBuffer, &lJulian, &lMilliSec); // TOCHECK:
         hb_itemPutTDT(pItem, lJulian, lMilliSec);
         break;
-      } else if (((ulSystemID == SYSTEMID_POSTGR) || (ulSystemID == SYSTEMID_ORACLE) ||
-                  (ulSystemID == SYSTEMID_FIREBR) || (ulSystemID == SYSTEMID_FIREBR3) ||
-                  (ulSystemID == SYSTEMID_FIREBR4) || (ulSystemID == SYSTEMID_FIREBR5) ||
-                  (ulSystemID == SYSTEMID_MYSQL) || (ulSystemID == SYSTEMID_MARIADB) ||
-                  (ulSystemID == SYSTEMID_MSSQL7 && sr_lsql2008newTypes())) &&
+      } else if (((ulSystemID == SQLRDD::RDBMS::POSTGR) || (ulSystemID == SQLRDD::RDBMS::ORACLE) ||
+                  (ulSystemID == SQLRDD::RDBMS::FIREBR) || (ulSystemID == SQLRDD::RDBMS::FIREBR3) ||
+                  (ulSystemID == SQLRDD::RDBMS::FIREBR4) || (ulSystemID == SQLRDD::RDBMS::FIREBR5) ||
+                  (ulSystemID == SQLRDD::RDBMS::MYSQL) || (ulSystemID == SQLRDD::RDBMS::MARIADB) ||
+                  (ulSystemID == SQLRDD::RDBMS::MSSQL7 && sr_lsql2008newTypes())) &&
                  (lType == SQL_TIMESTAMP || lType == SQL_TYPE_TIMESTAMP)) {
         long lJulian, lMilliSec;
         hb_timeStampStrRawGet(bBuffer, &lJulian, &lMilliSec); // TOCHECK:
@@ -871,7 +872,7 @@ HB_FUNC(SR_DESCRIB)
                            static_cast<SQLSMALLINT *>(&wBufLen), static_cast<SQLSMALLINT *>(&wDataType),
                            static_cast<SQLULEN *>(&wColSize), static_cast<SQLSMALLINT *>(&wDecimals),
                            static_cast<SQLSMALLINT *>(&wNullable));
-  if (wDataType == -8 && ulSystemID == SYSTEMID_MYSQL) { // MySQL ODBC Bug
+  if (wDataType == -8 && ulSystemID == SQLRDD::RDBMS::MYSQL) { // MySQL ODBC Bug
     odbcErrorDiagRTE(static_cast<SQLHSTMT>(hb_parptr(1)), "SQLCONNECT",
                      "MySQL Driver version 5 is not compatible with SQLRDD", 0, __LINE__, __FILE__);
   }
@@ -1187,7 +1188,7 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
         hb_itemPutNLLen(pItem, val, static_cast<int>(lLen));
       }
       if (static_cast<int>(iLen) == SQL_NULL_DATA) {
-        if (cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE) {
+        if (cType[0] == 'L' && ulSystemID == SQLRDD::RDBMS::ORACLE) {
           hb_itemPutL(pItem, false);
         } else {
           hb_itemPutNLLen(pItem, 0, static_cast<int>(lLen));
@@ -1199,7 +1200,7 @@ void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQuery
         hb_itemPutNIntLen(pItem, val, static_cast<int>(lLen));
       }
       if (static_cast<int>(iLen) == SQL_NULL_DATA) {
-        if (cType[0] == 'L' && ulSystemID == SYSTEMID_ORACLE) {
+        if (cType[0] == 'L' && ulSystemID == SQLRDD::RDBMS::ORACLE) {
           hb_itemPutL(pItem, false);
         } else {
           hb_itemPutNIntLen(pItem, 0, static_cast<int>(lLen));
