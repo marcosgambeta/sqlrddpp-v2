@@ -51,6 +51,7 @@
 #include <hbdbferr.h>
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"
+#include "sqlrddpp.h"
 #include <ctype.h>
 #include <assert.h>
 #include "ocilib.h"
@@ -213,7 +214,7 @@ HB_BOOL CreateSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
   INDEXBINDORAP SeekBind;
   bool bUseOptimizerHints;
 
-  bUseOptimizerHints = thiswa->nSystemID == SYSTEMID_ORACLE;
+  bUseOptimizerHints = thiswa->nSystemID == SQLRDD::RDBMS::ORACLE;
   thiswa->bConditionChanged1 = true; // SKIP statements are no longer valid
 
   // Alloc memory for binding structures, if first time
@@ -523,7 +524,7 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
     BindStructure = GetBindStructOra(thiswa, SeekBindParam);
     if (!BindStructure->isArgumentNull) {
 
-      // if( thiswa->nSystemID = SYSTEMID_ORACLE )
+      // if( thiswa->nSystemID = SQLRDD::RDBMS::ORACLE )
       //    if( BindStructure->iCType == SQL_C_TYPE_DATE )
       //       BindStructure->iCType = SQL_C_TYPE_TIMESTAMP; // May be DATE or TIMESTAMP
 
