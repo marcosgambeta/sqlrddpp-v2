@@ -196,6 +196,7 @@
 
 #define SUPPORTED_DATABASES           23
 
+#if 0
 #define SQLRDD_RDBMS_UNKNOW                0
 #define SQLRDD_RDBMS_ORACLE                1
 #define SQLRDD_RDBMS_MSSQL6                2
@@ -219,6 +220,7 @@
 #define SQLRDD_RDBMS_FIREBR3              20
 #define SQLRDD_RDBMS_FIREBR4              21
 #define SQLRDD_RDBMS_FIREBR5              22
+#endif
 
 #endif
 
