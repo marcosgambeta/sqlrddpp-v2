@@ -156,7 +156,7 @@ HB_FUNC(SR_FIXCACHEPOINTER)
 
 /*------------------------------------------------------------------------*/
 
-static HB_BOOL isCachePointerInRange(HB_LONG lPosCache, HB_LONG lBegin, HB_LONG lEnd)
+static bool isCachePointerInRange(HB_LONG lPosCache, HB_LONG lBegin, HB_LONG lEnd)
 {
   if (lBegin == lEnd) {
     return lPosCache == lBegin;
