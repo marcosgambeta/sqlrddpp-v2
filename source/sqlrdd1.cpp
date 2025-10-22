@@ -75,7 +75,7 @@
 
 static RDDFUNCS sqlrddSuper;
 
-void startSQLRDDSymbols(void);
+static void startSQLRDDSymbols(void);
 
 static bool ProcessFields(SQLAREAP ThisDb);
 static bool SetFields(SQLAREAP ThisDb);
@@ -136,7 +136,7 @@ static PHB_DYNS s_pSym_WORKAREA = nullptr;
 
 /*------------------------------------------------------------------------*/
 
-void fixCachePointer(HB_LONG *lPosCache)
+static void fixCachePointer(HB_LONG *lPosCache)
 {
   if (*lPosCache < 1) {
     *lPosCache += (CAHCE_PAGE_SIZE * 3);
@@ -156,7 +156,7 @@ HB_FUNC(SR_FIXCACHEPOINTER)
 
 /*------------------------------------------------------------------------*/
 
-HB_BOOL isCachePointerInRange(HB_LONG lPosCache, HB_LONG lBegin, HB_LONG lEnd)
+static HB_BOOL isCachePointerInRange(HB_LONG lPosCache, HB_LONG lBegin, HB_LONG lEnd)
 {
   if (lBegin == lEnd) {
     return lPosCache == lBegin;
@@ -169,7 +169,7 @@ HB_BOOL isCachePointerInRange(HB_LONG lPosCache, HB_LONG lBegin, HB_LONG lEnd)
 
 /*------------------------------------------------------------------------*/
 
-HB_LONG searchCacheFWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
+static HB_LONG searchCacheFWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 {
   auto lPosCache = hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE);
 
@@ -197,7 +197,7 @@ HB_LONG searchCacheFWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 
 /*------------------------------------------------------------------------*/
 
-HB_LONG searchCacheBWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
+static HB_LONG searchCacheBWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 {
   auto lPosCache = hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE);
 
@@ -225,7 +225,7 @@ HB_LONG searchCacheBWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 
 /*------------------------------------------------------------------------*/
 
-void readCachePageFWD(SQLAREAP thiswa)
+static void readCachePageFWD(SQLAREAP thiswa)
 {
   auto pOrd = hb_itemNew(nullptr);
   auto pDel = hb_itemNew(nullptr);
@@ -238,7 +238,7 @@ void readCachePageFWD(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-void readCachePageBWD(SQLAREAP thiswa)
+static void readCachePageBWD(SQLAREAP thiswa)
 {
   auto pOrd = hb_itemNew(nullptr);
   auto pDel = hb_itemNew(nullptr);
@@ -251,7 +251,7 @@ void readCachePageBWD(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
+static void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 {
   HB_SIZE nPos, nLen;
 
@@ -290,7 +290,7 @@ void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 
 /*------------------------------------------------------------------------*/
 
-void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
+static void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
 {
   HB_SIZE nPos, nLen;
 
@@ -538,7 +538,7 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
+int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact) // TODO: static ?
 {
   auto lorder = 0L;
   PHB_ITEM pTag, pKeyVal, itemTemp;
@@ -729,7 +729,7 @@ static HB_ERRCODE sqlSkip(SQLAREAP thiswa, HB_LONG lToSkip)
 
 /*------------------------------------------------------------------------*/
 
-HB_ERRCODE sqlSkipFilter(SQLAREAP thiswa, HB_LONG lUpDown)
+static HB_ERRCODE sqlSkipFilter(SQLAREAP thiswa, HB_LONG lUpDown)
 {
   bool bOutOfRange;
   HB_BOOL bDeleted;
@@ -1778,7 +1778,7 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
 
 /*------------------------------------------------------------------------*/
 
-void startSQLRDDSymbols()
+static void startSQLRDDSymbols()
 {
   if (s_pSym_WORKAREA == nullptr) {
     s_pSym_WORKAREA = hb_dynsymFindName(WORKAREA_CLASS);
@@ -2103,7 +2103,7 @@ static HB_ERRCODE sqlZap(SQLAREAP thiswa)
 
 /*------------------------------------------------------------------------*/
 
-HB_ERRCODE sqlChildEnd(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
+static HB_ERRCODE sqlChildEnd(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 {
   HB_ERRCODE uiError;
 
@@ -2122,7 +2122,7 @@ HB_ERRCODE sqlChildEnd(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 
 /*------------------------------------------------------------------------*/
 
-HB_ERRCODE sqlChildStart(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
+static HB_ERRCODE sqlChildStart(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 {
   HB_TRACE(HB_TR_DEBUG, ("sqlChildStart(%p, %p)", thiswa, pRelInfo));
 
@@ -2139,7 +2139,7 @@ HB_ERRCODE sqlChildStart(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 
 /*------------------------------------------------------------------------*/
 
-HB_ERRCODE sqlChildSync(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
+static HB_ERRCODE sqlChildSync(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 {
   HB_TRACE(HB_TR_DEBUG, ("sqlChildSync(%p, %p)", thiswa, pRelInfo));
 
@@ -2161,7 +2161,7 @@ HB_ERRCODE sqlChildSync(SQLAREAP thiswa, LPDBRELINFO pRelInfo)
 
 /*------------------------------------------------------------------------*/
 
-HB_ERRCODE sqlForceRel(SQLAREAP thiswa)
+static HB_ERRCODE sqlForceRel(SQLAREAP thiswa)
 {
   LPDBRELINFO lpdbPendingRel;
   HB_ERRCODE uiError;
@@ -2276,7 +2276,7 @@ static HB_ERRCODE sqlOrderListFocus(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo)
 
 /*------------------------------------------------------------------------*/
 
-HB_ERRCODE sqlOrderCondition(SQLAREAP thiswa, LPDBORDERCONDINFO lpdbOrdCondInfo)
+static HB_ERRCODE sqlOrderCondition(SQLAREAP thiswa, LPDBORDERCONDINFO lpdbOrdCondInfo)
 {
   auto pItemFor = hb_itemNew(nullptr);
   auto pItemWhile = hb_itemNew(nullptr);
@@ -3049,7 +3049,7 @@ static HB_ERRCODE sqlDrop(PHB_ITEM pItemTable)
 /* returns 1 if exists, 0 else */
 /*------------------------------------------------------------------------*/
 
-HB_BOOL sqlExists(PHB_ITEM pItemTable, PHB_ITEM pItemIndex)
+static HB_BOOL sqlExists(PHB_ITEM pItemTable, PHB_ITEM pItemIndex)
 {
   // sr_TraceLog(nullptr, "sqlExists\n");
 
@@ -3290,7 +3290,7 @@ HB_FUNC(ITEMCMP) /* ITEMCMP(cItem1, cItem2, nLenToCompare) ==> 0 == identical, <
 
 /*------------------------------------------------------------------------*/
 
-HB_BOOL iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2)
+HB_BOOL iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2) // TODO: static ?
 {
   if (HB_IS_NIL(pItem1) || HB_IS_NIL(pItem2)) {
     return false;
