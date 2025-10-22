@@ -267,7 +267,7 @@ METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
 
    ::cSystemName := cTargetDB
    ::cSystemVers := cSystemVers
-   ::nSystemID := SYSTEMID_MYSQL
+   ::nSystemID := SQLRDD_RDBMS_MYSQL
    ::cTargetDB := Upper(cTargetDB)
    ::uSid := MYSGETCONNID(hDbc)
 

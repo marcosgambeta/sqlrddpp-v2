@@ -176,8 +176,8 @@ FUNCTION SR_GetSyntheticIndexMinimun()
    DEFAULT s_nActiveConnection TO 0
 
    SWITCH s_aConnections[s_nActiveConnection]:nSystemID
-   CASE SYSTEMID_POSTGR
-   CASE SYSTEMID_ORACLE
+   CASE SQLRDD_RDBMS_POSTGR
+   CASE SQLRDD_RDBMS_ORACLE
       EXIT
    OTHERWISE
       nRet := 10
@@ -639,7 +639,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
 
       SWITCH oCnn:nSystemID
 
-      CASE SYSTEMID_ORACLE
+      CASE SQLRDD_RDBMS_ORACLE
          IF SR_UseSequences() .AND. i == 1
             aRet := {}
             oCnn:Exec("SELECT SEQUENCE_NAME FROM USER_SEQUENCES WHERE SEQUENCE_NAME='SQ_NRECNO'", .F., .T., @aRet)
@@ -668,12 +668,12 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          oCnn:Commit()
          EXIT
 
-      CASE SYSTEMID_INGRES
+      CASE SQLRDD_RDBMS_INGRES
          oCnn:Commit()
          oCnn:Exec("set lockmode session where readlock=nolock,level=row")
          EXIT
 
-      CASE SYSTEMID_IBMDB2
+      CASE SQLRDD_RDBMS_IBMDB2
 #if 0
          IF SR_UseSequences() .AND. i == 1
             aRet := {}
@@ -685,7 +685,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
 #endif
          EXIT
 
-      CASE SYSTEMID_SYBASE
+      CASE SQLRDD_RDBMS_SYBASE
          //oCnn:Commit()
          //oCnn:Exec("SET CHAINED ON")
          oCnn:Commit()
@@ -693,9 +693,9 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          oCnn:Exec("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")
          EXIT
 
-      CASE SYSTEMID_MSSQL7
-      CASE SYSTEMID_MSSQL6
-      CASE SYSTEMID_AZURE
+      CASE SQLRDD_RDBMS_MSSQL7
+      CASE SQLRDD_RDBMS_MSSQL6
+      CASE SQLRDD_RDBMS_AZURE
          oCnn:Commit()
          oCnn:Exec("SET QUOTED_IDENTIFIER ON")
          oCnn:Exec("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")
@@ -711,14 +711,14 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          oCnn:Commit()
          EXIT
 
-      CASE SYSTEMID_MYSQL
-      CASE SYSTEMID_MARIADB
+      CASE SQLRDD_RDBMS_MYSQL
+      CASE SQLRDD_RDBMS_MARIADB
          oCnn:Exec("set session autocommit=0;")
          oCnn:Exec("set session sql_mode = 'PIPES_AS_CONCAT'")
          oCnn:Exec("SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")
          EXIT
 
-      CASE SYSTEMID_POSTGR
+      CASE SQLRDD_RDBMS_POSTGR
          IF SR_UseSequences() .AND. i == 1
             aRet := {}
             oCnn:Exec("SELECT * FROM SQ_NRECNO", .F., .T., @aRet)
@@ -731,15 +731,15 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          oCnn:Commit()
          EXIT
 
-      CASE SYSTEMID_FIREBR
-      CASE SYSTEMID_FIREBR3
-      CASE SYSTEMID_FIREBR4
-      CASE SYSTEMID_FIREBR5
+      CASE SQLRDD_RDBMS_FIREBR
+      CASE SQLRDD_RDBMS_FIREBR3
+      CASE SQLRDD_RDBMS_FIREBR4
+      CASE SQLRDD_RDBMS_FIREBR5
          //oCnn:Exec("SET TERM !@¨§;", .F.)
          oCnn:Commit()
          EXIT
 
-      CASE SYSTEMID_CACHE
+      CASE SQLRDD_RDBMS_CACHE
          oCnn:Exec("SET OPTION SUPPORT_DELIMITED_IDENTIFIERS=TRUE")
 
          aRet := {}
@@ -805,8 +805,8 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTVERSION (VERSION_ CHAR(20), SIGNATURE_ CHAR(20))", .F.)
       oConnect:Commit()
 
-      IF oConnect:nSystemID == SYSTEMID_AZURE
-         oConnect:Exec("CREATE CLUSTERED INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTVERSION01 ON " + SR_GetToolsOwner() + "SR_MGMNTVERSION ( VERSION_ )", .F.)
+      IF oConnect:nSystemID == SQLRDD_RDBMS_AZURE
+         oConnect:Exec("CREATE CLUSTERED INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTVERSION01 ON " + SR_GetToolsOwner() + "SR_MGMNTVERSION ( VERSION_ )", .F.)
          oConnect:Commit()
       ENDIF
 
@@ -816,27 +816,27 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTINDEXES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), IDXNAME_ CHAR(64), PHIS_NAME_ CHAR(64), IDXKEY_ VARCHAR(254), IDXFOR_ VARCHAR(254), IDXCOL_ CHAR(3), TAG_ CHAR(30), TAGNUM_ CHAR(6) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED ", " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX01 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( TABLE_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED ", " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX01 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( TABLE_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX02 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( IDXNAME_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX02 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( IDXNAME_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES", .F.)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED ", " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED ", " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
 
       // Caché - should add dual table ,like Oracle
 
@@ -849,7 +849,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
       oConnect:Commit()
@@ -868,28 +868,28 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Commit()
 
       SWITCH oConnect:nSystemID
-      CASE SYSTEMID_MSSQL7
-      CASE SYSTEMID_AZURE
+      CASE SQLRDD_RDBMS_MSSQL7
+      CASE SQLRDD_RDBMS_AZURE
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMERIC(6), LOGIN_TIME_ DATETIME )", .F.)
          EXIT
-      CASE SYSTEMID_POSTGR
-      CASE SYSTEMID_SYBASE
-      CASE SYSTEMID_CACHE
+      CASE SQLRDD_RDBMS_POSTGR
+      CASE SQLRDD_RDBMS_SYBASE
+      CASE SQLRDD_RDBMS_CACHE
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMERIC(6), LOGIN_TIME_ TIMESTAMP )", .F.)
          EXIT
-      CASE SYSTEMID_ORACLE
+      CASE SQLRDD_RDBMS_ORACLE
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMBER(8), LOGIN_TIME_ TIMESTAMP )", .F.)
          EXIT
-      CASE SYSTEMID_IBMDB2
-      CASE SYSTEMID_MYSQL
-      CASE SYSTEMID_MARIADB
-      CASE SYSTEMID_ADABAS
-      CASE SYSTEMID_INGRES
-      CASE SYSTEMID_INFORM
-      CASE SYSTEMID_FIREBR
-      CASE SYSTEMID_FIREBR3
-      CASE SYSTEMID_FIREBR4
-      CASE SYSTEMID_FIREBR5
+      CASE SQLRDD_RDBMS_IBMDB2
+      CASE SQLRDD_RDBMS_MYSQL
+      CASE SQLRDD_RDBMS_MARIADB
+      CASE SQLRDD_RDBMS_ADABAS
+      CASE SQLRDD_RDBMS_INGRES
+      CASE SQLRDD_RDBMS_INFORM
+      CASE SQLRDD_RDBMS_FIREBR
+      CASE SQLRDD_RDBMS_FIREBR3
+      CASE SQLRDD_RDBMS_FIREBR4
+      CASE SQLRDD_RDBMS_FIREBR5
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ DECIMAL(8), LOGIN_TIME_ TIMESTAMP )", .F.)
          EXIT
       OTHERWISE
@@ -897,11 +897,11 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       ENDSWITCH
 
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE," CLUSTERED " ," ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE," CLUSTERED " ," ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( WSID_, LOCK_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( WSID_, LOCK_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( SPID_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( SPID_ )", .F.)
       oConnect:Commit()
 
       oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
@@ -915,7 +915,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_ CHAR(50), COLUMN_ CHAR(50), TYPE_ CHAR(1), LEN_ CHAR(8), DEC_ CHAR(8) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SYSTEMID_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLANG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_, COLUMN_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLANG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_, COLUMN_ )", .F.)
       oConnect:Commit()
 
       oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
@@ -929,17 +929,17 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
 
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
 
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
 
       oConnect:Commit()
       oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
@@ -950,7 +950,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
    ENDIF
 
    IF cStartingVersion < "MGMNT 1.67"
-      IF oConnect:nSystemID == SYSTEMID_MSSQL7 .OR. oConnect:nSystemID == SYSTEMID_AZURE
+      IF oConnect:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. oConnect:nSystemID == SQLRDD_RDBMS_AZURE
          oConnect:Exec("DROP FUNCTION dbo.trim", .F.)
          oConnect:Commit()
          oConnect:Exec("CREATE FUNCTION dbo.trim( @p1 AS CHAR  ) RETURNS CHAR BEGIN RETURN ltrim(rtrim( @p1 )) END", .F.)
@@ -989,44 +989,44 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
 
 #if 0
       SWITCH oConnect:nSystemID
-      CASE SYSTEMID_MSSQL7
-      CASE SYSTEMID_SYBASE
-      CASE SYSTEMID_CACHE
-      CASE SYSTEMID_POSTGR
+      CASE SQLRDD_RDBMS_MSSQL7
+      CASE SQLRDD_RDBMS_SYBASE
+      CASE SQLRDD_RDBMS_CACHE
+      CASE SQLRDD_RDBMS_POSTGR
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ NUMERIC(12) NOT NULL, WPID_ NUMERIC(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ TEXT, CALLSTACK_ TEXT, SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
          EXIT
-      CASE SYSTEMID_ORACLE
+      CASE SQLRDD_RDBMS_ORACLE
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ NUMERIC(12) NOT NULL, WPID_ NUMERIC(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ TEXT, CALLSTACK_ TEXT, SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
          EXIT
-      CASE SYSTEMID_IBMDB2
+      CASE SQLRDD_RDBMS_IBMDB2
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ DECIMAL(12) NOT NULL, WPID_ DECIMAL(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ CLOB (64000) " + IIf("DB2/400" $ oCOnnect:cSystemName, "",  " NOT LOGGED COMPACT") + ", CALLSTACK_ CLOB (4000) " + IIf( "DB2/400" $ oCOnnect:cSystemName, "",  " NOT LOGGED COMPACT") + ", SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
          EXIT
-      CASE SYSTEMID_MYSQL
-      CASE SYSTEMID_MARIADB
+      CASE SQLRDD_RDBMS_MYSQL
+      CASE SQLRDD_RDBMS_MARIADB
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ BIGINT(12) NOT NULL, WPID_ BIGINT(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ MEDIUMBLOB, CALLSTACK_ MEDIUMBLOB, SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
          EXIT
-      CASE SYSTEMID_ADABAS
+      CASE SQLRDD_RDBMS_ADABAS
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ BIGINT(12) NOT NULL, WPID_ BIGINT(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ LONG, CALLSTACK_ LONG, SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
          EXIT
-      CASE SYSTEMID_INGRES
+      CASE SQLRDD_RDBMS_INGRES
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ BIGINT(12) NOT NULL, WPID_ BIGINT(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ long varchar, CALLSTACK_ long varchar, SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
          EXIT
-      CASE SYSTEMID_INFORM
+      CASE SQLRDD_RDBMS_INFORM
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ DECIMAL(12) NOT NULL, WPID_ DECIMAL(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ TEXT, CALLSTACK_ TEXT, SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
          EXIT
-      CASE SYSTEMID_FIREBR
+      CASE SQLRDD_RDBMS_FIREBR
          oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ DECIMAL(12) NOT NULL, WPID_ DECIMAL(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ BLOB SUB_TYPE 1, CALLSTACK_ BLOB SUB_TYPE 1, SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
          EXIT
       ENDSWITCH
 
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( SPID_, WPID_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( SPID_, WPID_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( APPUSER_, SPID_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( APPUSER_, SPID_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TIME_, SITE_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TIME_, SITE_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG04 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TYPE_, TIME_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOGCHG04 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TYPE_, TIME_ )", .F.)
       oConnect:Commit()
 #endif
 
@@ -1057,7 +1057,7 @@ STATIC FUNCTION SR_SetEnvMinimal(oConnect)
 
    SWITCH oCnn:nSystemID
 
-   CASE SYSTEMID_ORACLE
+   CASE SQLRDD_RDBMS_ORACLE
       oCnn:Exec("ALTER SESSION SET NLS_LANGUAGE=AMERICAN", .F.)
       oCnn:Exec("ALTER SESSION SET NLS_SORT=BINARY", .F.)
       oCnn:Exec("ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.,'", .F.)
@@ -1070,12 +1070,12 @@ STATIC FUNCTION SR_SetEnvMinimal(oConnect)
       ENDIF
       EXIT
 
-   CASE SYSTEMID_INGRES
+   CASE SQLRDD_RDBMS_INGRES
       oCnn:Commit()
       oCnn:Exec("set lockmode session where readlock=nolock,level=row")
       EXIT
 
-   CASE SYSTEMID_SYBASE
+   CASE SQLRDD_RDBMS_SYBASE
       //oCnn:Commit()
       //oCnn:Exec("SET CHAINED ON")
       oCnn:Commit()
@@ -1083,27 +1083,27 @@ STATIC FUNCTION SR_SetEnvMinimal(oConnect)
       oCnn:Exec("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")
       EXIT
 
-   CASE SYSTEMID_MSSQL7
-   CASE SYSTEMID_MSSQL6
-   CASE SYSTEMID_AZURE
+   CASE SQLRDD_RDBMS_MSSQL7
+   CASE SQLRDD_RDBMS_MSSQL6
+   CASE SQLRDD_RDBMS_AZURE
       oCnn:Commit()
       oCnn:Exec("SET QUOTED_IDENTIFIER ON")
       oCnn:Exec("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")
       oCnn:Commit()
       EXIT
 
-   CASE SYSTEMID_MYSQL
-   CASE SYSTEMID_MARIADB
+   CASE SQLRDD_RDBMS_MYSQL
+   CASE SQLRDD_RDBMS_MARIADB
       oCnn:Exec("set session autocommit=0;", .F.)
       oCnn:Exec("SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED", .F.)
       EXIT
 
-   CASE SYSTEMID_CACHE
+   CASE SQLRDD_RDBMS_CACHE
       oCnn:Exec("SET OPTION SUPPORT_DELIMITED_IDENTIFIERS=TRUE")
       oCnn:Commit()
       EXIT
 
-   CASE SYSTEMID_POSTGR
+   CASE SQLRDD_RDBMS_POSTGR
       oCnn:Exec("SET CLIENT_ENCODING to 'SQL_ASCII'", .F., .T., @aRet)
       oCnn:Commit()
       EXIT
@@ -1644,17 +1644,17 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
       cPhisicalName := RTrim(aIndex[2])
 
       SWITCH oCnn:nSystemID
-      CASE SYSTEMID_MSSQL6
-      CASE SYSTEMID_MSSQL7
-      CASE SYSTEMID_SYBASE
-      CASE SYSTEMID_AZURE
+      CASE SQLRDD_RDBMS_MSSQL6
+      CASE SQLRDD_RDBMS_MSSQL7
+      CASE SQLRDD_RDBMS_SYBASE
+      CASE SQLRDD_RDBMS_AZURE
          oCnn:Exec("DROP INDEX " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + "." + cPhisicalName, .F.)
          EXIT
-      CASE SYSTEMID_MYSQL
-      CASE SYSTEMID_MARIADB
+      CASE SQLRDD_RDBMS_MYSQL
+      CASE SQLRDD_RDBMS_MARIADB
          oCnn:Exec("DROP INDEX " + cPhisicalName + " ON " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
          EXIT
-      CASE SYSTEMID_ORACLE
+      CASE SQLRDD_RDBMS_ORACLE
          IF Len(aIndex[6]) > 4 .AND. SubStr(aIndex[6], 4, 1) == "@"
             oCnn:Exec("DROP INDEX " + cOwner + "A$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
             oCnn:Commit()
@@ -1717,7 +1717,7 @@ FUNCTION SR_DropTable(cFileName, cOwner)
 
    // Drop the table
 
-   lRet := oCnn:Exec("DROP TABLE " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + IIf(oCnn:nSystemID == SYSTEMID_ORACLE, " CASCADE CONSTRAINTS", "") + IIf(oCnn:lComments, " /* drop table */", ""), .T.) == SQL_SUCCESS
+   lRet := oCnn:Exec("DROP TABLE " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + IIf(oCnn:nSystemID == SQLRDD_RDBMS_ORACLE, " CASCADE CONSTRAINTS", "") + IIf(oCnn:lComments, " /* drop table */", ""), .T.) == SQL_SUCCESS
    oCnn:Commit()
 
    IF lRet
@@ -1811,18 +1811,18 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
    ENDIF
 
    SWITCH oCnn:nSystemID
-   CASE SYSTEMID_MSSQL7
-   CASE SYSTEMID_AZURE
+   CASE SQLRDD_RDBMS_MSSQL7
+   CASE SQLRDD_RDBMS_AZURE
       nRet := oCnn:Exec("exec sp_rename " + cOwner + cTable + ", " + cOwner + cNewName, .F.)
       IF nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO
          lOk := .T.
       ENDIF
       EXIT
-   CASE SYSTEMID_POSTGR
-   CASE SYSTEMID_ORACLE
-   CASE SYSTEMID_MYSQL
-   CASE SYSTEMID_MARIADB
-      IF oCnn:nSystemID == SYSTEMID_POSTGR
+   CASE SQLRDD_RDBMS_POSTGR
+   CASE SQLRDD_RDBMS_ORACLE
+   CASE SQLRDD_RDBMS_MYSQL
+   CASE SQLRDD_RDBMS_MARIADB
+      IF oCnn:nSystemID == SQLRDD_RDBMS_POSTGR
          nRet := oCnn:Exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cTable + "_sq", oCnn:nSystemID) + " RENAME TO " + cOwner + SR_DBQUALIFY(cNewName+"_sq", oCnn:nSystemID), .F.)
          HB_SYMBOL_UNUSED(nRet)
       ENDIF
@@ -1832,11 +1832,11 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
          lOk := .T.
       ENDIF
 
-      IF oCnn:nSystemID == SYSTEMID_POSTGR
+      IF oCnn:nSystemID == SQLRDD_RDBMS_POSTGR
          nRet := oCnn:Exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cNewName, oCnn:nSystemID) + " ALTER COLUMN " + SR_RecnoName() + " SET DEFAULT nextval('" + Lower(cNewName) + "_sq'::regclass)")
          HB_SYMBOL_UNUSED(nRet)
       ENDIF
-      IF oCnn:nSystemID == SYSTEMID_ORACLE
+      IF oCnn:nSystemID == SQLRDD_RDBMS_ORACLE
          nRet := oCnn:Exec("RENAME " + cOwner + cTable + "_sq" + " TO " + cOwner + cNewName+"_sq", .F.)
          HB_SYMBOL_UNUSED(nRet)
       ENDIF
@@ -1997,20 +1997,20 @@ FUNCTION SR_SetLocks(uLocks, oCnn, nRetries)
       cValue := SR_Val2Char(cValue)
 
       SWITCH oCnn:nSystemID
-      CASE SYSTEMID_MSSQL7
-      CASE SYSTEMID_AZURE
+      CASE SQLRDD_RDBMS_MSSQL7
+      CASE SQLRDD_RDBMS_AZURE
          cIns := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_, LOGIN_TIME_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + "', @@SPID, '" + oCnn:oSqlTransact:cLoginTime + "' )"
          cDel := "DELETE FROM SR_MGMNTLOCKS WHERE convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)"
          EXIT
-      CASE SYSTEMID_ORACLE
+      CASE SQLRDD_RDBMS_ORACLE
          cIns := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + "', " + Str(oCnn:uSid) + " )"
          cDel := "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (select " + Chr(34) + "AUDSID" + Chr(34) + " from " + IIf(oCnn:lCluster, "g", "") + "v$session)"
          EXIT
-      CASE SYSTEMID_POSTGR
+      CASE SQLRDD_RDBMS_POSTGR
          cIns := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + "', (select pg_backend_pid()) )"
          cDel := "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))"
          EXIT
-      CASE SYSTEMID_IBMDB2
+      CASE SQLRDD_RDBMS_IBMDB2
          EXIT
       ENDSWITCH
 
@@ -2051,11 +2051,11 @@ FUNCTION SR_SetLocks(uLocks, oCnn, nRetries)
    IF !lRet
       FOR EACH cValue IN aAdded
          SWITCH oCnn:nSystemID
-         CASE SYSTEMID_MSSQL7
-         CASE SYSTEMID_ORACLE
-         CASE SYSTEMID_POSTGR
-         CASE SYSTEMID_IBMDB2
-         CASE SYSTEMID_AZURE
+         CASE SQLRDD_RDBMS_MSSQL7
+         CASE SQLRDD_RDBMS_ORACLE
+         CASE SQLRDD_RDBMS_POSTGR
+         CASE SQLRDD_RDBMS_IBMDB2
+         CASE SQLRDD_RDBMS_AZURE
             cSql := "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE LOCK_ = '" + cValue + "' AND WSID_ = '" + SR_GetInternalID() + "'"
             EXIT
          ENDSWITCH
@@ -2093,11 +2093,11 @@ FUNCTION SR_ReleaseLocks(uLocks, oCnn)
    FOR EACH cValue IN aLocks
       cValue := SR_Val2Char(cValue)
       SWITCH oCnn:nSystemID
-      CASE SYSTEMID_MSSQL7
-      CASE SYSTEMID_ORACLE
-      CASE SYSTEMID_POSTGR
-      CASE SYSTEMID_IBMDB2
-      CASE SYSTEMID_AZURE
+      CASE SQLRDD_RDBMS_MSSQL7
+      CASE SQLRDD_RDBMS_ORACLE
+      CASE SQLRDD_RDBMS_POSTGR
+      CASE SQLRDD_RDBMS_IBMDB2
+      CASE SQLRDD_RDBMS_AZURE
          cSql := "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE LOCK_ = '" + cValue + "' AND WSID_ = '" + SR_GetInternalID() + "'"
          EXIT
       ENDSWITCH
@@ -2124,24 +2124,24 @@ FUNCTION SR_ListLocks(oCnn, lAll)
    // Housekeeping to avoid wrong info
 
    SWITCH oCnn:oSqlTransact:nSystemID
-   CASE SYSTEMID_ORACLE
+   CASE SQLRDD_RDBMS_ORACLE
       oCnn:oSqlTransact:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select " + Chr(34) + "SID" + Chr(34) + " from " + IIf(oCnn:lCluster, "g", "") + "v$session)", .F.)
       EXIT
-   CASE SYSTEMID_INGRES
+   CASE SQLRDD_RDBMS_INGRES
       EXIT
-   CASE SYSTEMID_IBMDB2
+   CASE SQLRDD_RDBMS_IBMDB2
       EXIT
-   CASE SYSTEMID_SYBASE
+   CASE SQLRDD_RDBMS_SYBASE
       EXIT
-   CASE SYSTEMID_MSSQL7
-   CASE SYSTEMID_MSSQL6
-   CASE SYSTEMID_AZURE
+   CASE SQLRDD_RDBMS_MSSQL7
+   CASE SQLRDD_RDBMS_MSSQL6
+   CASE SQLRDD_RDBMS_AZURE
       oCnn:oSqlTransact:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)", .F.)
       EXIT
-   CASE SYSTEMID_MYSQL
-   CASE SYSTEMID_MARIADB
+   CASE SQLRDD_RDBMS_MYSQL
+   CASE SQLRDD_RDBMS_MARIADB
       EXIT
-   CASE SYSTEMID_POSTGR
+   CASE SQLRDD_RDBMS_POSTGR
       oCnn:oSqlTransact:Exec("DELETE FROM  " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))", .F.)
       EXIT
    ENDSWITCH
@@ -2199,7 +2199,7 @@ FUNCTION SR_DetectDBFromDSN(cConnect)
       ENDSWITCH
    NEXT
 
-RETURN SYSTEMID_UNKNOW
+RETURN SQLRDD_RDBMS_UNKNOW
 
 //------------------------------------------------------------------------
 
