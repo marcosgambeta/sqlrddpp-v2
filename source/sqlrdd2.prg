@@ -6329,7 +6329,14 @@ METHOD SR_WORKAREA:sqlCreate(aStruct, cFileName, cAlias, nArea)
 
    IF ::oSql:nSystemID == SQLRDD_RDBMS_MYSQL
 
-      IF Val(SubStr(::oSql:cSystemVers, 1, 3)) < 505
+#if 0
+      IF Val(SubStr(::oSql:cSystemVers, 1, 3)) < 505 // NOTE: not working with MySQL 8 [MAG]
+         cSql += " Type=InnoDb "
+      ELSE
+         cSql += " Engine=InnoDb "
+      ENDIF
+#endif
+      IF SubStr(::oSql:cSystemVers, 1, 1) == "5" // NOTE: trying another method [MAG]
          cSql += " Type=InnoDb "
       ELSE
          cSql += " Engine=InnoDb "
