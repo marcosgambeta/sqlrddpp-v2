@@ -31,6 +31,7 @@
 
 namespace SQLRDD {
   namespace RDBMS {
+    // NOTE: needs to be kept in sync with the sqlrddpp.ch file
     enum ID : int {
       UNKNOW = 0,
       ORACLE = 1,
