@@ -6,6 +6,9 @@
 
 #define SR_CRLF (Chr(13) + Chr(10))
 
+// Supported Database Engines (RDBMS)
+
+// NOTE: needs to be kept in sync with the sqlrddpp.h file
 #define SQLRDD_RDBMS_UNKNOW                0
 #define SQLRDD_RDBMS_ORACLE                1
 #define SQLRDD_RDBMS_MSSQL6                2
