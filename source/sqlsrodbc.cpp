@@ -100,8 +100,8 @@ static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 void odbcErrorDiagRTE(SQLHSTMT hStmt, const char *routine, const char *szSql, SQLRETURN res, int line,
                       const char *module);
-void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQueryOnly, HB_ULONG ulSystemID,
-                 HB_BOOL bTranslate, HB_USHORT ui);
+void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, bool bQueryOnly, HB_ULONG ulSystemID,
+                 bool bTranslate, HB_USHORT ui);
 
 //-----------------------------------------------------------------------------//
 
@@ -1134,8 +1134,8 @@ HB_FUNC(SR_ODBCWRITEMEMO)
 
 //-----------------------------------------------------------------------------//
 
-void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQueryOnly, HB_ULONG ulSystemID,
-                 HB_BOOL bTranslate, HB_USHORT ui)
+void odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, bool bQueryOnly, HB_ULONG ulSystemID,
+                 bool bTranslate, HB_USHORT ui)
 {
   // PHB_ITEM pTemp;
   SQLLEN lLenOut;

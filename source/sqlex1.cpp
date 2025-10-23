@@ -453,7 +453,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
 
   // lType = hb_arrayGetNL(pFieldStruct, FIELD_DOMAIN);
   odbcGetData(static_cast<HSTMT>(thiswa->colStmt[lFieldPosDB - 1]), hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB),
-              pFieldData, 0, thiswa->nSystemID, false, 1);
+              pFieldData, false, thiswa->nSystemID, false, 1);
   // odbcFieldGet(hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB), pFieldData, static_cast<char*>(bBuffer), lLenOut, 0,
   // thiswa->nSystemID, false);
 
@@ -1895,7 +1895,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
         // auto lType = hb_arrayGetNL(hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), FIELD_DOMAIN);
         ++iIndex;
         odbcGetData(static_cast<HSTMT>(thiswa->hStmtBuffer),
-                    hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), temp, 0, thiswa->nSystemID,
+                    hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), temp, false, thiswa->nSystemID,
                     bTranslate, iIndex);
         hb_arraySetForward(aRecord, i, temp);
       }
@@ -2468,7 +2468,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
         // auto lType = hb_arrayGetNL(hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), FIELD_DOMAIN);
         ++iIndex;
         odbcGetData(static_cast<HSTMT>(hStmt), hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), temp,
-                    0, thiswa->nSystemID, bTranslate, iIndex);
+                    false, thiswa->nSystemID, bTranslate, iIndex);
         hb_arraySetForward(aRecord, i, temp);
       }
       hb_itemRelease(temp);
