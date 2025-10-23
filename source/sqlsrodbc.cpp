@@ -847,6 +847,7 @@ void odbcErrorDiagRTE(SQLHSTMT hStmt, const char *routine, const char *szSql, SQ
 
 //-----------------------------------------------------------------------------//
 
+// SR_DESCRIB(p1, p2, @p3, p4, @p5, @p6, @p7, @p8, @p9, p10) --> numeric
 HB_FUNC(SR_DESCRIB)
 {
   auto lLen = static_cast<SQLSMALLINT>(hb_parni(4));
@@ -857,7 +858,6 @@ HB_FUNC(SR_DESCRIB)
   auto wNullable = static_cast<SQLSMALLINT>(hb_parni(9));
   // SQLTCHAR bBuffer[128] = {0};
 
-  RETCODE wResult;
   HB_ULONG ulSystemID = hb_parnl(10);
 
   if (lLen <= 0) {
@@ -867,12 +867,11 @@ HB_FUNC(SR_DESCRIB)
   auto bBuffer = static_cast<SQLTCHAR *>(hb_xgrab(lLen * sizeof(SQLTCHAR)));
   bBuffer[0] = '\0';
 
-  wResult = SQLDescribeCol(static_cast<HSTMT>(hb_parptr(1)), static_cast<SQLUSMALLINT>(hb_parni(2)),
-                           static_cast<SQLTCHAR *>(bBuffer), static_cast<SQLSMALLINT>(lLen),
-                           static_cast<SQLSMALLINT *>(&wBufLen), static_cast<SQLSMALLINT *>(&wDataType),
-                           static_cast<SQLULEN *>(&wColSize), static_cast<SQLSMALLINT *>(&wDecimals),
-                           static_cast<SQLSMALLINT *>(&wNullable));
-  if (wDataType == -8 && ulSystemID == SQLRDD::RDBMS::MYSQL) { // MySQL ODBC Bug
+  RETCODE wResult = SQLDescribeCol(static_cast<HSTMT>(hb_parptr(1)), static_cast<SQLUSMALLINT>(hb_parni(2)), bBuffer,
+                                   lLen, &wBufLen, &wDataType, &wColSize, &wDecimals, &wNullable);
+
+  if (wDataType == -8 /* SQL_WCHAR */ && ulSystemID == SQLRDD::RDBMS::MYSQL) {
+    // MySQL ODBC Bug
     odbcErrorDiagRTE(static_cast<SQLHSTMT>(hb_parptr(1)), "SQLCONNECT",
                      "MySQL Driver version 5 is not compatible with SQLRDD", 0, __LINE__, __FILE__);
   }
