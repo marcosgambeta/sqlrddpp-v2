@@ -20,18 +20,9 @@ source/exprsimpl.prg
 source/exprtransl.prg
 source/exprudf.prg
 source/sqlconnection.prg
-source/sqlfirebird.prg
-source/sqlfirebird3.prg
-source/sqlfirebird4.prg
-source/sqlfirebird5.prg
 source/sqlgen1.prg
-source/sqlmaria.prg
-source/sqlmy.prg
 #source/sqlnames.prg
 source/sqlodbc.prg
-source/sqloracle.prg
-source/sqloracle2.prg
-source/sqlpgs.prg
 source/sqlrdd0.prg
 source/sqlrdd2.prg
 source/utils.prg
@@ -42,24 +33,43 @@ source/txml.prg
 source/sqly.c
 
 source/tracelog.cpp
-source/firebird.cpp
-source/firebird3.cpp
-source/firebird4.cpp
-source/firebird5.cpp
-source/mysql.cpp
-source/pgs.cpp
 source/sqlact.cpp
 source/sqlex1.cpp
 source/sqlex2.cpp
 source/sqlex3.cpp
 source/sqllex.cpp
-source/sqlora.cpp
-source/sqlorax.cpp
 source/sqlrdd1.cpp
 source/sqlsrodbc.cpp
 source/xthrow.cpp
 source/xhbenum.cpp
 source/srxml.cpp
+
+# Firebird
+source/firebird/sqlfirebird.prg
+source/firebird/sqlfirebird3.prg
+source/firebird/sqlfirebird4.prg
+source/firebird/sqlfirebird5.prg
+source/firebird/firebird.cpp
+source/firebird/firebird3.cpp
+source/firebird/firebird4.cpp
+source/firebird/firebird5.cpp
+
+# MariaDB
+source/mariadb/sqlmaria.prg
+
+# MySQL
+source/mysql/sqlmy.prg
+source/mysql/mysql.cpp
+
+# Oracle
+source/oracle/sqloracle.prg
+source/oracle/sqloracle2.prg
+source/oracle/sqlora.cpp
+source/oracle/sqlorax.cpp
+
+# PostgreSQL
+source/postgresql/sqlpgs.prg
+source/postgresql/pgs.cpp
 
 -hbx=sqlrddpp-v2.hbx
 sqlrddpp-v2.hbx
