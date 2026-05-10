@@ -1,10 +1,10 @@
 # SQLRDD++ v2
 
-SQLRDD++ for Harbour++
+SQLRDD++ for Harbour and Harbour++
 
 ## Requisites
 
-Harbour++  
+Harbour or Harbour++  
 C++ compiler  
 C++11 or upper  
 
@@ -37,8 +37,16 @@ C++11 or upper
 
 ## C++ Compilers Compatibility
 
-| Project   | C/C++ compiler   | 32/64-bit | Status                  | Extra parameters    |
+| Project   | C++ compiler     | 32/64-bit | Status                  | Extra parameters    |
 | --------- | ---------------- | --------- | ----------------------- | ------------------- |
+| Harbour   | MinGW            | 32-bit    | Compiling with warnings | ...                 |
+| Harbour   | MinGW            | 64-bit    | Compiling with warnings | ...                 |
+| Harbour   | MSVC             | 32-bit    | ?                       | ...                 |
+| Harbour   | MSVC             | 64-bit    | ?                       | ...                 |
+| Harbour   | Clang            | 32-bit    | ?                       | ...                 |
+| Harbour   | Clang            | 64-bit    | ?                       | ...                 |
+| Harbour   | BCC 7.3          | 32-bit    | ?                       | ...                 |
+| Harbour   | BCC 7.3          | 64-bit    | ?                       | ...                 |
 | Harbour++ | MinGW            | 32-bit    | Compiling with warnings | ...                 |
 | Harbour++ | MinGW            | 64-bit    | Compiling with warnings | ...                 |
 | Harbour++ | MSVC             | 32-bit    | Compiling with warnings | ...                 |
