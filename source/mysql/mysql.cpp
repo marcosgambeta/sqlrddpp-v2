@@ -88,7 +88,7 @@ struct _MYSQL_SESSION
 using MYSQL_SESSION = _MYSQL_SESSION;
 using PMYSQL_SESSION = MYSQL_SESSION *;
 
-HB_FUNC(MYSCONNECT)
+HB_FUNC(SR_MYSCONNECT)
 {
   // auto session = static_cast<PMYSQL_SESSION>(hb_xgrab(sizeof(MYSQL_SESSION)));
   auto session = static_cast<PMYSQL_SESSION>(hb_xgrabz(sizeof(MYSQL_SESSION)));
@@ -123,7 +123,7 @@ HB_FUNC(MYSCONNECT)
   }
 }
 
-HB_FUNC(MYSFINISH)
+HB_FUNC(SR_MYSFINISH)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
   assert(session != nullptr);
@@ -140,7 +140,7 @@ HB_FUNC(MYSFINISH)
   hb_ret();
 }
 
-HB_FUNC(MYSGETCONNID)
+HB_FUNC(SR_MYSGETCONNID)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
   assert(session != nullptr);
@@ -148,7 +148,7 @@ HB_FUNC(MYSGETCONNID)
   hb_retnl(mysql_thread_id(session->dbh));
 }
 
-HB_FUNC(MYSKILLCONNID)
+HB_FUNC(SR_MYSKILLCONNID)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
   auto ulThreadID = static_cast<HB_ULONG>(hb_itemGetNL(hb_param(2, HB_IT_LONG)));
@@ -157,7 +157,7 @@ HB_FUNC(MYSKILLCONNID)
   hb_retni(mysql_kill(session->dbh, ulThreadID));
 }
 
-HB_FUNC(MYSEXEC)
+HB_FUNC(SR_MYSEXEC)
 {
   /* sr_TraceLog(nullptr, "mysqlExec : %s\n", hb_parc(2)); */
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
@@ -178,7 +178,7 @@ HB_FUNC(MYSEXEC)
   session->ifetch = -1;
 }
 
-HB_FUNC(MYSFETCH) /* MYSFetch(ConnHandle, ResultSet) => nStatus */
+HB_FUNC(SR_MYSFETCH) /* MYSFetch(ConnHandle, ResultSet) => nStatus */
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
 
@@ -380,8 +380,8 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBu
 
 //-----------------------------------------------------------------------------//
 
-// MYSLINEPROCESSED(pSession, p2, aFields, lQueryOnly, nSystemID, lTranslate, aRet) -> numeric
-HB_FUNC(MYSLINEPROCESSED)
+// SR_MYSLINEPROCESSED(pSession, p2, aFields, lQueryOnly, nSystemID, lTranslate, aRet) -> numeric
+HB_FUNC(SR_MYSLINEPROCESSED)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
   auto pFields = hb_param(3, HB_IT_ARRAY);
@@ -432,7 +432,7 @@ HB_FUNC(MYSLINEPROCESSED)
   }
 }
 
-HB_FUNC(MYSSTATUS)
+HB_FUNC(SR_MYSSTATUS)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
 
@@ -449,7 +449,7 @@ HB_FUNC(MYSSTATUS)
   hb_retni(ret);
 }
 
-HB_FUNC(MYSRESULTSTATUS)
+HB_FUNC(SR_MYSRESULTSTATUS)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
 
@@ -475,7 +475,7 @@ HB_FUNC(MYSRESULTSTATUS)
   hb_retnl(static_cast<HB_LONG>(ret));
 }
 
-HB_FUNC(MYSRESSTATUS)
+HB_FUNC(SR_MYSRESSTATUS)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
   assert(session != nullptr);
@@ -483,7 +483,7 @@ HB_FUNC(MYSRESSTATUS)
   hb_retc(const_cast<char *>(mysql_error(session->dbh)));
 }
 
-HB_FUNC(MYSCLEAR)
+HB_FUNC(SR_MYSCLEAR)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
 
@@ -497,7 +497,7 @@ HB_FUNC(MYSCLEAR)
   }
 }
 
-HB_FUNC(MYSCOLS)
+HB_FUNC(SR_MYSCOLS)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
   assert(session != nullptr);
@@ -505,7 +505,7 @@ HB_FUNC(MYSCOLS)
   hb_retni(session->numcols);
 }
 
-HB_FUNC(MYSVERS) /* MYSVERS(hConnection) => nVersion */
+HB_FUNC(SR_MYSVERS) /* MYSVERS(hConnection) => nVersion */
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
   assert(session != nullptr);
@@ -513,7 +513,7 @@ HB_FUNC(MYSVERS) /* MYSVERS(hConnection) => nVersion */
   hb_retnl(static_cast<long>(mysql_get_server_version(session->dbh)));
 }
 
-HB_FUNC(MYSERRMSG)
+HB_FUNC(SR_MYSERRMSG)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
   assert(session != nullptr);
@@ -521,7 +521,7 @@ HB_FUNC(MYSERRMSG)
   hb_retc(const_cast<char *>(mysql_error(session->dbh)));
 }
 
-HB_FUNC(MYSCOMMIT)
+HB_FUNC(SR_MYSCOMMIT)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
 
@@ -535,7 +535,7 @@ HB_FUNC(MYSCOMMIT)
   }
 }
 
-HB_FUNC(MYSROLLBACK)
+HB_FUNC(SR_MYSROLLBACK)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
 
@@ -549,7 +549,7 @@ HB_FUNC(MYSROLLBACK)
   }
 }
 
-HB_FUNC(MYSQUERYATTR)
+HB_FUNC(SR_MYSQUERYATTR)
 {
   if (hb_pcount() != 1) {
     hb_retnl(-2);
@@ -681,7 +681,7 @@ HB_FUNC(MYSQUERYATTR)
   hb_itemRelease(ret);
 }
 
-HB_FUNC(MYSTABLEATTR)
+HB_FUNC(SR_MYSTABLEATTR)
 {
   if (hb_pcount() != 2) {
     hb_retnl(-2);
@@ -831,7 +831,7 @@ HB_FUNC(MYSTABLEATTR)
   session->stmt = nullptr;
 }
 
-HB_FUNC(MYSAFFECTEDROWS)
+HB_FUNC(SR_MYSAFFECTEDROWS)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
 
