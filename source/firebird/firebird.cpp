@@ -84,7 +84,7 @@
 #define ISC_INT64_FORMAT PFLL
 #endif
 
-#define GET_FB_SESSION(session, numpar) auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(numpar, Harbour::Item::POINTER)))
+#define GET_FB_SESSION(session, numpar) auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(numpar, HB_IT_POINTER)))
 
 static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
@@ -1162,11 +1162,11 @@ HB_FUNC(SR_FBLINEPROCESSED)
   VARY *vary;
 
   PHB_ITEM temp;
-  auto pFields = hb_param(3, Harbour::Item::ARRAY);
+  auto pFields = hb_param(3, HB_IT_ARRAY);
   bool bQueryOnly = hb_parl(4);
   HB_ULONG ulSystemID = hb_parnl(5);
   bool bTranslate = hb_parl(6);
-  auto pRet = hb_param(7, Harbour::Item::ARRAY);
+  auto pRet = hb_param(7, HB_IT_ARRAY);
   HB_LONG lIndex;
 
   HB_SIZE lLen, lDec;

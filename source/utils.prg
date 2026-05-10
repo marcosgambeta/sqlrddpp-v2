@@ -56,7 +56,7 @@
 #include "sqlrddsetup.ch"
 
 REQUEST HB_Deserialize
-REQUEST HB_DeserialNext
+//REQUEST HB_DeserialNext
 #define FH_ALLOC_BLOCK     32
 
 Static s_DtAtiv, s_lHistorico
@@ -2083,7 +2083,7 @@ RETURN .F.
 
 HB_FUNC(SR_PHFILE)
 {
-  auto pFile = hb_param(1, Harbour::Item::STRING);
+  auto pFile = hb_param(1, HB_IT_STRING);
   hb_retl((pFile && hb_itemGetCLen(pFile) < HB_PATH_MAX - 1) ? hb_spFile(hb_itemGetCPtr(pFile), NULL) : false);
 }
 

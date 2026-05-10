@@ -156,7 +156,7 @@ static HB_ERRCODE ConcludeSkipraw(SQLEXORAAREAP thiswa)
   if (thiswa->sqlarea.area.lpdbRelations) {
     return SELF_SYNCCHILDREN(&thiswa->sqlarea.area);
   } else {
-    return Harbour::SUCCESS;
+    return HB_SUCCESS;
   }
 }
 
@@ -371,7 +371,7 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
     thiswa->colStmt[lFieldPosDB - 1].pStmt = OCI_StatementCreate(GetConnection(thiswa->hDbc));
 
     if (thiswa->colStmt[lFieldPosDB - 1].pStmt == nullptr) {
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
     OCI_AllowRebinding(thiswa->colStmt[lFieldPosDB - 1].pStmt, 1);
 
@@ -391,7 +391,7 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
     res = OCI_Prepare(thiswa->colStmt[lFieldPosDB - 1].pStmt, static_cast<char *>(sSql));
 
     if (!res) {
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
 
     // res = SQLBindParameter(thiswa->colStmt[lFieldPosDB - 1], 1, SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0,
@@ -399,7 +399,7 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
     res = OCI_BindUnsignedBigInt(thiswa->colStmt[lFieldPosDB - 1].pStmt, ":sz001", &thiswa->lCurrentRecord);
 
     if (!res) {
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
   }
 
@@ -415,7 +415,7 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
     // SQLFreeStmt(thiswa->colStmt[lFieldPosDB - 1], SQL_CLOSE);
     // OCI_StatementFree(thiswa->colStmt[lFieldPosDB - 1].pStmt);
     // thiswa->colStmt[lFieldPosDB - 1].pStmt = nullptr;
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   // Now fetch and store result in pFieldData
@@ -427,7 +427,7 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
   if (rs == nullptr) {
     OraErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1].pStmt, "getMissingColumn/SQLFetch", sSql, res, __LINE__, __FILE__);
     // OCI_StatementFree(thiswa->colStmt->pStmt);
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   OCI_FetchNext(rs);
@@ -445,14 +445,14 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
   // } else {
   //    OraErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLGetData", sSql, res, __LINE__, __FILE__);
   //    OCI_StatementFree(thiswa->colStmt[lFieldPosDB - 1]);
-  //    return Harbour::FAILURE;
+  //    return HB_FAILURE;
   // }
 
   // OCI_StatementFree(thiswa->colStmt[lFieldPosDB - 1].pStmt);
   // thiswa->colStmt[lFieldPosDB - 1].pStmt = nullptr;
   // hb_xfree(bBuffer);
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -635,7 +635,7 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
     break;
   }
   }
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -676,7 +676,7 @@ HB_ERRCODE SetBindEmptylValue2(COLUMNBINDORAP BindStructure)
     break;
   }
   }
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -1346,7 +1346,7 @@ static HB_ERRCODE getWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType)
 
   SolveFiltersOra(thiswa, bWhere);
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -1378,13 +1378,13 @@ HB_ERRCODE getWorkareaParamsOra(SQLEXORAAREAP thiswa)
 
     if (!(lCnnType == CONNECT_ORACLE || lCnnType == CONNECT_ORACLE_QUERY_ONLY)) {
       commonError(&thiswa->sqlarea.area, EG_OPEN, ESQLRDD_OPEN, "sqlExOra supports only ODBC connections.");
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
     thiswa->bConnVerified = true;
   }
   thiswa->bIsSelect = getMessageL(thiswa->sqlarea.oWorkArea, "LTABLEISSELECT");
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -1413,7 +1413,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXORAAREAP thiswa, int iMax) // Retur
   if (!res) {
     OraErrorDiagRTE(hStmt, "getPreparedRecordList", sSql, res, __LINE__, __FILE__);
     OCI_StatementFree(hStmt);
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   // Should SKIP over results to ignore current line
@@ -1448,7 +1448,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXORAAREAP thiswa, int iMax) // Retur
     // // // sr_TraceLog("aaa.log", "getPreparedRecordList 1 registro %i pego %lu\n", 1, lRecord);
 
     // if( CHECK_SQL_N_OK(res) ) {
-    //    return Harbour::FAILURE; // Any other error means a fault in SQL statement
+    //    return HB_FAILURE; // Any other error means a fault in SQL statement
     // }
     // // // sr_TraceLog("aaa.log", "thiswa->lCurrentRecord %lu lRecord %lu\n", thiswa->lCurrentRecord, lRecord);
   } while (thiswa->lCurrentRecord != lRecord);
@@ -1489,7 +1489,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXORAAREAP thiswa, int iMax) // Retur
       if (OCI_GetString(rs, 2) == nullptr) {
         // OCI_StatementFree(thiswa->hStmtSkip);
         // thiswa->hStmtSkip = nullptr;
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       } else {
         uiLen = OCI_GetDataLength(rs, 2);
         hb_xmemcpy(szValue, static_cast<char *>(OCI_GetString(rs, 2)), uiLen);
@@ -1512,7 +1512,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXORAAREAP thiswa, int iMax) // Retur
     return RESULTSET_OK;
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -1527,13 +1527,13 @@ static HB_ERRCODE getRecordList(SQLEXORAAREAP thiswa, int iMax) // Returns HB_TR
   thiswa->hStmt = OCI_StatementCreate(GetConnection(thiswa->hDbc));
 
   if (thiswa->hStmt == nullptr) {
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   res = OCI_ExecuteStmt(thiswa->hStmt, thiswa->sSql);
 
   if (!res) {
-    return Harbour::FAILURE; // It means a fault in SQL statement
+    return HB_FAILURE; // It means a fault in SQL statement
   }
 
   recordListChanged = 0;
@@ -1563,7 +1563,7 @@ static HB_ERRCODE getRecordList(SQLEXORAAREAP thiswa, int iMax) // Returns HB_TR
       unsigned int uiLen;
       if (OCI_GetString(rs, 2) == nullptr) {
         OCI_StatementFree(thiswa->hStmt);
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       } else {
         uiLen = OCI_GetDataLength(rs, 2);
 
@@ -1587,7 +1587,7 @@ static HB_ERRCODE getRecordList(SQLEXORAAREAP thiswa, int iMax) // Returns HB_TR
     return RESULTSET_OK;
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -1601,20 +1601,20 @@ static HB_ERRCODE getFirstColumnAsLong(SQLEXORAAREAP thiswa, HB_ULONG *szValue) 
   thiswa->hStmt = OCI_StatementCreate(GetConnection(thiswa->hDbc));
 
   if (thiswa->hStmt == nullptr) {
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   res = OCI_ExecuteStmt(thiswa->hStmt, static_cast<char *>(thiswa->sSql));
 
   if (!res) {
-    return Harbour::FAILURE; // It means a fault in SQL statement
+    return HB_FAILURE; // It means a fault in SQL statement
   }
 
   // res = SQLFetch(thiswa->hStmt);
   rs = OCI_GetResultset(thiswa->hStmtNextval);
   if (rs == nullptr) {
     OCI_StatementFree(thiswa->hStmt);
-    return Harbour::FAILURE; // It means a fault in SQL statement
+    return HB_FAILURE; // It means a fault in SQL statement
   }
 
   // res = SQLGetData(thiswa->hStmt, 1, SQL_C_ULONG, szValue, sizeof(SQL_C_ULONG), nullptr);
@@ -1623,12 +1623,12 @@ static HB_ERRCODE getFirstColumnAsLong(SQLEXORAAREAP thiswa, HB_ULONG *szValue) 
 
   // if( res == SQL_ERROR ) {
   //    OCI_StatementFree(thiswa->hStmt);
-  //    return Harbour::FAILURE;
+  //    return HB_FAILURE;
   // }
 
   OCI_StatementFree(thiswa->hStmt);
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -1773,7 +1773,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
       aRecord = hb_hashGetValueAt(thiswa->hBufferPool, lPos);
       hb_arrayCopy(aRecord, thiswa->sqlarea.aBuffer, nullptr, nullptr, nullptr);
       hb_itemRelease(pKey);
-      return Harbour::SUCCESS;
+      return HB_SUCCESS;
     }
   }
 
@@ -1843,7 +1843,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
     if (thiswa->hStmtBuffer) {
       res = OCI_StatementFree(thiswa->hStmtBuffer);
       if (!res) {
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       }
       // thiswa->hStmtBuffer = nullptr;
     }
@@ -1851,12 +1851,12 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
     // res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmtBuffer));
     thiswa->hStmtBuffer = OCI_StatementCreate(GetConnection(thiswa->hDbc));
     if (thiswa->hStmtBuffer == nullptr) {
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
 
     // res = SQLPrepare(thiswa->hStmtBuffer, (SQLCHAR *) (thiswa->sSqlBuffer), SQL_NTS);
     if (!OCI_Prepare(thiswa->hStmtBuffer, static_cast<char *>(thiswa->sSqlBuffer))) {
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
 
     for (i = 0; i < s_pageReadSize; i++) {
@@ -1868,7 +1868,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
       res = OCI_BindUnsignedBigInt(thiswa->hStmtBuffer, szBind, &thiswa->lRecordToRetrieve[i]);
       if (!res) {
         // thiswa->hStmtBuffer = nullptr;
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       }
     }
   }
@@ -1893,14 +1893,14 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
     OCI_StatementFree(thiswa->hStmtBuffer);
     // culik null the handle
     // thiswa->hStmtBuffer = nullptr;
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   // bBuffer = hb_xgrabDebug(__LINE__, __FILE__, COLUMN_BLOCK_SIZE + 1);
   rs = OCI_GetResultset(thiswa->hStmtBuffer);
   if (rs == nullptr) {
     // break;
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   for (iRow = 1; iRow <= s_pageReadSize; iRow++) {
@@ -1979,9 +1979,9 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
   // if( res == SQL_NO_DATA_FOUND && iRow == 1 )
   // if( rs->fetch_status == OCI_NO_DATA && iRow == 1 )
   if (iRow == 1) {
-    return Harbour::FAILURE; // Could not get at least one line from database
+    return HB_FAILURE; // Could not get at least one line from database
   } else {
-    return Harbour::SUCCESS;
+    return HB_SUCCESS;
   }
 }
 
@@ -1997,23 +1997,23 @@ static HB_ERRCODE trySkippingOnCache(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
 
       if (lSupposedPos >= 0 && lSupposedPos < thiswa->recordListSize) {
         thiswa->recordListPos = lSupposedPos;
-        if (updateRecordBuffer(thiswa, false) == Harbour::FAILURE) {
+        if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
           commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-          return Harbour::FAILURE;
+          return HB_FAILURE;
         }
-        return Harbour::SUCCESS;
+        return HB_SUCCESS;
       } else {
         // now, for sure thiswa->recordListPos is on the FIRST or LAST position in array
         // First, try to optimize EOF and BOF position cache
 
         if (lSupposedPos < 0 && thiswa->recordList[0] == thiswa->lBofAt) {
           thiswa->sqlarea.area.fBof = true;
-          return Harbour::SUCCESS;
+          return HB_SUCCESS;
         }
 
         if (lSupposedPos >= 0 && thiswa->recordList[thiswa->recordListPos] == thiswa->lEofAt) {
           sqlGetCleanBufferOra(thiswa);
-          return Harbour::SUCCESS;
+          return HB_SUCCESS;
         }
       }
     } else {
@@ -2021,28 +2021,28 @@ static HB_ERRCODE trySkippingOnCache(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
 
       if (lSupposedPos >= 0 && lSupposedPos < thiswa->recordListSize) {
         thiswa->recordListPos = lSupposedPos;
-        if (updateRecordBuffer(thiswa, false) == Harbour::FAILURE) {
+        if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
           commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-          return Harbour::FAILURE;
+          return HB_FAILURE;
         }
-        return Harbour::SUCCESS;
+        return HB_SUCCESS;
       } else {
         // now, for sure thiswa->recordListPos is on the FIRST or LAST position in array
         // First, try to optimize EOF and BOF position cache
         if (lSupposedPos < 0 && thiswa->recordList[0] == thiswa->lEofAt) {
           sqlGetCleanBufferOra(thiswa);
-          return Harbour::SUCCESS;
+          return HB_SUCCESS;
         }
 
         if (lSupposedPos >= 0 && thiswa->recordList[thiswa->recordListPos] == thiswa->lBofAt) {
           thiswa->sqlarea.area.fBof = true;
-          return Harbour::SUCCESS;
+          return HB_SUCCESS;
         }
       }
     }
   }
 
-  return Harbour::FAILURE;
+  return HB_FAILURE;
 }
 
 /*------------------------------------------------------------------------*/
@@ -2068,7 +2068,7 @@ HB_ERRCODE prepareRecordListQueryOra(SQLEXORAAREAP thiswa)
   }
 
   // if( CHECK_SQL_N_OK(res) ) {
-  //    return Harbour::FAILURE;
+  //    return HB_FAILURE;
   // }
 
   // if( CHECK_SQL_N_OK(SQLPrepare(hPrep, static_cast<char*>(thiswa->sSql), SQL_NTS)) )
@@ -2081,7 +2081,7 @@ HB_ERRCODE prepareRecordListQueryOra(SQLEXORAAREAP thiswa)
   }
 
   if (!res) {
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
   // // sr_TraceLog("aaa.log", "skips %s IndexBind->SkipFwdStmt %p IndexBind->SkipBwdStmt   %p\n", thiswa->sSql,
   // IndexBind->SkipFwdStmt, IndexBind->SkipBwdStmt);
@@ -2097,7 +2097,7 @@ HB_ERRCODE prepareRecordListQueryOra(SQLEXORAAREAP thiswa)
     IndexBind->SkipBwdSql[PREPARED_SQL_LEN - 1] = '\0';
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -2195,7 +2195,7 @@ static HB_ERRCODE sqlExOraBof(SQLEXORAAREAP thiswa, HB_BOOL *bof)
 
   *bof = thiswa->sqlarea.area.fBof;
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -2217,7 +2217,7 @@ static HB_ERRCODE sqlExOraEof(SQLEXORAAREAP thiswa, HB_BOOL *eof)
     *eof = thiswa->sqlarea.area.fEof;
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -2230,7 +2230,7 @@ static HB_ERRCODE sqlExOraFound(SQLEXORAAREAP thiswa, HB_BOOL *found)
 
   *found = thiswa->sqlarea.area.fFound;
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -2242,8 +2242,8 @@ static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
   thiswa->sqlarea.wasdel = false;
   thiswa->sqlarea.area.fFound = false;
 
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   if (thiswa->lEofAt) {
@@ -2255,10 +2255,10 @@ static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
       setResultSetLimitOra(thiswa, RECORD_LIST_SIZE / 10);
       createRecodListQueryOra(thiswa);
       // // // sr_TraceLog("aaa.log", "chamando getRecord list de  sqlExOraGoBottom\n");
-      if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == Harbour::FAILURE) {
+      if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
         OraErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
         commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       }
       // // // sr_TraceLog("aaa.log", "chamei getRecord list de  sqlExOraGoBottom\n");
     }
@@ -2270,10 +2270,10 @@ static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
     setResultSetLimitOra(thiswa, RECORD_LIST_SIZE / 10);
     createRecodListQueryOra(thiswa);
     // // // sr_TraceLog("aaa.log", "chamando getRecord list de  sqlExOraGoBottom\n");
-    if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == Harbour::FAILURE) {
+    if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
       OraErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
       commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
     // // // sr_TraceLog("aaa.log", "chamei getRecord list de  sqlExOraGoBottom\n");
   }
@@ -2290,9 +2290,9 @@ static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
     thiswa->sqlarea.area.fEof = false;
     thiswa->sqlarea.area.fBof = false;
     thiswa->lEofAt = thiswa->recordList[thiswa->recordListPos];
-    if (updateRecordBuffer(thiswa, false) == Harbour::FAILURE) {
+    if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
       commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
   }
 
@@ -2301,7 +2301,7 @@ static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
   if (thiswa->sqlarea.area.lpdbRelations) {
     return SELF_SYNCCHILDREN(&thiswa->sqlarea.area);
   } else {
-    return Harbour::SUCCESS;
+    return HB_SUCCESS;
   }
 }
 
@@ -2311,8 +2311,8 @@ static HB_ERRCODE sqlExOraGoTo(SQLEXORAAREAP thiswa, HB_LONG recno)
 {
   int i;
 
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   // Reset parent rel struct
@@ -2325,17 +2325,17 @@ static HB_ERRCODE sqlExOraGoTo(SQLEXORAAREAP thiswa, HB_LONG recno)
     // Move to phantom
     sqlGetCleanBufferOra(thiswa);
     thiswa->sqlarea.area.fBof = true;
-    return Harbour::SUCCESS;
+    return HB_SUCCESS;
   }
 
   // 1 - Try to look for the record in current skip sequence
   for (i = 0; i < thiswa->recordListSize; i++) {
     if (thiswa->recordList[i] == static_cast<HB_ULONG>(recno)) {
       thiswa->recordListPos = i;
-      if (updateRecordBuffer(thiswa, false) == Harbour::SUCCESS) {
+      if (updateRecordBuffer(thiswa, false) == HB_SUCCESS) {
         thiswa->sqlarea.area.fEof = false;
         thiswa->sqlarea.area.fBof = false;
-        return Harbour::SUCCESS;
+        return HB_SUCCESS;
       }
     }
   }
@@ -2347,17 +2347,17 @@ static HB_ERRCODE sqlExOraGoTo(SQLEXORAAREAP thiswa, HB_LONG recno)
   thiswa->recordListDirection = LIST_FORWARD;
   thiswa->recordListPos = 0;
 
-  if (updateRecordBuffer(thiswa, true) == Harbour::SUCCESS) {
+  if (updateRecordBuffer(thiswa, true) == HB_SUCCESS) {
     thiswa->sqlarea.area.fEof = false;
     thiswa->sqlarea.area.fBof = false;
-    return Harbour::SUCCESS;
+    return HB_SUCCESS;
   }
 
   // 3 - Move to phantom
   sqlGetCleanBufferOra(thiswa);
   thiswa->sqlarea.area.fBof = true;
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -2367,15 +2367,15 @@ static HB_ERRCODE sqlExOraGoToId(SQLEXORAAREAP thiswa, PHB_ITEM pItem)
   thiswa->sqlarea.firstinteract = false;
   thiswa->sqlarea.wasdel = false;
 
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   if (HB_IS_NUMERIC(pItem)) {
     return SELF_GOTO(&thiswa->sqlarea.area, hb_itemGetNL(pItem));
   } else {
     commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 }
 
@@ -2388,12 +2388,12 @@ static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
   thiswa->sqlarea.wasdel = false;
   thiswa->sqlarea.area.fFound = false;
 
-  if (getWorkareaParamsOra(thiswa) == Harbour::FAILURE) { // If workarea was opened by dbCreate()
-    return Harbour::FAILURE;
+  if (getWorkareaParamsOra(thiswa) == HB_FAILURE) { // If workarea was opened by dbCreate()
+    return HB_FAILURE;
   }
 
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   if (thiswa->lBofAt) {
@@ -2405,10 +2405,10 @@ static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
       setResultSetLimitOra(thiswa, RECORD_LIST_SIZE / 10);
       createRecodListQueryOra(thiswa);
       // // // sr_TraceLog("aaa.log", "chamando getRecord list de  sqlExOraGoTop\n");
-      if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == Harbour::FAILURE) {
+      if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
         OraErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
         commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       }
       // // // sr_TraceLog("aaa.log", "chamei getRecord list de  sqlExOraGoTop\n");
     }
@@ -2419,10 +2419,10 @@ static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
     setResultSetLimitOra(thiswa, RECORD_LIST_SIZE / 10);
     createRecodListQueryOra(thiswa);
     // // // sr_TraceLog("aaa.log", "chamando getRecord list de  sqlExOraGoTop\n");
-    if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == Harbour::FAILURE) {
+    if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
       OraErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
       commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
     // // // sr_TraceLog("aaa.log", "chamei getRecord list de  sqlExOraGoTop\n");
   }
@@ -2439,9 +2439,9 @@ static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
     thiswa->sqlarea.area.fEof = false;
     thiswa->sqlarea.area.fBof = false;
     thiswa->lBofAt = thiswa->recordList[thiswa->recordListPos];
-    if (updateRecordBuffer(thiswa, false) == Harbour::FAILURE) {
+    if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
       commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
   }
 
@@ -2450,7 +2450,7 @@ static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
   if (thiswa->sqlarea.area.lpdbRelations) {
     return SELF_SYNCCHILDREN(&thiswa->sqlarea.area);
   } else {
-    return Harbour::SUCCESS;
+    return HB_SUCCESS;
   }
 }
 
@@ -2460,7 +2460,7 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
 {
   int queryLevel;
   HB_USHORT iIndex, i;
-  HB_ERRCODE retvalue = Harbour::SUCCESS;
+  HB_ERRCODE retvalue = HB_SUCCESS;
   PHB_ITEM pNewKey = nullptr;
   OCI_Statement *hStmt;
   OCI_Resultset *rs;
@@ -2472,13 +2472,13 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
   thiswa->sqlarea.area.fEof = false;
   thiswa->sqlarea.area.fFound = false;
 
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   if (thiswa->sqlarea.hOrdCurrent == 0) {
     commonError(&thiswa->sqlarea.area, EG_NOORDER, EDBF_NOTINDEXED, thiswa->sTable);
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
 #ifndef HB_CDP_SUPPORT_OFF
@@ -2505,11 +2505,11 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
     SetIndexBindStructureOra(thiswa);
   }
 
-  if (FeedSeekKeyToBindingsOra(thiswa, pKey, &queryLevel) != Harbour::SUCCESS) {
+  if (FeedSeekKeyToBindingsOra(thiswa, pKey, &queryLevel) != HB_SUCCESS) {
     if (pNewKey) {
       hb_itemRelease(pNewKey);
     }
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   if (CreateSeekStmtora(thiswa, queryLevel)) { // Create and prepare new SEEK statement, if needed
@@ -2520,7 +2520,7 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
   thiswa->bConditionChanged2 = false;
 
   if (getPreparedSeekora(thiswa, queryLevel, &iIndex, &hStmt, &rs) ==
-      Harbour::SUCCESS) { // Fetch line from database, read RECNO and DELETED
+      HB_SUCCESS) { // Fetch line from database, read RECNO and DELETED
     // Create a line array to hold the record
     PHB_ITEM temp;
     bool bTranslate;
@@ -2536,7 +2536,7 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
     for (i = 1; i <= thiswa->sqlarea.area.uiFieldCount; i++) {
       // auto pF = hb_arrayGetItemPtr(thiswa->aFields, thiswa->sqlarea.uiBufferIndex[i - 1]);
       temp = hb_itemNew(nullptr);
-      // temp.type = Harbour::Item::NIL; // I know this is not a good practice, but we save tons of allocs.
+      // temp.type = HB_IT_NIL; // I know this is not a good practice, but we save tons of allocs.
       // please keep as is. ML.
 
       // if( (thiswa->sqlarea.uiFieldList[i - 1] == 0) && thiswa->sqlarea.iFieldListStatus != FIELD_LIST_LEARNING ) {
@@ -2621,10 +2621,10 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
     hb_itemRelease(pNewKey);
   }
 
-  if (thiswa->sqlarea.area.lpdbRelations && retvalue == Harbour::SUCCESS) {
+  if (thiswa->sqlarea.area.lpdbRelations && retvalue == HB_SUCCESS) {
     return SELF_SYNCCHILDREN(&thiswa->sqlarea.area);
   } else {
-    return Harbour::SUCCESS;
+    return HB_SUCCESS;
   }
 }
 
@@ -2635,8 +2635,8 @@ static HB_ERRCODE sqlExOraSkip(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
   HB_LONG lSkip;
 
   if (thiswa->sqlarea.lpdbPendingRel) {
-    if (SELF_FORCEREL(&thiswa->sqlarea.area) != Harbour::SUCCESS) {
-      return Harbour::FAILURE;
+    if (SELF_FORCEREL(&thiswa->sqlarea.area) != HB_SUCCESS) {
+      return HB_FAILURE;
     }
   } else if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
@@ -2662,11 +2662,11 @@ static HB_ERRCODE sqlExOraSkip(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
     lToSkip *= -1;
   }
   while (--lToSkip >= 0) {
-    if (SELF_SKIPRAW(&thiswa->sqlarea.area, lSkip) != Harbour::SUCCESS) {
-      return Harbour::FAILURE;
+    if (SELF_SKIPRAW(&thiswa->sqlarea.area, lSkip) != HB_SUCCESS) {
+      return HB_FAILURE;
     }
-    if (SELF_SKIPFILTER(&thiswa->sqlarea.area, lSkip) != Harbour::SUCCESS) {
-      return Harbour::FAILURE;
+    if (SELF_SKIPFILTER(&thiswa->sqlarea.area, lSkip) != HB_SUCCESS) {
+      return HB_FAILURE;
     }
     if (thiswa->sqlarea.area.fBof || thiswa->sqlarea.area.fEof) {
       break;
@@ -2680,7 +2680,7 @@ static HB_ERRCODE sqlExOraSkip(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
     thiswa->sqlarea.area.fBof = false;
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -2695,7 +2695,7 @@ static HB_ERRCODE sqlExOraSkipFilter(SQLEXORAAREAP thiswa, HB_LONG lUpDown)
   HB_TRACE(HB_TR_DEBUG, ("hb_waSkipFilter(%p, %ld)", thiswa, lUpDown));
 
   if (!hb_setGetDeleted() && thiswa->sqlarea.area.dbfi.itmCobExpr == nullptr) {
-    return Harbour::SUCCESS;
+    return HB_SUCCESS;
   }
 
   // Since lToSkip is passed to SkipRaw, it should never request more than  a single skip.
@@ -2709,12 +2709,12 @@ static HB_ERRCODE sqlExOraSkipFilter(SQLEXORAAREAP thiswa, HB_LONG lUpDown)
   while (!thiswa->sqlarea.area.fBof && !thiswa->sqlarea.area.fEof) {
     // SET DELETED
     if (hb_setGetDeleted()) {
-      if (SELF_DELETED(&thiswa->sqlarea.area, &fDeleted) != Harbour::SUCCESS) {
-        return Harbour::FAILURE;
+      if (SELF_DELETED(&thiswa->sqlarea.area, &fDeleted) != HB_SUCCESS) {
+        return HB_FAILURE;
       }
       if (fDeleted) {
-        if (SELF_SKIPRAW(&thiswa->sqlarea.area, lUpDown) != Harbour::SUCCESS) {
-          return Harbour::FAILURE;
+        if (SELF_SKIPRAW(&thiswa->sqlarea.area, lUpDown) != HB_SUCCESS) {
+          return HB_FAILURE;
         }
         continue;
       }
@@ -2722,13 +2722,13 @@ static HB_ERRCODE sqlExOraSkipFilter(SQLEXORAAREAP thiswa, HB_LONG lUpDown)
 
     // SET FILTER TO
     if (thiswa->sqlarea.area.dbfi.itmCobExpr) {
-      if (SELF_EVALBLOCK(&thiswa->sqlarea.area, thiswa->sqlarea.area.dbfi.itmCobExpr) != Harbour::SUCCESS) {
-        return Harbour::FAILURE;
+      if (SELF_EVALBLOCK(&thiswa->sqlarea.area, thiswa->sqlarea.area.dbfi.itmCobExpr) != HB_SUCCESS) {
+        return HB_FAILURE;
       }
 
       if (HB_IS_LOGICAL(thiswa->sqlarea.area.valResult) && !hb_itemGetL(thiswa->sqlarea.area.valResult)) {
-        if (SELF_SKIPRAW(&thiswa->sqlarea.area, lUpDown) != Harbour::SUCCESS) {
-          return Harbour::FAILURE;
+        if (SELF_SKIPRAW(&thiswa->sqlarea.area, lUpDown) != HB_SUCCESS) {
+          return HB_FAILURE;
         }
         continue;
       }
@@ -2758,7 +2758,7 @@ static HB_ERRCODE sqlExOraSkipFilter(SQLEXORAAREAP thiswa, HB_LONG lUpDown)
       thiswa->sqlarea.area.fBof = true;
     }
   } else {
-    uiError = Harbour::SUCCESS;
+    uiError = HB_SUCCESS;
   }
 
   return uiError;
@@ -2770,8 +2770,8 @@ static HB_ERRCODE sqlExOraSkipRaw(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
 {
   HB_ERRCODE res;
 
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
   // if we are over phantom record we go bottom.
   if (lToSkip < 0 && thiswa->lCurrentRecord == thiswa->lLastRec) {
@@ -2786,7 +2786,7 @@ static HB_ERRCODE sqlExOraSkipRaw(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
     // Try to find needed record in record list cache
     thiswa->skipDirection = lToSkip > 0 ? 1 : -1;
 
-    if (trySkippingOnCache(thiswa, lToSkip) == Harbour::SUCCESS) {
+    if (trySkippingOnCache(thiswa, lToSkip) == HB_SUCCESS) {
       return ConcludeSkipraw(thiswa);
     }
 
@@ -2822,9 +2822,9 @@ static HB_ERRCODE sqlExOraSkipRaw(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
 
       if (res == RESULTSET_OK) {
         break;
-      } else if (res == Harbour::FAILURE) {
+      } else if (res == HB_FAILURE) {
         commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       } else if (res == HB_RETRY) {
         if (lToSkip > 0) {
           sqlGetCleanBufferOra(thiswa);
@@ -2839,9 +2839,9 @@ static HB_ERRCODE sqlExOraSkipRaw(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
     // Now new database cache should had been read
 
     if (res == RESULTSET_OK) {
-      if (updateRecordBuffer(thiswa, false) == Harbour::FAILURE) {
+      if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
         commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       }
       return ConcludeSkipraw(thiswa);
     } else {
@@ -2873,8 +2873,8 @@ static HB_ERRCODE sqlExOraAppend(SQLEXORAAREAP thiswa)
 
   hb_arraySize(thiswa->sqlarea.aLocked, 0);
 
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   thiswa->bufferHot = true;
@@ -2882,7 +2882,7 @@ static HB_ERRCODE sqlExOraAppend(SQLEXORAAREAP thiswa)
 
   sqlGetCleanBufferOra(thiswa);
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -2896,8 +2896,8 @@ static HB_ERRCODE sqlExOraDeleteRec(SQLEXORAAREAP thiswa)
   bool isDeleted;
   unsigned int res;
 
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   if (thiswa->sqlarea.firstinteract) {
@@ -2927,12 +2927,12 @@ static HB_ERRCODE sqlExOraDeleteRec(SQLEXORAAREAP thiswa)
     // res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmt));
     thiswa->hStmt = OCI_StatementCreate(GetConnection(thiswa->hDbc));
     if (thiswa->hStmt == nullptr) {
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
 
     res = OCI_ExecuteStmt(thiswa->hStmt, thiswa->sSql);
     if (!res) {
-      return Harbour::FAILURE; // It means a fault in SQL statement
+      return HB_FAILURE; // It means a fault in SQL statement
     }
     OCI_StatementFree(thiswa->hStmt);
   }
@@ -2947,7 +2947,7 @@ static HB_ERRCODE sqlExOraDeleteRec(SQLEXORAAREAP thiswa)
     thiswa->lBofAt = 0;
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -2969,7 +2969,7 @@ static HB_ERRCODE sqlExOraDeleted(SQLEXORAAREAP thiswa, HB_BOOL *isDeleted)
     *isDeleted = thiswa->deletedList[thiswa->recordListPos] != ' ';
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3023,7 +3023,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
   } else if (HB_IS_HASH(itemTemp) && sr_isMultilang()) {
     LPFIELD pField = thiswa->sqlarea.area.lpFields + fieldNum - 1;
 
-    if (pField->uiType == Harbour::DB::Field::MEMO) {
+    if (pField->uiType == HB_FT_MEMO) {
       auto pLangItem = hb_itemNew(nullptr);
 
       if (hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &ulPos) ||
@@ -3050,7 +3050,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
           memset(empty + nSrcLen, ' ', nLen - nSrcLen);
         }
 #ifndef HB_CDP_SUPPORT_OFF
-        if (pField->uiType == Harbour::DB::Field::STRING) {
+        if (pField->uiType == HB_FT_STRING) {
           PHB_CODEPAGE cdpDest = thiswa->sqlarea.cdPageCnv ? thiswa->sqlarea.cdPageCnv : hb_vmCDP();
           if (thiswa->sqlarea.area.cdPage && thiswa->sqlarea.area.cdPage != cdpDest) {
             char *pszVal = hb_cdpnDup(empty, &nLen, thiswa->sqlarea.area.cdPage, cdpDest);
@@ -3076,7 +3076,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
 
   hb_itemRelease(itemTemp);
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3105,37 +3105,37 @@ static HB_ERRCODE sqlExOraGoCold(SQLEXORAAREAP thiswa)
       if (!thiswa->hStmtInsert) {    // Check if we have the INSERT statement prepared
         CreateInsertStmtOra(thiswa); // Create also column binding structures
 
-        if (PrepareInsertStmtOra(thiswa) == Harbour::FAILURE) {
-          return Harbour::FAILURE;
+        if (PrepareInsertStmtOra(thiswa) == HB_FAILURE) {
+          return HB_FAILURE;
         }
 
-        if (BindInsertColumnsOra(thiswa) == Harbour::FAILURE) {
-          return Harbour::FAILURE;
+        if (BindInsertColumnsOra(thiswa) == HB_FAILURE) {
+          return HB_FAILURE;
         }
       } else {
         thiswa->sSql[0] = '\0'; // To prevent erroneous error message
       }
 
-      if (FeedRecordColsOra(thiswa, false) == Harbour::FAILURE) { // Stmt created and prepared, only need to push data
-        return Harbour::FAILURE;
+      if (FeedRecordColsOra(thiswa, false) == HB_FAILURE) { // Stmt created and prepared, only need to push data
+        return HB_FAILURE;
       }
 
-      if (ExecuteInsertStmtOra(thiswa) == Harbour::FAILURE) {
-        return Harbour::FAILURE;
+      if (ExecuteInsertStmtOra(thiswa) == HB_FAILURE) {
+        return HB_FAILURE;
       }
       // ReleaseInsertRecordStructureOra(thiswa, 0);
     } else if (!thiswa->sqlarea.area.fEof) {
       if ((!thiswa->hStmtUpdate) ||
           memcmp((const void *)(thiswa->editMask), (const void *)(thiswa->updatedMask), MAX_FIELDS) != 0) {
-        if (CreateUpdateStmtOra(thiswa) == Harbour::FAILURE) {
-          return Harbour::FAILURE;
+        if (CreateUpdateStmtOra(thiswa) == HB_FAILURE) {
+          return HB_FAILURE;
         }
       } else {
         thiswa->sSql[0] = '\0'; // Avoid wrong error message in Execute
       }
 
-      if (ExecuteUpdateStmtOra(thiswa) == Harbour::FAILURE) {
-        return Harbour::FAILURE;
+      if (ExecuteUpdateStmtOra(thiswa) == HB_FAILURE) {
+        return HB_FAILURE;
       }
     }
     thiswa->bufferHot = false;
@@ -3144,7 +3144,7 @@ static HB_ERRCODE sqlExOraGoCold(SQLEXORAAREAP thiswa)
 
   memset(thiswa->editMask, 0, MAX_FIELDS); // Clear edited mask
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3199,7 +3199,7 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
       (HB_IS_LOGICAL(pDest) && HB_IS_LOGICAL(value)) || (HB_IS_DATE(pDest) && HB_IS_DATE(value)) ||
       (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value))) {
 
-    if (pField->uiType == Harbour::DB::Field::STRING) {
+    if (pField->uiType == HB_FT_STRING) {
       HB_SIZE nSize = hb_itemGetCLen(value), nLen = pField->uiLen;
 
       cfield = static_cast<char *>(hb_xgrabz(nLen + 1));
@@ -3216,7 +3216,7 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
       }
       cfield[nLen] = '\0';
       hb_itemPutCLPtr(value, cfield, nLen);
-    } else if (pField->uiType == Harbour::DB::Field::LONG) {
+    } else if (pField->uiType == HB_FT_LONG) {
       len = pField->uiLen;
       dec = pField->uiDec;
       if (dec > 0) {
@@ -3231,24 +3231,24 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
     auto pLangItem = hb_itemNew(nullptr);
     hb_hashAdd(pDest, sr_getBaseLang(pLangItem), value);
     hb_itemRelease(pLangItem);
-  } else if (pField->uiType == Harbour::DB::Field::MEMO) { // Memo fields can hold ANY datatype
+  } else if (pField->uiType == HB_FT_MEMO) { // Memo fields can hold ANY datatype
     hb_arraySet(thiswa->sqlarea.aBuffer, fieldindex, value);
   } else {
 #ifdef SQLRDD_NWG_SPECIFIC
     thiswa->bufferHot = true;
-    return Harbour::SUCCESS;
+    return HB_SUCCESS;
 #else
     char type_err[128];
     sprintf(type_err, "data type origin: %i - data type target %i", hb_itemType(value), hb_itemType(pDest));
     commonError(&thiswa->sqlarea.area, EG_DATATYPE, ESQLRDD_DATATYPE, type_err);
-    return Harbour::FAILURE;
+    return HB_FAILURE;
 #endif
   }
 
   thiswa->bufferHot = true;
   hb_itemRelease(pDest);
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3258,8 +3258,8 @@ static HB_ERRCODE sqlExOraRecall(SQLEXORAAREAP thiswa)
   bool isDeleted;
   unsigned int res;
 
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   if (thiswa->sqlarea.lpdbPendingRel) {
@@ -3280,19 +3280,19 @@ static HB_ERRCODE sqlExOraRecall(SQLEXORAAREAP thiswa)
     // res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmt));
     thiswa->hStmt = OCI_StatementCreate(GetConnection(thiswa->hDbc));
     if (thiswa->hStmt == nullptr) {
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     }
 
     res = OCI_ExecuteStmt(thiswa->hStmt, thiswa->sSql);
     if (!res) {
-      return Harbour::FAILURE; // It means a fault in SQL statement
+      return HB_FAILURE; // It means a fault in SQL statement
     }
     OCI_StatementFree(thiswa->hStmt);
   }
 
   thiswa->deletedList[thiswa->recordListPos] = ' ';
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3311,7 +3311,7 @@ static HB_ERRCODE sqlExOraRecCount(SQLEXORAAREAP thiswa, HB_ULONG *recCount)
 
   thiswa->lLastRec = (*recCount) + 1;
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3325,7 +3325,7 @@ static HB_ERRCODE sqlExOraRecNo(SQLEXORAAREAP thiswa, HB_ULONG *recno)
 #ifdef SQLRDD_NWG_SPECIFIC
   if (thiswa->bIsInsert) {
     commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_NOT_COMMITED_YET, nullptr);
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 #endif
   if (thiswa->sqlarea.lpdbPendingRel) {
@@ -3337,7 +3337,7 @@ static HB_ERRCODE sqlExOraRecNo(SQLEXORAAREAP thiswa, HB_ULONG *recno)
 
   *recno = static_cast<HB_ULONG>(GetCurrentRecordNumOra(thiswa));
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3361,7 +3361,7 @@ static HB_ERRCODE sqlExOraRecId(SQLEXORAAREAP thiswa, PHB_ITEM recno)
     hb_itemPutNLL(recno, 0);
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3374,8 +3374,8 @@ static HB_ERRCODE sqlExOraRecId(SQLEXORAAREAP thiswa, PHB_ITEM recno)
 static HB_ERRCODE sqlExOraClose(SQLEXORAAREAP thiswa)
 {
   HB_ERRCODE code;
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
   code = (SUPER_CLOSE(&thiswa->sqlarea.area));
   // Reset parent rel struct
@@ -3554,12 +3554,12 @@ static HB_ERRCODE sqlExOraOpen(SQLEXORAAREAP thiswa, LPDBOPENINFO OpenInfo)
 
   errCode = SUPER_OPEN(&thiswa->sqlarea.area, OpenInfo);
 
-  if (errCode != Harbour::SUCCESS) {
+  if (errCode != HB_SUCCESS) {
     return errCode;
   }
 
-  if (getWorkareaParamsOra(thiswa) == Harbour::FAILURE) { // If workarea was opened by dbCreate()
-    return Harbour::FAILURE;
+  if (getWorkareaParamsOra(thiswa) == HB_FAILURE) { // If workarea was opened by dbCreate()
+    return HB_FAILURE;
   }
 
   // Releases allocated cache for SQLRDD, since
@@ -3580,7 +3580,7 @@ static HB_ERRCODE sqlExOraStructSize(SQLEXORAAREAP thiswa, HB_USHORT *StructSize
 {
   HB_SYMBOL_UNUSED(thiswa); // Avoid compiler warning
   *StructSize = sizeof(SQLEXORAAREA);
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3637,7 +3637,7 @@ static HB_ERRCODE sqlExOraOrderListClear(SQLEXORAAREAP thiswa)
   ReleaseIndexBindStructureOra(thiswa);
   thiswa->sqlarea.hOrdCurrent = 0;
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -3707,7 +3707,7 @@ static HB_ERRCODE sqlExOraOrderCreate(SQLEXORAAREAP thiswa, LPDBORDERCREATEINFO 
     SetInsertRecordStructureOra(thiswa);
   }
 
-  if (err == Harbour::SUCCESS) {
+  if (err == HB_SUCCESS) {
     s_bOldReverseIndex = thiswa->bReverseIndex;
     thiswa->bReverseIndex = hb_arrayGetL(thiswa->sqlarea.aInfo, AINFO_REVERSE_INDEX);
   }
@@ -3746,19 +3746,19 @@ static HB_ERRCODE sqlExOraOrderInfo(SQLEXORAAREAP thiswa, HB_USHORT uiIndex, LPD
       getWhereExpressionOra(thiswa, LIST_FROM_TOP);
       createCountQuery(thiswa);
 
-      if (getFirstColumnAsLong(thiswa, &lValue) == Harbour::FAILURE) {
+      if (getFirstColumnAsLong(thiswa, &lValue) == HB_FAILURE) {
         OraErrorDiagRTE(thiswa->hStmt, "OrdKeyCount", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
-        uiError = Harbour::FAILURE;
+        uiError = HB_FAILURE;
       } else {
         pInfo->itmResult = hb_itemPutNInt(pInfo->itmResult, lValue);
-        uiError = Harbour::SUCCESS;
+        uiError = HB_SUCCESS;
       }
       break;
     }
     case DBOI_POSITION:
     case DBOI_KEYNORAW: {
       pInfo->itmResult = hb_itemPutNL(pInfo->itmResult, (long)(thiswa->recordListPos + 1));
-      uiError = Harbour::SUCCESS;
+      uiError = HB_SUCCESS;
       break;
     }
     case DBOI_SCOPETOP:
@@ -3827,7 +3827,7 @@ static HB_ERRCODE sqlExOraSetFilter(SQLEXORAAREAP thiswa, LPDBFILTERINFO pFilter
 {
   HB_ERRCODE ret;
   ret = SUPER_SETFILTER(&thiswa->sqlarea.area, pFilterInfo);
-  if (ret == Harbour::SUCCESS) {
+  if (ret == HB_SUCCESS) {
     thiswa->bConditionChanged1 = true;
     thiswa->bConditionChanged2 = true;
   }
@@ -3864,8 +3864,8 @@ static HB_ERRCODE sqlExOraSetScope(SQLEXORAAREAP thiswa, LPDBORDSCOPEINFO sInfo)
 
 static HB_ERRCODE sqlExOraLock(SQLEXORAAREAP thiswa, LPDBLOCKINFO pLockInfo)
 {
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   if (thiswa->sqlarea.firstinteract) {
@@ -3884,8 +3884,8 @@ static HB_ERRCODE sqlExOraLock(SQLEXORAAREAP thiswa, LPDBLOCKINFO pLockInfo)
 
 static HB_ERRCODE sqlExOraUnLock(SQLEXORAAREAP thiswa, PHB_ITEM pRecNo)
 {
-  if (SELF_GOCOLD(&thiswa->sqlarea.area) == Harbour::FAILURE) {
-    return Harbour::FAILURE;
+  if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
+    return HB_FAILURE;
   }
 
   if (thiswa->sqlarea.firstinteract) {
@@ -4016,7 +4016,7 @@ HB_FUNC(SQLEXORA_GETFUNCTABLE)
     errCode = hb_rddInherit(pTable, &sqlTable, &sqlExOraSuper, static_cast<const char *>("SQLRDD"));
     hb_retni(errCode);
   } else {
-    hb_retni(Harbour::FAILURE);
+    hb_retni(HB_FAILURE);
   }
 }
 
@@ -4079,14 +4079,14 @@ HB_CALL_ON_STARTUP_END(_hb_sqlExOraora_rdd_init_)
 HB_FUNC(SR_SETPAGEREADSIZE2)
 {
   if (HB_ISNUM(1)) {
-    s_pageReadSize = hb_itemGetNS(hb_param(1, Harbour::Item::NUMERIC));
+    s_pageReadSize = hb_itemGetNS(hb_param(1, HB_IT_NUMERIC));
   }
 }
 
 HB_FUNC(SR_SETBUFFERPOOLSIZE2)
 {
   if (HB_ISNUM(1)) {
-    s_bufferPoolSize = hb_itemGetNS(hb_param(1, Harbour::Item::NUMERIC));
+    s_bufferPoolSize = hb_itemGetNS(hb_param(1, HB_IT_NUMERIC));
   }
 }
 

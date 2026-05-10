@@ -165,7 +165,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREAP thiswa, int iListType, int q
   bWhere = strlen(thiswa->sWhere) > 0;
   SolveFilters(thiswa, bWhere);
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 #if 0
@@ -248,7 +248,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREAP thiswa, int iListType, int q
 
    SolveFilters(thiswa, bWhere);
 
-   return Harbour::SUCCESS;
+   return HB_SUCCESS;
 }
 #endif
 
@@ -262,11 +262,11 @@ HB_ERRCODE prepareSeekQuery(SQLEXAREAP thiswa, INDEXBINDP SeekBind)
   res = SQLAllocStmt((HDBC)thiswa->hDbc, &hPrep);
 
   if (CHECK_SQL_N_OK(res)) {
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   if (CHECK_SQL_N_OK(SQLPrepare(hPrep, (SQLCHAR *)(thiswa->sSql), SQL_NTS))) {
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   if (thiswa->recordListDirection == LIST_FORWARD) {
@@ -281,7 +281,7 @@ HB_ERRCODE prepareSeekQuery(SQLEXAREAP thiswa, INDEXBINDP SeekBind)
     SeekBind->SeekBwdSql[PREPARED_SQL_LEN - 1] = '\0';
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -529,7 +529,7 @@ HB_ERRCODE FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *queryLev
     if (HB_IS_NUMERIC(pKey)) {
       if (BindStructure->iCType != SQL_C_DOUBLE) { // Check column data type
         // To Do: Raise RT error
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       }
       BindStructure->asNumeric = (SQLDOUBLE)hb_itemGetND(pKey);
     } else if (HB_IS_DATE(pKey) || HB_IS_DATETIME(pKey)) {
@@ -556,18 +556,18 @@ HB_ERRCODE FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *queryLev
         BindStructure->asTimestamp.fraction = 0;
       } else {
         // To Do: Raise RT error
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       }
     } else if (HB_IS_LOGICAL(pKey)) {
       if (BindStructure->iCType != SQL_C_BIT) { // Check column data type
         // To Do: Raise RT error
-        return Harbour::FAILURE;
+        return HB_FAILURE;
       }
       BindStructure->asLogical = (SQLCHAR)hb_itemGetL(pKey);
     }
   }
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }
 
 /*------------------------------------------------------------------------*/
@@ -677,19 +677,19 @@ HB_ERRCODE getPreparedSeek(SQLEXAREAP thiswa, int queryLevel, HB_USHORT *iIndex,
     odbcErrorDiagRTE(*hStmt, "getPreparedSeek", "", res, __LINE__, __FILE__);
     // SQLCloseCursor(*hStmt);
     SQLFreeStmt(*hStmt, SQL_CLOSE);
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   res = SQLFetch(*hStmt);
   if (res != SQL_SUCCESS) {
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   res = SQLGetData(*hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), nullptr);
 
   if (res == SQL_ERROR) {
     SQLFreeStmt(*hStmt, SQL_CLOSE);
-    return Harbour::FAILURE;
+    return HB_FAILURE;
   }
 
   if (thiswa->ulhDeleted > 0) {
@@ -697,7 +697,7 @@ HB_ERRCODE getPreparedSeek(SQLEXAREAP thiswa, int queryLevel, HB_USHORT *iIndex,
     res = SQLGetData(*hStmt, 2, SQL_C_CHAR, szValue, 2, nullptr);
     if (res == SQL_ERROR) {
       SQLFreeStmt(*hStmt, SQL_CLOSE);
-      return Harbour::FAILURE;
+      return HB_FAILURE;
     } else {
       if (szValue[0] == 0) {
         thiswa->deletedList[0] = ' '; // MySQL driver climps spaces from right side
@@ -714,5 +714,5 @@ HB_ERRCODE getPreparedSeek(SQLEXAREAP thiswa, int queryLevel, HB_USHORT *iIndex,
   thiswa->recordListSize = 1L;
   thiswa->recordListPos = 0;
 
-  return Harbour::SUCCESS;
+  return HB_SUCCESS;
 }

@@ -7,6 +7,8 @@ libs=sqlrddpp-v2
 {win}libs=odbccp32
 {unix&!darwin}libs=odbc
 {unix&darwin}libs=iodbc
-libs=xhb.hbc
+#libs=xhb.hbc
 
 prgflags=-gc3
+
+cpp=yes
