@@ -103,7 +103,7 @@ METHOD SR_PGS:Getline(aFields, lTranslate, aArray)
    ENDIF
 
    IF ::aCurrLine == NIL
-      PGSLINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, aArray)
+      SR_PGSLINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, aArray)
       ::aCurrLine := aArray
       RETURN aArray
    ENDIF
@@ -121,7 +121,7 @@ METHOD SR_PGS:FieldGet(nField, aFields, lTranslate)
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
       ::aCurrLine := array(LEN(aFields))
-      PGSLINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, ::aCurrLine)
+      SR_PGSLINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, ::aCurrLine)
    ENDIF
 
 RETURN ::aCurrLine[nField]
@@ -135,7 +135,7 @@ METHOD SR_PGS:FetchRaw(lTranslate, aFields)
    DEFAULT lTranslate TO .T.
 
    IF ::hDBC != NIL
-      ::nRetCode := PGSFetch(::hDbc)
+      ::nRetCode := SR_PGSFetch(::hDbc)
       ::aCurrLine := NIL
    ELSE
       ::RunTimeErr("", "PGSFetch - Invalid cursor state" + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
@@ -148,7 +148,7 @@ RETURN ::nRetCode
 METHOD SR_PGS:FreeStatement()
 
    IF ::hStmt != NIL
-      PGSClear(::hDbc)
+      SR_PGSClear(::hDbc)
    ENDIF
    ::hStmt := NIL
 
@@ -183,12 +183,12 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
       ENDIF
    ENDIF
 
-   IF PGSResultStatus(::hStmt) != SQL_SUCCESS
+   IF SR_PGSResultStatus(::hStmt) != SQL_SUCCESS
       ::RunTimeErr("", "SqlNumResultCols Error" + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
       RETURN NIL
    ENDIF
 
-   nFields := PGSCols(::hStmt)
+   nFields := SR_PGSCols(::hStmt)
    ::nFields := nFields
 
    IF !Empty(cTable) .AND. Empty(cCommand)
@@ -200,9 +200,9 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
       IF Left(cTbl, 1) == Chr(34) // "
          cTbl := SubStr(cTbl, 2, Len(cTbl) - 2)
       ENDIF
-      aFields := PGSTableAttr(::hDbc, cTbl, cOwner)
+      aFields := SR_PGSTableAttr(::hDbc, cTbl, cOwner)
    ELSE
-      aFields := PGSQueryAttr(::hDbc)
+      aFields := SR_PGSQueryAttr(::hDbc)
    ENDIF
 
    ::aFields := aFields
@@ -218,10 +218,10 @@ RETURN aFields
 METHOD SR_PGS:LastError()
 
    IF ::hStmt != NIL
-      RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + PGSResStatus(::hDbc) + " - " + PGSErrMsg(::hDbc)
+      RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + SR_PGSResStatus(::hDbc) + " - " + SR_PGSErrMsg(::hDbc)
    ENDIF
 
-RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + PGSErrMsg(::hDbc)
+RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + SR_PGSErrMsg(::hDbc)
 
 //------------------------------------------------------------------------
 
@@ -263,12 +263,12 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
       cConnect += " sslmode=prefer sslcert=" + ::sslcert + " sslkey=" + ::sslkey + " sslrootcert=" + ::sslrootcert + " sslcrl=" + ::sslcrl
    ENDIF
 
-   hDbc := PGSConnect(cConnect)
-   nRet := PGSStatus(hDbc)
+   hDbc := SR_PGSConnect(cConnect)
+   nRet := SR_PGSStatus(hDbc)
 
    IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
       ::nRetCode := nRet
-      SR_MsgLogFile("Connection Error: " + AllTrim(Str(PGSStatus2(hDbc))) + " (see pgs.ch)")
+      SR_MsgLogFile("Connection Error: " + AllTrim(Str(SR_PGSStatus2(hDbc))) + " (see pgs.ch)")
       RETURN Self
    ENDIF
 
@@ -325,7 +325,7 @@ METHOD SR_PGS:End()
    ::FreeStatement()
 
    IF !Empty(::hDbc)
-      PGSFinish(::hDbc)
+      SR_PGSFinish(::hDbc)
    ENDIF
 
    ::hEnv := 0
@@ -346,7 +346,7 @@ RETURN (::nRetCode := ::Exec("COMMIT;BEGIN", .F.))
 METHOD SR_PGS:RollBack()
 
    ::Super:RollBack()
-   ::nRetCode := PGSRollBack(::hDbc)
+   ::nRetCode := SR_PGSRollBack(::hDbc)
    ::Exec("BEGIN", .F.)
 
 RETURN ::nRetCode
@@ -361,9 +361,9 @@ METHOD SR_PGS:ExecuteRaw(cCommand)
       ::lResultSet := .F.
    ENDIF
 
-   ::hStmt := PGSExec(::hDbc, cCommand)
+   ::hStmt := SR_PGSExec(::hDbc, cCommand)
 
-RETURN PGSResultStatus(::hStmt)
+RETURN SR_PGSResultStatus(::hStmt)
 
 //------------------------------------------------------------------------
 
@@ -372,7 +372,7 @@ METHOD SR_PGS:AllocStatement()
    IF ::lSetNext
       IF ::nSetOpt == SQL_ATTR_QUERY_TIMEOUT
          // Commented 2005/02/04 - It's better to wait forever on a lock than have a corruct transaction
-         // PGSExec(::hDbc, "set statement_timeout=" + Str(::nSetValue * 1000))
+         // SR_PGSExec(::hDbc, "set statement_timeout=" + Str(::nSetValue * 1000))
       ENDIF
       ::lSetNext := .F.
    ENDIF
@@ -382,6 +382,6 @@ RETURN SQL_SUCCESS
 //------------------------------------------------------------------------
 
 METHOD SR_PGS:GetAffectedRows()
-RETURN PGSAFFECTEDROWS(::hDbc)
+RETURN SR_PGSAFFECTEDROWS(::hDbc)
 
 //------------------------------------------------------------------------
