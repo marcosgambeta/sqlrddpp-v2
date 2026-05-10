@@ -41,8 +41,12 @@ C++11 or upper
 | --------- | ---------------- | --------- | ----------------------- | ------------------- |
 | Harbour   | MinGW            | 32-bit    | Compiling with warnings | ...                 |
 | Harbour   | MinGW            | 64-bit    | Compiling with warnings | ...                 |
-| Harbour   | MSVC             | 32-bit    | ?                       | ...                 |
-| Harbour   | MSVC             | 64-bit    | ?                       | ...                 |
+| Harbour   | MSVC 2019        | 32-bit    | Compiling with warnings | ...                 |
+| Harbour   | MSVC 2019        | 64-bit    | Compiling with warnings | ...                 |
+| Harbour   | MSVC 2022        | 32-bit    | Compiling with warnings | ...                 |
+| Harbour   | MSVC 2022        | 64-bit    | Compiling with warnings | ...                 |
+| Harbour   | MSVC 2026        | 32-bit    | Compiling with warnings | ...                 |
+| Harbour   | MSVC 2026        | 64-bit    | Compiling with warnings | ...                 |
 | Harbour   | Clang            | 32-bit    | ?                       | ...                 |
 | Harbour   | Clang            | 64-bit    | ?                       | ...                 |
 | Harbour   | BCC 7.3          | 32-bit    | ?                       | ...                 |
