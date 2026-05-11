@@ -71,10 +71,15 @@
 
 #define CLIENT_ALL_FLAGS (CLIENT_COMPRESS | CLIENT_MULTI_RESULTS | CLIENT_MULTI_STATEMENTS)
 #define CLIENT_ALL_FLAGS2 (CLIENT_MULTI_RESULTS | CLIENT_MULTI_STATEMENTS)
+
 static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 static int s_iConnectionCount = 0;
+
 #define LOGFILE "mysql.log"
+
+#define GET_MYSQL_SESSION(session, numpar) auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(numpar, HB_IT_POINTER)))
+
 struct _MYSQL_SESSION
 {
   int status;                   // Execution return value
@@ -125,7 +130,7 @@ HB_FUNC(SR_MYSCONNECT)
 
 HB_FUNC(SR_MYSFINISH)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   assert(session != nullptr);
   assert(session->dbh != nullptr);
   mysql_close(session->dbh);
@@ -142,7 +147,7 @@ HB_FUNC(SR_MYSFINISH)
 
 HB_FUNC(SR_MYSGETCONNID)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   assert(session != nullptr);
   assert(session->dbh != nullptr);
   hb_retnl(mysql_thread_id(session->dbh));
@@ -150,7 +155,7 @@ HB_FUNC(SR_MYSGETCONNID)
 
 HB_FUNC(SR_MYSKILLCONNID)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   auto ulThreadID = static_cast<HB_ULONG>(hb_itemGetNL(hb_param(2, HB_IT_LONG)));
   assert(session != nullptr);
   assert(session->dbh != nullptr);
@@ -160,7 +165,7 @@ HB_FUNC(SR_MYSKILLCONNID)
 HB_FUNC(SR_MYSEXEC)
 {
   /* sr_TraceLog(nullptr, "mysqlExec : %s\n", hb_parc(2)); */
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   auto szQuery = hb_parc(2);
   assert(session != nullptr);
   assert(session->dbh != nullptr);
@@ -180,7 +185,7 @@ HB_FUNC(SR_MYSEXEC)
 
 HB_FUNC(SR_MYSFETCH) /* MYSFetch(ConnHandle, ResultSet) => nStatus */
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
 
   assert(session != nullptr);
   assert(session->dbh != nullptr);
@@ -383,7 +388,7 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBu
 // SR_MYSLINEPROCESSED(pSession, p2, aFields, lQueryOnly, nSystemID, lTranslate, aRet) -> numeric
 HB_FUNC(SR_MYSLINEPROCESSED)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   auto pFields = hb_param(3, HB_IT_ARRAY);
   bool bQueryOnly = hb_parl(4);
   HB_ULONG ulSystemID = hb_parnl(5);
@@ -434,7 +439,7 @@ HB_FUNC(SR_MYSLINEPROCESSED)
 
 HB_FUNC(SR_MYSSTATUS)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
 
   assert(session != nullptr);
   assert(session->dbh != nullptr);
@@ -451,7 +456,7 @@ HB_FUNC(SR_MYSSTATUS)
 
 HB_FUNC(SR_MYSRESULTSTATUS)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
 
   assert(session != nullptr);
   assert(session->dbh != nullptr);
@@ -477,7 +482,7 @@ HB_FUNC(SR_MYSRESULTSTATUS)
 
 HB_FUNC(SR_MYSRESSTATUS)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   assert(session != nullptr);
   assert(session->dbh != nullptr);
   hb_retc(const_cast<char *>(mysql_error(session->dbh)));
@@ -485,7 +490,7 @@ HB_FUNC(SR_MYSRESSTATUS)
 
 HB_FUNC(SR_MYSCLEAR)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
 
   assert(session != nullptr);
   assert(session->dbh != nullptr);
@@ -499,7 +504,7 @@ HB_FUNC(SR_MYSCLEAR)
 
 HB_FUNC(SR_MYSCOLS)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   assert(session != nullptr);
   assert(session->dbh != nullptr);
   hb_retni(session->numcols);
@@ -507,7 +512,7 @@ HB_FUNC(SR_MYSCOLS)
 
 HB_FUNC(SR_MYSVERS) /* MYSVERS(hConnection) => nVersion */
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   assert(session != nullptr);
   assert(session->dbh != nullptr);
   hb_retnl(static_cast<long>(mysql_get_server_version(session->dbh)));
@@ -515,7 +520,7 @@ HB_FUNC(SR_MYSVERS) /* MYSVERS(hConnection) => nVersion */
 
 HB_FUNC(SR_MYSERRMSG)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   assert(session != nullptr);
   assert(session->dbh != nullptr);
   hb_retc(const_cast<char *>(mysql_error(session->dbh)));
@@ -523,7 +528,7 @@ HB_FUNC(SR_MYSERRMSG)
 
 HB_FUNC(SR_MYSCOMMIT)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
 
   assert(session != nullptr);
   assert(session->dbh != nullptr);
@@ -537,7 +542,7 @@ HB_FUNC(SR_MYSCOMMIT)
 
 HB_FUNC(SR_MYSROLLBACK)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
 
   assert(session != nullptr);
   assert(session->dbh != nullptr);
@@ -555,7 +560,7 @@ HB_FUNC(SR_MYSQUERYATTR)
     hb_retnl(-2);
   }
 
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   assert(session->dbh != nullptr);
   assert(session->stmt != nullptr);
 
@@ -689,7 +694,7 @@ HB_FUNC(SR_MYSTABLEATTR)
 
   char attcmm[256] = {0};
 
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
   assert(session->dbh != nullptr);
 
   sprintf(attcmm, "select * from %s where 0 = 1", hb_parc(2));
@@ -833,7 +838,7 @@ HB_FUNC(SR_MYSTABLEATTR)
 
 HB_FUNC(SR_MYSAFFECTEDROWS)
 {
-  auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
+  GET_MYSQL_SESSION(session, 1);
 
   hb_retnll(session != nullptr ? session->ulAffected_rows : 0);
 }
