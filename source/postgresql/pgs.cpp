@@ -895,11 +895,8 @@ HB_FUNC(SR_PGSLINEPROCESSED)
 HB_FUNC(SR_PGSAFFECTEDROWS)
 {
   auto session = static_cast<PPSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
-  if (session) {
-    hb_retni(session->iAffectedRows);
-    return;
-  }
-  hb_retni(0);
+
+  hb_retni(session != nullptr ? session->iAffectedRows : 0);
 }
 
 //-----------------------------------------------------------------------------//
