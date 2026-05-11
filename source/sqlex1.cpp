@@ -2778,8 +2778,10 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREAP thiswa, HB_LONG lToSkip)
 /*------------------------------------------------------------------------*/
 
 // (DBENTRYP_B)
-static HB_ERRCODE sqlExAppend(SQLEXAREAP thiswa)
+static HB_ERRCODE sqlExAppend(SQLEXAREAP thiswa, HB_BOOL value)
 {
+  HB_SYMBOL_UNUSED(value);
+
   // Reset parent rel struct
   thiswa->lpdbPendingRel = nullptr;
   thiswa->firstinteract = false;
