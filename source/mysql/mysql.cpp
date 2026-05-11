@@ -835,12 +835,7 @@ HB_FUNC(SR_MYSAFFECTEDROWS)
 {
   auto session = static_cast<PMYSQL_SESSION>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
 
-  if (session) {
-    hb_retnll(session->ulAffected_rows);
-    return;
-  }
-
-  hb_retni(0);
+  hb_retnll(session != nullptr ? session->ulAffected_rows : 0);
 }
 
 //-----------------------------------------------------------------------------//
