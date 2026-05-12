@@ -54,6 +54,7 @@
 #include <windows.h>
 #endif
 
+#include "sqlrddpp.h"
 #include "compat.h"
 
 #include "sqlrddsetup.ch"
@@ -72,8 +73,8 @@
 #define CLIENT_ALL_FLAGS (CLIENT_COMPRESS | CLIENT_MULTI_RESULTS | CLIENT_MULTI_STATEMENTS)
 #define CLIENT_ALL_FLAGS2 (CLIENT_MULTI_RESULTS | CLIENT_MULTI_STATEMENTS)
 
-static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
-static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = SR_NULLPTR;
+static PHB_DYNS s_pSym_SR_FROMJSON = SR_NULLPTR;
 static int s_iConnectionCount = 0;
 
 #define LOGFILE "mysql.log"
@@ -104,35 +105,35 @@ HB_FUNC(SR_MYSCONNECT)
   HB_UINT uiPort = HB_ISNUM(5) ? hb_parnl(5) : MYSQL_PORT;
   HB_UINT uiTimeout = HB_ISNUM(7) ? hb_parnl(7) : 3600;
   bool lCompress = HB_ISLOG(8) ? hb_parl(8) : false;
-  mysql_library_init(0, nullptr, nullptr);
+  mysql_library_init(0, SR_NULLPTR, SR_NULLPTR);
   // memset(session, 0, sizeof(MYSQL_SESSION));
 
   session->dbh = mysql_init(static_cast<MYSQL *>(0));
   session->ifetch = -2;
 
-  if (session->dbh != nullptr) {
+  if (session->dbh != SR_NULLPTR) {
     s_iConnectionCount++;
     mysql_options(session->dbh, MYSQL_OPT_CONNECT_TIMEOUT, reinterpret_cast<const char *>(&uiTimeout));
     if (lCompress) {
-      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr, CLIENT_ALL_FLAGS);
+      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, SR_NULLPTR, CLIENT_ALL_FLAGS);
     } else {
-      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr, CLIENT_ALL_FLAGS2);
+      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, SR_NULLPTR, CLIENT_ALL_FLAGS2);
     }
     hb_retptr(static_cast<void *>(session));
   } else {
-    mysql_close(nullptr);
+    mysql_close(SR_NULLPTR);
     if (s_iConnectionCount == 0) {
       mysql_library_end();
     }
-    hb_retptr(nullptr);
+    hb_retptr(SR_NULLPTR);
   }
 }
 
 HB_FUNC(SR_MYSFINISH)
 {
   GET_MYSQL_SESSION(session, 1);
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
   mysql_close(session->dbh);
 
   hb_xfree(session);
@@ -148,8 +149,8 @@ HB_FUNC(SR_MYSFINISH)
 HB_FUNC(SR_MYSGETCONNID)
 {
   GET_MYSQL_SESSION(session, 1);
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
   hb_retnl(mysql_thread_id(session->dbh));
 }
 
@@ -157,18 +158,18 @@ HB_FUNC(SR_MYSKILLCONNID)
 {
   GET_MYSQL_SESSION(session, 1);
   auto ulThreadID = static_cast<HB_ULONG>(hb_itemGetNL(hb_param(2, HB_IT_LONG)));
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
   hb_retni(mysql_kill(session->dbh, ulThreadID));
 }
 
 HB_FUNC(SR_MYSEXEC)
 {
-  /* sr_TraceLog(nullptr, "mysqlExec : %s\n", hb_parc(2)); */
+  /* sr_TraceLog(SR_NULLPTR, "mysqlExec : %s\n", hb_parc(2)); */
   GET_MYSQL_SESSION(session, 1);
   auto szQuery = hb_parc(2);
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
   session->ulAffected_rows = 0;
   // mysql_query(session->dbh, szQuery);
   mysql_real_query(session->dbh, szQuery, static_cast<unsigned long>(hb_parclen(2)));
@@ -187,9 +188,9 @@ HB_FUNC(SR_MYSFETCH) /* MYSFetch(ConnHandle, ResultSet) => nStatus */
 {
   GET_MYSQL_SESSION(session, 1);
 
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
-  assert(session->stmt != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
+  assert(session->stmt != SR_NULLPTR);
 
   session->status = mysql_errno(session->dbh);
   int rows;
@@ -307,24 +308,24 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBu
     case SQL_LONGVARCHAR: {
       if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
           (sr_lSerializeArrayAsJson())) {
-        if (s_pSym_SR_FROMJSON == nullptr) {
+        if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
           s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-          if (s_pSym_SR_FROMJSON == nullptr) {
+          if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
             printf("Could not find Symbol HB_JSONDECODE\n");
           }
         }
         hb_vmPushDynSym(s_pSym_SR_FROMJSON);
         hb_vmPushNil();
         hb_vmPushString(bBuffer, lLenBuff);
-        pTemp = hb_itemNew(nullptr);
+        pTemp = hb_itemNew(SR_NULLPTR);
         hb_vmPush(pTemp);
         hb_vmDo(2);
         hb_itemMove(pItem, pTemp);
         hb_itemRelease(pTemp);
       } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
-        if (s_pSym_SR_DESERIALIZE == nullptr) {
+        if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
           s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-          if (s_pSym_SR_DESERIALIZE == nullptr) {
+          if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
             printf("Could not find Symbol SR_DESERIALIZE\n");
           }
         }
@@ -333,11 +334,11 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBu
         hb_vmPushString(bBuffer, lLenBuff);
         hb_vmDo(1);
 
-        pTemp = hb_itemNew(nullptr);
+        pTemp = hb_itemNew(SR_NULLPTR);
         hb_itemMove(pTemp, hb_stackReturnItem());
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
-          auto pLangItem = hb_itemNew(nullptr);
+          auto pLangItem = hb_itemNew(SR_NULLPTR);
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos) ||
@@ -372,7 +373,7 @@ void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBu
     }
     case SQL_TIME: {
       long lMilliSec;
-      lMilliSec = hb_timeUnformat(bBuffer, nullptr); // TOCHECK:
+      lMilliSec = hb_timeUnformat(bBuffer, SR_NULLPTR); // TOCHECK:
       hb_itemPutTDT(pItem, 0, lMilliSec);
       break;
     }
@@ -395,9 +396,9 @@ HB_FUNC(SR_MYSLINEPROCESSED)
   bool bTranslate = hb_parl(6);
   auto pRet = hb_param(7, HB_IT_ARRAY);
 
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
-  assert(session->stmt != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
+  assert(session->stmt != SR_NULLPTR);
 
   session->status = mysql_errno(session->dbh);
 
@@ -415,7 +416,7 @@ HB_FUNC(SR_MYSLINEPROCESSED)
       HB_LONG lIndex;
 
       for (int col = 0; col < cols; col++) {
-        temp = hb_itemNew(nullptr);
+        temp = hb_itemNew(SR_NULLPTR);
         lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, col + 1), FIELD_ENUM);
 
         if (lIndex != 0) {
@@ -441,8 +442,8 @@ HB_FUNC(SR_MYSSTATUS)
 {
   GET_MYSQL_SESSION(session, 1);
 
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
 
   int ret = mysql_errno(session->dbh);
 
@@ -458,8 +459,8 @@ HB_FUNC(SR_MYSRESULTSTATUS)
 {
   GET_MYSQL_SESSION(session, 1);
 
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
 
   auto ret = static_cast<HB_UINT>(mysql_errno(session->dbh));
 
@@ -483,8 +484,8 @@ HB_FUNC(SR_MYSRESULTSTATUS)
 HB_FUNC(SR_MYSRESSTATUS)
 {
   GET_MYSQL_SESSION(session, 1);
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
   hb_retc(const_cast<char *>(mysql_error(session->dbh)));
 }
 
@@ -492,12 +493,12 @@ HB_FUNC(SR_MYSCLEAR)
 {
   GET_MYSQL_SESSION(session, 1);
 
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
 
   if (session->stmt) {
     mysql_free_result(session->stmt);
-    session->stmt = nullptr;
+    session->stmt = SR_NULLPTR;
     session->ifetch = -2;
   }
 }
@@ -505,24 +506,24 @@ HB_FUNC(SR_MYSCLEAR)
 HB_FUNC(SR_MYSCOLS)
 {
   GET_MYSQL_SESSION(session, 1);
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
   hb_retni(session->numcols);
 }
 
 HB_FUNC(SR_MYSVERS) /* MYSVERS(hConnection) => nVersion */
 {
   GET_MYSQL_SESSION(session, 1);
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
   hb_retnl(static_cast<long>(mysql_get_server_version(session->dbh)));
 }
 
 HB_FUNC(SR_MYSERRMSG)
 {
   GET_MYSQL_SESSION(session, 1);
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
   hb_retc(const_cast<char *>(mysql_error(session->dbh)));
 }
 
@@ -530,8 +531,8 @@ HB_FUNC(SR_MYSCOMMIT)
 {
   GET_MYSQL_SESSION(session, 1);
 
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
 
   if (mysql_commit(session->dbh)) {
     hb_retni(SQL_SUCCESS);
@@ -544,8 +545,8 @@ HB_FUNC(SR_MYSROLLBACK)
 {
   GET_MYSQL_SESSION(session, 1);
 
-  assert(session != nullptr);
-  assert(session->dbh != nullptr);
+  assert(session != SR_NULLPTR);
+  assert(session->dbh != SR_NULLPTR);
 
   if (mysql_rollback(session->dbh)) {
     hb_retni(SQL_SUCCESS);
@@ -561,13 +562,13 @@ HB_FUNC(SR_MYSQUERYATTR)
   }
 
   GET_MYSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
-  assert(session->stmt != nullptr);
+  assert(session->dbh != SR_NULLPTR);
+  assert(session->stmt != SR_NULLPTR);
 
   int rows = session->numcols;
-  auto ret = hb_itemNew(nullptr);
-  auto temp = hb_itemNew(nullptr);
-  auto atemp = hb_itemNew(nullptr);
+  auto ret = hb_itemNew(SR_NULLPTR);
+  auto temp = hb_itemNew(SR_NULLPTR);
+  auto atemp = hb_itemNew(SR_NULLPTR);
 
   hb_arrayNew(ret, rows);
 
@@ -695,7 +696,7 @@ HB_FUNC(SR_MYSTABLEATTR)
   char attcmm[256] = {0};
 
   GET_MYSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
 
   sprintf(attcmm, "select * from %s where 0 = 1", hb_parc(2));
 
@@ -707,9 +708,9 @@ HB_FUNC(SR_MYSTABLEATTR)
     sr_TraceLog(LOGFILE, "Query error : %i - %s\n", mysql_errno(session->dbh), mysql_error(session->dbh));
   }
 
-  auto ret = hb_itemNew(nullptr);
-  auto temp = hb_itemNew(nullptr);
-  auto atemp = hb_itemNew(nullptr);
+  auto ret = hb_itemNew(SR_NULLPTR);
+  auto temp = hb_itemNew(SR_NULLPTR);
+  auto atemp = hb_itemNew(SR_NULLPTR);
 
   int rows = mysql_num_fields(session->stmt);
   hb_arrayNew(ret, rows);
@@ -833,14 +834,14 @@ HB_FUNC(SR_MYSTABLEATTR)
   hb_itemReturnForward(ret);
   hb_itemRelease(ret);
   mysql_free_result(session->stmt);
-  session->stmt = nullptr;
+  session->stmt = SR_NULLPTR;
 }
 
 HB_FUNC(SR_MYSAFFECTEDROWS)
 {
   GET_MYSQL_SESSION(session, 1);
 
-  hb_retnll(session != nullptr ? session->ulAffected_rows : 0);
+  hb_retnll(session != SR_NULLPTR ? session->ulAffected_rows : 0);
 }
 
 //-----------------------------------------------------------------------------//
