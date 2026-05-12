@@ -48,6 +48,7 @@
 #define _INTPTR_T_DEFINED
 #endif
 
+#include "sqlrddpp.h"
 #include "compat.h"
 
 #include "sqlrddsetup.ch"
@@ -99,8 +100,8 @@
 
 #define GET_FB_SESSION(session, numpar) auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(numpar, HB_IT_POINTER)))
 
-static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
-static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = SR_NULLPTR;
+static PHB_DYNS s_pSym_SR_FROMJSON = SR_NULLPTR;
 
 static char isc_tpb[] = {isc_tpb_version3, isc_tpb_write, isc_tpb_read_committed, isc_tpb_rec_version, isc_tpb_nowait};
 
@@ -201,7 +202,7 @@ HB_FUNC(SR_FBCONNECT4)
   session->transactionPending = 0;
 
   for (i = 0, var = session->sqlda->sqlvar; i < MAX_COLUMNS_IN_QUERY; i++, var++) {
-    var->sqldata = nullptr;
+    var->sqldata = SR_NULLPTR;
   }
 
   auto db_connect = hb_parcx(1);
@@ -223,7 +224,7 @@ HB_FUNC(SR_FBCONNECT4)
   memcpy(&(dpb[i]), passwd, len);
   i += len;
 
-  if (charset != nullptr) {
+  if (charset != SR_NULLPTR) {
     dpb[i++] = isc_dpb_lc_ctype;
     len = static_cast<int>(strlen(charset));
     dpb[i++] = static_cast<char>(len);
@@ -500,13 +501,13 @@ HB_FUNC(SR_FBEXECUTE4)
 
   if (!session->sqlda->sqld) {
     // ISC_STATUS r;
-    // if( isc_dsql_execute(session->status, &(session->transac), &(session->stmt), hb_parni(3), nullptr) )
+    // if( isc_dsql_execute(session->status, &(session->transac), &(session->stmt), hb_parni(3), SR_NULLPTR) )
     if (session->queryType == isc_info_sql_stmt_exec_procedure) {
       isc_dsql_execute2(session->status, &(session->transac), &(session->stmt),
-                        static_cast<unsigned short>(hb_parni(3)), nullptr, nullptr);
+                        static_cast<unsigned short>(hb_parni(3)), SR_NULLPTR, SR_NULLPTR);
     } else {
       isc_dsql_execute(session->status, &(session->transac), &(session->stmt), static_cast<unsigned short>(hb_parni(3)),
-                       nullptr);
+                       SR_NULLPTR);
     }
 
     if (CHECK_ERROR(session)) {
@@ -517,7 +518,7 @@ HB_FUNC(SR_FBEXECUTE4)
     // ISC_STATUS r; ,
     if (session->queryType == isc_info_sql_stmt_exec_procedure) {
       isc_dsql_execute2(session->status, &(session->transac), &(session->stmt),
-                        static_cast<unsigned short>(hb_parni(3)), nullptr, session->sqlda);
+                        static_cast<unsigned short>(hb_parni(3)), SR_NULLPTR, session->sqlda);
     } else {
       isc_dsql_execute(session->status, &(session->transac), &(session->stmt), static_cast<unsigned short>(hb_parni(3)),
                        session->sqlda);
@@ -554,11 +555,11 @@ HB_FUNC(SR_FBEXECUTEIMMEDIATE4)
   }
 
   // if( isc_dsql_execute_immediate(session->status, &(session->db), &(session->transac), 0, command, hb_parni(3),
-  // nullptr) ) {
+  // SR_NULLPTR) ) {
   //    ERRORLOGANDEXIT(session, static_cast<char*>(command));
   // }
   isc_dsql_execute_immediate(session->status, &(session->db), &(session->transac), 0, command,
-                             static_cast<unsigned short>(hb_parni(3)), nullptr);
+                             static_cast<unsigned short>(hb_parni(3)), SR_NULLPTR);
 
   if (CHECK_ERROR(session)) {
     ERRORLOGANDEXIT(session, const_cast<char *>(command));
@@ -798,7 +799,7 @@ HB_FUNC(SR_FBGETDATA4)
         hb_snprintf(date_s, sizeof(date_s), "%02d:%02d:%02d.%04d", times.tm_hour, times.tm_min, times.tm_sec,
                     static_cast<int>((*(reinterpret_cast<ISC_TIME *>(var->sqldata))) % 10000));
         // hb_storc(date_s, 3);
-        lMilliSec = hb_timeUnformat(date_s, nullptr); // TOCHECK:
+        lMilliSec = hb_timeUnformat(date_s, SR_NULLPTR); // TOCHECK:
         // hb_itemPutTDT(pItem, 0, lMilliSec);
         hb_stortdt(0, lMilliSec, 3); // TOCHECK:
         break;
@@ -872,7 +873,7 @@ HB_FUNC(SR_FBGETDATA4)
       case IB_SQL_ARRAY:
       case IB_SQL_QUAD: {
         blob_id = reinterpret_cast<ISC_QUAD *>(var->sqldata);
-        if (isc_open_blob2(session->status, &(session->db), &(session->transac), &blob_handle, blob_id, 0, nullptr)) {
+        if (isc_open_blob2(session->status, &(session->db), &(session->transac), &blob_handle, blob_id, 0, SR_NULLPTR)) {
           ERRORLOGANDEXIT(session, "FBGETDATA1");
         }
         if (isc_blob_info(session->status, &blob_handle, sizeof(blob_items), blob_items, sizeof(res_buffer),
@@ -980,7 +981,7 @@ HB_FUNC(SR_FBCREATEDB4)
       hb_snprintf(create_db, sizeof(create_db), "CREATE DATABASE '%s' USER '%s' PASSWORD '%s'", db_name, username, passwd /*, page, charset*/);
    }
 
-   if( isc_dsql_execute_immediate(reinterpret_cast<ISC_STATUS*>(status), &newdb, &trans, 0, create_db, static_cast<unsigned short>(dialect), nullptr) ) {
+   if( isc_dsql_execute_immediate(reinterpret_cast<ISC_STATUS*>(status), &newdb, &trans, 0, create_db, static_cast<unsigned short>(dialect), SR_NULLPTR) ) {
       hb_retni(SQL_ERROR);
       sr_TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
    } else {
@@ -1033,7 +1034,7 @@ HB_FUNC(SR_FBCREATEDB4)
   }
 
   if (isc_dsql_execute_immediate(reinterpret_cast<ISC_STATUS *>(status), &newdb, &trans, 0, sql.c_str(), dialect,
-                                 nullptr)) {
+                                 SR_NULLPTR)) {
     hb_retni(SQL_ERROR);
     sr_TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
   } else {
@@ -1171,16 +1172,16 @@ static void FBFieldGet4(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE 
       PHB_ITEM pTemp;
       if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
           (sr_lSerializeArrayAsJson())) {
-        if (s_pSym_SR_FROMJSON == nullptr) {
+        if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
           s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-          if (s_pSym_SR_FROMJSON == nullptr) {
+          if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
             printf("Could not find Symbol HB_JSONDECODE\n");
           }
         }
         hb_vmPushDynSym(s_pSym_SR_FROMJSON);
         hb_vmPushNil();
         hb_vmPushString(bBuffer, lLenBuff);
-        pTemp = hb_itemNew(nullptr);
+        pTemp = hb_itemNew(SR_NULLPTR);
         hb_vmPush(pTemp);
         hb_vmDo(2);
         /* TOFIX: What this code should do ???
@@ -1190,9 +1191,9 @@ static void FBFieldGet4(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE 
         hb_itemMove(pItem, pTemp);
         hb_itemRelease(pTemp);
       } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
-        if (s_pSym_SR_DESERIALIZE == nullptr) {
+        if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
           s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-          if (s_pSym_SR_DESERIALIZE == nullptr) {
+          if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
             printf("Could not find Symbol SR_DESERIALIZE\n");
           }
         }
@@ -1200,10 +1201,10 @@ static void FBFieldGet4(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE 
         hb_vmPushNil();
         hb_vmPushString(bBuffer, lLenBuff);
         hb_vmDo(1);
-        pTemp = hb_itemNew(nullptr);
+        pTemp = hb_itemNew(SR_NULLPTR);
         hb_itemMove(pTemp, hb_stackReturnItem());
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
-          auto pLangItem = hb_itemNew(nullptr);
+          auto pLangItem = hb_itemNew(SR_NULLPTR);
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos) ||
@@ -1238,7 +1239,7 @@ static void FBFieldGet4(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE 
 #endif
     case SQL_TIME: {
       long lMilliSec;
-      lMilliSec = hb_timeUnformat(bBuffer, nullptr); // TOCHECK:
+      lMilliSec = hb_timeUnformat(bBuffer, SR_NULLPTR); // TOCHECK:
       hb_itemPutTDT(pItem, 0, lMilliSec);
       break;
     }
@@ -1295,7 +1296,7 @@ HB_FUNC(SR_FBLINEPROCESSED4)
 
     for (icol = 1; icol <= cols; icol++) {
       // HB_LONG lType;
-      temp = hb_itemNew(nullptr);
+      temp = hb_itemNew(SR_NULLPTR);
       var = session->sqlda->sqlvar;
       lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, icol), FIELD_ENUM);
       // lType = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, icol), 6);
@@ -1452,7 +1453,7 @@ HB_FUNC(SR_FBLINEPROCESSED4)
           case IB_SQL_QUAD: {
             blob_id = reinterpret_cast<ISC_QUAD *>(var->sqldata);
             if (isc_open_blob2(session->status, &(session->db), &(session->transac), &blob_handle, blob_id, 0,
-                               nullptr)) {
+                               SR_NULLPTR)) {
               ERRORLOGANDEXIT(session, "FBGETDATA1");
             }
             if (isc_blob_info(session->status, &blob_handle, sizeof(blob_items), blob_items, sizeof(res_buffer),
