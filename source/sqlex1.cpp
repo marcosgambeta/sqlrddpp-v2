@@ -4070,23 +4070,18 @@ HB_FUNC(SQLEX)
 
 HB_FUNC(SQLEX_GETFUNCTABLE)
 {
-  RDDFUNCS *pTable;
-  HB_USHORT *uiCount;
-
   // startSQLEXSymbols();
 
-  uiCount = static_cast<HB_USHORT *>(hb_parptr(1));
-  pTable = static_cast<RDDFUNCS *>(hb_parptr(2));
+  auto uiCount = static_cast<HB_USHORT *>(hb_parptr(1));
+  auto pTable = static_cast<RDDFUNCS *>(hb_parptr(2));
 
   HB_TRACE(HB_TR_DEBUG, ("SQLEX_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
   if (pTable) {
-    HB_ERRCODE errCode;
-
     if (uiCount) {
       *uiCount = RDDFUNCSCOUNT;
     }
-    errCode = hb_rddInherit(pTable, &sqlTable, &sqlExSuper, static_cast<const char *>("SQLRDD"));
+    HB_ERRCODE errCode = hb_rddInherit(pTable, &sqlTable, &sqlExSuper, static_cast<const char *>("SQLRDD"));
     hb_retni(errCode);
   } else {
     hb_retni(HB_FAILURE);
@@ -4102,11 +4097,10 @@ HB_FUNC(SQLEX_GETFUNCTABLE)
 
 static void hb_sqlExRddInit(void *cargo)
 {
-  HB_USHORT usResult;
   HB_SYMBOL_UNUSED(cargo);
 
   if (hb_rddRegister("SQLRDD", RDT_FULL) <= 1) {
-    usResult = static_cast<HB_USHORT>(hb_rddRegister("SQLEX", RDT_FULL));
+    auto usResult = static_cast<HB_USHORT>(hb_rddRegister("SQLEX", RDT_FULL));
     if (usResult <= 1) {
       if (usResult == 0) {
         HB_FUNC_EXEC(SR_INIT);
