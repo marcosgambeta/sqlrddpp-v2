@@ -80,9 +80,7 @@ static void startSQLRDDSymbols(void);
 static bool ProcessFields(SQLAREAP ThisDb);
 static bool SetFields(SQLAREAP ThisDb);
 
-/*
-static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder);
-*/
+// static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder);
 HB_EXTERN_BEGIN
 PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG *lorder);
 HB_EXTERN_END
@@ -91,7 +89,7 @@ HB_FUNC_EXTERN(SR_END);
 HB_FUNC_EXTERN(SR_INIT);
 HB_FUNC_EXTERN(__SR_STARTSQL);
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static PHB_DYNS s_pSym_SQLGOBOTTOM;
 static PHB_DYNS s_pSym_SQLGOTO;
@@ -134,7 +132,7 @@ static PHB_DYNS s_pSym_SQLINIT = nullptr;
 static PHB_DYNS s_pSym_SQLEXIT = nullptr;
 static PHB_DYNS s_pSym_WORKAREA = nullptr;
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static void fixCachePointer(HB_LONG *lPosCache)
 {
@@ -145,7 +143,7 @@ static void fixCachePointer(HB_LONG *lPosCache)
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 HB_FUNC(SR_FIXCACHEPOINTER)
 {
@@ -154,7 +152,7 @@ HB_FUNC(SR_FIXCACHEPOINTER)
   hb_retnl(lPos);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static bool isCachePointerInRange(HB_LONG lPosCache, HB_LONG lBegin, HB_LONG lEnd)
 {
@@ -167,7 +165,7 @@ static bool isCachePointerInRange(HB_LONG lPosCache, HB_LONG lBegin, HB_LONG lEn
   return (lPosCache >= lBegin || lPosCache <= lEnd);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static HB_LONG searchCacheFWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 {
@@ -195,7 +193,7 @@ static HB_LONG searchCacheFWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
   return 0;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static HB_LONG searchCacheBWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 {
@@ -223,7 +221,7 @@ static HB_LONG searchCacheBWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
   return 0;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static void readCachePageFWD(SQLAREAP thiswa)
 {
@@ -236,7 +234,7 @@ static void readCachePageFWD(SQLAREAP thiswa)
   hb_itemRelease(pDel);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static void readCachePageBWD(SQLAREAP thiswa)
 {
@@ -249,7 +247,7 @@ static void readCachePageBWD(SQLAREAP thiswa)
   hb_itemRelease(pDel);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 {
@@ -288,7 +286,7 @@ static void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
   hb_itemRelease(pCol);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
 {
@@ -323,7 +321,7 @@ static void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
   hb_arraySetNL(thiswa->aInfo, AINFO_NPOSCACHE, lPos);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static void sqlGetCleanBuffer(SQLAREAP thiswa)
 {
@@ -346,7 +344,7 @@ static void sqlGetCleanBuffer(SQLAREAP thiswa)
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_BP)
 static HB_ERRCODE sqlBof(SQLAREAP thiswa, HB_BOOL *bof) // RDDFUNC
@@ -367,7 +365,7 @@ static HB_ERRCODE sqlBof(SQLAREAP thiswa, HB_BOOL *bof) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_BP)
 static HB_ERRCODE sqlEof(SQLAREAP thiswa, HB_BOOL *eof) // RDDFUNC
@@ -392,7 +390,7 @@ static HB_ERRCODE sqlEof(SQLAREAP thiswa, HB_BOOL *eof) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_BP)
 static HB_ERRCODE sqlFound(SQLAREAP thiswa, HB_BOOL *found) // RDDFUNC
@@ -409,7 +407,7 @@ static HB_ERRCODE sqlFound(SQLAREAP thiswa, HB_BOOL *found) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa) // RDDFUNC
@@ -450,7 +448,7 @@ static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa) // RDDFUNC
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_UL)
 // TODO: HB_LONG -> HB_ULONG
@@ -458,7 +456,7 @@ static HB_ERRCODE sqlGoTo(SQLAREAP thiswa, HB_LONG recno) // RDDFUNC
 {
   // sr_TraceLog(nullptr, "sqlGoTo %i\n", recno);
 
-  /* Reset parent rel struct */
+  // Reset parent rel struct
   thiswa->lpdbPendingRel = nullptr;
   thiswa->firstinteract = false;
   thiswa->wasdel = false;
@@ -476,7 +474,7 @@ static HB_ERRCODE sqlGoTo(SQLAREAP thiswa, HB_LONG recno) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_I)
 static HB_ERRCODE sqlGoToId(SQLAREAP thiswa, PHB_ITEM pItem) // RDDFUNC
@@ -505,7 +503,7 @@ static HB_ERRCODE sqlGoToId(SQLAREAP thiswa, PHB_ITEM pItem) // RDDFUNC
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlGoTop(SQLAREAP thiswa) // RDDFUNC
@@ -544,7 +542,7 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa) // RDDFUNC
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact) // TODO: static ?
 {
@@ -635,7 +633,7 @@ int sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact) // TODO: static ?
   return iResult;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_BIB)
 static HB_ERRCODE sqlSeek(SQLAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_BOOL bFindLast) // RDDFUNC
@@ -706,7 +704,7 @@ static HB_ERRCODE sqlSeek(SQLAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_L)
 static HB_ERRCODE sqlSkip(SQLAREAP thiswa, HB_LONG lToSkip) // RDDFUNC
@@ -737,7 +735,7 @@ static HB_ERRCODE sqlSkip(SQLAREAP thiswa, HB_LONG lToSkip) // RDDFUNC
   return ret;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_L)
 static HB_ERRCODE sqlSkipFilter(SQLAREAP thiswa, HB_LONG lUpDown) // RDDFUNC
@@ -762,7 +760,7 @@ static HB_ERRCODE sqlSkipFilter(SQLAREAP thiswa, HB_LONG lUpDown) // RDDFUNC
       break;
     }
 
-    /* SET FILTER TO */
+    // SET FILTER TO
     if (thiswa->area.dbfi.itmCobExpr) {
       pResult = hb_vmEvalBlock(thiswa->area.dbfi.itmCobExpr);
       if (HB_IS_LOGICAL(pResult) && !hb_itemGetL(pResult)) {
@@ -771,7 +769,7 @@ static HB_ERRCODE sqlSkipFilter(SQLAREAP thiswa, HB_LONG lUpDown) // RDDFUNC
       }
     }
 
-    /* SET DELETED */
+    // SET DELETED
     if (hb_setGetDeleted()) {
       SELF_DELETED(&thiswa->area, &bDeleted);
       if (bDeleted) {
@@ -799,19 +797,19 @@ static HB_ERRCODE sqlSkipFilter(SQLAREAP thiswa, HB_LONG lUpDown) // RDDFUNC
   return uiError;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static HB_ERRCODE ConcludeSkipraw(SQLAREAP thiswa, HB_LONG lToSkip)
 {
-  /*
-     if( lToSkip != 0 ) {
-        thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
-        thiswa->area.fEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
-     }
-  */
+#if 0
+  if (lToSkip != 0) {
+     thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
+     thiswa->area.fEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
+  }
+#endif
   HB_SYMBOL_UNUSED(lToSkip);
 
-  /* Force relational movement in child WorkAreas */
+  // Force relational movement in child WorkAreas
 
   if (thiswa->area.lpdbRelations) {
     return SELF_SYNCCHILDREN(&thiswa->area);
@@ -820,7 +818,7 @@ static HB_ERRCODE ConcludeSkipraw(SQLAREAP thiswa, HB_LONG lToSkip)
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_L)
 static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip) // RDDFUNC
@@ -1019,12 +1017,12 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip) // RDDFUNC
   return ConcludeSkipraw(thiswa, lToSkip);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VF)
 #define sqlAddField nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_B)
 static HB_ERRCODE sqlAppend(SQLAREAP thiswa, HB_BOOL value) // RDDFUNC
@@ -1033,7 +1031,7 @@ static HB_ERRCODE sqlAppend(SQLAREAP thiswa, HB_BOOL value) // RDDFUNC
 
   // sr_TraceLog(nullptr, "sqlAppend\n");
 
-  /* Reset parent rel struct */
+  // Reset parent rel struct
   thiswa->lpdbPendingRel = nullptr;
   thiswa->firstinteract = false;
   thiswa->wasdel = false;
@@ -1057,7 +1055,7 @@ static HB_ERRCODE sqlAppend(SQLAREAP thiswa, HB_BOOL value) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_I)
 static HB_ERRCODE sqlCreateFields(SQLAREAP thiswa, PHB_ITEM pStruct) // RDDFUNC
@@ -1066,7 +1064,7 @@ static HB_ERRCODE sqlCreateFields(SQLAREAP thiswa, PHB_ITEM pStruct) // RDDFUNC
   return SUPER_CREATEFIELDS(&thiswa->area, pStruct);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlDeleteRec(SQLAREAP thiswa) // RDDFUNC
@@ -1089,7 +1087,7 @@ static HB_ERRCODE sqlDeleteRec(SQLAREAP thiswa) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_BP)
 static HB_ERRCODE sqlDeleted(SQLAREAP thiswa, HB_BOOL *isDeleted) // RDDFUNC
@@ -1108,7 +1106,7 @@ static HB_ERRCODE sqlDeleted(SQLAREAP thiswa, HB_BOOL *isDeleted) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SP)
 static HB_ERRCODE sqlFieldCount(SQLAREAP thiswa, HB_USHORT *fieldCount) // RDDFUNC
@@ -1118,7 +1116,7 @@ static HB_ERRCODE sqlFieldCount(SQLAREAP thiswa, HB_USHORT *fieldCount) // RDDFU
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VF)
 #define sqlFieldDisplay nullptr
@@ -1127,7 +1125,7 @@ static HB_ERRCODE sqlFieldCount(SQLAREAP thiswa, HB_USHORT *fieldCount) // RDDFU
 // (DBENTRYP_SCP)
 #define sqlFieldName nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlFlush(SQLAREAP thiswa) // RDDFUNC
@@ -1137,12 +1135,12 @@ static HB_ERRCODE sqlFlush(SQLAREAP thiswa) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_PP)
-#define sqlGetRec nullptr /* leave it unUsed */
+#define sqlGetRec nullptr // leave it unUsed
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM value) // RDDFUNC
@@ -1223,12 +1221,11 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
       hb_itemRelease(pLangItem);
     }
   } else {
-    /*
-    if( HB_IS_NIL(itemTemp) ) {
-       sr_TraceLog(nullptr, "Empty buffer found at position %i, fieldpos %i\n",
-    static_cast<int>(thiswa->uiBufferIndex[fieldNum - 1]), static_cast<int>(fieldNum));
+#if 0
+    if (HB_IS_NIL(itemTemp)) {
+      sr_TraceLog(nullptr, "Empty buffer found at position %i, fieldpos %i\n", static_cast<int>(thiswa->uiBufferIndex[fieldNum - 1]), static_cast<int>(fieldNum));
     }
-    */
+#endif
 #ifndef HB_CDP_SUPPORT_OFF
     LPFIELD pField_ = thiswa->area.lpFields + fieldNum - 1;
     if (pField_->uiType == HB_FT_STRING) {
@@ -1246,12 +1243,12 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SVL)
 #define sqlGetVarLen nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlGoCold(SQLAREAP thiswa) // RDDFUNC
@@ -1262,14 +1259,14 @@ static HB_ERRCODE sqlGoCold(SQLAREAP thiswa) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 #define sqlGoHot nullptr
 // (DBENTRYP_P)
 #define sqlPutRec nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM value) // RDDFUNC
@@ -1323,12 +1320,13 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
 
   pField = thiswa->area.lpFields + fieldNum - 1;
 
-  /* test compatible datatypes */
-  // if (HB_IS_TIMESTAMP(value)) //|| HB_IS_DATE(pDest))
-  //{
-  // bOk = false;
-  // hb_arraySet(thiswa->aBuffer, fieldindex, value);
-  //}
+  // test compatible datatypes
+#if 0
+  if (HB_IS_TIMESTAMP(value)) { //|| HB_IS_DATE(pDest))
+    bOk = false;
+    hb_arraySet(thiswa->aBuffer, fieldindex, value);
+  }
+#endif
   if ((HB_IS_NUMBER(pDest) && HB_IS_NUMBER(value)) || (HB_IS_STRING(pDest) && HB_IS_STRING(value)) ||
       (HB_IS_LOGICAL(pDest) && HB_IS_LOGICAL(value)) || (HB_IS_DATE(pDest) && HB_IS_DATE(value)) ||
       (HB_IS_TIMESTAMP(pDest) && HB_IS_DATETIME(value)) || (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value))) {
@@ -1389,7 +1387,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlRecall(SQLAREAP thiswa) // RDDFUNC
@@ -1408,7 +1406,7 @@ static HB_ERRCODE sqlRecall(SQLAREAP thiswa) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_ULP)
 static HB_ERRCODE sqlRecCount(SQLAREAP thiswa, HB_ULONG *recCount) // RDDFUNC
@@ -1428,12 +1426,12 @@ static HB_ERRCODE sqlRecCount(SQLAREAP thiswa, HB_ULONG *recCount) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_ISI)
 #define sqlRecInfo nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_ULP)
 static HB_ERRCODE sqlRecNo(SQLAREAP thiswa, HB_ULONG *recno) // RDDFUNC
@@ -1458,7 +1456,7 @@ static HB_ERRCODE sqlRecNo(SQLAREAP thiswa, HB_ULONG *recno) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_I)
 static HB_ERRCODE sqlRecId(SQLAREAP thiswa, PHB_ITEM recno) // RDDFUNC
@@ -1481,7 +1479,7 @@ static HB_ERRCODE sqlRecId(SQLAREAP thiswa, PHB_ITEM recno) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_S)
 static HB_ERRCODE sqlSetFieldExtent(SQLAREAP thiswa, HB_USHORT uiFieldExtent)// RDDFUNC
@@ -1509,12 +1507,12 @@ static HB_ERRCODE sqlSetFieldExtent(SQLAREAP thiswa, HB_USHORT uiFieldExtent)// 
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_CP)
 #define sqlAlias nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlClose(SQLAREAP thiswa) // RDDFUNC
@@ -1523,7 +1521,7 @@ static HB_ERRCODE sqlClose(SQLAREAP thiswa) // RDDFUNC
 
   // sr_TraceLog(nullptr, "sqlClose\n");
 
-  /* Reset parent rel struct */
+  // Reset parent rel struct
   thiswa->lpdbPendingRel = nullptr;
 
   if (thiswa->oWorkArea && HB_IS_OBJECT(thiswa->oWorkArea)) {
@@ -1534,12 +1532,13 @@ static HB_ERRCODE sqlClose(SQLAREAP thiswa) // RDDFUNC
 
   uiError = SUPER_CLOSE(&thiswa->area);
 
-  /*
-     else {
-        commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
-        return HB_FAILURE;
-     }
-  */
+#if 0
+  else {
+    commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
+    return HB_FAILURE;
+  }
+#endif
+
   // Release the used objects
 
   hb_itemRelease(thiswa->aStruct);
@@ -1574,7 +1573,7 @@ static HB_ERRCODE sqlClose(SQLAREAP thiswa) // RDDFUNC
   return uiError;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VO)
 static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo) // RDDFUNC
@@ -1604,7 +1603,7 @@ static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo) // RDDFUN
 
   //   thiswa->valResult = nullptr;
 
-  /* Create and run class object */
+  // Create and run class object
   hb_vmPushDynSym(s_pSym_WORKAREA);
   hb_vmPushNil();
   hb_vmDo(0);
@@ -1656,7 +1655,7 @@ static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo) // RDDFUN
     return HB_FAILURE;
   }
 
-  /* If successful call SUPER_CREATE to finish system jobs */
+  // If successful call SUPER_CREATE to finish system jobs
   errCode = SUPER_CREATE(&thiswa->area, pCreateInfo);
 
   hb_objSendMsg(thiswa->oWorkArea, "LISAM", 0);
@@ -1681,7 +1680,7 @@ static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo) // RDDFUN
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem) // RDDFUNC
@@ -1817,7 +1816,7 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem) //
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static void startSQLRDDSymbols()
 {
@@ -1935,7 +1934,7 @@ static void startSQLRDDSymbols()
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlNewArea(SQLAREAP thiswa) // RDDFUNC
@@ -1949,7 +1948,7 @@ static HB_ERRCODE sqlNewArea(SQLAREAP thiswa) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VO)
 static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo) // RDDFUNC
@@ -1969,7 +1968,7 @@ static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo) // RDDFUNC
   thiswa->szDataFileName = static_cast<char *>(hb_xgrab(strlen(const_cast<char *>(pOpenInfo->abName)) + 1));
   strcpy(thiswa->szDataFileName, const_cast<char *>(pOpenInfo->abName));
 
-  /* Create default alias if necessary */
+  // Create default alias if necessary
   if (!pOpenInfo->atomAlias) {
     PHB_FNAME pFileName;
     pFileName = hb_fsFNameSplit(const_cast<char *>(pOpenInfo->abName));
@@ -2093,29 +2092,29 @@ static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 #define sqlRelease nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SP)
 static HB_ERRCODE sqlStructSize(SQLAREAP thiswa, HB_USHORT *StructSize) // RDDFUNC
 {
-  HB_SYMBOL_UNUSED(thiswa); /* Avoid compiler warning */
+  HB_SYMBOL_UNUSED(thiswa); // Avoid compiler warning
   *StructSize = sizeof(SQLAREA);
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_CP)
 #define sqlSysName nullptr
 // (DBENTRYP_VEI)
 #define sqlEval nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlPack(SQLAREAP thiswa) // RDDFUNC
@@ -2126,7 +2125,7 @@ static HB_ERRCODE sqlPack(SQLAREAP thiswa) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_LSP)
 #define sqlPackRec nullptr
@@ -2137,7 +2136,7 @@ static HB_ERRCODE sqlPack(SQLAREAP thiswa) // RDDFUNC
 // (DBENTRYP_VT)
 #define sqlTransRec nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlZap(SQLAREAP thiswa) // RDDFUNC
@@ -2154,7 +2153,7 @@ static HB_ERRCODE sqlZap(SQLAREAP thiswa) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VR)
 static HB_ERRCODE sqlChildEnd(SQLAREAP thiswa, LPDBRELINFO pRelInfo) // RDDFUNC
@@ -2174,7 +2173,7 @@ static HB_ERRCODE sqlChildEnd(SQLAREAP thiswa, LPDBRELINFO pRelInfo) // RDDFUNC
   return uiError;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VR)
 static HB_ERRCODE sqlChildStart(SQLAREAP thiswa, LPDBRELINFO pRelInfo) // RDDFUNC
@@ -2192,7 +2191,7 @@ static HB_ERRCODE sqlChildStart(SQLAREAP thiswa, LPDBRELINFO pRelInfo) // RDDFUN
   return SUPER_CHILDSTART(&thiswa->area, pRelInfo);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VR)
 static HB_ERRCODE sqlChildSync(SQLAREAP thiswa, LPDBRELINFO pRelInfo) // RDDFUNC
@@ -2207,17 +2206,17 @@ static HB_ERRCODE sqlChildSync(SQLAREAP thiswa, LPDBRELINFO pRelInfo) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 #define sqlSyncChildren nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 #define sqlClearRel nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlForceRel(SQLAREAP thiswa) // RDDFUNC
@@ -2238,7 +2237,7 @@ static HB_ERRCODE sqlForceRel(SQLAREAP thiswa) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SSP)
 #define sqlRelArea nullptr
@@ -2249,7 +2248,7 @@ static HB_ERRCODE sqlForceRel(SQLAREAP thiswa) // RDDFUNC
 // (DBENTRYP_VR)
 #define sqlSetRel nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VOI)
 static HB_ERRCODE sqlOrderListAdd(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo) // RDDFUNC
@@ -2284,7 +2283,7 @@ static HB_ERRCODE sqlOrderListAdd(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo) // 
   return HB_FAILURE;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlOrderListClear(SQLAREAP thiswa) // RDDFUNC
@@ -2301,12 +2300,12 @@ static HB_ERRCODE sqlOrderListClear(SQLAREAP thiswa) // RDDFUNC
   return HB_FAILURE;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VOI)
 #define sqlOrderListDelete nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VOI)
 static HB_ERRCODE sqlOrderListFocus(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo) // RDDFUNC
@@ -2337,12 +2336,12 @@ static HB_ERRCODE sqlOrderListFocus(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo) /
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 #define sqlOrderListRebuild nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VOO)
 static HB_ERRCODE sqlOrderCondition(SQLAREAP thiswa, LPDBORDERCONDINFO lpdbOrdCondInfo) // RDDFUNC
@@ -2388,7 +2387,7 @@ static HB_ERRCODE sqlOrderCondition(SQLAREAP thiswa, LPDBORDERCONDINFO lpdbOrdCo
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VOC)
 static HB_ERRCODE sqlOrderCreate(SQLAREAP thiswa, LPDBORDERCREATEINFO pOrderInfo) // RDDFUNC
@@ -2427,7 +2426,7 @@ static HB_ERRCODE sqlOrderCreate(SQLAREAP thiswa, LPDBORDERCREATEINFO pOrderInfo
   return HB_FAILURE;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VOI)
 static HB_ERRCODE sqlOrderDestroy(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo) // RDDFUNC
@@ -2464,29 +2463,31 @@ static HB_ERRCODE sqlOrderDestroy(SQLAREAP thiswa, LPDBORDERINFO pOrderInfo) // 
   return HB_FAILURE;
 }
 
-/*------------------------------------------------------------------------*/
-/*
-static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
+//------------------------------------------------------------------------
+
+#if 0
+static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG *lorder)
 {
-   PHB_ITEM pTag = nullptr;
+  PHB_ITEM pTag = nullptr;
 
-   if( pInfo && pInfo->itmOrder ) {
-      if( HB_IS_OBJECT(thiswa->oWorkArea) ) {
-         hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTNUM, 1, pInfo->itmOrder);
-      } else {
-         commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
-         return nullptr;
-      }
+  if (pInfo && pInfo->itmOrder) {
+    if (HB_IS_OBJECT(thiswa->oWorkArea)) {
+      hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTNUM, 1, pInfo->itmOrder);
+    } else {
+      commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, nullptr);
+      return nullptr;
+    }
 
-      if( hb_itemGetNL(hb_stackReturnItem()) ) {
-         *lorder = hb_itemGetNL(hb_stackReturnItem());
-         pTag = hb_itemArrayGet(thiswa->aOrders, static_cast<HB_ULONG>(*lorder));
-      }
-   }
-   return pTag;
+    if (hb_itemGetNL(hb_stackReturnItem())) {
+      *lorder = hb_itemGetNL(hb_stackReturnItem());
+      pTag = hb_itemArrayGet(thiswa->aOrders, static_cast<HB_ULONG>(*lorder));
+    }
+  }
+  return pTag;
 }
-*/
-/*------------------------------------------------------------------------*/
+#endif
+
+//------------------------------------------------------------------------
 
 PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG *lorder)
 {
@@ -2533,7 +2534,7 @@ PHB_ITEM loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG *lorder)
   return pTag;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static HB_ERRCODE sqlSetServerSideIndexScope(SQLAREAP thiswa, int nScope, PHB_ITEM scopeValue)
 {
@@ -2553,7 +2554,7 @@ static HB_ERRCODE sqlSetServerSideIndexScope(SQLAREAP thiswa, int nScope, PHB_IT
   return (res == 0) ? HB_SUCCESS : HB_FAILURE;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SVOI)
 static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO pInfo) // RDDFUNC
@@ -2576,7 +2577,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
 
   lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
 
-  if (lIndexes) { /* Exists opened orders ? */
+  if (lIndexes) { // Exists opened orders ?
     switch (uiIndex) {
     case DBOI_KEYCOUNTRAW: {
       HB_ULONG ulRecCount = 0;
@@ -2841,7 +2842,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 static HB_ERRCODE sqlClearFilter(SQLAREAP thiswa) // RDDFUNC
@@ -2853,22 +2854,22 @@ static HB_ERRCODE sqlClearFilter(SQLAREAP thiswa) // RDDFUNC
   return SUPER_CLEARFILTER(&thiswa->area);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 #define sqlClearLocate nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 #define sqlClearScope nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VPLP)
 #define sqlCountScope nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_I)
 static HB_ERRCODE sqlFilterText(SQLAREAP thiswa, PHB_ITEM pFilter) // RDDFUNC
@@ -2882,7 +2883,7 @@ static HB_ERRCODE sqlFilterText(SQLAREAP thiswa, PHB_ITEM pFilter) // RDDFUNC
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem) // RDDFUNC
@@ -2895,7 +2896,7 @@ static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem
   hb_itemClear(pItem);
   lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
 
-  if (lIndexes) { /* Exists opened orders ? */
+  if (lIndexes) { // Exists opened orders ?
     if (HB_IS_OBJECT(thiswa->oWorkArea)) {
       auto pOrder = hb_itemNew(nullptr);
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLORDERLISTNUM, 1, pOrder);
@@ -2916,7 +2917,7 @@ static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VFI)
 static HB_ERRCODE sqlSetFilter(SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo) // RDDFUNC
@@ -2947,12 +2948,12 @@ static HB_ERRCODE sqlSetFilter(SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo) // R
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VLO)
 #define sqlSetLocate nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VOS)
 static HB_ERRCODE sqlSetScope(SQLAREAP thiswa, LPDBORDSCOPEINFO sInfo) // RDDFUNC
@@ -2987,12 +2988,12 @@ static HB_ERRCODE sqlSetScope(SQLAREAP thiswa, LPDBORDSCOPEINFO sInfo) // RDDFUN
   return (res == 0) ? HB_SUCCESS : HB_FAILURE;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VPL)
 #define sqlSkipScope nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_B)
 static HB_ERRCODE sqlLocate(SQLAREAP thiswa, HB_BOOL fContinue) // RDDFUNC
@@ -3005,7 +3006,7 @@ static HB_ERRCODE sqlLocate(SQLAREAP thiswa, HB_BOOL fContinue) // RDDFUNC
   return err;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_CC)
 #define sqlCompile nullptr
@@ -3016,7 +3017,7 @@ static HB_ERRCODE sqlLocate(SQLAREAP thiswa, HB_BOOL fContinue) // RDDFUNC
 // (DBENTRYP_VSP)
 #define sqlRawLock nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_VL)
 static HB_ERRCODE sqlLock(SQLAREAP thiswa, LPDBLOCKINFO pLockInfo)
@@ -3069,7 +3070,7 @@ static HB_ERRCODE sqlLock(SQLAREAP thiswa, LPDBLOCKINFO pLockInfo)
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_I)
 static HB_ERRCODE sqlUnLock(SQLAREAP thiswa, PHB_ITEM pRecNo)
@@ -3088,7 +3089,7 @@ static HB_ERRCODE sqlUnLock(SQLAREAP thiswa, PHB_ITEM pRecNo)
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_V)
 #define sqlCloseMemFile nullptr
@@ -3107,7 +3108,7 @@ static HB_ERRCODE sqlUnLock(SQLAREAP thiswa, PHB_ITEM pRecNo)
 // (DBENTRYP_R)
 #define sqlInit nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_R)
 static HB_ERRCODE sqlExit(LPRDDNODE pRDD) // RDDFUNC
@@ -3124,7 +3125,7 @@ static HB_ERRCODE sqlExit(LPRDDNODE pRDD) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_RVVL)
 static HB_ERRCODE sqlDrop(PHB_ITEM pItemTable) // RDDFUNC
@@ -3145,8 +3146,8 @@ static HB_ERRCODE sqlDrop(PHB_ITEM pItemTable) // RDDFUNC
   return HB_SUCCESS;
 }
 
-/* returns 1 if exists, 0 else */
-/*------------------------------------------------------------------------*/
+// returns 1 if exists, 0 else
+//------------------------------------------------------------------------
 
 // (DBENTRYP_RVVL)
 static HB_BOOL sqlExists(PHB_ITEM pItemTable, PHB_ITEM pItemIndex) // RDDFUNC
@@ -3173,12 +3174,12 @@ static HB_BOOL sqlExists(PHB_ITEM pItemTable, PHB_ITEM pItemIndex) // RDDFUNC
   return hb_itemGetL(hb_stackReturnItem());
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_RVVVL)
 #define sqlRename nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_RSLV)
 static HB_ERRCODE sqlRddInfo(LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConnect, PHB_ITEM pItem) // RDDFUNC
@@ -3207,12 +3208,12 @@ static HB_ERRCODE sqlRddInfo(LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConne
   return HB_SUCCESS;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // (DBENTRYP_SVP)
 #define sqlWhoCares nullptr
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static bool ProcessFields(SQLAREAP thiswa)
 {
@@ -3242,7 +3243,7 @@ static bool ProcessFields(SQLAREAP thiswa)
       return false;
     }
 
-    /* Clear out the field */
+    // Clear out the field
     memset(&field, 0, sizeof(field));
 
     field.uiTypeExtended = 0;
@@ -3320,7 +3321,7 @@ static bool ProcessFields(SQLAREAP thiswa)
   return true;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 static bool SetFields(SQLAREAP thiswa)
 {
@@ -3353,7 +3354,7 @@ static bool SetFields(SQLAREAP thiswa)
   return true;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 void commonError(AREAP thiswa, HB_USHORT uiGenCode, HB_USHORT uiSubCode, const char *filename)
 {
@@ -3381,10 +3382,9 @@ void commonError(AREAP thiswa, HB_USHORT uiGenCode, HB_USHORT uiSubCode, const c
   return;
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
-HB_FUNC(ITEMCMP) /* ITEMCMP(cItem1, cItem2, nLenToCompare) ==> 0 == identical, < 0 if cItem1 < cIten2, > 0 == cItem1 >
-                    cIten2 */
+HB_FUNC(ITEMCMP) // ITEMCMP(cItem1, cItem2, nLenToCompare) ==> 0 == identical, < 0 if cItem1 < cIten2, > 0 == cItem1 > cIten2
 {
   int ret;
 
@@ -3395,7 +3395,7 @@ HB_FUNC(ITEMCMP) /* ITEMCMP(cItem1, cItem2, nLenToCompare) ==> 0 == identical, <
   hb_retni(ret);
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 HB_BOOL iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2) // TODO: static ?
 {
@@ -3416,7 +3416,7 @@ HB_BOOL iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2) // TODO: static ?
   }
 }
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 #ifdef _WIN32
 
@@ -3435,12 +3435,12 @@ HB_FUNC(SR_GETCURRINSTANCEID)
 
 #endif
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 // clang-format off
 static const RDDFUNCS sqlTable = {
 
-  /* Movement and positioning methods */
+  // Movement and positioning methods
 
   (DBENTRYP_BP)sqlBof,
   (DBENTRYP_BP)sqlEof,
@@ -3454,7 +3454,7 @@ static const RDDFUNCS sqlTable = {
   (DBENTRYP_L)sqlSkipFilter,
   (DBENTRYP_L)sqlSkipRaw,
 
-  /* Data management */
+  // Data management
 
   (DBENTRYP_VF)sqlAddField,
   (DBENTRYP_B)sqlAppend,
@@ -3480,7 +3480,7 @@ static const RDDFUNCS sqlTable = {
   (DBENTRYP_I)sqlRecId,
   (DBENTRYP_S)sqlSetFieldExtent,
 
-  /* WorkArea/Database management */
+  // WorkArea/Database management
 
   (DBENTRYP_CP)sqlAlias,
   (DBENTRYP_V)sqlClose,
@@ -3499,7 +3499,7 @@ static const RDDFUNCS sqlTable = {
   (DBENTRYP_VT)sqlTransRec,
   (DBENTRYP_V)sqlZap,
 
-  /* Relational Methods */
+  // Relational Methods
 
   (DBENTRYP_VR)sqlChildEnd,
   (DBENTRYP_VR)sqlChildStart,
@@ -3512,7 +3512,7 @@ static const RDDFUNCS sqlTable = {
   (DBENTRYP_SI)sqlRelText,
   (DBENTRYP_VR)sqlSetRel,
 
-  /* Order Management */
+  // Order Management
 
   (DBENTRYP_VOI)sqlOrderListAdd,
   (DBENTRYP_V)sqlOrderListClear,
@@ -3524,7 +3524,7 @@ static const RDDFUNCS sqlTable = {
   (DBENTRYP_VOI)sqlOrderDestroy,
   (DBENTRYP_SVOI)sqlOrderInfo,
 
-  /* Filters and Scope Settings */
+  // Filters and Scope Settings
 
   (DBENTRYP_V)sqlClearFilter,
   (DBENTRYP_V)sqlClearLocate,
@@ -3538,19 +3538,19 @@ static const RDDFUNCS sqlTable = {
   (DBENTRYP_VPL)sqlSkipScope,
   (DBENTRYP_B)sqlLocate,
 
-  /* Miscellaneous */
+  // Miscellaneous
 
   (DBENTRYP_CC)sqlCompile,
   (DBENTRYP_I)sqlError,
   (DBENTRYP_I)sqlEvalBlock,
 
-  /* Network operations */
+  // Network operations
 
   (DBENTRYP_VSP)sqlRawLock,
   (DBENTRYP_VL)sqlLock,
   (DBENTRYP_I)sqlUnLock,
 
-  /* Memofile functions */
+  // Memofile functions
 
   (DBENTRYP_V)sqlCloseMemFile,
   (DBENTRYP_VO)sqlCreateMemFile,
@@ -3558,12 +3558,12 @@ static const RDDFUNCS sqlTable = {
   (DBENTRYP_VO)sqlOpenMemFile,
   (DBENTRYP_SCCS)sqlPutValueFile,
 
-  /* Database file header handling */
+  // Database file header handling
 
   (DBENTRYP_V)sqlReadDBHeader,
   (DBENTRYP_V)sqlWriteDBHeader,
 
-  /* non WorkArea functions       */
+  // non WorkArea functions
   (DBENTRYP_R)sqlInit,
   (DBENTRYP_R)sqlExit,
   (DBENTRYP_RVVL)sqlDrop,
@@ -3571,7 +3571,7 @@ static const RDDFUNCS sqlTable = {
   (DBENTRYP_RVVVL)sqlRename,
   (DBENTRYP_RSLV)sqlRddInfo,
 
-  /* Special and reserved methods */
+  // Special and reserved methods
 
   (DBENTRYP_SVP)sqlWhoCares
 };
