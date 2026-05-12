@@ -1027,8 +1027,10 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip) // RDDFUNC
 /*------------------------------------------------------------------------*/
 
 // (DBENTRYP_B)
-static HB_ERRCODE sqlAppend(SQLAREAP thiswa) // RDDFUNC
+static HB_ERRCODE sqlAppend(SQLAREAP thiswa, HB_BOOL value) // RDDFUNC
 {
+  HB_SYMBOL_UNUSED(value);
+
   // sr_TraceLog(nullptr, "sqlAppend\n");
 
   /* Reset parent rel struct */
