@@ -210,7 +210,7 @@ PHB_ITEM SQLpCodeGenArrayItem(PHB_ITEM pArray, PHB_ITEM value)
 
 PHB_ITEM SQLpCodeGenArrayInt(PHB_ITEM pArray, int code)
 {
-  auto pItem = hb_itemPutNILen(nullptr, code, 6);
+  auto pItem = hb_itemPutNILen(SR_NULLPTR, code, 6);
 
   hb_arrayAddForward(pArray, pItem);
   hb_itemRelease(pItem);
@@ -220,7 +220,7 @@ PHB_ITEM SQLpCodeGenArrayInt(PHB_ITEM pArray, int code)
 
 PHB_ITEM SQLpCodeGenArrayIntInt(PHB_ITEM pArray, int code, int code2)
 {
-  auto pItem = hb_itemPutNILen(nullptr, code, 6);
+  auto pItem = hb_itemPutNILen(SR_NULLPTR, code, 6);
   hb_arrayAddForward(pArray, pItem);
   hb_itemPutNILen(pItem, code2, 6);
   hb_arrayAddForward(pArray, pItem);
@@ -231,7 +231,7 @@ PHB_ITEM SQLpCodeGenArrayIntInt(PHB_ITEM pArray, int code, int code2)
 
 PHB_ITEM SQLpCodeGenIntArray(int code, PHB_ITEM pArray)
 {
-  auto pItem = hb_itemNew(nullptr);
+  auto pItem = hb_itemNew(SR_NULLPTR);
   hb_arrayAdd(pArray, pItem);
   hb_arrayIns(pArray, 1);
   hb_itemPutNILen(pItem, code, 6);
@@ -249,7 +249,7 @@ HB_FUNC(SR_STRTOHEX)
   int iCipher;
 
   if (!HB_ISCHAR(1)) {
-    hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_STRTOHEX", 1, hb_param(1, HB_IT_ANY));
+    hb_errRT_BASE_SubstR(EG_ARG, 3012, SR_NULLPTR, "SR_STRTOHEX", 1, hb_param(1, HB_IT_ANY));
     return;
   }
 
@@ -348,7 +348,7 @@ HB_FUNC(SR_HEXTOSTR)
   int nalloc;
 
   if (!HB_ISCHAR(1)) {
-    hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_HEXTOSTR", 1, hb_param(1, HB_IT_ANY));
+    hb_errRT_BASE_SubstR(EG_ARG, 3012, SR_NULLPTR, "SR_HEXTOSTR", 1, hb_param(1, HB_IT_ANY));
     return;
   }
 
@@ -537,7 +537,7 @@ HB_FUNC(SR_ESCAPESTRING)
   auto idatabase = hb_parni(2);
 
   if (!(HB_ISCHAR(1) && HB_ISNUM(2))) {
-    hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPESTRING", 2, hb_param(1, HB_IT_ANY),
+    hb_errRT_BASE_SubstR(EG_ARG, 3012, SR_NULLPTR, "SR_ESCAPESTRING", 2, hb_param(1, HB_IT_ANY),
                          hb_param(2, HB_IT_ANY));
     return;
   }
@@ -662,7 +662,7 @@ HB_FUNC(SR_ESCAPENUM)
   auto FromBuffer = hb_parc(1);
 
   if (!(HB_ISCHAR(1) && HB_ISNUM(2) && HB_ISNUM(3))) {
-    hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPENUM", 3, hb_param(1, HB_IT_ANY),
+    hb_errRT_BASE_SubstR(EG_ARG, 3012, SR_NULLPTR, "SR_ESCAPENUM", 3, hb_param(1, HB_IT_ANY),
                          hb_param(2, HB_IT_ANY), hb_param(3, HB_IT_ANY));
     return;
   }
@@ -941,7 +941,7 @@ HB_FUNC(SR_DBQUALIFY)
     }
     hb_retclen_buffer(szOut, ulLen + 2);
   } else {
-    hb_errRT_BASE_SubstR(EG_ARG, 1102, nullptr, "SR_DBQUALIFY", 1, hb_paramError(1));
+    hb_errRT_BASE_SubstR(EG_ARG, 1102, SR_NULLPTR, "SR_DBQUALIFY", 1, hb_paramError(1));
   }
 }
 
@@ -1012,14 +1012,14 @@ HB_BOOL SR_itemEmpty(PHB_ITEM pItem)
     return false;
   }
   case HB_IT_POINTER: {
-    return hb_itemGetPtr(pItem) == nullptr;
+    return hb_itemGetPtr(pItem) == SR_NULLPTR;
   }
   case HB_IT_SYMBOL: {
     PHB_SYMB pSym = hb_itemGetSymbol(pItem);
     if (pSym && (pSym->scope.value & HB_FS_DEFERRED) && pSym->pDynSym) {
       pSym = hb_dynsymSymbol(pSym->pDynSym);
     }
-    return pSym == nullptr || pSym->value.pFunPtr == nullptr;
+    return pSym == SR_NULLPTR || pSym->value.pFunPtr == SR_NULLPTR;
   }
   default: {
     return true;
@@ -1035,7 +1035,7 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
   char *sValue, sDate[9];
   HB_SIZE iSizeOut;
   int iTrim, iPos, iSize;
-  sValue = nullptr;
+  sValue = SR_NULLPTR;
 
   *bNullArgument = false;
 

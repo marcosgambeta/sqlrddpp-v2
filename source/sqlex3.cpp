@@ -318,12 +318,12 @@ HB_BOOL CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel)
 
     if (SeekBind->SeekFwdStmt) {
       SQLFreeStmt(SeekBind->SeekFwdStmt, SQL_DROP);
-      SeekBind->SeekFwdStmt = nullptr;
+      SeekBind->SeekFwdStmt = SR_NULLPTR;
     }
 
     if (SeekBind->SeekBwdStmt) {
       SQLFreeStmt(SeekBind->SeekBwdStmt, SQL_DROP);
-      SeekBind->SeekBwdStmt = nullptr;
+      SeekBind->SeekBwdStmt = SR_NULLPTR;
     }
 
     getSeekWhereExpression(thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD,
@@ -376,12 +376,12 @@ HB_ERRCODE FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *queryLev
 
       if (SeekBind->SeekFwdStmt) {
         SQLFreeStmt(SeekBind->SeekFwdStmt, SQL_DROP);
-        SeekBind->SeekFwdStmt = nullptr;
+        SeekBind->SeekFwdStmt = SR_NULLPTR;
         thiswa->bRebuildSeekQuery = true;
       }
       if (SeekBind->SeekBwdStmt) {
         SQLFreeStmt(SeekBind->SeekBwdStmt, SQL_DROP);
-        SeekBind->SeekBwdStmt = nullptr;
+        SeekBind->SeekBwdStmt = SR_NULLPTR;
         thiswa->bRebuildSeekQuery = true;
       }
 
@@ -469,13 +469,13 @@ HB_ERRCODE FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *queryLev
           datemask[iPos] = szKey[iPos];
         }
 
-        hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
+        hb_compStrToNum(datemask, 4, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
         BindStructure->asTimestamp.year = static_cast<SQLSMALLINT>(lVal);
         mask += 4;
-        hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
+        hb_compStrToNum(mask, 2, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
         BindStructure->asTimestamp.month = static_cast<SQLUSMALLINT>(lVal);
         mask += 2;
-        hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
+        hb_compStrToNum(mask, 2, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
         BindStructure->asTimestamp.day = static_cast<SQLUSMALLINT>(lVal);
         BindStructure->asTimestamp.hour = 0;
         BindStructure->asTimestamp.minute = 0;
@@ -499,13 +499,13 @@ HB_ERRCODE FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *queryLev
           datemask[iPos] = szKey[iPos];
         }
 
-        hb_compStrToNum(datemask, 4, &lVal, &dVal, nullptr, nullptr);
+        hb_compStrToNum(datemask, 4, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
         BindStructure->asDate.year = static_cast<SQLSMALLINT>(lVal);
         mask += 4;
-        hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
+        hb_compStrToNum(mask, 2, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
         BindStructure->asDate.month = static_cast<SQLUSMALLINT>(lVal);
         mask += 2;
-        hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
+        hb_compStrToNum(mask, 2, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
         BindStructure->asDate.day = static_cast<SQLUSMALLINT>(lVal);
 
         break;
@@ -607,14 +607,14 @@ void BindSeekStmt(SQLEXAREAP thiswa, int queryLevel)
         res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT,
                                static_cast<SQLSMALLINT>(BindStructure->iCType),
                                static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
-                               BindStructure->DecimalDigits, BindStructure->asChar.value, 0, nullptr);
+                               BindStructure->DecimalDigits, BindStructure->asChar.value, 0, SR_NULLPTR);
         break;
       }
       case SQL_C_DOUBLE: {
         res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT,
                                static_cast<SQLSMALLINT>(BindStructure->iCType),
                                static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
-                               BindStructure->DecimalDigits, &(BindStructure->asNumeric), 0, nullptr);
+                               BindStructure->DecimalDigits, &(BindStructure->asNumeric), 0, SR_NULLPTR);
         break;
       }
       case SQL_C_TYPE_TIMESTAMP: {
@@ -633,14 +633,14 @@ void BindSeekStmt(SQLEXAREAP thiswa, int queryLevel)
       }
       case SQL_C_TYPE_DATE: {
         res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_TYPE_DATE, SQL_TYPE_DATE,
-                               SQL_DATE_LEN, 0, &(BindStructure->asDate), 0, nullptr);
+                               SQL_DATE_LEN, 0, &(BindStructure->asDate), 0, SR_NULLPTR);
         break;
       }
       case SQL_C_BIT: {
         res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT,
                                static_cast<SQLSMALLINT>(BindStructure->iCType),
                                static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
-                               BindStructure->DecimalDigits, &(BindStructure->asLogical), 0, nullptr);
+                               BindStructure->DecimalDigits, &(BindStructure->asLogical), 0, SR_NULLPTR);
         break;
       }
       }
@@ -685,7 +685,7 @@ HB_ERRCODE getPreparedSeek(SQLEXAREAP thiswa, int queryLevel, HB_USHORT *iIndex,
     return HB_FAILURE;
   }
 
-  res = SQLGetData(*hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), nullptr);
+  res = SQLGetData(*hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), SR_NULLPTR);
 
   if (res == SQL_ERROR) {
     SQLFreeStmt(*hStmt, SQL_CLOSE);
@@ -694,7 +694,7 @@ HB_ERRCODE getPreparedSeek(SQLEXAREAP thiswa, int queryLevel, HB_USHORT *iIndex,
 
   if (thiswa->ulhDeleted > 0) {
     SQLCHAR szValue[2];
-    res = SQLGetData(*hStmt, 2, SQL_C_CHAR, szValue, 2, nullptr);
+    res = SQLGetData(*hStmt, 2, SQL_C_CHAR, szValue, 2, SR_NULLPTR);
     if (res == SQL_ERROR) {
       SQLFreeStmt(*hStmt, SQL_CLOSE);
       return HB_FAILURE;

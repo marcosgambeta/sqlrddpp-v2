@@ -47,6 +47,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#include "sqlrddpp.h"
+
 #include "compat.h"
 
 #include "hbsql.h"
@@ -181,7 +183,7 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
           queryPtr++;
         }
       } else if (c == quoteChar) {
-        lvalp->item_val = hb_itemNew(nullptr);
+        lvalp->item_val = hb_itemNew(SR_NULLPTR);
         hb_itemPutCL(lvalp->item_val, stmt->queryPtr + 1, (queryPtr - stmt->queryPtr - 2));
         stmt->queryPtr = queryPtr;
         return STRINGVAL;
@@ -201,7 +203,7 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
     while (queryPtr < queryEnd) {
       c = *queryPtr++;
       if (c == quoteChar) {
-        lvalp->item_val = hb_itemNew(nullptr);
+        lvalp->item_val = hb_itemNew(SR_NULLPTR);
         hb_itemPutCL(lvalp->item_val, stmt->queryPtr + 1, (queryPtr - stmt->queryPtr - 2));
         stmt->queryPtr = queryPtr;
         return QUOTED_IDENT;
@@ -218,7 +220,7 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
     if (queryPtr + 9 < queryEnd && queryPtr[9] == ']') {
       memcpy(szDate, stmt->queryPtr + 1, 8);
       szDate[8] = 0;
-      lvalp->item_val = hb_itemNew(nullptr);
+      lvalp->item_val = hb_itemNew(SR_NULLPTR);
       hb_itemPutDS(lvalp->item_val, szDate);
       stmt->queryPtr = stmt->queryPtr + 10;
       return DATEVAL;
@@ -680,7 +682,7 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
       ++queryPtr;
     }
 
-    lvalp->item_val = hb_itemNew(nullptr);
+    lvalp->item_val = hb_itemNew(SR_NULLPTR);
     hb_itemPutCL(lvalp->item_val, stmt->queryPtr, (queryPtr - stmt->queryPtr));
 
     stmt->queryPtr = queryPtr;
