@@ -44,6 +44,7 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+#include "sqlrddpp.h"
 #include "compat.h"
 
 #include <libpq-fe.h>
@@ -55,9 +56,9 @@
 
 #include <assert.h>
 
-static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
-static PHB_DYNS s_pSym_SR_FROMXML = nullptr;
-static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = SR_NULLPTR;
+static PHB_DYNS s_pSym_SR_FROMXML = SR_NULLPTR;
+static PHB_DYNS s_pSym_SR_FROMJSON = SR_NULLPTR;
 
 #define LOGFILE "pgs.log"
 
@@ -98,14 +99,14 @@ HB_FUNC(SR_PGSCONNECT) /* PGSConnect(ConnectionString) => ConnHandle */
 
   session->ifetch = -2;
   /* Setup Postgres Notice Processor */
-  PQsetNoticeProcessor(session->dbh, myNoticeProcessor, nullptr);
+  PQsetNoticeProcessor(session->dbh, myNoticeProcessor, SR_NULLPTR);
   hb_retptr(static_cast<void *>(session));
 }
 
 HB_FUNC(SR_PGSFINISH) /* PGSFinish(ConnHandle) */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
   PQfinish(session->dbh);
   hb_xfree(session);
   hb_ret();
@@ -114,7 +115,7 @@ HB_FUNC(SR_PGSFINISH) /* PGSFinish(ConnHandle) */
 HB_FUNC(SR_PGSSTATUS) /* PGSStatus(ConnHandle) => nStatus */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
 
   if (PQstatus(session->dbh) == CONNECTION_OK) {
     hb_retni(SQL_SUCCESS);
@@ -126,14 +127,14 @@ HB_FUNC(SR_PGSSTATUS) /* PGSStatus(ConnHandle) => nStatus */
 HB_FUNC(SR_PGSSTATUS2) /* PGSStatus(ConnHandle) => nStatus */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
   hb_retni(static_cast<int>(PQstatus(session->dbh)));
 }
 
 HB_FUNC(SR_PGSRESULTSTATUS) /* PGSResultStatus(ResultSet) => nStatus */
 {
   auto res = static_cast<PGresult *>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
-  assert(res != nullptr);
+  assert(res != SR_NULLPTR);
   auto ret = static_cast<int>(PQresultStatus(res));
 
   switch (ret) {
@@ -168,9 +169,9 @@ HB_FUNC(SR_PGSRESULTSTATUS) /* PGSResultStatus(ResultSet) => nStatus */
 
 HB_FUNC(SR_PGSEXEC) /* PGSExec(ConnHandle, cCommand) => ResultSet */
 {
-  /* sr_TraceLog(nullptr, "PGSExec : %s\n", hb_parc(2)); */
+  /* sr_TraceLog(SR_NULLPTR, "PGSExec : %s\n", hb_parc(2)); */
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
 
   session->stmt = PQexec(session->dbh, hb_parc(2));
   hb_retptr(static_cast<void *>(session->stmt));
@@ -193,8 +194,8 @@ HB_FUNC(SR_PGSEXEC) /* PGSExec(ConnHandle, cCommand) => ResultSet */
 HB_FUNC(SR_PGSFETCH) /* PGSFetch(ResultSet) => nStatus */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
-  assert(session->stmt != nullptr);
+  assert(session->dbh != SR_NULLPTR);
+  assert(session->stmt != SR_NULLPTR);
 
   int iTpl = PQresultStatus(session->stmt);
   session->iAffectedRows = 0;
@@ -219,18 +220,18 @@ HB_FUNC(SR_PGSFETCH) /* PGSFetch(ResultSet) => nStatus */
 HB_FUNC(SR_PGSRESSTATUS) /* PGSResStatus(ResultSet) => cErrMessage */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
-  assert(session->stmt != nullptr);
+  assert(session->dbh != SR_NULLPTR);
+  assert(session->stmt != SR_NULLPTR);
   hb_retc(PQresStatus(PQresultStatus(session->stmt)));
 }
 
 HB_FUNC(SR_PGSCLEAR) /* PGSClear(ResultSet) */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
   if (session->stmt) {
     PQclear(session->stmt);
-    session->stmt = nullptr;
+    session->stmt = SR_NULLPTR;
     session->ifetch = -2;
   }
 }
@@ -238,29 +239,29 @@ HB_FUNC(SR_PGSCLEAR) /* PGSClear(ResultSet) */
 HB_FUNC(SR_PGSGETDATA) /* PGSGetData(ResultSet, nColumn) => cValue */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
-  assert(session->stmt != nullptr);
+  assert(session->dbh != SR_NULLPTR);
+  assert(session->stmt != SR_NULLPTR);
   hb_retc(PQgetvalue(session->stmt, session->ifetch, hb_parnl(2) - 1));
 }
 
 HB_FUNC(SR_PGSCOLS) /* PGSCols(ResultSet) => nColsInQuery */
 {
   auto res = static_cast<PGresult *>(hb_itemGetPtr(hb_param(1, HB_IT_POINTER)));
-  assert(res != nullptr);
+  assert(res != SR_NULLPTR);
   hb_retnl(static_cast<long>(PQnfields(res)));
 }
 
 HB_FUNC(SR_PGSERRMSG) /* PGSErrMsg(ConnHandle) => cErrorMessage */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
   hb_retc(PQerrorMessage(session->dbh));
 }
 
 HB_FUNC(SR_PGSCOMMIT) /* PGSCommit(ConnHandle) => nError */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
   PGresult *res = PQexec(session->dbh, "COMMIT");
   if (PQresultStatus(res) == PGRES_COMMAND_OK) {
     hb_retni(SQL_SUCCESS);
@@ -272,7 +273,7 @@ HB_FUNC(SR_PGSCOMMIT) /* PGSCommit(ConnHandle) => nError */
 HB_FUNC(SR_PGSROLLBACK) /* PGSRollBack(ConnHandle) => nError */
 {
   GET_PGSQL_SESSION(session, 1);
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
   PGresult *res = PQexec(session->dbh, "ROLLBACK");
   if (PQresultStatus(res) == PGRES_COMMAND_OK) {
     hb_retni(SQL_SUCCESS);
@@ -290,13 +291,13 @@ HB_FUNC(SR_PGSQUERYATTR) /* PGSQueryAttr(ResultSet) => aStruct */
 
   GET_PGSQL_SESSION(session, 1);
 
-  assert(session->dbh != nullptr);
-  assert(session->stmt != nullptr);
+  assert(session->dbh != SR_NULLPTR);
+  assert(session->stmt != SR_NULLPTR);
 
   int rows = PQnfields(session->stmt);
-  auto ret = hb_itemNew(nullptr);
-  auto temp = hb_itemNew(nullptr);
-  auto atemp = hb_itemNew(nullptr);
+  auto ret = hb_itemNew(SR_NULLPTR);
+  auto temp = hb_itemNew(SR_NULLPTR);
+  auto atemp = hb_itemNew(SR_NULLPTR);
 
   hb_arrayNew(ret, rows);
 
@@ -479,7 +480,7 @@ HB_FUNC(SR_PGSTABLEATTR) /* PGSTableAttr(ConnHandle, cTableName) => aStruct */
   char attcmm[512];
   GET_PGSQL_SESSION(session, 1);
 
-  assert(session->dbh != nullptr);
+  assert(session->dbh != SR_NULLPTR);
 
   sprintf(attcmm,
           "select a.attname, a.atttypid, a.atttypmod, a.attnotnull from pg_attribute a left join pg_class b on "
@@ -495,9 +496,9 @@ HB_FUNC(SR_PGSTABLEATTR) /* PGSTableAttr(ConnHandle, cTableName) => aStruct */
   }
 
   int rows = PQntuples(stmtTemp);
-  auto ret = hb_itemNew(nullptr);
-  auto atemp = hb_itemNew(nullptr);
-  auto temp = hb_itemNew(nullptr);
+  auto ret = hb_itemNew(SR_NULLPTR);
+  auto atemp = hb_itemNew(SR_NULLPTR);
+  auto temp = hb_itemNew(SR_NULLPTR);
 
   hb_arrayNew(ret, rows);
 
@@ -757,25 +758,25 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
     case SQL_LONGVARCHAR: {
       if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
           (sr_lSerializeArrayAsJson())) {
-        if (s_pSym_SR_FROMJSON == nullptr) {
+        if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
           s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-          if (s_pSym_SR_FROMJSON == nullptr) {
+          if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
             printf("Could not find Symbol HB_JSONDECODE\n");
           }
         }
         hb_vmPushDynSym(s_pSym_SR_FROMJSON);
         hb_vmPushNil();
         hb_vmPushString(bBuffer, lLenBuff);
-        pTemp = hb_itemNew(nullptr);
+        pTemp = hb_itemNew(SR_NULLPTR);
         hb_vmPush(pTemp);
         hb_vmDo(2);
         /* TOFIX: */
         hb_itemMove(pItem, pTemp);
         hb_itemRelease(pTemp);
       } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
-        if (s_pSym_SR_DESERIALIZE == nullptr) {
+        if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
           s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-          if (s_pSym_SR_DESERIALIZE == nullptr) {
+          if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
             printf("Could not find Symbol SR_DESERIALIZE\n");
           }
         }
@@ -785,11 +786,11 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
 
         hb_vmDo(1);
 
-        pTemp = hb_itemNew(nullptr);
+        pTemp = hb_itemNew(SR_NULLPTR);
         hb_itemMove(pTemp, hb_stackReturnItem());
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
-          auto pLangItem = hb_itemNew(nullptr);
+          auto pLangItem = hb_itemNew(SR_NULLPTR);
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos) ||
@@ -808,9 +809,9 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
     }
     // xmltoarray
     case SQL_LONGVARCHARXML: {
-      if (s_pSym_SR_FROMXML == nullptr) {
+      if (s_pSym_SR_FROMXML == SR_NULLPTR) {
         s_pSym_SR_FROMXML = hb_dynsymFindName("SR_FROMXML");
-        if (s_pSym_SR_FROMXML == nullptr) {
+        if (s_pSym_SR_FROMXML == SR_NULLPTR) {
           printf("Could not find Symbol SR_DESERIALIZE\n");
         }
       }
@@ -823,7 +824,7 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
       hb_vmPushString(bBuffer, lLenBuff);
       hb_vmDo(4);
 
-      pTemp = hb_itemNew(nullptr);
+      pTemp = hb_itemNew(SR_NULLPTR);
       hb_itemMove(pTemp, hb_stackReturnItem());
 
       hb_itemMove(pItem, pTemp);
@@ -849,7 +850,7 @@ void PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuf
     }
     case SQL_TIME: {
       long lMilliSec;
-      lMilliSec = hb_timeUnformat(bBuffer, nullptr); // TOCHECK:
+      lMilliSec = hb_timeUnformat(bBuffer, SR_NULLPTR); // TOCHECK:
       hb_itemPutTDT(pItem, 0, lMilliSec);
       break;
     }
@@ -875,14 +876,14 @@ HB_FUNC(SR_PGSLINEPROCESSED)
   auto pRet = hb_param(7, HB_IT_ARRAY);
   HB_LONG lIndex, cols;
 
-  assert(session->dbh != nullptr);
-  assert(session->stmt != nullptr);
+  assert(session->dbh != SR_NULLPTR);
+  assert(session->stmt != SR_NULLPTR);
 
   if (session) {
     cols = static_cast<HB_LONG>(hb_arrayLen(pFields));
 
     for (i = 0; i < cols; i++) {
-      temp = hb_itemNew(nullptr);
+      temp = hb_itemNew(SR_NULLPTR);
       lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i + 1), FIELD_ENUM);
 
       if (lIndex != 0) {
@@ -900,7 +901,7 @@ HB_FUNC(SR_PGSAFFECTEDROWS)
 {
   GET_PGSQL_SESSION(session, 1);
 
-  hb_retni(session != nullptr ? session->iAffectedRows : 0);
+  hb_retni(session != SR_NULLPTR ? session->iAffectedRows : 0);
 }
 
 //-----------------------------------------------------------------------------//
