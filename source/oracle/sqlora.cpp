@@ -43,6 +43,7 @@ const char *_sqlo_sqloraID = "$Id$";
 #include "config.h"
 #endif
 
+#include "sqlrddpp.h"
 #include "compat.h"
 
 #include <limits.h>
@@ -78,9 +79,9 @@ const char *_sqlo_sqloraID = "$Id$";
 #define FREE(_p)                                                                                                       \
   {                                                                                                                    \
     void **l_p = (void **)&(_p);                                                                                       \
-    if (*l_p != nullptr) {                                                                                             \
+    if (*l_p != SR_NULLPTR) {                                                                                             \
       g_free(*l_p);                                                                                                    \
-      *l_p = nullptr;                                                                                                  \
+      *l_p = SR_NULLPTR;                                                                                                  \
     }                                                                                                                  \
   }
 #else
@@ -89,9 +90,9 @@ const char *_sqlo_sqloraID = "$Id$";
 #define FREE(_p)                                                                                                       \
   {                                                                                                                    \
     void **l_p = (void **)&(_p);                                                                                       \
-    if (*l_p != nullptr) {                                                                                             \
+    if (*l_p != SR_NULLPTR) {                                                                                             \
       free(*l_p);                                                                                                      \
-      *l_p = nullptr;                                                                                                  \
+      *l_p = SR_NULLPTR;                                                                                                  \
     }                                                                                                                  \
   }
 #endif
@@ -292,7 +293,7 @@ enum _sqlora_constants
  * TRACE(3, fprintf(g_ftp, "Calling foo()\n"););
  */
 #define TRACE(p_trace_level, p_cmd)                                                                                    \
-  if (TRACE_ENABLED && (nullptr != _trace_fp) && (_trace_level >= p_trace_level)) {                                    \
+  if (TRACE_ENABLED && (SR_NULLPTR != _trace_fp) && (_trace_level >= p_trace_level)) {                                    \
     {p_cmd}(void)fflush(_trace_fp);                                                                                    \
   }
 
@@ -329,7 +330,7 @@ enum _sqlora_constants
  */
 #define CHECK_STHANDLE(p_stp, p_sth, p_func, p_errval)                                                                 \
   {                                                                                                                    \
-    if (nullptr == (p_stp = _sth2stp(p_sth, p_func)) || !p_stp->used) {                                                \
+    if (SR_NULLPTR == (p_stp = _sth2stp(p_sth, p_func)) || !p_stp->used) {                                                \
       return p_errval;                                                                                                 \
     }                                                                                                                  \
   }
@@ -609,7 +610,7 @@ static unsigned int _max_long_size = MAX_LONG_SIZE;
  * The array is proteced by the mutex @ref _dbv_mux when compiled with threading
  * enabled.
  */
-static sqlo_db_struct_t **_dbv = nullptr; /* array for database connections */
+static sqlo_db_struct_t **_dbv = SR_NULLPTR; /* array for database connections */
 
 /**
  * @var _dbv_size
@@ -740,7 +741,7 @@ static OCIError *_oci_errhp;
  */
 static const char *DEFAULT_TRACE_FNAME = "sqlora.log";
 
-static FILE *_trace_fp = nullptr; /**< The filepointer of the global tracefile  */
+static FILE *_trace_fp = SR_NULLPTR; /**< The filepointer of the global tracefile  */
 
 static unsigned int _session_count = 0; /**< The nubmer of created sessions. Used to name the trace file */
 
@@ -941,11 +942,11 @@ char *DEFUN(strdup, (s), const char *s)
 ---------------------------------------------------------------------------*/
 /* Parameters, sort them by name */
 static sqlora_param_t g_params[] = {
-    {const_cast<char *>("PREFETCH_ROWS"), INTEGER, (VOID *)&_num_prefetch_rows, nullptr},
-    {const_cast<char *>("LONGSIZE"), INTEGER, (VOID *)&_max_long_size, nullptr},
-    {const_cast<char *>("TRACE_FILE"), STRING, _trace_file, nullptr},
-    {const_cast<char *>("TRACE_LEVEL"), INTEGER, &_trace_level, nullptr},
-    {nullptr, INTEGER, nullptr, nullptr}};
+    {const_cast<char *>("PREFETCH_ROWS"), INTEGER, (VOID *)&_num_prefetch_rows, SR_NULLPTR},
+    {const_cast<char *>("LONGSIZE"), INTEGER, (VOID *)&_max_long_size, SR_NULLPTR},
+    {const_cast<char *>("TRACE_FILE"), STRING, _trace_file, SR_NULLPTR},
+    {const_cast<char *>("TRACE_LEVEL"), INTEGER, &_trace_level, SR_NULLPTR},
+    {SR_NULLPTR, INTEGER, SR_NULLPTR, SR_NULLPTR}};
 
 /*-------------------------------------------------------------------------
  * STATIC FUNCTIONS
@@ -966,7 +967,7 @@ static inline int DEFUN(_mutex_init, (mutex), sqlo_mutex_t *mutex)
 
 #ifdef ENABLE_PTHREADS
 
-  pthread_mutex_init(mutex, nullptr);
+  pthread_mutex_init(mutex, SR_NULLPTR);
 
 #elif ENABLE_ORATHREADS
 
@@ -975,7 +976,7 @@ static inline int DEFUN(_mutex_init, (mutex), sqlo_mutex_t *mutex)
 #else
 #ifdef ENABLE_WINTHREADS
 
-  if ((*mutex = CreateMutex(nullptr, FALSE, nullptr)) != nullptr) {
+  if ((*mutex = CreateMutex(SR_NULLPTR, FALSE, SR_NULLPTR)) != SR_NULLPTR) {
     status = SQLO_SUCCESS;
   } else {
     status = SQLO_ERROR;
@@ -1094,7 +1095,7 @@ static inline int DEFUN_VOID(_init_init_mux)
 
 #ifdef ENABLE_PTHREADS
 
-  pthread_mutex_init(&_init_mux, nullptr);
+  pthread_mutex_init(&_init_mux, SR_NULLPTR);
 
 #elif ENABLE_ORATHREADS
 
@@ -1103,7 +1104,7 @@ static inline int DEFUN_VOID(_init_init_mux)
 #else
 #ifdef ENABLE_WINTHREADS
 
-  if ((_init_mux = CreateMutex(nullptr, FALSE, nullptr)) != nullptr) {
+  if ((_init_mux = CreateMutex(SR_NULLPTR, FALSE, SR_NULLPTR)) != SR_NULLPTR) {
     status = SQLO_SUCCESS;
   } else {
     status = SQLO_ERROR;
@@ -1291,7 +1292,7 @@ static inline sqlo_thread_t DEFUN_VOID(_get_thread_id)
 
 #elif ENABLE_ORATHREADS
 
-  sqlo_thread_t tid = nullptr;
+  sqlo_thread_t tid = SR_NULLPTR;
   OCIThreadIdInit(_oci_envhp, _oci_errhp, &tid);
   OCIThreadIdGet(_oci_envhp, _oci_errhp, tid);
   return tid;
@@ -1319,10 +1320,10 @@ static inline int DEFUN(_set_prefetch_rows, (stp, nrows), sqlo_stmt_struct_ptr_t
   unsigned int prefetch_rows = nrows;
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp != nullptr);
-  assert(stp->dbp != nullptr);
-  assert(stp->stmthp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp != SR_NULLPTR);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->stmthp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
   dbp = stp->dbp;
 
   dbp->status = OCIAttrSet((dvoid *)stp->stmthp, (ub4)OCI_HTYPE_STMT, &prefetch_rows, (ub4)sizeof(prefetch_rows),
@@ -1368,12 +1369,12 @@ static inline int DEFUN(_get_stmt_state, (stp), sqlo_stmt_struct_ptr_t stp)
   ub4 st = 0;
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp != nullptr);
-  assert(stp->dbp != nullptr);
+  assert(stp != SR_NULLPTR);
+  assert(stp->dbp != SR_NULLPTR);
 
   dbp = stp->dbp;
-  assert(dbp->stmthp != nullptr);
-  assert(dbp->errhp != nullptr);
+  assert(dbp->stmthp != SR_NULLPTR);
+  assert(dbp->errhp != SR_NULLPTR);
 
   /* OCI_ATTR_STMT_STATE is not defined in Oracle < 9i
    * I define this here, to make it compile with Oracle 8,8i,
@@ -1467,7 +1468,7 @@ static int DEFUN(_db_alloc, (dbv_idx), unsigned int dbv_idx)
     memset(_dbv[dbv_idx], 0, sizeof(sqlo_db_struct_t));
   }
 
-  return _dbv[dbv_idx] != nullptr ? SQLO_SUCCESS : SQLO_ERROR;
+  return _dbv[dbv_idx] != SR_NULLPTR ? SQLO_SUCCESS : SQLO_ERROR;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1481,7 +1482,7 @@ static int DEFUN(_db_alloc, (dbv_idx), unsigned int dbv_idx)
 static int DEFUN(_stmtv_alloc, (dbv_idx), unsigned int dbv_idx)
 {
   /* allocate the stmtv arrays in the _dbv */
-  if (nullptr == _dbv[dbv_idx]->stmtv) {
+  if (SR_NULLPTR == _dbv[dbv_idx]->stmtv) {
     TRACE(4, fprintf(_trace_fp, "_stmtv_alloc: Alloc stmtv for %d cursors at %u\n", _max_cursors, dbv_idx););
 
     _dbv[dbv_idx]->stmtv =
@@ -1509,7 +1510,7 @@ static sqlo_db_struct_ptr_t DEFUN_VOID(_db_add)
 
   /* check for initialization */
   if ((!_sqlo_init) || (_dbv_size <= 0))
-    return nullptr;
+    return SR_NULLPTR;
 
   EXEC_WHEN_THREADING(_dbv_lock();); /* start of critical section */
 
@@ -1517,14 +1518,14 @@ static sqlo_db_struct_ptr_t DEFUN_VOID(_db_add)
 
   if (status != SQLO_SUCCESS) {          /* no more slots available? */
     EXEC_WHEN_THREADING(_dbv_unlock();); /* end of critical section */
-    return nullptr;
+    return SR_NULLPTR;
   }
 
   /* If the slot is not allocated yet, we do it first */
   if (!_dbv[free_idx]) {
     if (SQLO_SUCCESS != _db_alloc(free_idx)) {
       EXEC_WHEN_THREADING(_dbv_unlock();); /* end of critical section */
-      return nullptr;
+      return SR_NULLPTR;
     }
   }
 
@@ -1539,9 +1540,9 @@ static sqlo_db_struct_ptr_t DEFUN_VOID(_db_add)
   EXEC_WHEN_THREADING(_dbv[free_idx]->thread_id = _get_thread_id(););
 
   /* allocate the stmtv arrays in the _dbv */
-  if (nullptr == _dbv[free_idx]->stmtv) {
+  if (SR_NULLPTR == _dbv[free_idx]->stmtv) {
     if (SQLO_SUCCESS != _stmtv_alloc(free_idx)) {
-      return nullptr;
+      return SR_NULLPTR;
     }
   }
 
@@ -1612,12 +1613,12 @@ static void DEFUN(_db_release, (dbp), sqlo_db_struct_ptr_t dbp)
     XFREE(dbp->tnsname, __LINE__);
   }
 
-  dbp->srvhp = nullptr;
-  dbp->svchp = nullptr;
-  dbp->errhp = nullptr;
-  dbp->authp = nullptr;
-  dbp->envhp = nullptr;
-  dbp->tnsname = nullptr;
+  dbp->srvhp = SR_NULLPTR;
+  dbp->svchp = SR_NULLPTR;
+  dbp->errhp = SR_NULLPTR;
+  dbp->authp = SR_NULLPTR;
+  dbp->envhp = SR_NULLPTR;
+  dbp->tnsname = SR_NULLPTR;
 
   /* close the trace file */
   if (TRACE_ENABLED && _trace_level > 0)
@@ -1636,7 +1637,7 @@ static void DEFUN(_db_release, (dbp), sqlo_db_struct_ptr_t dbp)
   if (dbp->stmtv) {
     XFREE(dbp->stmtv, __LINE__);
   }
-  dbp->stmtv = nullptr;
+  dbp->stmtv = SR_NULLPTR;
 
   EXEC_WHEN_THREADING(_dbv_lock();); /* start of critical section */
 
@@ -1658,7 +1659,7 @@ static void DEFUN(_bindpv_reset, (stp), sqlo_stmt_struct_ptr_t stp)
 
   if (stp) {
     for (bindp_idx = 0; bindp_idx < stp->num_bindpv; ++bindp_idx) {
-      stp->bindpv[bindp_idx] = nullptr;
+      stp->bindpv[bindp_idx] = SR_NULLPTR;
     }
 
     stp->num_bindpv = 0;
@@ -1699,7 +1700,7 @@ static sqlo_stmt_struct_ptr_t DEFUN(_get_stmt_ptr, (dbp), const_sqlo_db_struct_p
 
   /* check for initialization */
   if ((!_sqlo_init) || (dbp->stmtv_size <= 0)) {
-    return nullptr;
+    return SR_NULLPTR;
   }
 
   /* we need to check first if there is an unused allocated slot */
@@ -1720,7 +1721,7 @@ static sqlo_stmt_struct_ptr_t DEFUN(_get_stmt_ptr, (dbp), const_sqlo_db_struct_p
     stp->sth = stmt_idx;
     stp->used = TRUE;
   } else {
-    stp = nullptr;
+    stp = SR_NULLPTR;
   }
 
   return stp;
@@ -1738,7 +1739,7 @@ static int DEFUN(_stmt_init, (stp, dbp, stmt),
   auto len = static_cast<unsigned int>(strlen(stmt)) + 1;
 
   stp->dbp = dbp;
-  stp->stmthp = nullptr;
+  stp->stmthp = SR_NULLPTR;
   stp->stype = 0;
   stp->opened = FALSE;
   stp->prepared = FALSE;
@@ -1828,7 +1829,7 @@ static int DEFUN(_alloc_bindp, (stp, size), sqlo_stmt_struct_ptr_t stp AND unsig
   /* register */ int num_new;
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   dbp->status = SQLO_SUCCESS;
@@ -1888,15 +1889,15 @@ static void DEFUN(_dealloc_bindp, (stp), sqlo_stmt_struct_ptr_t stp)
 {
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   TRACE(4,
         fprintf(_get_trace_fp(dbp), "_dealloc_bindp: dealloc sth: %u bindpv_size: %u\n", stp->sth, stp->bindpv_size););
 
   if (stp->bindpv_size > 0) {
-    assert(stp->bindpv != nullptr);
-    assert(stp->indpv != nullptr);
+    assert(stp->bindpv != SR_NULLPTR);
+    assert(stp->indpv != SR_NULLPTR);
 
     XFREE(stp->bindpv, __LINE__); /* bind pointer array */
     XFREE(stp->indpv, __LINE__);  /* indicator var. pointer array */
@@ -1927,7 +1928,7 @@ static int DEFUN(_alloc_definep, (stp, size), sqlo_stmt_struct_ptr_t stp AND uns
   /* register */ int num_new; /* number of new elements in the arrays */
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   dbp->status = SQLO_SUCCESS;
@@ -2005,21 +2006,21 @@ static void DEFUN(_dealloc_definep, (stp), sqlo_stmt_struct_ptr_t stp)
   sqlo_db_struct_ptr_t dbp;
   unsigned int col_idx;
 
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   TRACE(4, fprintf(_get_trace_fp(dbp), "_dealloc_definep: dealloc sth: %u defnpv_size: %u\n", stp->sth,
                    stp->defnpv_size););
 
   if (stp->defnpv_size > 0) {
-    assert(stp->defnpv != nullptr);
-    assert(stp->ocolsv != nullptr);
-    assert(stp->outv != nullptr);
-    assert(stp->outv_size != nullptr);
-    assert(stp->oindv != nullptr);
-    assert(stp->rlenv != nullptr);
-    assert(stp->ocol_namev != nullptr);
-    assert(stp->ocol_namev_size != nullptr);
+    assert(stp->defnpv != SR_NULLPTR);
+    assert(stp->ocolsv != SR_NULLPTR);
+    assert(stp->outv != SR_NULLPTR);
+    assert(stp->outv_size != SR_NULLPTR);
+    assert(stp->oindv != SR_NULLPTR);
+    assert(stp->rlenv != SR_NULLPTR);
+    assert(stp->ocol_namev != SR_NULLPTR);
+    assert(stp->ocol_namev_size != SR_NULLPTR);
 
     /* free all column names */
     for (col_idx = 0; col_idx < stp->defnpv_size; ++col_idx) {
@@ -2030,12 +2031,12 @@ static void DEFUN(_dealloc_definep, (stp), sqlo_stmt_struct_ptr_t stp)
       if (stp->ocolsv[col_idx].loblp) {
         // sr_TraceLog(LOGFILE, "col %i, OCIDescriptorFree 1 %p\n", col_idx, stp->ocolsv[col_idx].loblp);
         OCIDescriptorFree((dvoid **)&(stp->ocolsv[col_idx].loblp), (ub4)OCI_DTYPE_LOB);
-        stp->ocolsv[col_idx].loblp = nullptr;
+        stp->ocolsv[col_idx].loblp = SR_NULLPTR;
       }
 
       if (stp->outv[col_idx]) {
         XFREE(stp->outv[col_idx], __LINE__);
-        stp->outv[col_idx] = nullptr;
+        stp->outv[col_idx] = SR_NULLPTR;
         stp->outv_size[col_idx] = 0;
         stp->rlenv[col_idx] = 0;
       }
@@ -2050,14 +2051,14 @@ static void DEFUN(_dealloc_definep, (stp), sqlo_stmt_struct_ptr_t stp)
     XFREE(stp->ocol_namev, __LINE__);
     XFREE(stp->ocol_namev_size, __LINE__);
 
-    stp->defnpv = nullptr;
-    stp->ocolsv = nullptr;
-    stp->outv = nullptr;
-    stp->outv_size = nullptr;
-    stp->oindv = nullptr;
-    stp->rlenv = nullptr;
-    stp->ocol_namev = nullptr;
-    stp->ocol_namev_size = nullptr;
+    stp->defnpv = SR_NULLPTR;
+    stp->ocolsv = SR_NULLPTR;
+    stp->outv = SR_NULLPTR;
+    stp->outv_size = SR_NULLPTR;
+    stp->oindv = SR_NULLPTR;
+    stp->rlenv = SR_NULLPTR;
+    stp->ocol_namev = SR_NULLPTR;
+    stp->ocol_namev_size = SR_NULLPTR;
   }
   stp->defnpv_size = 0;
   stp->num_defnpv = 0;
@@ -2088,7 +2089,7 @@ static int DEFUN_VOID(_sqlo_getenv)
 
     ep = getenv(vname);
 
-    if (nullptr != ep && strlen(ep)) {
+    if (SR_NULLPTR != ep && strlen(ep)) {
 
       switch (g_params[i].vtyp) {
       case INTEGER: {
@@ -2127,7 +2128,7 @@ static int DEFUN_VOID(_open_global_trace_file)
   if (_trace_fp)
     return SQLO_SUCCESS;
 
-  if (nullptr == (_trace_fp = fopen(_trace_file, "w"))) {
+  if (SR_NULLPTR == (_trace_fp = fopen(_trace_file, "w"))) {
     fprintf(stderr, "Cannot open %s (errno=%d)\n", _trace_file, errno);
     return SQLO_ERROR;
   }
@@ -2149,7 +2150,7 @@ DEFUN_VOID(_close_global_trace_file)
   int stat = SQLO_SUCCESS;
   if( _trace_fp ) {
     stat = fclose(_trace_fp);
-    _trace_fp = nullptr;
+    _trace_fp = SR_NULLPTR;
   }
   return (0 == stat) ? SQLO_SUCCESS : SQLO_ERROR;
 }
@@ -2178,7 +2179,7 @@ static int DEFUN(_open_session_trace_file, (dbp), sqlo_db_struct_ptr_t dbp)
   /* construct the trace filename */
   sprintf(trace_file, "%s%u", _trace_file, _session_count);
 
-  if (nullptr == (dbp->trace_fp = fopen(trace_file, "w"))) {
+  if (SR_NULLPTR == (dbp->trace_fp = fopen(trace_file, "w"))) {
     fprintf(stderr, "Cannot open %s (errno=%d)\n", trace_file, errno);
     return SQLO_ERROR;
   }
@@ -2201,7 +2202,7 @@ static int DEFUN(_close_session_trace_file, (dbp), sqlo_db_struct_ptr_t dbp)
 
   if (dbp->trace_fp) {
     stat = fclose(dbp->trace_fp);
-    dbp->trace_fp = nullptr;
+    dbp->trace_fp = SR_NULLPTR;
   }
 
   return (0 == stat) ? SQLO_SUCCESS : SQLO_ERROR;
@@ -2241,7 +2242,7 @@ static int DEFUN(_save_oci_status, (dbp, action, object, lineno),
     break;
   }
   case OCI_SUCCESS_WITH_INFO: {
-    (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)nullptr, &dbp->errcode, (text *)errbuf, (ub4)sizeof(errbuf),
+    (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)SR_NULLPTR, &dbp->errcode, (text *)errbuf, (ub4)sizeof(errbuf),
                       OCI_HTYPE_ERROR);
 #ifndef NDEBUG
     sprintf(dbp->errmsg, "%s\n(line: %d)\n", errbuf, lineno);
@@ -2259,7 +2260,7 @@ static int DEFUN(_save_oci_status, (dbp, action, object, lineno),
     break;
   }
   case OCI_ERROR: {
-    (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)nullptr, &dbp->errcode, (text *)errbuf, (ub4)sizeof(errbuf),
+    (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)SR_NULLPTR, &dbp->errcode, (text *)errbuf, (ub4)sizeof(errbuf),
                       OCI_HTYPE_ERROR);
 #ifndef NDEBUG
     sprintf(dbp->errmsg, "%s\n(line: %d)\n", errbuf, lineno);
@@ -2640,9 +2641,9 @@ static inline void DEFUN(_strip_string, (s, len), char *s AND unsigned int len)
 #endif
 static inline int DEFUN(_get_errcode, (dbp), sqlo_db_struct_ptr_t dbp)
 {
-  assert((dbp != nullptr));
+  assert((dbp != SR_NULLPTR));
 
-  (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)nullptr, &dbp->errcode, nullptr, (ub4)0, OCI_HTYPE_ERROR);
+  (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)SR_NULLPTR, &dbp->errcode, SR_NULLPTR, (ub4)0, OCI_HTYPE_ERROR);
 
   return dbp->errcode;
 }
@@ -2670,8 +2671,8 @@ static inline int DEFUN(_bind_by_pos, (stp, param_pos, param_type, param_addr, p
                    _get_data_type_str(param_type), param_size););
 
   assert(param_pos > 0);
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -2689,7 +2690,7 @@ static inline int DEFUN(_bind_by_pos, (stp, param_pos, param_type, param_addr, p
         OCIBindByPos(stp->stmthp, bindp_addr, dbp->errhp, (ub4)param_pos, (dvoid *)param_addr, (sword)param_size,
                      static_cast<ub2>(param_type), (dvoid *)ind_addr, (ub2 *)0, (ub2 *)0, (ub4)0, (ub4 *)0, OCI_DEFAULT);
 
-    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos. Cannot bind", nullptr);
+    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos. Cannot bind", SR_NULLPTR);
     if (is_array) {
       dbp->status = OCIBindArrayOfStruct(*bindp_addr, dbp->errhp, param_size, ind_addr ? sizeof(short) : 0, 0, 0);
 
@@ -2732,8 +2733,8 @@ static inline int DEFUN(
                    _get_data_type_str(param_type), param_size););
 
   assert(param_pos > 0);
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -2751,7 +2752,7 @@ static inline int DEFUN(
         OCIBindByPos(stp->stmthp, bindp_addr, dbp->errhp, (ub4)param_pos, (dvoid *)param_addr, (sword)param_size,
                      (ub2)param_type, (dvoid *)ind_addr, (ub2 *)0, (ub2 *)rcode_addr, (ub4)0, (ub4 *)0, OCI_DEFAULT);
 
-    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos. Cannot bind", nullptr);
+    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_bind_by_pos. Cannot bind", SR_NULLPTR);
 
     if (skip_size > 0) {
       dbp->status = OCIBindArrayOfStruct(*bindp_addr, dbp->errhp, skip_size, ind_addr ? skip_size : 0, 0,
@@ -2792,8 +2793,8 @@ static inline int DEFUN(
                    value_type, _get_data_type_str(value_type), value_size, skip_size, stp->num_defnpv););
 
   assert(value_pos > 0);
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -2809,7 +2810,7 @@ static inline int DEFUN(
                                  (ub1 *)value_addr, (sword)value_size, static_cast<ub2>(value_type), (dvoid *)ind_addr, (ub2 *)rlen_addr,
                                  (ub2 *)rcode_addr, OCI_DEFAULT);
 
-    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos2: Cannot define", nullptr);
+    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos2: Cannot define", SR_NULLPTR);
 
     if (skip_size) {
       dbp->status = OCIDefineArrayOfStruct(stp->defnpv[value_pos - 1], dbp->errhp, skip_size, ind_addr ? skip_size : 0,
@@ -2850,7 +2851,7 @@ static inline int DEFUN(
                    value_pos, value_type, _get_data_type_str(value_type), value_size, is_array, stp->num_defnpv););
 
   assert(value_pos > 0);
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   if (_is_prepared(stp)) {
@@ -2865,7 +2866,7 @@ static inline int DEFUN(
                                  (ub1 *)value_addr, (sword)value_size, static_cast<ub2>(value_type), (dvoid *)ind_addr, (ub2 *)rlen_addr,
                                  (ub2 *)rcode_addr, OCI_DEFAULT);
 
-    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos: Cannot define", nullptr);
+    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_by_pos: Cannot define", SR_NULLPTR);
 
     if (is_array) {
       dbp->status =
@@ -2905,7 +2906,7 @@ static int DEFUN(_bind_argv, (stp, argc, argv), sqlo_stmt_struct_ptr_t stp AND u
   unsigned int size;
   /* register */ short *ind_ptr;
 
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   /* allocate the necessary intput bind variables */
@@ -2956,7 +2957,7 @@ static inline int DEFUN(_calc_obuf_size, (bufsizep, data_type, prec, scale, dbsi
   unsigned int buffer_size = 0;
   int status = SQLO_SUCCESS;
 
-  assert(bufsizep != nullptr);
+  assert(bufsizep != SR_NULLPTR);
 
   switch (data_type) {
   case SQLT_NUM:
@@ -3036,10 +3037,10 @@ static int DEFUN(_get_ocol_db_data_type, (stp, pos, dtypep),
   sqlo_db_struct_ptr_t dbp;
   OCIParam *paramd;
 
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
   assert(pos > 0);
-  assert(dtypep != nullptr);
+  assert(dtypep != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3079,10 +3080,10 @@ static int DEFUN(_get_ocol_db_size, (stp, pos, sizep), sqlo_stmt_struct_ptr_t st
   sqlo_db_struct_ptr_t dbp;
   OCIParam *paramd;
 
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
   assert(pos > 0);
-  assert(sizep != nullptr);
+  assert(sizep != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3120,10 +3121,10 @@ static int DEFUN(_get_ocol_db_prec, (stp, pos, precp), sqlo_stmt_struct_ptr_t st
   sqlo_db_struct_ptr_t dbp;
   OCIParam *paramd;
 
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
   assert(pos > 0);
-  assert(precp != nullptr);
+  assert(precp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3163,10 +3164,10 @@ static int DEFUN(_get_ocol_db_scale, (stp, pos, scalep),
   sqlo_db_struct_ptr_t dbp;
   OCIParam *paramd;
 
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
   assert(pos > 0);
-  assert(scalep != nullptr);
+  assert(scalep != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3206,10 +3207,10 @@ static int DEFUN(_get_ocol_db_is_null, (stp, colp, pos, is_nullp),
   sqlo_db_struct_ptr_t dbp;
   OCIParam *paramd;
 
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
   assert(pos > 0);
-  assert(is_nullp != nullptr);
+  assert(is_nullp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3253,10 +3254,10 @@ static int DEFUN(_set_ocol_name, (stp, colp, pos),
   /* register */ unsigned int col_idx; /* the index into our arrays */
   OCIParam *paramd;
 
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
   assert(pos > 0);
-  assert(colp != nullptr);
+  assert(colp != SR_NULLPTR);
 
   dbp = stp->dbp;
   col_idx = pos - 1;
@@ -3269,7 +3270,7 @@ static int DEFUN(_set_ocol_name, (stp, colp, pos),
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_set_ocol_name", "OCIParamGet");
 
   col_name_len = 0;
-  col_name = nullptr;
+  col_name = SR_NULLPTR;
   dbp->status = OCIAttrGet((dvoid *)paramd, (ub4)OCI_DTYPE_PARAM, (dvoid **)&(col_name), (ub4 *)&(col_name_len),
                            (ub4)OCI_ATTR_NAME, (OCIError *)dbp->errhp);
 
@@ -3326,8 +3327,8 @@ static int DEFUN(_set_all_ocol_names, (stp), sqlo_stmt_struct_ptr_t stp)
   sqlo_col_struct_ptr_t colp;
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3375,9 +3376,9 @@ static int DEFUN(_alloc_ocol_buffer, (stp, pos, buffer_size),
 {
   int col_idx;
   unsigned int buf_size = buffer_size;
-  assert(stp != nullptr);
+  assert(stp != SR_NULLPTR);
   assert(pos > 0);
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
 
   col_idx = pos - 1;
 
@@ -3437,7 +3438,7 @@ static int DEFUN(_define_ocol_by_pos, (stp, colp, pos),
   /* register */ unsigned int col_idx; /* the index into our arrays */
 
   assert(pos > 0);
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
 
   dbp = stp->dbp;
   col_idx = pos - 1;
@@ -3469,7 +3470,7 @@ static int DEFUN(_define_ocol_by_pos, (stp, colp, pos),
       // stp->outv_size[col_idx], buffer_size, stp->rlenv[col_idx]);
 
       dbp->status = _define_by_pos(stp, pos, SQLT_STR, stp->outv[col_idx], stp->outv_size[col_idx],
-                                   (short *)&stp->oindv[col_idx], (ub4 *)&stp->outv_size[col_idx], nullptr, 0);
+                                   (short *)&stp->oindv[col_idx], (ub4 *)&stp->outv_size[col_idx], SR_NULLPTR, 0);
       stp->outv_size[col_idx] = stp->outv_size[col_idx] - 1;
 
       // sr_TraceLog(LOGFILE, "_define_by_pos col %i, OUT length %i\n", col_idx, stp->outv_size[col_idx]);
@@ -3484,7 +3485,7 @@ static int DEFUN(_define_ocol_by_pos, (stp, colp, pos),
       }
 
       dbp->status =
-          _define_by_pos(stp, pos, SQLOT_CLOB, &(colp->loblp), 0, (short *)&stp->oindv[col_idx], 0, nullptr, 0);
+          _define_by_pos(stp, pos, SQLOT_CLOB, &(colp->loblp), 0, (short *)&stp->oindv[col_idx], 0, SR_NULLPTR, 0);
     }
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_define_ocol_by_pos", "_define_by_pos");
   }
@@ -3512,7 +3513,7 @@ static inline sqlo_stmt_struct_ptr_t DEFUN(_sth2stp, (sth, func_name), int sth A
   real_sth = DECODE_STH(sth);
   dbh = DECODE_DBH(sth);
 
-  CHECK_DBHANDLE(dbp, dbh, (static_cast<CONST char *>(func_name)), nullptr);
+  CHECK_DBHANDLE(dbp, dbh, (static_cast<CONST char *>(func_name)), SR_NULLPTR);
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "_sth2stp: sth %d -> sth=%u, dbh=%u\n", sth, real_sth, dbh););
 
@@ -3522,7 +3523,7 @@ static inline sqlo_stmt_struct_ptr_t DEFUN(_sth2stp, (sth, func_name), int sth A
     TRACE(1, fprintf(_get_trace_fp(dbp), dbp->errmsg););
     /* make sure we release all locks */
     UNLOCK_ALL;
-    return nullptr;
+    return SR_NULLPTR;
   }
 
   return &(dbp->stmtv[real_sth]);
@@ -3543,7 +3544,7 @@ static int DEFUN(_define_output, (stp), sqlo_stmt_struct_ptr_t stp)
   sqlo_col_struct_ptr_t colp;
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3656,11 +3657,11 @@ static void DEFUN(_close_all_db_cursors, (dbp), const_sqlo_db_struct_ptr_t dbp)
         OCIDescriptorFree((dvoid **)&(stp->ocolsv[col_idx].loblp), (ub4)OCI_DTYPE_LOB);
         // sr_TraceLog(LOGFILE, "col %i, OCIDescriptorFree 2 %p\n", col_idx, stp->ocolsv[col_idx].loblp);
 
-        stp->ocolsv[col_idx].loblp = nullptr;
+        stp->ocolsv[col_idx].loblp = SR_NULLPTR;
       }
       if (stp->outv && stp->outv[col_idx]) {
         XFREE(stp->outv[col_idx], __LINE__);
-        stp->outv[col_idx] = nullptr;
+        stp->outv[col_idx] = SR_NULLPTR;
         stp->outv_size[col_idx] = 0;
       }
     }
@@ -3693,15 +3694,15 @@ static void DEFUN(_close_all_db_cursors, (dbp), const_sqlo_db_struct_ptr_t dbp)
       XFREE(stp->stmt, __LINE__);
     }
 
-    stp->defnpv = nullptr;
-    stp->ocolsv = nullptr;
-    stp->outv = nullptr;
-    stp->outv_size = nullptr;
-    stp->oindv = nullptr;
-    stp->rlenv = nullptr;
-    stp->ocol_namev_size = nullptr;
+    stp->defnpv = SR_NULLPTR;
+    stp->ocolsv = SR_NULLPTR;
+    stp->outv = SR_NULLPTR;
+    stp->outv_size = SR_NULLPTR;
+    stp->oindv = SR_NULLPTR;
+    stp->rlenv = SR_NULLPTR;
+    stp->ocol_namev_size = SR_NULLPTR;
     stp->stmt_size = 0;
-    stp->stmt = nullptr;
+    stp->stmt = SR_NULLPTR;
     stp->defnpv_size = 0;
     stp->num_defnpv = 0;
   }
@@ -3789,9 +3790,9 @@ static int DEFUN(_get_stmt_type, (stp, stmt_typep), sqlo_stmt_struct_ptr_t stp A
 {
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp != nullptr);
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp != SR_NULLPTR);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3829,9 +3830,9 @@ static int DEFUN(_prepare, (stp, stmt, stmt_type), sqlo_stmt_struct_ptr_t stp AN
 {
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp != nullptr);
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp != SR_NULLPTR);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3874,9 +3875,9 @@ static int DEFUN(_sqlo_reopen, (stp, argc, argv), sqlo_stmt_struct_ptr_t stp AND
 
   sqlo_db_struct_ptr_t dbp;
 
-  assert(stp != nullptr);
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp != SR_NULLPTR);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -3980,14 +3981,14 @@ static int DEFUN(_sqlo_reopen, (stp, argc, argv), sqlo_stmt_struct_ptr_t stp AND
 CONST char *DEFUN(sqlo_get_stmt, (sth), sqlo_stmt_handle_t sth)
 {
   sqlo_stmt_struct_ptr_t stp;
-  CHECK_STHANDLE(stp, sth, "sqlo_get_stmt", nullptr);
+  CHECK_STHANDLE(stp, sth, "sqlo_get_stmt", SR_NULLPTR);
 
-  assert(stp != nullptr);
+  assert(stp != SR_NULLPTR);
 
   if (_get_stmt_string(stp))
     return stp->stmt;
 
-  return nullptr;
+  return SR_NULLPTR;
 }
 
 /*-------------------------------------------------------------------------
@@ -3998,7 +3999,7 @@ int DEFUN(sqlo_get_stmt_state, (sth), sqlo_stmt_handle_t sth)
   sqlo_stmt_struct_ptr_t stp;
   CHECK_STHANDLE(stp, sth, "sqlo_get_stmt_state", SQLO_INVALID_STMT_HANDLE);
 
-  assert(stp != nullptr);
+  assert(stp != SR_NULLPTR);
 
   return _get_stmt_state(stp);
 }
@@ -4074,7 +4075,7 @@ int DEFUN(sqlo_init, (threaded_mode, max_db, max_cursors),
 #ifdef ENABLE_ORATHREADS
 
 #ifdef HAVE_OCIENVCREATE
-    status = OCIEnvCreate(&_oci_envhp, _oci_init_mode, nullptr, nullptr, nullptr, nullptr, 0, nullptr);
+    status = OCIEnvCreate(&_oci_envhp, _oci_init_mode, SR_NULLPTR, SR_NULLPTR, SR_NULLPTR, SR_NULLPTR, 0, SR_NULLPTR);
     if (status) {
       EXEC_WHEN_THREADING(_init_unlock();); /* end of critical section */
       return status;
@@ -4112,7 +4113,7 @@ int DEFUN(sqlo_init, (threaded_mode, max_db, max_cursors),
       return SQLO_ERRMALLOC;
     }
 
-    TRACE(4, fprintf(_get_trace_fp(nullptr), "sqlo_init: Allocated %u bytes for %u db handles\n",
+    TRACE(4, fprintf(_get_trace_fp(SR_NULLPTR), "sqlo_init: Allocated %u bytes for %u db handles\n",
                      static_cast<unsigned int>(_dbv_size * sizeof(sqlo_db_struct_t)), _dbv_size););
     memset(_dbv, 0, _dbv_size * sizeof(sqlo_db_struct_ptr_t));
   }
@@ -4129,9 +4130,9 @@ int DEFUN(sqlo_trace, (dbh, on), sqlo_db_handle_t dbh AND int on)
 {
   int stat;
   if (on) {
-    stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE TRUE", nullptr);
+    stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE TRUE", SR_NULLPTR);
   } else {
-    stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE FALSE", nullptr);
+    stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE FALSE", SR_NULLPTR);
   }
 
   return stat;
@@ -4151,9 +4152,9 @@ CONST char *DEFUN(sqlo_geterror, (dbh), sqlo_db_handle_t dbh)
    * the global error message.
    */
   if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used) {
-    TRACE(1, fprintf(_get_trace_fp(nullptr), "Invalid Database handle %d in sqlo_geterror.\n", dbh););
+    TRACE(1, fprintf(_get_trace_fp(SR_NULLPTR), "Invalid Database handle %d in sqlo_geterror.\n", dbh););
     if (*_errmsg) {
-      TRACE(1, fprintf(_get_trace_fp(nullptr), "Return _errmsg (%s)", _errmsg););
+      TRACE(1, fprintf(_get_trace_fp(SR_NULLPTR), "Return _errmsg (%s)", _errmsg););
       return _errmsg;
     }
     sprintf(fatal_error, "Invalid dbh %d passed to sqlo_geterror", dbh);
@@ -4163,9 +4164,9 @@ CONST char *DEFUN(sqlo_geterror, (dbh), sqlo_db_handle_t dbh)
     dbp = _dbv[dbh];
 
     if (!dbp) {
-      TRACE(1, fprintf(_get_trace_fp(nullptr), "Invalid Database handle %d in sqlo_geterror.\n", dbh););
+      TRACE(1, fprintf(_get_trace_fp(SR_NULLPTR), "Invalid Database handle %d in sqlo_geterror.\n", dbh););
       if (*_errmsg) {
-        TRACE(1, fprintf(_get_trace_fp(nullptr), "Return _errmsg (%s)", _errmsg););
+        TRACE(1, fprintf(_get_trace_fp(SR_NULLPTR), "Return _errmsg (%s)", _errmsg););
         return _errmsg;
       }
       sprintf(fatal_error, "Invalid dbh %d passed to sqlo_geterror (points to NULL entry)", dbh);
@@ -4177,7 +4178,7 @@ CONST char *DEFUN(sqlo_geterror, (dbh), sqlo_db_handle_t dbh)
     */
 
     if ('\0' == *dbp->errmsg) {
-      (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)nullptr, &dbp->errcode, (text *)dbp->errmsg,
+      (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)SR_NULLPTR, &dbp->errcode, (text *)dbp->errmsg,
                         (ub4)SQLO_MAX_ERRMSG_LEN * sizeof(char), OCI_HTYPE_ERROR);
 #ifndef NDEBUG
       sprintf(dbp->errmsg, "%s\n(line: %d)\n", dbp->errmsg, __LINE__);
@@ -4197,7 +4198,7 @@ int DEFUN(sqlo_geterrcode, (dbh), sqlo_db_handle_t dbh)
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_geterrcode", SQLO_INVALID_DB_HANDLE);
 
-  assert(dbp != nullptr);
+  assert(dbp != SR_NULLPTR);
 
   return _get_errcode(dbp);
 }
@@ -4344,7 +4345,7 @@ int DEFUN(sqlo_count, (dbh, table, colname, colval, where),
   if (status < 0) {
     CHECK_OCI_STATUS_RETURN(dbp, status, "sqlo_count", "sqlo_fetch");
   } else if (status == 0) {
-    v = sqlo_values(sth, nullptr, 1);
+    v = sqlo_values(sth, SR_NULLPTR, 1);
     cnt = atoi(*v);
   } else {
     cnt = 0;
@@ -4425,17 +4426,17 @@ int DEFUN(sqlo_exec, (dbh, stmt, rr), sqlo_db_handle_t dbh AND const char *stmt 
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_exec", SQLO_INVALID_DB_HANDLE);
 
-  assert(dbp != nullptr);
-  assert(stmt != nullptr);
+  assert(dbp != SR_NULLPTR);
+  assert(stmt != SR_NULLPTR);
 
   /* we can use a local variable, because we will never return a
    * SQLO_OCI_STILL_EXECUTING
    */
   /* Use the stmthp in dbp. */
 
-  if (!(dbp->stmthp == nullptr)) {
+  if (!(dbp->stmthp == SR_NULLPTR)) {
     (void)OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
-    dbp->stmthp = nullptr;
+    dbp->stmthp = SR_NULLPTR;
   }
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_exec: prepare: %s\n", stmt););
@@ -4468,11 +4469,11 @@ int DEFUN(sqlo_exec, (dbh, stmt, rr), sqlo_db_handle_t dbh AND const char *stmt 
       *rr = prows;
       dbp->status = OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_exec", "OCIHandleFree");
-      dbp->stmthp = nullptr;
+      dbp->stmthp = SR_NULLPTR;
     } else {
       /* ERROR */
       (void)OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
-      dbp->stmthp = nullptr;
+      dbp->stmthp = SR_NULLPTR;
       return dbp->status;
     }
   } else if (dbp->status == OCI_STILL_EXECUTING) { /* Execute still processing= */
@@ -4480,7 +4481,7 @@ int DEFUN(sqlo_exec, (dbh, stmt, rr), sqlo_db_handle_t dbh AND const char *stmt 
   } else {
     /* ERROR IN EXECUTE */
     OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
-    dbp->stmthp = nullptr;
+    dbp->stmthp = SR_NULLPTR;
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_exec", "OCIStmtExecute");
   }
 
@@ -4568,7 +4569,7 @@ int DEFUN(sqlo_open2, (sthp, dbh, stmt, argc, argv),
           sqlo_stmt_handle_t *sthp AND sqlo_db_handle_t dbh AND const char *stmt AND int argc AND const char **argv)
 {
   sqlo_db_struct_ptr_t dbp;
-  sqlo_stmt_struct_ptr_t stp = nullptr;
+  sqlo_stmt_struct_ptr_t stp = SR_NULLPTR;
   int status;
   int ret;
   auto blocking = static_cast<unsigned int>(SQLO_STH_INIT);
@@ -4598,14 +4599,14 @@ int DEFUN(sqlo_open2, (sthp, dbh, stmt, argc, argv),
   if (SQLO_OFF == blocking) {
     stp = &(dbp->stmtv[real_sth]);
 
-    if (stp != nullptr) {
+    if (stp != SR_NULLPTR) {
       TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_open2: sth=%d, used=%d, opened=%d, is_query=%d, still_executing=%d\n",
                        real_sth, stp->used, _is_opened(stp), _is_query(stp), stp->still_executing););
     } else {
       TRACE(1, fprintf(_get_trace_fp(dbp), "sqlo_open2: NULL pointer exception: stp is NULL"););
     }
 
-    if (real_sth >= 0 && real_sth < static_cast<int>(dbp->stmtv_size) && (stp != nullptr) && stp->used &&
+    if (real_sth >= 0 && real_sth < static_cast<int>(dbp->stmtv_size) && (stp != SR_NULLPTR) && stp->used &&
         !_is_opened(stp) && _is_query(stp) && stp->still_executing) {
 
       return _sqlo_reopen(stp, argc, argv);
@@ -4681,10 +4682,10 @@ int DEFUN(sqlo_fetch, (sth, nrows), sqlo_stmt_handle_t sth AND unsigned int nrow
 
   CHECK_STHANDLE(stp, sth, "sqlo_fetch", SQLO_INVALID_STMT_HANDLE);
 
-  assert(stp->dbp != nullptr);
-  assert(stp->stmthp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
-  assert(stp->dbp->svchp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->stmthp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
+  assert(stp->dbp->svchp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -4777,7 +4778,7 @@ CONST char **DEFUN(sqlo_values, (sth, num, do_strip_string),
 {
   sqlo_stmt_struct_ptr_t stp;
 
-  CHECK_STHANDLE(stp, sth, "sqlo_values", nullptr);
+  CHECK_STHANDLE(stp, sth, "sqlo_values", SR_NULLPTR);
 
   if (!_is_query(stp) || !_is_opened(stp)) {
     sprintf(stp->dbp->errmsg,
@@ -4785,7 +4786,7 @@ CONST char **DEFUN(sqlo_values, (sth, num, do_strip_string),
     TRACE(1, (void)fputs(stp->dbp->errmsg, _get_trace_fp(stp->dbp)););
     if (num)
       *num = 0;
-    return nullptr;
+    return SR_NULLPTR;
   }
 
   TRACE(2, fprintf(_get_trace_fp(stp->dbp), "Get values [%2u]. _strip_string: %d\n", stp->sth, do_strip_string););
@@ -4809,9 +4810,9 @@ int DEFUN(sqlo_prows, (sth), sqlo_stmt_handle_t sth)
 
   CHECK_STHANDLE(stp, sth, "sqlo_prows", SQLO_INVALID_STMT_HANDLE);
 
-  assert(stp->dbp != nullptr);
-  assert(stp->stmthp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->stmthp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -4845,10 +4846,10 @@ int DEFUN(sqlo_ncols, (sth, in), sqlo_stmt_handle_t sth AND int in)
 
   CHECK_STHANDLE(stp, sth, "sqlo_ncols", SQLO_INVALID_STMT_HANDLE);
 
-  assert(stp->dbp != nullptr);
-  assert(stp->stmthp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
-  assert(stp->dbp->svchp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->stmthp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
+  assert(stp->dbp->svchp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -4884,7 +4885,7 @@ CONST char *DEFUN(sqlo_command, (sth), sqlo_stmt_handle_t sth)
 {
   sqlo_stmt_struct_ptr_t stp;
 
-  CHECK_STHANDLE(stp, sth, "sqlo_command", nullptr);
+  CHECK_STHANDLE(stp, sth, "sqlo_command", SR_NULLPTR);
   return static_cast<CONST char *>(_get_stmt_string(stp));
 }
 
@@ -4900,7 +4901,7 @@ int DEFUN(sqlo_close, (sth), sqlo_stmt_handle_t sth)
 
   CHECK_STHANDLE(stp, sth, "sqlo_close", SQLO_INVALID_STMT_HANDLE);
 
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_close [%2u]: %.60s\n", stp->sth, _get_stmt_string(stp)););
@@ -4917,7 +4918,7 @@ int DEFUN(sqlo_close, (sth), sqlo_stmt_handle_t sth)
     /* deallocate memory allocated for LONG columns */
     if (stp->outv_size[defnp_idx] >= _max_long_size) {
       XFREE(stp->outv[defnp_idx], __LINE__);
-      stp->outv[defnp_idx] = nullptr;
+      stp->outv[defnp_idx] = SR_NULLPTR;
       stp->outv_size[defnp_idx] = 0;
     }
     /*
@@ -4926,7 +4927,7 @@ int DEFUN(sqlo_close, (sth), sqlo_stmt_handle_t sth)
         if( stp->ocolsv[defnp_idx].loblp ) {
           OCIDescriptorFree((dvoid **) &(stp->ocolsv[defnp_idx].loblp), (ub4) OCI_DTYPE_LOB);
           //sr_TraceLog(LOGFILE, "col %i, OCIDescriptorFree 3 %p\n", defnp_idx, stp->ocolsv[defnp_idx].loblp);
-          stp->ocolsv[defnp_idx].loblp = nullptr;
+          stp->ocolsv[defnp_idx].loblp = SR_NULLPTR;
         }
     */
   } /* end for defnp_idx */
@@ -4937,7 +4938,7 @@ int DEFUN(sqlo_close, (sth), sqlo_stmt_handle_t sth)
   if (stp->stmthp) {
     dbp->status = OCIHandleFree(stp->stmthp, OCI_HTYPE_STMT);
 
-    stp->stmthp = nullptr;
+    stp->stmthp = SR_NULLPTR;
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_close", "OCIHandleFree(stmthp)");
   }
 
@@ -5043,7 +5044,7 @@ int DEFUN(sqlo_split_cstring, (cstr, uid, pwd, tnsname, bufsize),
     }
     *tnsname = '\0';
   } else {
-    if ((env_ptr = getenv("ORACLE_SID")) != nullptr) {
+    if ((env_ptr = getenv("ORACLE_SID")) != SR_NULLPTR) {
       strncpy(tnsname, env_ptr, bufsize - 1);
       tnsname[bufsize - 1] = '\0';
     }
@@ -5061,10 +5062,10 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   if (dbhp)
     *dbhp = -1;
 
-  TRACE(2, fprintf(_get_trace_fp(nullptr), "sqlo_server_attach starts\n"););
+  TRACE(2, fprintf(_get_trace_fp(SR_NULLPTR), "sqlo_server_attach starts\n"););
 
-  if ((dbp = _db_add()) == nullptr) {
-    TRACE(3, fprintf(_get_trace_fp(nullptr), "sqlo_server_attach: Could not alloacte a dbp\n"););
+  if ((dbp = _db_add()) == SR_NULLPTR) {
+    TRACE(3, fprintf(_get_trace_fp(SR_NULLPTR), "sqlo_server_attach: Could not alloacte a dbp\n"););
     return SQLO_ERROR;
   }
 
@@ -5113,7 +5114,7 @@ int DEFUN(sqlo_server_attach, (dbhp, tnsname), sqlo_db_handle_t *dbhp AND const 
   EXEC_WHEN_THREADING(_env_lock(););
 
 #ifdef HAVE_OCIENVCREATE
-  dbp->status = OCIEnvCreate(&dbp->envhp, _oci_init_mode, nullptr, nullptr, nullptr, nullptr, 0, nullptr);
+  dbp->status = OCIEnvCreate(&dbp->envhp, _oci_init_mode, SR_NULLPTR, SR_NULLPTR, SR_NULLPTR, SR_NULLPTR, 0, SR_NULLPTR);
   CHECK_OCI_STATUS(dbp, dbp->status, "sqlo_server_attach", "OCIEnvCreate");
 #else
   dbp->status = OCIEnvInit((OCIEnv **)((dvoid *)&dbp->envhp), _oci_init_mode, 0, (dvoid **)0);
@@ -5226,7 +5227,7 @@ int DEFUN(sqlo_session_begin, (dbh, username, password),
   dbp = _dbv[dbh]; /* setup the pointer to the db structure */
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_session_begin[%d] starts\n", dbh););
 
-  assert(dbp != nullptr);
+  assert(dbp != SR_NULLPTR);
 
   if (!username || !password) {
     strcpy(dbp->errmsg, "sqlo_sesson_begin: No username or password specified");
@@ -5302,7 +5303,7 @@ int DEFUN(sqlo_server_detach, (dbh), sqlo_db_handle_t dbh)
 {
   sqlo_db_struct_ptr_t dbp;
 
-  TRACE(2, fprintf(_get_trace_fp(nullptr), "sqlo_server_detach starts dbh=%d\n", dbh););
+  TRACE(2, fprintf(_get_trace_fp(SR_NULLPTR), "sqlo_server_detach starts dbh=%d\n", dbh););
 
   if (!VALID_DBH_RANGE(dbh) || !_dbv[dbh]->used || !_dbv[dbh]->attached) {
     TRACE(1, fprintf(_trace_fp, "Invalid Database handle %d in sqlo_server_detach\n", dbh););
@@ -5311,7 +5312,7 @@ int DEFUN(sqlo_server_detach, (dbh), sqlo_db_handle_t dbh)
 
   dbp = _dbv[dbh]; /* setup the pointer to the db structure */
 
-  assert(dbp != nullptr);
+  assert(dbp != SR_NULLPTR);
 
   /* forgot to call sqlo_session_end ? */
   if (dbp->session_created) {
@@ -5347,7 +5348,7 @@ int DEFUN(sqlo_server_free, (dbh), sqlo_db_handle_t dbh)
   CHECK_DBHANDLE(dbp, dbh, "sqlo_server_free", SQLO_INVALID_DB_HANDLE);
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_server_free[%d] starts\n", dbh););
-  assert(dbp != nullptr);
+  assert(dbp != SR_NULLPTR);
 
   if (dbp->attached) {
     dbp->status = OCIServerDetach(dbp->srvhp, dbp->errhp, OCI_DEFAULT);
@@ -5373,7 +5374,7 @@ int DEFUN(sqlo_session_end, (dbh), sqlo_db_handle_t dbh)
   }
 
   dbp = _dbv[dbh]; /* setup the pointer to the db structure */
-  assert(dbp != nullptr);
+  assert(dbp != SR_NULLPTR);
 
   TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_session_end[%d] starts\n", dbh););
 
@@ -5415,12 +5416,12 @@ int DEFUN(sqlo_connect, (dbhp, cstr), sqlo_db_handle_t *dbhp AND const char *cst
     return SQLO_ERROR;
   }
 
-  TRACE(2, fprintf(_get_trace_fp(nullptr), "sqlo_connect starts\n"););
+  TRACE(2, fprintf(_get_trace_fp(SR_NULLPTR), "sqlo_connect starts\n"););
 
   if (SQLO_SUCCESS != sqlo_split_cstring(cstr, uid, pwd, tnsname, MAX_BUFLEN))
     return SQLO_ERROR;
 
-  TRACE(3, fprintf(_get_trace_fp(nullptr), "sqlo_connect: uid=%s, pwd=%s, tnsname=%s\n", uid, pwd, tnsname););
+  TRACE(3, fprintf(_get_trace_fp(SR_NULLPTR), "sqlo_connect: uid=%s, pwd=%s, tnsname=%s\n", uid, pwd, tnsname););
 
   if (SQLO_SUCCESS != (status = sqlo_server_attach(dbhp, tnsname))) {
     /* save the error message, because the db will be released */
@@ -5486,7 +5487,7 @@ int DEFUN(sqlo_finish, (dbh), sqlo_db_handle_t dbh)
           }
           _db_release(_dbv[dbv_idx]);
           XFREE(_dbv[dbv_idx], __LINE__);
-          _dbv[dbv_idx] = nullptr;
+          _dbv[dbv_idx] = SR_NULLPTR;
         }
       }
       XFREE(_dbv, __LINE__);
@@ -5512,11 +5513,11 @@ void DEFUN(sqlo_freeall, (), )
         }
         _db_release(_dbv[dbv_idx]);
         XFREE(_dbv[dbv_idx], __LINE__);
-        _dbv[dbv_idx] = nullptr;
+        _dbv[dbv_idx] = SR_NULLPTR;
       }
     }
     XFREE(_dbv, __LINE__);
-    _dbv = nullptr;
+    _dbv = SR_NULLPTR;
     _sqlo_init = 0;
   }
 }
@@ -5531,7 +5532,7 @@ CONST char *DEFUN(sqlo_getdatabase, (dbh), sqlo_db_handle_t dbh)
   CHECK_DBHANDLE(dbp, dbh, "sqlo_getdatabase", "Invalid db handle");
 
   if (!dbp)
-    return nullptr;
+    return SR_NULLPTR;
 
   if (!dbp->tnsname) {
     sprintf(dbp->errmsg, "No tnsname in db structure\n");
@@ -5595,7 +5596,7 @@ int DEFUN(sqlo_prepare, (dbh, stmt), sqlo_db_handle_t dbh AND const char *stmt)
   sqlo_stmt_struct_ptr_t stp;
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_prepare", SQLO_INVALID_DB_HANDLE);
-  assert(dbp != nullptr);
+  assert(dbp != SR_NULLPTR);
 
   _stmt_new(dbp, stmt, &stp);
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_prepare", "_stmt_new");
@@ -5632,8 +5633,8 @@ int DEFUN(sqlo_bind_by_name, (sth, param_name, param_type, param_addr, param_siz
 
   CHECK_STHANDLE(stp, sth, "sqlo_bind_by_name", SQLO_INVALID_STMT_HANDLE);
 
-  assert(stp->dbp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
   dbp = stp->dbp;
 
   TRACE(3, fprintf(_get_trace_fp(dbp),
@@ -5733,8 +5734,8 @@ int DEFUN(sqlo_define_ntable, (sth, pos, sth2p),
   sqlo_db_struct_ptr_t dbp;
 
   CHECK_STHANDLE(stp, sth, "sqlo_define_ntable", SQLO_INVALID_STMT_HANDLE);
-  assert(stp != nullptr);
-  assert(stp->dbp != nullptr);
+  assert(stp != SR_NULLPTR);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   TRACE(3,
@@ -5841,7 +5842,7 @@ int DEFUN(sqlo_define_by_pos2,
   /* register */ sqlo_stmt_struct_ptr_t stp;
 
   CHECK_STHANDLE(stp, sth, "sqlo_define_by_pos2", SQLO_INVALID_STMT_HANDLE);
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
 
   TRACE(3, fprintf(_get_trace_fp(stp->dbp),
                    "sqlo_define_by_pos [%2d]: pos: %d type: %d (%s), "
@@ -5861,7 +5862,7 @@ int DEFUN(sqlo_execute, (sth, iterations), sqlo_stmt_handle_t sth AND unsigned i
   sqlo_db_struct_ptr_t dbp;
 
   CHECK_STHANDLE(stp, sth, "sqlo_execute", SQLO_INVALID_STMT_HANDLE);
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_execute [%2d]: iter=%u, stmt=%.80s\n", sth, iterations,
@@ -5917,7 +5918,7 @@ int DEFUN(sqlo_executeselect, (sth, iterations), sqlo_stmt_handle_t sth AND unsi
   //   int Ret;
 
   CHECK_STHANDLE(stp, sth, "sqlo_execute", SQLO_INVALID_STMT_HANDLE);
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_execute [%2d]: iter=%u, stmt=%.80s\n", sth, iterations,
@@ -5975,7 +5976,7 @@ CONST char **DEFUN(sqlo_ocol_names, (sth, num), sqlo_stmt_handle_t sth AND int *
   sqlo_stmt_struct_ptr_t stp;
   sqlo_db_struct_ptr_t dbp;
 
-  CHECK_STHANDLE(stp, sth, "sqlo_ocol_names", nullptr);
+  CHECK_STHANDLE(stp, sth, "sqlo_ocol_names", SR_NULLPTR);
   assert(stp->dbp);
   dbp = stp->dbp;
 
@@ -5989,7 +5990,7 @@ CONST char **DEFUN(sqlo_ocol_names, (sth, num), sqlo_stmt_handle_t sth AND int *
 
     if (num)
       *num = 0;
-    return nullptr;
+    return SR_NULLPTR;
   }
 
   if (num)
@@ -6012,7 +6013,7 @@ int DEFUN(sqlo_ocol_names2, (sth, num, ocol_names), sqlo_stmt_handle_t sth AND i
 
   CHECK_STHANDLE(stp, sth, "sqlo_ocol_names2", SQLO_INVALID_STMT_HANDLE);
 
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   if (!_is_query(stp) || !_is_opened(stp)) {
@@ -6049,8 +6050,8 @@ CONST int *DEFUN(sqlo_ocol_name_lens, (sth, num), sqlo_stmt_handle_t sth AND int
   sqlo_stmt_struct_ptr_t stp;
   sqlo_db_struct_ptr_t dbp;
 
-  CHECK_STHANDLE(stp, sth, "sqlo_ocol_name_lens", nullptr);
-  assert(stp->dbp != nullptr);
+  CHECK_STHANDLE(stp, sth, "sqlo_ocol_name_lens", SR_NULLPTR);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   if (!_is_query(stp) || !_is_opened(stp)) {
@@ -6060,7 +6061,7 @@ CONST int *DEFUN(sqlo_ocol_name_lens, (sth, num), sqlo_stmt_handle_t sth AND int
             sth);
 
     TRACE(1, (void)fputs(dbp->errmsg, _get_trace_fp(dbp)););
-    return nullptr;
+    return SR_NULLPTR;
   }
 
   if (num)
@@ -6081,8 +6082,8 @@ CONST unsigned int *DEFUN(sqlo_value_lens, (sth, num), sqlo_stmt_handle_t sth AN
   sqlo_stmt_struct_ptr_t stp;
   sqlo_db_struct_ptr_t dbp;
 
-  CHECK_STHANDLE(stp, sth, "sqlo_value_lens", nullptr);
-  assert(stp->dbp != nullptr);
+  CHECK_STHANDLE(stp, sth, "sqlo_value_lens", SR_NULLPTR);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   if (!_is_query(stp) || !_is_opened(stp)) {
@@ -6093,7 +6094,7 @@ CONST unsigned int *DEFUN(sqlo_value_lens, (sth, num), sqlo_stmt_handle_t sth AN
     TRACE(1, (void)fputs(dbp->errmsg, _get_trace_fp(dbp)););
     if (num)
       *num = 0;
-    return nullptr;
+    return SR_NULLPTR;
   }
 
   if (num)
@@ -6165,7 +6166,7 @@ int DEFUN(sqlo_get_db_handle, (sth), sqlo_stmt_handle_t sth)
 
   CHECK_STHANDLE(stp, sth, "sqlo_get_db_handle", SQLO_INVALID_STMT_HANDLE);
 
-  if (!stp->used || nullptr == stp->dbp) {
+  if (!stp->used || SR_NULLPTR == stp->dbp) {
     sprintf(errmsg, "Invalid sth %d passed to sqlo_get_db_handle.\n", sth);
 
     if (stp->dbp)
@@ -6341,7 +6342,7 @@ int DEFUN(sqlo_free_lob_desc, (dbh, loblpp), sqlo_db_handle_t dbh AND sqlo_lob_d
 
   // sr_TraceLog(LOGFILE, "col ?, OCIDescriptorFree 4 %p\n", loblpp);
 
-  *loblpp = nullptr;
+  *loblpp = SR_NULLPTR;
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_free_lob_desc", "OCIDescriptorAlloc");
 
   return dbp->status;
@@ -6377,7 +6378,7 @@ int DEFUN(sqlo_lob_write_buffer, (dbh, loblp, loblen, bufp, bufl, piece),
   }
 
   dbp->status = OCILobWrite(dbp->svchp, dbp->errhp, (OCILobLocator *)loblp, &amtp, offset, (dvoid *)bufp, (ub4)nbytes,
-                            p, (dvoid *)0, (OCICallbackLobWrite) nullptr, (ub2)0, (ub1)SQLCS_IMPLICIT);
+                            p, (dvoid *)0, (OCICallbackLobWrite) SR_NULLPTR, (ub2)0, (ub1)SQLCS_IMPLICIT);
 
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_lob_write_buffer", "OCILobWrite");
 
@@ -6414,7 +6415,7 @@ int DEFUN(sqlo_lob_append_buffer, (dbh, loblp, loblen, bufp, bufl, piece),
   }
 
   dbp->status = OCILobWriteAppend(dbp->svchp, dbp->errhp, (OCILobLocator *)loblp, &amtp, (dvoid *)bufp, (ub4)nbytes, p,
-                                  (dvoid *)0, (OCICallbackLobWrite) nullptr, (ub2)0, (ub1)SQLCS_IMPLICIT);
+                                  (dvoid *)0, (OCICallbackLobWrite) SR_NULLPTR, (ub2)0, (ub1)SQLCS_IMPLICIT);
 
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_lob_append_buffer", "OCILobWriteAppend");
 
@@ -6618,7 +6619,7 @@ int DEFUN(sqlo_lob_read_buffer, (dbh, loblp, loblen, bufp, bufl),
   amtp = loblen;
 
   dbp->status = OCILobRead(dbp->svchp, dbp->errhp, (OCILobLocator *)loblp, &amtp, offset, (dvoid *)bufp,
-                           (ub4)(loblen < bufl ? loblen : bufl), (dvoid *)0, (OCICallbackLobRead) nullptr, (ub2)0,
+                           (ub4)(loblen < bufl ? loblen : bufl), (dvoid *)0, (OCICallbackLobRead) SR_NULLPTR, (ub2)0,
                            (ub1)SQLCS_IMPLICIT);
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_lob_read_buffer: amtp=%u\n", amtp););
@@ -6735,7 +6736,7 @@ int DEFUN(sqlo_set_prefetch_rows, (sth, nrows), sqlo_stmt_handle_t sth AND unsig
   sqlo_db_struct_ptr_t dbp;
 
   CHECK_STHANDLE(stp, sth, "sqlo_set_prefetch_rows", SQLO_INVALID_STMT_HANDLE);
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
   _set_prefetch_rows(stp, nrows);
   CHECK_OCI_STATUS_RETURN(stp->dbp, dbp->status, "sqlo_set_prefetch_rows", "");
@@ -6771,7 +6772,7 @@ int DEFUN(sqlo_get_ocol_dtype, (sth, pos), sqlo_stmt_handle_t sth AND unsigned i
   assert(pos > 0);
 
   CHECK_STHANDLE(stp, sth, "sqlo_get_ocol_dtype", SQLO_INVALID_STMT_HANDLE);
-  assert(stp->dbp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
   dbp = stp->dbp;
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_get_ocol_dtype: Getting datatype of col: %u\n", pos););
@@ -6824,7 +6825,7 @@ int DEFUN(sqlo_register_int_handler, (handle, signal_handler), int *handle AND s
 {
 #ifdef HAVE_OSNSUI
   int status;
-  status = osnsui(handle, signal_handler, static_cast<char *>(nullptr));
+  status = osnsui(handle, signal_handler, static_cast<char *>(SR_NULLPTR));
   return status;
 #else
   (void)handle;
@@ -6860,15 +6861,15 @@ static void DEFUN(_terminate_ocols, (stp, do_strip_string), sqlo_stmt_struct_ptr
   /* register */ short *indp;
 
   colp = stp->ocolsv;
-  assert(colp != nullptr);
+  assert(colp != SR_NULLPTR);
 
   outpp = stp->outv;     /* points to the vector of output column values */
   lenp = stp->outv_size; /* points to the vector of returned lengths */
   indp = stp->oindv;     /* points to the vector of indicator variables */
 
-  assert(outpp != nullptr);
-  assert(lenp != nullptr);
-  assert(indp != nullptr);
+  assert(outpp != SR_NULLPTR);
+  assert(lenp != SR_NULLPTR);
+  assert(indp != SR_NULLPTR);
 
   /* scan thru all output columns and terminate and optionally strip them */
   for (col_idx = 0; col_idx < stp->num_defnpv; ++col_idx, ++colp, ++outpp, ++lenp, ++indp) {
@@ -6925,10 +6926,10 @@ int DEFUN(sqlo_query_result, (sth, ncols, values, value_lens, colnames, colname_
 
   CHECK_STHANDLE(stp, sth, "sqlo_query_result", SQLO_INVALID_STMT_HANDLE);
 
-  assert(stp->dbp != nullptr);
-  assert(stp->stmthp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
-  assert(stp->dbp->svchp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->stmthp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
+  assert(stp->dbp->svchp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
@@ -6953,20 +6954,20 @@ int DEFUN(sqlo_query_result, (sth, ncols, values, value_lens, colnames, colname_
 
     _terminate_ocols(stp, 1); /* terminate and strip */
 
-    if (ncols != nullptr)
+    if (ncols != SR_NULLPTR)
       *ncols = stp->num_defnpv;
 
-    if (values != nullptr)
+    if (values != SR_NULLPTR)
       *values = stp->outv;
 
-    if (value_lens != nullptr)
+    if (value_lens != SR_NULLPTR)
       *value_lens = stp->outv_size;
 
-    if (colnames != nullptr) {
+    if (colnames != SR_NULLPTR) {
       *colnames = stp->ocol_namev;
     }
 
-    if (colname_lens != nullptr) {
+    if (colname_lens != SR_NULLPTR) {
       *colname_lens = stp->ocol_namev_size;
     }
   } else if (dbp->status == OCI_STILL_EXECUTING) {
@@ -7033,10 +7034,10 @@ int DEFUN(sqlo_describecol, (sth, col, dType, name, namelen, prec, scale, dbsize
 
   CHECK_STHANDLE(stp, sth, "sqlo_describecol", SQLO_INVALID_STMT_HANDLE);
 
-  assert(stp->dbp != nullptr);
-  assert(stp->stmthp != nullptr);
-  assert(stp->dbp->errhp != nullptr);
-  assert(stp->dbp->svchp != nullptr);
+  assert(stp->dbp != SR_NULLPTR);
+  assert(stp->stmthp != SR_NULLPTR);
+  assert(stp->dbp->errhp != SR_NULLPTR);
+  assert(stp->dbp->svchp != SR_NULLPTR);
 
   dbp = stp->dbp;
 
