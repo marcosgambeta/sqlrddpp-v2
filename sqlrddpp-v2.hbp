@@ -11,7 +11,9 @@
 -Iinclude/mysql
 -Iinclude/oci
 -Iinclude/pgsql
+
 -Isource
+-Isource/parser
 
 source/exprobjs.prg
 source/exprparser.prg
@@ -28,9 +30,6 @@ source/utils.prg
 source/utilslang.prg
 source/txml.prg
 
-#source/sql.y
-source/sqly.c
-
 source/sqlact.cpp
 source/sqlex1.cpp
 source/sqlex2.cpp
@@ -43,6 +42,10 @@ source/srxml.cpp
 source/misc/tracelog.cpp
 source/misc/xhbenum.cpp
 source/misc/xthrow.cpp
+
+# parser
+#source/parser/sql.y
+source/parser/sqly.c
 
 # Firebird
 source/firebird/sr_firebird.prg
