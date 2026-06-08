@@ -32,7 +32,6 @@ source/txml.prg
 #source/sql.y
 source/sqly.c
 
-source/tracelog.cpp
 source/sqlact.cpp
 source/sqlex1.cpp
 source/sqlex2.cpp
@@ -40,9 +39,12 @@ source/sqlex3.cpp
 source/sqllex.cpp
 source/sqlrdd1.cpp
 source/sqlsrodbc.cpp
-source/xthrow.cpp
-source/xhbenum.cpp
 source/srxml.cpp
+
+# Misc
+source/misc/tracelog.cpp
+source/misc/xhbenum.cpp
+source/misc/xthrow.cpp
 
 # Firebird
 source/firebird/sr_firebird.prg
