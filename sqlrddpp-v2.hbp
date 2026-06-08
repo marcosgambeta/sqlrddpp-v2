@@ -13,6 +13,7 @@
 -Iinclude/pgsql
 
 -Isource
+-Isource/oracle
 -Isource/parser
 
 source/exprobjs.prg
@@ -51,35 +52,35 @@ source/xml/srxml.cpp
 
 # Firebird
 source/firebird/sr_firebird.prg
-source/firebird/sr_firebird_bind.cpp
+#source/firebird/sr_firebird_bind.cpp
 source/firebird/sr_firebird3.prg
-source/firebird/sr_firebird3_bind.cpp
+#source/firebird/sr_firebird3_bind.cpp
 source/firebird/sr_firebird4.prg
-source/firebird/sr_firebird4_bind.cpp
+#source/firebird/sr_firebird4_bind.cpp
 source/firebird/sr_firebird5.prg
-source/firebird/sr_firebird5_bind.cpp
+#source/firebird/sr_firebird5_bind.cpp
 
 # MariaDB
 source/mariadb/sr_mariadb.prg
 
 # MySQL
 source/mysql/sr_mysql.prg
-source/mysql/sr_mysql_bind.cpp
+#source/mysql/sr_mysql_bind.cpp
 
 # ODBC
 source/odbc/sr_odbc.prg
-source/odbc/sr_odbc_bind.cpp
+#source/odbc/sr_odbc_bind.cpp
 
 # Oracle
 source/oracle/sqlora.cpp
 source/oracle/sr_oracle.prg
-source/oracle/sr_oracle_bind.cpp
+#source/oracle/sr_oracle_bind.cpp
 source/oracle/sr_oracle2.prg
 #source/oracle/sr_oracle2_bind.cpp
 
 # PostgreSQL
 source/postgresql/sr_pgs.prg
-source/postgresql/sr_pgs_bind.cpp
+#source/postgresql/sr_pgs_bind.cpp
 
 -hbx=sqlrddpp-v2.hbx
 sqlrddpp-v2.hbx

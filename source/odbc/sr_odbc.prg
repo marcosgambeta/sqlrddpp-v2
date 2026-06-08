@@ -534,3 +534,9 @@ METHOD SR_ODBC:WriteMemo(cFileName, nRecno, cRecnoName, aColumnsAndData)
    ::FreeStatement()
 
 RETURN SR_ODBCWriteMemo(::hDbc, cFileName, nRecno, cRecnoName, aColumnsAndData)
+
+//------------------------------------------------------------------------
+
+#include "sr_odbc_bind.cpp"
+
+//------------------------------------------------------------------------

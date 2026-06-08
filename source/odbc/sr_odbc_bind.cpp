@@ -39,6 +39,8 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+#pragma BEGINDUMP
+
 #if defined(_MSC_VER)
 #pragma warning(disable : 4201)
 #endif
@@ -1271,3 +1273,5 @@ HB_FUNC(SR_BINDBYVALUE)
 #endif
 
 //-----------------------------------------------------------------------------//
+
+#pragma ENDDUMP

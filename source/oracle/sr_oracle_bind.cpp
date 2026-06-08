@@ -47,6 +47,8 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+#pragma BEGINDUMP
+
 #include "sqlrddpp.h"
 #include "compat.h"
 
@@ -1232,3 +1234,5 @@ HB_FUNC(SR_SETORAHANDLE)
     session->stmt = hb_parni(2);
   }
 }
+
+#pragma ENDDUMP

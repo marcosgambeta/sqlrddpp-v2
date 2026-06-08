@@ -311,3 +311,9 @@ RETURN SR_MYSResultStatus(::hDbc)
 
 METHOD SR_MYSQL:GetAffectedRows()
 RETURN SR_MYSAFFECTEDROWS(::hDbc)
+
+//------------------------------------------------------------------------
+
+#include "sr_mysql_bind.cpp"
+
+//------------------------------------------------------------------------

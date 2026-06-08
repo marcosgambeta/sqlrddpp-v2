@@ -365,3 +365,9 @@ METHOD SR_FIREBIRD5:MoreResults(aArray, lTranslate)
    ENDIF
 
 RETURN nRet
+
+//------------------------------------------------------------------------
+
+#include "sr_firebird5_bind.cpp"
+
+//------------------------------------------------------------------------

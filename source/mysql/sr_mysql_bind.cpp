@@ -44,6 +44,8 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+#pragma BEGINDUMP
+
 /* this is workaround for problems with xHarbour core header files which
  * define _WINSOCKAPI_ what effectively breaks compilation of code using
  * sockets. It means that we have to include windows.h before xHarbour
@@ -845,3 +847,5 @@ HB_FUNC(SR_MYSAFFECTEDROWS)
 }
 
 //-----------------------------------------------------------------------------//
+
+#pragma ENDDUMP

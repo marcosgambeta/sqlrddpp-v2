@@ -44,6 +44,8 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+#pragma BEGINDUMP
+
 #if (defined(__BORLANDC__) && __BORLANDC__ > 0x580)
 #define _INTPTR_T_DEFINED
 #endif
@@ -1554,3 +1556,5 @@ HB_FUNC(SR_FBMORERESULTS4)
 }
 
 /*------------------------------------------------------------------------*/
+
+#pragma ENDDUMP

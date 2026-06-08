@@ -44,6 +44,8 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+#pragma BEGINDUMP
+
 #include "sqlrddpp.h"
 #include "compat.h"
 
@@ -905,3 +907,5 @@ HB_FUNC(SR_PGSAFFECTEDROWS)
 }
 
 //-----------------------------------------------------------------------------//
+
+#pragma ENDDUMP

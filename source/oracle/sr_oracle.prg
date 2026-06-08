@@ -766,3 +766,9 @@ RETURN nError
 
 METHOD SR_ORACLE:GetAffectedRows()
 RETURN SR_GETAFFECTROWS(::hdbc)
+
+//------------------------------------------------------------------------
+
+#include "sr_oracle_bind.cpp"
+
+//------------------------------------------------------------------------
