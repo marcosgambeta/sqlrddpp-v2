@@ -62,8 +62,8 @@ source/mysql/sr_mysql.prg
 source/mysql/sr_mysql_bind.cpp
 
 # ODBC
-source/odbc/sqlodbc.prg
-source/odbc/sqlsrodbc.cpp
+source/odbc/sr_odbc.prg
+source/odbc/sr_odbc_bind.cpp
 
 # Oracle
 source/oracle/sqlora.cpp
