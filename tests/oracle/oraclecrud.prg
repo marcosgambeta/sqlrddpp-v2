@@ -1,7 +1,7 @@
 // SQLRDD++
-// test with MySQL simulating CRUD
+// test with Oracle simulating CRUD
 // To compile:
-// hbmk2 mysqlcrud -llibmysql
+// hbmk2 oraclecrud -loci
 
 #ifdef __XHARBOUR__
 #xtranslate HB_PVALUE([<x,...>]) => PVALUE(<x>)
@@ -11,20 +11,16 @@
 #include "inkey.ch"
 
 // To run the test:
-// mysqlcrud --server <servername> --uid <username> --pwd <userpassword> --dtb <databasename>
+// oraclecrud --server <servername> --uid <username> --pwd <userpassword> --dtb <databasename>
 // NOTE: the database must exist before runnning the test.
 
-STATIC s_MYSQL_SERVER := "localhost"
-STATIC s_MYSQL_UID    := "root"
-STATIC s_MYSQL_PWD    := "password"
-STATIC s_MYSQL_DTB    := "dbtest"
-
-#define RDD_NAME "SQLRDD"
-#define TABLE_NAME "tabcrud"
-#define NUM_REC 100
+STATIC s_ORACLE_SERVER := "localhost"
+STATIC s_ORACLE_UID    := "root"
+STATIC s_ORACLE_PWD    := "password"
+STATIC s_ORACLE_DTB    := "dbtest"
 
 REQUEST SQLRDD
-REQUEST SR_MYSQL
+REQUEST SR_ORACLE
 
 PROCEDURE Main()
 
@@ -33,30 +29,28 @@ PROCEDURE Main()
    LOCAL oTB
    LOCAL nKey
 
-   hb_RandomSeed()
-
    SetMode(25, maxcol() + 1)
 
    n := 1
    DO WHILE n <= PCount()
       IF HB_PValue(n) == "--server"
          ++n
-         s_MYSQL_SERVER := HB_PValue(n)
+         s_ORACLE_SERVER := HB_PValue(n)
          LOOP
       ENDIF
       IF HB_PValue(n) == "--uid"
          ++n
-         s_MYSQL_UID := HB_PValue(n)
+         s_ORACLE_UID := HB_PValue(n)
          LOOP
       ENDIF
       IF HB_PValue(n) == "--pwd"
          ++n
-         s_MYSQL_PWD := HB_PValue(n)
+         s_ORACLE_PWD := HB_PValue(n)
          LOOP
       ENDIF
       IF HB_PValue(n) == "--dtb"
          ++n
-         s_MYSQL_DTB := HB_PValue(n)
+         s_ORACLE_DTB := HB_PValue(n)
          LOOP
       ENDIF
       ++n
@@ -64,11 +58,11 @@ PROCEDURE Main()
 
    SET DELETED ON
 
-   rddSetDefault(RDD_NAME)
+   rddSetDefault("SQLRDD")
 
    CLS
 
-   nConnection := sr_AddConnection(CONNECT_MYSQL, "MySQL=" + s_MYSQL_SERVER + ";UID=" + s_MYSQL_UID + ";PWD=" + s_MYSQL_PWD + ";DTB=" + s_MYSQL_DTB)
+   nConnection := sr_AddConnection(CONNECT_ORACLE, "OCI=" + s_ORACLE_SERVER + ";UID=" + s_ORACLE_UID + ";PWD=" + s_ORACLE_PWD + ";DTB=" + s_ORACLE_DTB)
 
    IF nConnection < 0
       alert("Connection error. See sqlerror.log for details.")
@@ -77,26 +71,26 @@ PROCEDURE Main()
 
    sr_StartLog(nConnection)
 
-   IF !sr_ExistTable(TABLE_NAME)
-      dbCreate(TABLE_NAME, {{"ID",      "N", 10, 0}, ;
-                            {"FIRST",   "C", 30, 0}, ;
-                            {"LAST",    "C", 30, 0}, ;
-                            {"AGE",     "N",  3, 0}, ;
-                            {"DATE",    "D",  8, 0}, ;
-                            {"MARRIED", "L",  1, 0}, ;
-                            {"VALUE",   "N", 12, 2}}, RDD_NAME)
+   IF !sr_ExistTable("tabcrud")
+      dbCreate("tabcrud", {{"ID",      "N", 10, 0}, ;
+                           {"FIRST",   "C", 30, 0}, ;
+                           {"LAST",    "C", 30, 0}, ;
+                           {"AGE",     "N",  3, 0}, ;
+                           {"DATE",    "D",  8, 0}, ;
+                           {"MARRIED", "L",  1, 0}, ;
+                           {"VALUE",   "N", 12, 2}}, "SQLRDD")
    ENDIF
 
-   USE (TABLE_NAME) EXCLUSIVE VIA (RDD_NAME)
+   USE tabcrud EXCLUSIVE VIA "SQLRDD"
 
 #if 0
    IF reccount() == 0
-      FOR n := 1 TO NUM_REC
+      FOR n := 1 TO 100
          APPEND BLANK
          REPLACE ID      WITH n
          REPLACE FIRST   WITH "FIRST" + hb_ntos(n)
          REPLACE LAST    WITH "LAST" + hb_ntos(n)
-         REPLACE AGE     WITH hb_RandomInt(18, 90) // n + 18
+         REPLACE AGE     WITH n + 18
          REPLACE DATE    WITH date() - n
          REPLACE MARRIED WITH iif(n / 2 == int(n / 2), .T., .F.)
          REPLACE VALUE   WITH n * 1000 / 100

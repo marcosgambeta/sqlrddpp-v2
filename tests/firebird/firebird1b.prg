@@ -1,34 +1,73 @@
 // SQLRDD++
-// test with Firebird 3
+// test with Firebird 5
 // To compile:
 // hbmk2 firebird1b -lfbclient
+
+#ifdef __XHARBOUR__
+#xtranslate HB_PVALUE([<x,...>]) => PVALUE(<x>)
+#endif
 
 #include "sqlrdd.ch"
 
 // Make a copy of this file and change the values below (if necessary).
 // NOTE: the database will be created automatically.
-#define SERVER ""
-#define UID    "SYSDBA"
-#define PWD    "masterkey"
-#define DTB    "fb3dbtest1.fdb"
+
+STATIC s_SERVER := ""
+STATIC s_UID    := "SYSDBA"
+STATIC s_PWD    := "masterkey"
+STATIC s_DTB    := "fb5dbtest1.fdb"
+
+#define RDD_NAME "SQLRDD"
+#define TABLE_NAME "test"
+#define NUM_REC 100
 
 REQUEST SQLRDD
-REQUEST SR_FIREBIRD3
+REQUEST SR_FIREBIRD5
 
 PROCEDURE Main()
 
    LOCAL nConnection
    LOCAL n
 
+   hb_RandomSeed()
+
    SetMode(25, maxcol() + 1)
 
-   rddSetDefault("SQLRDD")
+   CLS
 
-   IF !file(DTB)
-      sr_fbcreatedb3(DTB, UID, PWD, NIL, NIL, NIL)
+   n := 1
+   DO WHILE n <= PCount()
+      IF HB_PValue(n) == "--server"
+         ++n
+         s_SERVER := HB_PValue(n)
+         LOOP
+      ENDIF
+      IF HB_PValue(n) == "--uid"
+         ++n
+         s_UID := HB_PValue(n)
+         LOOP
+      ENDIF
+      IF HB_PValue(n) == "--pwd"
+         ++n
+         s_PWD := HB_PValue(n)
+         LOOP
+      ENDIF
+      IF HB_PValue(n) == "--dtb"
+         ++n
+         s_DTB := HB_PValue(n)
+         LOOP
+      ENDIF
+      ++n
+   ENDDO
+
+   rddSetDefault(RDD_NAME)
+
+   IF !file(s_DTB)
+      //SR_fbcreatedb5(s_DTB, s_UID, s_PWD, NIL, NIL, NIL) (deprecated)
+      SR_FIREBIRD5():CreateDatabase(s_DTB, s_UID, s_PWD, NIL, NIL, NIL)
    ENDIF
 
-   nConnection := sr_AddConnection(CONNECT_FIREBIRD3, "FIREBIRD=" + SERVER + ";UID=" + UID + ";PWD=" + PWD + ";DTB=" + DTB)
+   nConnection := sr_AddConnection(CONNECT_FIREBIRD5, "FIREBIRD=" + s_SERVER + ";UID=" + s_UID + ";PWD=" + s_PWD + ";DTB=" + s_DTB)
 
    IF nConnection < 0
       alert("Connection error. See sqlerror.log for details.")
@@ -37,25 +76,25 @@ PROCEDURE Main()
 
    sr_StartLog(nConnection)
 
-   IF !sr_ExistTable("test")
-      dbCreate("test", {{"ID",      "N", 10, 0}, ;
-                        {"FIRST",   "C", 30, 0}, ;
-                        {"LAST",    "C", 30, 0}, ;
-                        {"AGE",     "N",  3, 0}, ;
-                        {"DATE",    "D",  8, 0}, ;
-                        {"MARRIED", "L",  1, 0}, ;
-                        {"VALUE",   "N", 12, 2}}, "SQLRDD")
+   IF !sr_ExistTable(TABLE_NAME)
+      dbCreate(TABLE_NAME, {{"ID",      "N", 10, 0}, ;
+                            {"FIRST",   "C", 30, 0}, ;
+                            {"LAST",    "C", 30, 0}, ;
+                            {"AGE",     "N",  3, 0}, ;
+                            {"DATE",    "D",  8, 0}, ;
+                            {"MARRIED", "L",  1, 0}, ;
+                            {"VALUE",   "N", 12, 2}}, RDD_NAME)
    ENDIF
 
-   USE test EXCLUSIVE VIA "SQLRDD"
+   USE (TABLE_NAME) EXCLUSIVE VIA (RDD_NAME)
 
-   IF reccount() < 100
-      FOR n := 1 TO 100
+   IF reccount() == 0
+      FOR n := 1 TO NUM_REC
          APPEND BLANK
          REPLACE ID      WITH n
          REPLACE FIRST   WITH "FIRST" + hb_ntos(n)
          REPLACE LAST    WITH "LAST" + hb_ntos(n)
-         REPLACE AGE     WITH n + 18
+         REPLACE AGE     WITH hb_RandomInt(18, 90) // n + 18
          REPLACE DATE    WITH date() - n
          REPLACE MARRIED WITH iif(n / 2 == int(n / 2), .T., .F.)
          REPLACE VALUE   WITH n * 1000 / 100
@@ -69,7 +108,7 @@ PROCEDURE Main()
    CLOSE DATABASE
 
    sr_StopLog(nConnection)
-   
+
    sr_EndConnection(nConnection)
 
 RETURN

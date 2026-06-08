@@ -82,7 +82,7 @@ PROCEDURE Main()
 
       USE test EXCLUSIVE VIA "SQLRDD"
 
-      IF reccount() < 100
+      IF reccount() == 0
          FOR n := 1 TO 100
             APPEND BLANK
             REPLACE ID      WITH n
@@ -96,8 +96,11 @@ PROCEDURE Main()
       ENDIF
 
       GO TOP
-      
+
       oTB := TBrowseDB(0, 0, maxrow(), maxcol())
+
+      oTB:HeadSep := "-"
+      oTB:ColSep := "|"
 
       oTB:addColumn(TBColumnNew("ID", {||TEST->ID}))
       oTB:addColumn(TBColumnNew("FIRST", {||TEST->FIRST}))
@@ -106,7 +109,7 @@ PROCEDURE Main()
       oTB:addColumn(TBColumnNew("DATE", {||TEST->DATE}))
       oTB:addColumn(TBColumnNew("MARRIED", {||TEST->MARRIED}))
       oTB:addColumn(TBColumnNew("VALUE", {||TEST->VALUE}))
-      
+
       nKey := 0
 
       DO WHILE nKey != K_ESC
@@ -137,7 +140,7 @@ PROCEDURE Main()
       ENDDO
 
       CLOSE DATABASE
-      
+
       sr_StopLog(nConnection)
 
       sr_EndConnection(nConnection)

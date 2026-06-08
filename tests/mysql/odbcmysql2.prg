@@ -3,6 +3,10 @@
 // To compile:
 // hbmk2 odbcmysql2
 
+#ifdef __XHARBOUR__
+#xtranslate HB_PVALUE([<x,...>]) => PVALUE(<x>)
+#endif
+
 #include "sqlrdd.ch"
 #include "inkey.ch"
 
@@ -12,6 +16,7 @@
 
 #define RDD_NAME "SQLEX"
 #define TABLE_NAME "test"
+#define NUM_REC 100
 
 REQUEST SQLEX
 REQUEST SR_ODBC
@@ -31,6 +36,8 @@ PROCEDURE Main()
    LOCAL cConnectionString
    LOCAL oTB
    LOCAL nKey
+
+   hb_RandomSeed()
 
    SetMode(25, maxcol() + 1)
 
@@ -107,13 +114,13 @@ PROCEDURE Main()
 
    USE (TABLE_NAME) EXCLUSIVE VIA (RDD_NAME)
 
-   IF reccount() < 100
-      FOR n := 1 TO 100
+   IF reccount() == 0
+      FOR n := 1 TO NUM_REC
          APPEND BLANK
          REPLACE ID      WITH n
          REPLACE FIRST   WITH "FIRST" + hb_ntos(n)
          REPLACE LAST    WITH "LAST" + hb_ntos(n)
-         REPLACE AGE     WITH n + 18
+         REPLACE AGE     WITH hb_RandomInt(18, 90) // n + 18
          REPLACE DATE    WITH date() - n
          REPLACE MARRIED WITH iif(n / 2 == int(n / 2), .T., .F.)
          REPLACE VALUE   WITH n * 1000 / 100
@@ -123,6 +130,9 @@ PROCEDURE Main()
    GO TOP
 
    oTB := TBrowseDB(0, 0, maxrow(), maxcol())
+
+   oTB:HeadSep := "-"
+   oTB:ColSep := "|"
 
    oTB:addColumn(TBColumnNew("ID", {||(TABLE_NAME)->ID}))
    oTB:addColumn(TBColumnNew("FIRST", {||(TABLE_NAME)->FIRST}))

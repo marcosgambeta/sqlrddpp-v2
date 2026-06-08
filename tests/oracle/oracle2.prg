@@ -1,7 +1,7 @@
 // SQLRDD++
-// test with Firebird 5
+// test with Oracle
 // To compile:
-// hbmk2 firebird2a -lfbclient
+// hbmk2 oracle2 -loci
 
 #ifdef __XHARBOUR__
 #xtranslate HB_PVALUE([<x,...>]) => PVALUE(<x>)
@@ -10,20 +10,18 @@
 #include "sqlrdd.ch"
 #include "inkey.ch"
 
-// Make a copy of this file and change the values below.
+// To run the test:
+// oracle2 --server <servername> --uid <username> --pwd <userpassword> --dtb <databasename>
 // NOTE: the database must exist before runnning the test.
 
-STATIC s_SERVER := "inet://"
-STATIC s_UID    := "SYSDBA"
-STATIC s_PWD    := "masterkey"
-STATIC s_DTB    := "C:\PATHTODATABASE\TEST.FDB"
-
-#define RDD_NAME "SQLRDD"
-#define TABLE_NAME "test"
-#define NUM_REC 100
-
 REQUEST SQLRDD
-REQUEST SR_FIREBIRD5
+REQUEST SQLEX
+REQUEST SR_ORACLE
+
+STATIC s_SERVER := "localhost"
+STATIC s_UID    := "root"
+STATIC s_PWD    := "password"
+STATIC s_DTB    := "dbtest"
 
 PROCEDURE Main()
 
@@ -32,11 +30,7 @@ PROCEDURE Main()
    LOCAL oTB
    LOCAL nKey
 
-   hb_RandomSeed()
-
    SetMode(25, maxcol() + 1)
-   
-   CLS
 
    n := 1
    DO WHILE n <= PCount()
@@ -63,9 +57,9 @@ PROCEDURE Main()
       ++n
    ENDDO
 
-   rddSetDefault(RDD_NAME)
+   rddSetDefault("SQLRDD")
 
-   nConnection := sr_AddConnection(CONNECT_FIREBIRD5, "FIREBIRD=" + s_SERVER + ";UID=" + s_UID + ";PWD=" + s_PWD + ";DTB=" + s_DTB)
+   nConnection := sr_AddConnection(CONNECT_ORACLE, "OCI=" + s_SERVER + ";UID=" + s_UID + ";PWD=" + s_PWD + ";DTB=" + s_DTB)
 
    IF nConnection < 0
       alert("Connection error. See sqlerror.log for details.")
@@ -74,25 +68,25 @@ PROCEDURE Main()
 
    sr_StartLog(nConnection)
 
-   IF !sr_ExistTable(TABLE_NAME)
-      dbCreate(TABLE_NAME, {{"ID",      "N", 10, 0}, ;
-                            {"FIRST",   "C", 30, 0}, ;
-                            {"LAST",    "C", 30, 0}, ;
-                            {"AGE",     "N",  3, 0}, ;
-                            {"DATE",    "D",  8, 0}, ;
-                            {"MARRIED", "L",  1, 0}, ;
-                            {"VALUE",   "N", 12, 2}}, RDD_NAME)
+   IF !sr_ExistTable("test")
+      dbCreate("test", {{"ID",      "N", 10, 0}, ;
+                        {"FIRST",   "C", 30, 0}, ;
+                        {"LAST",    "C", 30, 0}, ;
+                        {"AGE",     "N",  3, 0}, ;
+                        {"DATE",    "D",  8, 0}, ;
+                        {"MARRIED", "L",  1, 0}, ;
+                        {"VALUE",   "N", 12, 2}}, "SQLRDD")
    ENDIF
 
-   USE (TABLE_NAME) EXCLUSIVE VIA (RDD_NAME)
+   USE test EXCLUSIVE VIA "SQLRDD"
 
    IF reccount() == 0
-      FOR n := 1 TO NUM_REC
+      FOR n := 1 TO 100
          APPEND BLANK
          REPLACE ID      WITH n
          REPLACE FIRST   WITH "FIRST" + hb_ntos(n)
          REPLACE LAST    WITH "LAST" + hb_ntos(n)
-         REPLACE AGE     WITH hb_RandomInt(18, 90) // n + 18
+         REPLACE AGE     WITH n + 18
          REPLACE DATE    WITH date() - n
          REPLACE MARRIED WITH iif(n / 2 == int(n / 2), .T., .F.)
          REPLACE VALUE   WITH n * 1000 / 100

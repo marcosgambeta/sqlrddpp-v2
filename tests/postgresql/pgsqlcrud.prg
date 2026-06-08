@@ -3,16 +3,20 @@
 // To compile:
 // hbmk2 pgsqlcrud -llibpq
 
+#ifdef __XHARBOUR__
+#xtranslate HB_PVALUE([<x,...>]) => PVALUE(<x>)
+#endif
+
 #include "sqlrdd.ch"
 #include "inkey.ch"
 
 // Make a copy of this file and change the values below.
 // NOTE: the database must exist before runnning the test.
 
-#define POSTGRES_SERVER  "localhost"
-#define POSTGRES_UID     "postgres"
-#define POSTGRES_PWD     "password"
-#define POSTGRES_DTB     "dbtest"
+STATIC s_SERVER := "localhost"
+STATIC s_UID    := "postgres"
+STATIC s_PWD    := "password"
+STATIC s_DTB    := "dbtest"
 
 REQUEST SQLRDD
 REQUEST SR_PGS
@@ -20,13 +24,38 @@ REQUEST SR_PGS
 PROCEDURE Main()
 
    LOCAL nConnection
-#if 0
    LOCAL n
-#endif
    LOCAL oTB
    LOCAL nKey
 
-   setMode(25, 80)
+   hb_RandomSeed()
+
+   SetMode(25, maxcol() + 1)
+
+   n := 1
+   DO WHILE n <= PCount()
+      IF HB_PValue(n) == "--server"
+         ++n
+         s_SERVER := HB_PValue(n)
+         LOOP
+      ENDIF
+      IF HB_PValue(n) == "--uid"
+         ++n
+         s_UID := HB_PValue(n)
+         LOOP
+      ENDIF
+      IF HB_PValue(n) == "--pwd"
+         ++n
+         s_PWD := HB_PValue(n)
+         LOOP
+      ENDIF
+      IF HB_PValue(n) == "--dtb"
+         ++n
+         s_DTB := HB_PValue(n)
+         LOOP
+      ENDIF
+      ++n
+   ENDDO
 
    SET DELETED ON
 
@@ -34,7 +63,7 @@ PROCEDURE Main()
 
    CLS
 
-   nConnection := sr_AddConnection(CONNECT_POSTGRES, "PGS=" + POSTGRES_SERVER + ";UID=" + POSTGRES_UID + ";PWD=" + POSTGRES_PWD + ";DTB=" + POSTGRES_DTB)
+   nConnection := sr_AddConnection(CONNECT_POSTGRES, "PGS=" + s_SERVER + ";UID=" + s_UID + ";PWD=" + s_PWD + ";DTB=" + s_DTB)
 
    IF nConnection < 0
       alert("Connection error. See sqlerror.log for details.")
@@ -56,13 +85,13 @@ PROCEDURE Main()
    USE tabcrud EXCLUSIVE VIA "SQLRDD"
 
 #if 0
-   IF reccount() < 100
+   IF reccount() == 0
       FOR n := 1 TO 100
          APPEND BLANK
          REPLACE ID      WITH n
          REPLACE FIRST   WITH "FIRST" + hb_ntos(n)
          REPLACE LAST    WITH "LAST" + hb_ntos(n)
-         REPLACE AGE     WITH n + 18
+         REPLACE AGE     WITH hb_RandomInt(18, 90) // n + 18
          REPLACE DATE    WITH date() - n
          REPLACE MARRIED WITH iif(n / 2 == int(n / 2), .T., .F.)
          REPLACE VALUE   WITH n * 1000 / 100
@@ -146,7 +175,7 @@ STATIC FUNCTION AddRecord()
    REPLACE ID      WITH n
    REPLACE FIRST   WITH "FIRST" + hb_ntos(n)
    REPLACE LAST    WITH "LAST" + hb_ntos(n)
-   REPLACE AGE     WITH n + 18
+   REPLACE AGE     WITH hb_RandomInt(18, 90) // n + 18
    REPLACE DATE    WITH date() - n
    REPLACE MARRIED WITH iif(n / 2 == int(n / 2), .T., .F.)
    REPLACE VALUE   WITH n * 1000 / 100
