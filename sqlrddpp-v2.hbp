@@ -22,7 +22,6 @@ source/exprudf.prg
 source/sqlconnection.prg
 source/sqlgen1.prg
 #source/sqlnames.prg
-source/sqlodbc.prg
 source/sqlrdd0.prg
 source/sqlrdd2.prg
 source/utils.prg
@@ -38,7 +37,6 @@ source/sqlex2.cpp
 source/sqlex3.cpp
 source/sqllex.cpp
 source/sqlrdd1.cpp
-source/sqlsrodbc.cpp
 source/srxml.cpp
 
 # Misc
@@ -62,6 +60,10 @@ source/mariadb/sr_mariadb.prg
 # MySQL
 source/mysql/sr_mysql.prg
 source/mysql/sr_mysql_bind.cpp
+
+# ODBC
+source/odbc/sqlodbc.prg
+source/odbc/sqlsrodbc.cpp
 
 # Oracle
 source/oracle/sqlora.cpp
