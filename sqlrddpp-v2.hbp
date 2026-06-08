@@ -58,8 +58,8 @@ source/firebird/sr_firebird5_bind.cpp
 source/mariadb/sr_mariadb.prg
 
 # MySQL
-source/mysql/sqlmy.prg
-source/mysql/mysql.cpp
+source/mysql/sr_mysql.prg
+source/mysql/sr_mysql_bind.cpp
 
 # Oracle
 source/oracle/sqloracle.prg
