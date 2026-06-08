@@ -62,10 +62,11 @@ source/mysql/sr_mysql.prg
 source/mysql/sr_mysql_bind.cpp
 
 # Oracle
-source/oracle/sqloracle.prg
-source/oracle/sqloracle2.prg
 source/oracle/sqlora.cpp
-source/oracle/sqlorax.cpp
+source/oracle/sr_oracle.prg
+source/oracle/sr_oracle_bind.cpp
+source/oracle/sr_oracle2.prg
+#source/oracle/sr_oracle2_bind.cpp
 
 # PostgreSQL
 source/postgresql/sqlpgs.prg
