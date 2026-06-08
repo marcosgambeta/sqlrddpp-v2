@@ -69,8 +69,8 @@ source/oracle/sr_oracle2.prg
 #source/oracle/sr_oracle2_bind.cpp
 
 # PostgreSQL
-source/postgresql/sqlpgs.prg
-source/postgresql/pgs.cpp
+source/postgresql/sr_pgs.prg
+source/postgresql/sr_pgs_bind.cpp
 
 -hbx=sqlrddpp-v2.hbx
 sqlrddpp-v2.hbx
