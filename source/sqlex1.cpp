@@ -182,7 +182,7 @@ static void sqlGetCleanBuffer(SQLEXAREAP thiswa)
 {
   HB_SIZE nPos, nLen;
   //PHB_ITEM pCol; (using stack instead of heap)
-  HB_ITEM pCol = {0};
+  HB_ITEM pCol{};
 
   //pCol = hb_itemNew(SR_NULLPTR);
   for (nPos = 1, nLen = hb_arrayLen(thiswa->aEmptyBuff); nPos <= nLen; nPos++) {
@@ -1884,7 +1884,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
       // temp.type = HB_IT_NIL; // I know this is not a good practice, but we save tons of allocs.
       // please keep as is. ML.
       //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-      HB_ITEM temp = {0};
+      HB_ITEM temp{};
 
       if ((thiswa->uiFieldList[i - 1] == 0) && thiswa->iColumnListStatus != FIELD_LIST_LEARNING) {
         hb_arraySetForward(aRecord, i, &temp); // Field is temporaly NIL since it's have never
@@ -2468,7 +2468,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
       // iReallocs = 0;
 
       //temp = hb_itemNew(SR_NULLPTR);
-      HB_ITEM temp = {0};
+      HB_ITEM temp{};
       // temp.type = HB_IT_NIL; // I know this is not a good practice, but we save tons of allocs.
       // please keep as is. ML.
 

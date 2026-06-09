@@ -426,7 +426,7 @@ HB_FUNC_STATIC(SR_PGSQUERYATTR)
 {
   int row, rows, type;
   PHB_ITEM ret, atemp /*, temp*/;
-  HB_ITEM temp = {0};
+  HB_ITEM temp{};
   HB_LONG typmod;
   GET_PGSQL_SESSION(session, 1);
 
@@ -626,7 +626,7 @@ HB_FUNC_STATIC(SR_PGSTABLEATTR)
   char attcmm[512];
   int row, rows;
   PHB_ITEM ret, atemp /*, temp*/;
-  HB_ITEM temp = {0};
+  HB_ITEM temp{};
   PGresult *stmtTemp;
   GET_PGSQL_SESSION(session, 1);
 
@@ -931,7 +931,7 @@ static void sr_PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
           //PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-          HB_ITEM pLangItem = {0};
+          HB_ITEM pLangItem{};
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(&pLangItem), &ulPos) ||
@@ -1040,7 +1040,7 @@ HB_FUNC_STATIC(SR_PGSLINEPROCESSED)
 
   for (i = 0; i < cols; i++) {
     //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-    HB_ITEM temp = {0};
+    HB_ITEM temp{};
     lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i + 1), FIELD_ENUM);
 
     if (lIndex != 0) {

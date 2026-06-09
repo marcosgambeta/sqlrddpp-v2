@@ -616,7 +616,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
           //PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-          HB_ITEM pLangItem = {0};
+          HB_ITEM pLangItem{};
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(&pLangItem), &ulPos) ||

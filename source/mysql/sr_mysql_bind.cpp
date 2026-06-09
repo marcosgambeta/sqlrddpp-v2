@@ -379,7 +379,7 @@ static void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
           //PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-          HB_ITEM pLangItem = {0};
+          HB_ITEM pLangItem{};
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(&pLangItem), &ulPos) ||
@@ -659,7 +659,7 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
   GET_MYSQL_SESSION(session, 1);
   int row, rows, type;
   PHB_ITEM ret, /* temp, */ atemp;
-  HB_ITEM temp = {0};
+  HB_ITEM temp{};
   MYSQL_FIELD *field;
 
   if (session == SR_NULLPTR || session->dbh == SR_NULLPTR || session->stmt == SR_NULLPTR) {

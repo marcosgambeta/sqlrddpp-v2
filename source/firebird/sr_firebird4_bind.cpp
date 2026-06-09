@@ -1180,7 +1180,7 @@ static void sr_FBFieldGet4(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
           //PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-          HB_ITEM pLangItem = {0};
+          HB_ITEM pLangItem{};
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(&pLangItem), &ulPos) ||
@@ -1281,7 +1281,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED4)
     for (icol = 1; icol <= cols; icol++) {
       // HB_LONG lType;
       //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-      HB_ITEM temp = {0};
+      HB_ITEM temp{};
       var = session->sqlda->sqlvar;
       lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, icol), FIELD_ENUM);
       // lType = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, icol), 6);

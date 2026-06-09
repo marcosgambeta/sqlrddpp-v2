@@ -549,7 +549,7 @@ static void sr_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
           //PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-          HB_ITEM pLangItem = {0};
+          HB_ITEM pLangItem{};
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(&pLangItem), &ulPos) ||
@@ -634,7 +634,7 @@ HB_FUNC_STATIC(SR_ODBCLINEPROCESSED)
 
   for (i = 1; i <= cols; i++) {
     //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-    HB_ITEM temp = {0};
+    HB_ITEM temp{};
     lIndex = (HB_USHORT)hb_arrayGetNI(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM);
 
     if (lIndex == 0) {
@@ -737,7 +737,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
     }
 
     for (i = 1; i <= cols; i++) {
-      HB_ITEM temp = {0};
+      HB_ITEM temp{};
       bOut = SR_NULLPTR;
       lInitBuff = (HB_LONG)lLen;
       lLenOut = 0;

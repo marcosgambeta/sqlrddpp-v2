@@ -374,7 +374,7 @@ static void sr_MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
           //PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-          HB_ITEM pLangItem = {0};
+          HB_ITEM pLangItem{};
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
               hb_hashScan(pTemp, sr_getSecondLang(&pLangItem), &ulPos) ||
@@ -472,7 +472,7 @@ HB_FUNC_STATIC(SR_MARIADBLINEPROCESSED)
 
     for (col = 0; col < cols; col++) {
       //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-      HB_ITEM TempItem = {0};
+      HB_ITEM TempItem{};
       lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, col + 1), FIELD_ENUM);
 
       if (lIndex != 0) {
@@ -657,7 +657,7 @@ HB_FUNC_STATIC(SR_MARIADBQUERYATTR)
 {
   int row, rows, type;
   PHB_ITEM ret, /*temp,*/ atemp;
-  HB_ITEM TempItem = {0};
+  HB_ITEM TempItem{};
   MYSQL_FIELD *field;
 
   GET_MARIADB_SESSION(session, 1);

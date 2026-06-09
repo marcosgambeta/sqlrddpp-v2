@@ -227,9 +227,9 @@ static HB_LONG searchCacheBWD(SQLAREAP thiswa, HB_LONG lPreviousCacheStatus)
 static void readCachePageFWD(SQLAREAP thiswa)
 {
   //PHB_ITEM pOrd = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-  HB_ITEM pOrd = {0};
+  HB_ITEM pOrd{};
   //PHB_ITEM pDel = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-  HB_ITEM pDel = {0};
+  HB_ITEM pDel{};
   hb_itemPutNL(&pOrd, ORD_DIR_FWD);
   hb_itemPutL(&pDel, thiswa->wasdel);
   hb_objSendMessage(thiswa->oWorkArea, s_pSym_READPAGE, 2, &pOrd, &pDel);
@@ -242,9 +242,9 @@ static void readCachePageFWD(SQLAREAP thiswa)
 static void readCachePageBWD(SQLAREAP thiswa)
 {
   //PHB_ITEM pOrd = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-  HB_ITEM pOrd = {0};
+  HB_ITEM pOrd{};
   //PHB_ITEM pDel = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-  HB_ITEM pDel = {0};
+  HB_ITEM pDel{};
   hb_itemPutNL(&pOrd, ORD_DIR_BWD);
   hb_itemPutL(&pDel, thiswa->wasdel);
   hb_objSendMessage(thiswa->oWorkArea, s_pSym_READPAGE, 2, &pOrd, &pDel);
@@ -258,7 +258,7 @@ static void setCurrentFromCache(SQLAREAP thiswa, HB_LONG lPos)
 {
   HB_SIZE nPos, nLen;
   PHB_ITEM pCacheRecord; //, pCol; (using stack instead of heap)
-  HB_ITEM pCol = {0};
+  HB_ITEM pCol{};
 
   hb_arraySetNL(thiswa->aInfo, AINFO_NPOSCACHE, lPos);
 
@@ -292,7 +292,7 @@ static void sqlGetBufferFromCache2(SQLAREAP thiswa, HB_LONG lPos)
 {
   HB_SIZE nPos, nLen;
   PHB_ITEM pCacheRecord;//, pCol; (using stack instead of heap)
-  HB_ITEM pCol = {0};
+  HB_ITEM pCol{};
 
   pCacheRecord = hb_arrayGetItemPtr(thiswa->aCache, lPos);
 
@@ -325,7 +325,7 @@ static void sqlGetCleanBuffer(SQLAREAP thiswa)
 {
   HB_SIZE nPos, nLen;
   //PHB_ITEM pCol; (using stack instead of heap)
-  HB_ITEM pCol = {0};
+  HB_ITEM pCol{};
 
   //pCol = hb_itemNew(SR_NULLPTR);
   for (nPos = 1, nLen = hb_arrayLen(thiswa->aEmptyBuff); nPos <= nLen; nPos++) {
@@ -415,7 +415,7 @@ static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
 {
   HB_LONG leof;
   //PHB_ITEM eofat; (using stack instead of heap)
-  HB_ITEM eofat = {0};
+  HB_ITEM eofat{};
 
   //eofat = hb_itemNew(SR_NULLPTR);
 
@@ -456,7 +456,7 @@ static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
 static HB_ERRCODE sqlGoTo(SQLAREAP thiswa, HB_LONG recno)
 {
   //PHB_ITEM pParam1; (using stack instead of heap)
-  HB_ITEM pParam1 = {0};
+  HB_ITEM pParam1{};
 
   // SR_TraceLog(SR_NULLPTR, "sqlGoTo %i\n", recno);
 
@@ -528,7 +528,7 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
 
   if (lbof) {
     //PHB_ITEM pBOF = hb_itemPutNL(SR_NULLPTR, lbof); (using stack instead of heap)
-    HB_ITEM pBOF = {0};
+    HB_ITEM pBOF{};
     hb_itemPutNL(&pBOF, lbof);
     hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGOTO, 1, &pBOF);
     //hb_itemRelease(pBOF);
@@ -642,8 +642,8 @@ static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 static HB_ERRCODE sqlSeek(SQLAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_BOOL bFindLast)
 {
   PHB_ITEM pNewKey = SR_NULLPTR; //, pItem, pItem2;
-  HB_ITEM pItem = {0};
-  HB_ITEM pItem2 = {0};
+  HB_ITEM pItem{};
+  HB_ITEM pItem2{};
   HB_ERRCODE retvalue = HB_SUCCESS;
 
   // SR_TraceLog(SR_NULLPTR, "sqlSeek(%p, %d, %p, %d)", thiswa, bSoftSeek, pKey, bFindLast);
@@ -2016,15 +2016,15 @@ static HB_ERRCODE sqlNewArea(SQLAREAP thiswa)
 static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo)
 {
   //PHB_ITEM pConnection = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-  HB_ITEM pConnection = {0};
+  HB_ITEM pConnection{};
   PHB_ITEM pTable = hb_itemNew(SR_NULLPTR); // TODO: heap -> stack
   //PHB_ITEM pArea = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-  HB_ITEM pArea = {0};
+  HB_ITEM pArea{};
   PHB_ITEM pAlias = hb_itemNew(SR_NULLPTR); // TODO: heap -> stack
   //PHB_ITEM pShared = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-  HB_ITEM pShared = {0};
+  HB_ITEM pShared{};
   //PHB_ITEM pReadOnly = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-  HB_ITEM pReadOnly = {0};
+  HB_ITEM pReadOnly{};
   HB_ERRCODE errCode;
 
   char szAlias[HB_RDD_MAX_ALIAS_LEN + 1];
