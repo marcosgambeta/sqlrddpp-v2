@@ -1,7 +1,5 @@
-//
 // SQLRDD Language Utilities
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -44,9 +42,9 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
-// #include "compat.ch"
 #include <hbclass.ch>
 #include <common.ch>
+
 #include "msg.ch"
 
 STATIC s_nMessages := 32
@@ -371,7 +369,7 @@ HB_FUNC_STATIC(SR_SETMSGCOUNT)
 
 HB_FUNC(SR_SETBASELANG)
 {
-  auto iLang = hb_parni(1);
+  int iLang = hb_parni(1);
 
   hb_retni(s_iBaseLang);
 
@@ -382,7 +380,7 @@ HB_FUNC(SR_SETBASELANG)
 
 HB_FUNC(SR_SETSECONDLANG)
 {
-  auto iLang = hb_parni(1);
+  int iLang = hb_parni(1);
 
   hb_retni(s_iSecondLang);
 
@@ -393,7 +391,7 @@ HB_FUNC(SR_SETSECONDLANG)
 
 HB_FUNC(SR_SETROOTLANG)
 {
-  auto iLang = hb_parni(1);
+  int iLang = hb_parni(1);
 
   hb_retni(s_iRootLang);
 

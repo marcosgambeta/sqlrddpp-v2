@@ -1,9 +1,6 @@
-//
 // HBXML - XML DOM oriented routines - Classes encapsulating the document
-//
 // Copyright 2003 Giancarlo Niccolai <gian@niccolai.ws>
-//    See also MXML library related copyright in hbxml.c
-//
+// See also MXML library related copyright in hbxml.c
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -46,9 +43,17 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+// for xHarbour compatibility
+#ifndef HB_SYMBOL_UNUSED
+#define HB_SYMBOL_UNUSED(symbol) (symbol := (symbol))
+#endif
+
+#ifndef __XHARBOUR__
+
 #include <fileio.ch>
-#include "srxml.ch"
 #include <hbclass.ch>
+
+#include "srxml.ch"
 
 //-------------------------------------------------------------------------------------------------------------------//
 
@@ -66,16 +71,16 @@ CREATE CLASS sr_TXMLNode
    VAR oChild
 
    METHOD New(nType, cName, aAttributes, cData) CONSTRUCTOR
-   METHOD Clone() INLINE srxml_node_clone(Self)
-   METHOD CloneTree() INLINE srxml_node_clone_tree(Self)
+   METHOD Clone() INLINE sr_xml_node_clone(Self)
+   METHOD CloneTree() INLINE sr_xml_node_clone_tree(Self)
 
-   METHOD Unlink() INLINE srxml_node_unlink(Self)
+   METHOD Unlink() INLINE sr_xml_node_unlink(Self)
    METHOD NextInTree()
 
-   METHOD InsertBefore(oNode) INLINE srxml_node_insert_before(Self, oNode)
-   METHOD InsertAfter(oNode) INLINE srxml_node_insert_after(Self, oNode)
-   METHOD InsertBelow(oNode) INLINE srxml_node_insert_below(Self, oNode)
-   METHOD AddBelow(oNode) INLINE srxml_node_add_below(Self, oNode)
+   METHOD InsertBefore(oNode) INLINE sr_xml_node_insert_before(Self, oNode)
+   METHOD InsertAfter(oNode) INLINE sr_xml_node_insert_after(Self, oNode)
+   METHOD InsertBelow(oNode) INLINE sr_xml_node_insert_below(Self, oNode)
+   METHOD AddBelow(oNode) INLINE sr_xml_node_add_below(Self, oNode)
 
    METHOD GetAttribute(cAttrib) INLINE IIf(cAttrib $ ::aAttributes, ::aAttributes[cAttrib], NIL)
    METHOD SetAttribute(cAttrib, xValue) INLINE ::aAttributes[cAttrib] := xValue
@@ -83,8 +88,8 @@ CREATE CLASS sr_TXMLNode
    METHOD Depth()
    METHOD Path()
 
-   METHOD ToString(nStyle) INLINE srxml_node_to_string(Self, nStyle)
-   METHOD Write(fHandle, nStyle) INLINE srxml_node_write(Self, fHandle, nStyle)
+   METHOD ToString(nStyle) INLINE sr_xml_node_to_string(Self, nStyle)
+   METHOD Write(fHandle, nStyle) INLINE sr_xml_node_write(Self, fHandle, nStyle)
 
    // Useful for debugging purposes
    METHOD ToArray() INLINE {::nType, ::cName, ::aAttributes, ::cData}
@@ -96,7 +101,7 @@ ENDCLASS
 METHOD sr_TXmlNode:New(nType, cName, aAttributes, cData)
 
    IF nType == NIL
-      ::nType := SRXML_TYPE_TAG
+      ::nType := SR_XML_TYPE_TAG
    ELSE
       ::nType := nType
    ENDIF
@@ -150,7 +155,7 @@ RETURN 0
 
 METHOD sr_TXmlNode:Path()
 
-   IF ::nType == SRXML_TYPE_DOCUMENT
+   IF ::nType == SR_XML_TYPE_DOCUMENT
       RETURN ""
    ENDIF
 
@@ -238,7 +243,7 @@ METHOD sr_TXmlIterator:Find(cName, cAttribute, cValue, cData)
    ::cValue := cValue
    ::cData := cData
 
-   IF ::oNode:nType == SRXML_TYPE_DOCUMENT
+   IF ::oNode:nType == SR_XML_TYPE_DOCUMENT
       IF ::oNode:oChild == NIL
          RETURN NIL
       ENDIF
@@ -380,7 +385,7 @@ CREATE CLASS sr_TXMLDocument
    VAR nNodeCount
 
    METHOD New(xElem, nStyle) CONSTRUCTOR
-   METHOD Read(xData, nStyle) INLINE srxml_dataread(Self, xData, nStyle)
+   METHOD Read(xData, nStyle) INLINE sr_xml_dataread(Self, xData, nStyle)
    METHOD ToString(nStyle) INLINE ::oRoot:ToString(nStyle)
    METHOD Write(fHandle, nStyle)
 
@@ -401,13 +406,13 @@ ENDCLASS
 
 METHOD sr_TXMLDocument:New(xElem, nStyle)
 
-   ::nStatus := SRXML_STATUS_OK
-   ::nError := SRXML_ERROR_NONE
+   ::nStatus := SR_XML_STATUS_OK
+   ::nError := SR_XML_ERROR_NONE
    ::nLine := 1
    ::nNodeCount := 0
 
    IF xElem == NIL
-      ::oRoot := sr_TXMLNode():New(SRXML_TYPE_DOCUMENT)
+      ::oRoot := sr_TXMLNode():New(SR_XML_TYPE_DOCUMENT)
    ELSE
       SWITCH ValType(xElem)
       CASE "O"
@@ -415,7 +420,7 @@ METHOD sr_TXMLDocument:New(xElem, nStyle)
          EXIT
       CASE "N"
       CASE "C"
-         ::oRoot := sr_TXMLNode():New(SRXML_TYPE_DOCUMENT)
+         ::oRoot := sr_TXMLNode():New(SR_XML_TYPE_DOCUMENT)
          IF hb_FileExists(xElem)
             ::Read(hb_MemoRead(xElem), nStyle)
          ELSE
@@ -434,7 +439,7 @@ RETURN Self
 
 METHOD sr_TXMLDocument:Write(fHandle, nStyle)
 
-   LOCAL nResult := SRXML_STATUS_ERROR
+   LOCAL nResult := SR_XML_STATUS_ERROR
 
    IF HB_IsString(fHandle)  // It's a filename!
       fHandle := FCreate(fHandle)
@@ -482,3 +487,5 @@ METHOD sr_TXMLDocument:GetContext()
 RETURN oDoc
 
 //-------------------------------------------------------------------------------------------------------------------//
+
+#endif

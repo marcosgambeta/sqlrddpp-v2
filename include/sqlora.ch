@@ -1,7 +1,5 @@
-//
 // SQLRDD PRG Header (Oracle DEFINES)
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -44,16 +42,16 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+// TODO: revise and remove duplicates
+
 #ifndef SQLORA_CH
 #define SQLORA_CH
-
-// TODO: revise and remove duplicates
 
 #include "sqlodbc.ch"
 
 #define OCI_SUCCESS 0                      // maps to SQL_SUCCESS of SAG CLI
 #define OCI_SUCCESS_WITH_INFO 1             // maps to SQL_SUCCESS_WITH_INFO
-#define OCI_RESERVED_FOR_INT_USE 200                             // reserved
+#define OCI_RESERVED_FOR_INT_USE 200                            // reserved
 #define OCI_NO_DATA 100                               // maps to SQL_NO_DATA
 #define OCI_ERROR -1                                    // maps to SQL_ERROR
 #define OCI_INVALID_HANDLE -2                  // maps to SQL_INVALID_HANDLE

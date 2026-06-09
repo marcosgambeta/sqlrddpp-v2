@@ -1,6 +1,22 @@
 REQUEST ADS
 #include "ads.ch"
 
+// xHarbour compatibility
+#ifdef __XHARBOUR__
+#xtranslate HB_HASH([<x,...>]) => hash(<x>)
+#xtranslate HB_HALLOCATE([<x,...>]) => hallocate(<x>)
+#xtranslate HB_HPOS([<x,...>]) => hgetpos(<x>)
+#xtranslate HB_HVALUEAT([<x,...>]) => hgetvalueat(<x>)
+#xtranslate HB_HVALUEAT([<x,...>]) => hsetvalueat(<x>)
+#xtranslate HB_HDELAT([<x,...>]) => hdelat(<x>)
+#xtranslate HB_HEVAL([<x,...>]) => heval(<x>)
+#endif
+
+// for xHarbour compatibility
+#ifndef HB_SYMBOL_UNUSED
+#define HB_SYMBOL_UNUSED(symbol) (symbol := (symbol))
+#endif
+
 STATIC s_hHashData := hb_hash()
 
 STATIC s_TRACE_STRUCT := { ;
@@ -13,95 +29,92 @@ STATIC s_TRACE_STRUCT := { ;
                          {"COMANDO",    "M", 10, 0} ;
                        }
 
-/*
- * xHarbour Project source code:
- * DBEDIT() function
- *
- * Copyright 2003 Mauricio Abre <maurifull@datafull.com>
- * www - http://www.xharbour.org
- * www - http://www.harbour-project.org
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
- *
- * As a special exception, the Harbour Project gives permission for
- * additional uses of the text contained in its release of Harbour.
- *
- * The exception is that, if you link the Harbour libraries with other
- * files to produce an executable, this does not by itself cause the
- * resulting executable to be covered by the GNU General Public License.
- * Your use of that executable is in no way restricted on account of
- * linking the Harbour library code into it.
- *
- * This exception does not however invalidate any other reasons why
- * the executable file might be covered by the GNU General Public License.
- *
- * This exception applies only to the code released by the Harbour
- * Project under the name Harbour.  If you copy code from other
- * Harbour Project or Free Software Foundation releases into a copy of
- * Harbour, as the General Public License permits, the exception does
- * not apply to the code that you add in this way.  To avoid misleading
- * anyone as to the status of such modified files, you must delete
- * this exception notice from them.
- *
- * If you write modifications of your own for Harbour, it is your choice
- * whether to permit this exception to apply to your modifications.
- * If you do not wish that, delete this exception notice.
- *
- */
+//
+// xHarbour Project source code:
+// DBEDIT() function
+//
+// Copyright 2003 Mauricio Abre <maurifull@datafull.com>
+// www - http://www.xharbour.org
+// www - http://www.harbour-project.org
+//
 
-/*
- * NOTE: This is a total rewrite with all features previous dbedit() had
- *       plus a few more.
- *       It works with or w/o 5.3 extensions
- *       + Using 5.3 extensions gives mouse event handling :)
- *       + Features previous dbedit() had are:
- *         - User func can be a codeblock
- *         - No coords = full screen
- *         - No columns = fill with db structure
- *       + New features in this version:
- *         - Any column can be also a codeblock instead of a string
- *         - Heading/footing separator is single line instead of double line
- *           (see below in the code)
- *         - Columns are movable via K_CTRL_UP / K_CTRL_DOWN
- *         - A column can be an array of 2 items
- *           In this case, the second is the codeblock to do coloring :)
- *         - Userfunc is called with a third parameter, the actual TBRowse object
- *           This is very useful, it increases A LOT the power of dbedit()
- *         - UserFunc is also called once with nMode == -1 (initialization)
- *           Prior to begin browsing
- *         - You can pass pre/post blocks for later using in user func
- *           (combinated with the GET system)
- *
- * DBEdit() is no more deprecated :)
- * Have fun
- *                      Mauricio
- *
- */
+// $BEGIN_LICENSE$
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2, or (at your option)
+// any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this software; see the file COPYING.  If not, write to
+// the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+// Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+//
+// As a special exception, the Harbour Project gives permission for
+// additional uses of the text contained in its release of Harbour.
+//
+// The exception is that, if you link the Harbour libraries with other
+// files to produce an executable, this does not by itself cause the
+// resulting executable to be covered by the GNU General Public License.
+// Your use of that executable is in no way restricted on account of
+// linking the Harbour library code into it.
+//
+// This exception does not however invalidate any other reasons why
+// the executable file might be covered by the GNU General Public License.
+//
+// This exception applies only to the code released by the Harbour
+// Project under the name Harbour.  If you copy code from other
+// Harbour Project or Free Software Foundation releases into a copy of
+// Harbour, as the General Public License permits, the exception does
+// not apply to the code that you add in this way.  To avoid misleading
+// anyone as to the status of such modified files, you must delete
+// this exception notice from them.
+//
+// If you write modifications of your own for Harbour, it is your choice
+// whether to permit this exception to apply to your modifications.
+// If you do not wish that, delete this exception notice.
+// $END_LICENSE$
 
-#include <dbedit.ch>
+// NOTE: This is a total rewrite with all features previous dbedit() had
+//       plus a few more.
+//       It works with or w/o 5.3 extensions
+//       + Using 5.3 extensions gives mouse event handling :)
+//       + Features previous dbedit() had are:
+//         - User func can be a codeblock
+//         - No coords = full screen
+//         - No columns = fill with db structure
+//       + New features in this version:
+//         - Any column can be also a codeblock instead of a string
+//         - Heading/footing separator is single line instead of double line
+//           (see below in the code)
+//         - Columns are movable via K_CTRL_UP / K_CTRL_DOWN
+//         - A column can be an array of 2 items
+//           In this case, the second is the codeblock to do coloring :)
+//         - Userfunc is called with a third parameter, the actual TBRowse object
+//           This is very useful, it increases A LOT the power of dbedit()
+//         - UserFunc is also called once with nMode == -1 (initialization)
+//           Prior to begin browsing
+//         - You can pass pre/post blocks for later using in user func
+//           (combinated with the GET system)
+//
+// DBEdit() is no more deprecated :)
+// Have fun
+//                      Mauricio
+
+#include "dbedit.ch"
 #include <inkey.ch>
-#include <setcurs.ch>
-#include <hbsetup.ch>
+#include "setcurs.ch"
+#include "hbsetup.ch"
 #include <common.ch>
-#include <tbrowse.ch>
+#include "tbrowse.ch"
 
-/* E.F. 2006/04/22 - The #define DE_APPEND is for Append mode in dbEdit.
- * I have used tbrowse "cargo" to assign true/false for that.
- * (Append mode is undocumented Clipper's dbEdit feature)
- */
+// E.F. 2006/04/22 - The #define DE_APPEND is for Append mode in dbEdit.
+// I have used tbrowse "cargo" to assign true/false for that.
+// (Append mode is undocumented Clipper's dbEdit feature)
 
 #ifndef DE_APPEND
 #define DE_APPEND  3
@@ -271,18 +284,18 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    refreshFullData(csql, cAlias, cfile, nHigerBound, nLowerBound, nStep)
 
    createkeyfrompk(calias, ctable, lDescIndex) //cria o indice temporatio em cima da pk
-   cFiletoDelete := (calias)->(DBInfo(10))
+   cFiletoDelete := (calias)->(dbinfo(10))
    nLowerBound += nHigerBound
 
    IF !Used()
 #ifdef HB_C52_STRICT
-      DBGoBottom() /* Clipper compliance: call dbgobotom() to forces error message. */
+      DBGoBottom() // Clipper compliance: call dbgobotom() to forces error message.
 #else
-      /* Call Errorsys() with error 2001 if not database in use. */
+      // Call Errorsys() with error 2001 if not database in use.
       _SR_Throw(ErrorNew("DBCMD", 0, 2001, procname(), "Workarea not in use"))
 #endif
    ELSEIF Eof() .AND. LastRec() > 0
-      /* DbEdit() moves cursor to the bottom record if eof() is reached at init. */
+      // DbEdit() moves cursor to the bottom record if Eof() is reached at init.
       DBGoBottom()
    ENDIF
 
@@ -296,7 +309,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    //       so the output is ugly with them
    //
    DEFAULT acHeadingSep TO Chr(196) + Chr(194) + Chr(196)
-   DEFAULT acColumnSep  TO " " + Chr(179) + " "
+   DEFAULT acColumnSep TO " " + Chr(179) + " "
    DEFAULT acColumnFootings TO ""
 
    IF Empty(axColumns) .OR. !HB_IsArray(axColumns)
@@ -304,21 +317,24 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       axColumns := Array(FCount())
 
       FOR EACH i IN axColumns
+#ifdef __XHARBOUR__
+         i := FieldName(hb_EnumIndex())
+#else
          i := FieldName(i:__EnumIndex())
+#endif
       NEXT
 
    ENDIF
 
-   /* 17/05/2006 - E.F. - Check parameters type before continue.
-    * 1) Clipper avoid argument values if it is invalid.
-    *    xHarbour call a run time error. IMHO this is better solution to
-         avoid old errors in code and bad practices inherited from Clipper's days.
-    * 2) There is no error base reserved to dbEdit function, then I have
-    *    assigned the 1127 for this.
-   */
+   // 17/05/2006 - E.F. - Check parameters type before continue.
+   // 1) Clipper avoid argument values if it is invalid.
+   //    xHarbour call a run time error. IMHO this is better solution to
+   //    avoid old errors in code and bad practices inherited from Clipper's days.
+   // 2) There is no error base reserved to dbEdit function, then I have
+   //    assigned the 1127 for this.
 
-   /* Note: The column's type doesn't need to verify. If any column type is
-           invalid or empty, then the dbEdit() will ignore it. */
+   // Note: The column's type doesn't need to verify. If any column type is
+   //       invalid or empty, then the dbEdit() will ignore it.
 
    IF nTop != NIL .AND. !HB_IsNumeric(nTop)
       _SR_Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(nTop) + ">", Procname() + " <nTop>"))
@@ -333,14 +349,13 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       _SR_Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(nRight) + ">", Procname() + " <nRight>"))
    ENDIF
 
-   nTop    := Max(0, nTop)
-   nLeft   := Max(0, nLeft)
+   nTop := Max(0, nTop)
+   nLeft := Max(0, nLeft)
    nBottom := Min(MaxRow(), nBottom)
-   nRight  := Min(MaxCol(), nRight)
+   nRight := Min(MaxCol(), nRight)
 
-   /* In Clipper the <cUserFunc> paramenter only can be a
-    * string or NIL, but in xHarbour can be a codeblock also.
-   */
+   // In Clipper the <cUserFunc> paramenter only can be a
+   // string or NIL, but in xHarbour can be a codeblock also.
    IF xUserFunc != NIL .AND. (!HB_IsString(xUserFunc) .AND. !HB_IsBlock(xUserFunc) .AND. !HB_IsLogical(xUserFunc))
       _SR_Throw(ErrorNew("BASE", 0, 1127, "Argument type error <" + ValType(xUserFunc) + ">", Procname() + " <xUserFunc>"))
    ELSE
@@ -393,7 +408,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    IF HB_IsBlock(bPostBlock)
       i := bPostBlock
       bPostBlock := Array(Len(axColumns))
-      aFill(bPostBlock, i)
+      AFill(bPostBlock, i)
    END
 
    // Save previous cursor shape and position.
@@ -401,16 +416,16 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
 
    IIf(acFootingSep == NIL .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
 
-   /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
+   // 2007/JAN/30 - EF - To avoid dbedit blinking.
    DispBegin()
 
-   /* Create Tbrowse object */
+   // Create Tbrowse object
    oTBR := TBrowseDB(nTop, nLeft, nBottom, nRight)
 
-   /* E.F. 2006/04/22 - Set append mode off by default */
+   // E.F. 2006/04/22 - Set append mode off by default
    oTBR:Cargo := .F.
 
-   /* E.F. 2006/04/22 - Use a custom 'skipper' to handle append mode */
+   // E.F. 2006/04/22 - Use a custom 'skipper' to handle append mode
    oTBR:SkipBlock := {|x|dbe_Skipper(x, oTBR, calias)}
    //oTBR:SkipBlock := {|x|Skipped(x, lappend)}
 
@@ -625,7 +640,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
 
             //nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, GetCurValue(calias), oTBR, , , , , , , cTable)
             lExcept := .F.
-            IF lastkey() == K_ENTER
+            IF LastKey() == K_ENTER
                oTBR:RefreshCurrent()
             ENDIF
          ENDIF
@@ -662,7 +677,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
 
       oTBR:Hilite()
 
-      IF Nextkey() != 0
+      IF NextKey() != 0
          nKey := Inkey()
       ELSE
          nKey := Inkey(0)
@@ -698,7 +713,7 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
    IF nOldArea > 0
       Select(nOldArea)
    ENDIF
-   IF file(s_hHashData[s_nAliasTmp]["cFile"] + "sqllog.dbf")
+   IF File(s_hHashData[s_nAliasTmp]["cFile"] + "sqllog.dbf")
       FErase(s_hHashData[s_nAliasTmp]["cFile"] + "sqllog.dbf")
       FErase(s_hHashData[s_nAliasTmp]["cFile"] + "sqllog.dbt")
    ENDIF
@@ -706,11 +721,11 @@ FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop, nLeft, nBottom, ;
       s_nAliasTmp--
    ENDIF
    FErase(cFiletoDelete)
-   IF file(StrTran(cFiletoDelete, ".tmp", ".adi"))
+   IF File(StrTran(cFiletoDelete, ".tmp", ".adi"))
       FErase(StrTran(cFiletoDelete, ".tmp", ".adi"))
    ENDIF
 
-/* Clipper's NG says that DBEdit always returns NIL, but doesn't. */
+// Clipper's NG says that DBEdit always returns NIL, but doesn't.
 RETURN 0 //.T.
 
 //-----------------------------------------------------//
@@ -736,12 +751,12 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
       nKey := NextKey()
 
       IF nKey == K_ENTER .OR. nKey == K_ESC
-         inkey()
+         Inkey()
          RETURN DE_ABORT
       ENDIF
 
       DO WHILE nKey != 0
-         inkey()
+         Inkey()
          dbe_ProcessKey(nKey, oTBR)
          nRet := dbe_return(Eval(bFunc, DE_EXCEPT, nColPos, GetCurValue(calias)))
          IF nRet == DE_ABORT
@@ -776,12 +791,12 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
    ENDIF
 
    lDeleted := Deleted()
-   nRec     := RecNo()
+   nRec := RecNo()
    nLastRec := (cAlias)->(LastRec())
 
    // Call UDF
    aValues := GetCurValue(calias)
-   nkey := lastkey()
+   nkey := LastKey()
    IF nKey == K_ENTER .OR. nKey == K_DEL
       GETREFRESHCURVALUE(cAlias, ctable)
       aValues := GetCurValue(calias)
@@ -793,7 +808,7 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
    IF nRet == DE_REFRESH
 
       IF nKey == K_DEL
-         IF IsPrimaryKeyDeleted(cAlias, cTable)
+         if IsPrimaryKeyDeleted(cAlias, cTable)
             (calias)->(RLock())
             (calias)->(DBDelete())
             (calias)->(DBUnlock())
@@ -814,10 +829,10 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
          //   cvalues := AllTrim(values)
          //   cSql := AllTrim(cSql)
          //   cSql := SubStr(csql, At("(", csql) + 1)
-         //   csql :=StrTran(csql, ")", "")
+         //   csql := StrTran(csql, ")", "")
          //   cvalues := AllTrim(cvalues)
          //   cvalues := SubStr(cvalues, At("(", cvalues) + 1)
-         //   cvalues :=StrTran(cvalues, ")", "")
+         //   cvalues := StrTran(cvalues, ")", "")
          //   aField := hb_atokens(csql, ",")
          //   aVal := hb_atokens(cvalues, ",")
          //   (calias)->(DBAppend())
@@ -859,17 +874,17 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
 
       IF (cAlias)->(LastRec()) > nLastRec // append.
 
-         nKey := nextkey()
+         nKey := NextKey()
          //refreshFullData(csql, calias)
 
          IF (nKey != 0 .AND. !dbe_CursorKey(nKey)) .OR. (calias)->(ordkeyno()) < oTBR:RowPos
             oTBR:Gotop()
          ENDIF
          //IF (Set(_SET_DELETED) .AND. Deleted()) .OR. (!Empty(dbfilter()) .AND. !&(dbFilter()))
-         //   dbSkip()
+         //   DBSkip()
          //ENDIF
          //IF Eof()
-         //   dbGoBottom()
+         //   DBGoBottom()
          //ENDIF
          //
          //otbr:forceStable()
@@ -882,7 +897,7 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
       ELSEIF (calias)->(Deleted()) .AND. (cAlias)->(LastRec()) != 0 .OR. aret[1, 1] <= (calias)->(RecCount()) // deleted
 
          IF SET(_SET_DELETED)
-            DO WHILE !Eof() .AND. deleted()
+            DO WHILE !Eof() .AND. Deleted()
                DBSkip()
             ENDDO
          ELSE
@@ -901,7 +916,7 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
 
          oTBR:Up():forceStable()
          //s_hHashData[calias]["eof"] := .F.
-         // // dbgobottom()
+         // // DBGoBottom()
          //culik comentado para teste
          //nHigerBound += nStep
          //refreshFullData(csql, cAlias, cfile, nHigerBound, nLowerBound, nStep)
@@ -912,7 +927,7 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
 
    ENDIF
    IF Eof()
-      //dbskip(-1)
+      //DBSkip(-1)
 
       //oTBR:Up():forceStable()
       //culik comentado para teste
@@ -936,19 +951,16 @@ STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, c
 
 RETURN nRet
 
-/***
-*
-*  dbe_Skipper()
-*
-*  Handle record movement requests from Tbrowse object.
-*
-*  This is a special "skipper" that handles append mode. It
-*  takes two parameters instead of the usual one. The second
-*  parameter is a reference to the Tbrowse object itself. The
-*  Tbrowse's "cargo" variable contains information on whether
-*  append mode is turned on. This function was based from:
-*  clipper\source\samples\tbdemo.prg
-*/
+// dbe_Skipper()
+//
+// Handle record movement requests from Tbrowse object.
+//
+// This is a special "skipper" that handles append mode. It
+// takes two parameters instead of the usual one. The second
+// parameter is a reference to the Tbrowse object itself. The
+// Tbrowse's "cargo" variable contains information on whether
+// append mode is turned on. This function was based from:
+// clipper\source\samples\tbdemo.prg
 
 //---------------------------------------//
 STATIC FUNCTION dbe_Skipper(nSkip, oTb, calias)
@@ -1022,7 +1034,7 @@ STATIC FUNCTION dbe_emptydb()
       RETURN .T.
    ENDIF
 
-   IF !Empty(DBFilter())
+   IF !Empty(dbFilter())
       lEmpty := (Eof() .OR. RecNo() > LastRec())
    ELSEIF IndexOrd() == 0
       lEmpty := ((Eof() .OR. RecNo() > LastRec()) .AND. Bof())
@@ -1069,7 +1081,7 @@ RETURN nRet
 STATIC FUNCTION dbe_Return(n)
 //--------------------------------//
 
-   IF !HB_IsNumeric(n)
+   IF !hb_isnumeric(n)
       n := DE_CONT
    ELSEIF n < DE_ABORT .OR. n > DE_APPEND
       n := DE_CONT
@@ -1122,7 +1134,7 @@ STATIC FUNCTION dbe_syncpos(oTb)
          ELSE
             DBGoTop()
             DO WHILE !Eof() .AND. RecNo() != nRec
-               IF deleted()
+               IF Deleted()
                   nDel++
                ENDIF
                DBSkip()
@@ -1148,7 +1160,7 @@ FUNCTION GetCurValue(calias)
    LOCAL n
    LOCAL aTemp := {}
 
-   FOR n := 1 TO (cAlias)->(fcount())
+   FOR n := 1 TO (cAlias)->(FCount())
       AAdd(aTemp,(cAlias)->(FieldGet(n)))
    NEXT n
    AAdd(aTemp,(calias)->(RecNo()))
@@ -1162,7 +1174,7 @@ STATIC FUNCTION refreshFullData(csql, cAlias, cfile, nHigh, nLow, nStep)
    LOCAL nBeforeTotRec := 0
    LOCAL nAfterRec := 0
 
-   DEFAULT cFile TO (calias)->(DBInfo(10))
+   DEFAULT cFile TO (calias)->(dbinfo(10))
 
    //IF Select(caLias) > 0
    //   ZAP
@@ -1219,7 +1231,7 @@ RETURN aFields
 
 FUNCTION GETREFRESHCURVALUE(calias, ctable)
 
-   //LOCAL cTable := (calias)->(DBInfo(10))
+   //LOCAL cTable := (calias)->(dbinfo(10))
    LOCAL aFields := GETPRIMARYKEY(cTable)
    LOCAL aFields2
    LOCAL aTemp
@@ -1249,7 +1261,7 @@ FUNCTION GETREFRESHCURVALUE(calias, ctable)
       SR_GetConnection():Exec(cSql, , .T., @aret)
       aFields2 := SR_GetConnection():aFields
       IF Len(aret) > 0
-         (calias)->(rlock())
+         (calias)->(RLock())
          aTemp := aret[1]
          FOR EACH aTmp IN aFields2
             nPos := AScan(adb,{|x|x[1] == aFields2[i, 1]})
@@ -1268,7 +1280,7 @@ RETURN NIL
 
 FUNCTION GETREFRESHCURINSVALUE(calias, ctable, calias2)
 
-   //LOCAL cTable := (calias)->(DBInfo(10))
+   //LOCAL cTable := (calias)->(dbinfo(10))
    LOCAL aFields := GETPRIMARYKEY(cTable)
    LOCAL aFields2
    LOCAL aTemp
@@ -1277,7 +1289,7 @@ FUNCTION GETREFRESHCURINSVALUE(calias, ctable, calias2)
    LOCAL aret := {}
    LOCAL nrec
    LOCAL uDat
-   LOCAL cfile := (calias2)->(DBInfo(10))
+   LOCAL cfile := (calias2)->(dbinfo(10))
    LOCAL cfield
    LOCAL aTmpField
    LOCAL nposf
@@ -1314,12 +1326,12 @@ FUNCTION GETREFRESHCURINSVALUE(calias, ctable, calias2)
             (cAlias2)->(FieldPut(nposf, aTemp[i]))
             ++i
          NEXT
-         (calias2)->(DBCommit())
+         (calias2)->(dbcommit())
          (calias2)->(DBUnlock())
          //NEXT
    
          //nrec := (cAlias2)->(RecNo())
-         //(calias2)->(dbgoto(nrec))
+         //(calias2)->(DBGoTo(nrec))
    
       ENDIF
 
@@ -1366,7 +1378,7 @@ FUNCTION insertupdated(calias, ctable)
    LOCAL aFields := GETPRIMARYKEY(cTable)
    LOCAL cFields := ""
    LOCAL cDesc := ""
-   LOCAL ctemp := (calias)->(DBInfo(10))
+   LOCAL ctemp := (calias)->(dbinfo(10))
    LOCAL cFileDrive := SubStr(cTemp, 1, RAt("\", cTemp) - 2)
    LOCAL cFile := SubStr(cTemp, RAt("\", cTemp) + 1)
    LOCAL aVal
@@ -1402,12 +1414,12 @@ FUNCTION insertupdated(calias, ctable)
          cvalues := AllTrim(cvalues)
          cSql := AllTrim(cSql)
          cSql := SubStr(csql, At("(", csql) + 1)
-         csql :=StrTran(csql, ")", "")
+         csql := StrTran(csql, ")", "")
 
          cSql := AllTrim(cSql)
          cvalues := AllTrim(cvalues)
          cvalues := SubStr(cvalues, At("(", cvalues) + 1)
-         cvalues :=StrTran(cvalues, ")", "")
+         cvalues := StrTran(cvalues, ")", "")
          //cvalues := StrTran(cvalues, "'", "")
          aField := hb_atokens(csql, ",")
          aVal := hb_atokens(cvalues, ",")
@@ -1426,11 +1438,11 @@ FUNCTION insertupdated(calias, ctable)
                IF "TO_DATE(" $ Upper(aval[npos])
                   aval[nPos] := SubStr(aval[npos], At("TO_DATE(", Upper(aval[nPos])) + 8)
                   aval[npos] := StrTran(aval[npos], "'", "")
-                  aval[npos] := stod(aval[npos])
+                  aval[npos] := SToD(aval[npos])
                ENDIF
                IF HB_IsChar(aval[npos])
                   cSql += " " + aTemp  + " = " +  aVal[nPos]
-               ELSEIF  HB_IsNumeric(aval[npos]) .OR. HB_IsDate(aval[npos])
+               ELSEIF HB_IsNumeric(aval[npos]) .OR. HB_IsDate(aval[npos])
                   cSql += " " + aTemp  + " = " +  sr_cdbvalue(aVal[nPos])
                ENDIF
                cSql += " AND "
@@ -1441,7 +1453,7 @@ FUNCTION insertupdated(calias, ctable)
          csql := "select " + cfields + " from " + ctable + " where rownum <4  order by " + cDesc
       ENDIF
       USE (csql) NEW alias "INSSQLTMP" VIA "SQLRDD"
-      IF INSSQLTMP->(RecCount()) > 0
+      if INSSQLTMP->(RecCount()) > 0
 
          inssqltmp->(DBGoTop())
          DO WHILE !inssqltmp->(Eof())
@@ -1451,7 +1463,7 @@ FUNCTION insertupdated(calias, ctable)
                nPos := AScan(adb,{|x|Upper(x[1]) == aTemp})
                IF nPos > 0
                   IF inssqltmp->(fieldtype(i)) == "C"
-                     cSqlTmp += inssqltmp->(Fieldget(i))
+                     cSqlTmp += inssqltmp->(FieldGet(i))
                   ELSEIF inssqltmp->(fieldtype(i)) == "N"
                      IF adb[npos, 4] > 0
                         cSqlTmp += Str(inssqltmp->(FieldGet(i)), adb[npos, 3], adb[npos, 4])
@@ -1467,7 +1479,7 @@ FUNCTION insertupdated(calias, ctable)
 
             //USE (cSqlTmp) NEW Alias "INSSQLTMP2" VIA "ADSADT"
 
-            IF !(calias)->(DBSeek(csqltmp))
+            IF !(calias)->(dbseek(csqltmp))
                GETREFRESHCURINSVALUE("INSSQLTMP", ctable, calias)
             ENDIF
 

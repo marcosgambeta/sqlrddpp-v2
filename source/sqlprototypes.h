@@ -1,7 +1,5 @@
-//
 // SQLRDD Connection Classes C Internal header
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -64,7 +62,7 @@ HB_BOOL HB_EXPORT sr_fShortasNum(void);
 HB_BOOL hb_arraySetNL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_LONG ulVal);
 HB_BOOL hb_arraySetL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_BOOL lVal);
 #endif
-HB_BOOL iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2);
+//HB_BOOL iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2); NOTE: changed to static
 HB_BOOL hb_itemEmpty(PHB_ITEM pItem);
 HB_BOOL sr_GoTopOnScope(void);
 

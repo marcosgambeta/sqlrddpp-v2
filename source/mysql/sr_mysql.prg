@@ -1,8 +1,6 @@
-//
 // SQLRDD MySQL Native Connection Class
 // Copyright (c) 2003 - Marcelo Lombardo  <marcelo@xharbour.com.br>
 // Copyright (c) 2003 - Luiz Rafal Culik Guimarães <luiz@xharbour.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -45,26 +43,34 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+// for xHarbour compatibility
+#ifndef HB_SYMBOL_UNUSED
+#define HB_SYMBOL_UNUSED(symbol) (symbol := (symbol))
+#endif
+
 #include <hbclass.ch>
 #include <common.ch>
-// #include "compat.ch"
+#include <error.ch>
+
 #include "sqlodbc.ch"
 #include "sqlrdd.ch"
 #include "sqlrddpp.ch"
-#include <error.ch>
 #include "msg.ch"
 #include "mysql.ch"
 #include "sqlrddsetup.ch"
 
-#define DEBUGSESSION .F.
-#define ARRAY_BLOCK 500
-#define MINIMAL_MYSQL_SUPPORTED 40105
+#define DEBUGSESSION              .F.
+#define ARRAY_BLOCK               500
+#define MINIMAL_MYSQL_SUPPORTED   40105
+
+//-------------------------------------------------------------------------------------------------------------------//
 
 CLASS SR_MYSQL FROM SR_CONNECTION
 
    DATA aCurrLine
 
-   METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
+   METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, ;
+      nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
    METHOD End()
    METHOD LastError()
    METHOD Commit(lNoLog)
@@ -81,16 +87,16 @@ CLASS SR_MYSQL FROM SR_CONNECTION
 
 ENDCLASS
 
-METHOD SR_MYSQL:MoreResults(aArray, lTranslate)
+//-------------------------------------------------------------------------------------------------------------------//
 
-   LOCAL nRet
+METHOD SR_MYSQL:MoreResults(aArray, lTranslate)
 
    HB_SYMBOL_UNUSED(aArray)
    HB_SYMBOL_UNUSED(lTranslate)
 
-   nRet := -1
+RETURN -1
 
-RETURN nRet
+//-------------------------------------------------------------------------------------------------------------------//
 
 METHOD SR_MYSQL:Getline(aFields, lTranslate, aArray)
 
@@ -116,15 +122,19 @@ METHOD SR_MYSQL:Getline(aFields, lTranslate, aArray)
 
 RETURN aArray
 
+//-------------------------------------------------------------------------------------------------------------------//
+
 METHOD SR_MYSQL:FieldGet(nField, aFields, lTranslate)
 
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
-      ::aCurrLine := array(Len(aFields))
+      ::aCurrLine := Array(Len(aFields))
       SR_MYSLINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, ::aCurrLine)
    ENDIF
 
 RETURN ::aCurrLine[nField]
+
+//-------------------------------------------------------------------------------------------------------------------//
 
 METHOD SR_MYSQL:FetchRaw(lTranslate, aFields)
 
@@ -137,10 +147,13 @@ METHOD SR_MYSQL:FetchRaw(lTranslate, aFields)
       ::nRetCode := SR_MYSFetch(::hDbc)
       ::aCurrLine := NIL
    ELSE
-      ::RunTimeErr("", "MySQLFetch - Invalid cursor state" + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
+      ::RunTimeErr("", "MySQLFetch - Invalid cursor state" + SR_CRLF + SR_CRLF + ;
+         "Last command sent to database : " + SR_CRLF + ::cLastComm)
    ENDIF
 
 RETURN ::nRetCode
+
+//-------------------------------------------------------------------------------------------------------------------//
 
 METHOD SR_MYSQL:FreeStatement()
 
@@ -151,15 +164,12 @@ METHOD SR_MYSQL:FreeStatement()
 
 RETURN NIL
 
+//-------------------------------------------------------------------------------------------------------------------//
+
 METHOD SR_MYSQL:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
-   //LOCAL nType := 0 (variable not used)
-   //LOCAL nLen := 0 (variable not used)
-   //LOCAL nNull := 0 (variable not used)
-   LOCAL aFields //:= {} (value not used)
-   //LOCAL nDec := 0 (variable not used)
+   LOCAL aFields
    LOCAL nRet
-   //LOCAL cVlr := "" (variable not used)
    LOCAL aFld
 
    DEFAULT lReSelect TO .T.
@@ -172,7 +182,9 @@ METHOD SR_MYSQL:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
       IF !Empty(cCommand)
          nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       ELSE
-         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
+         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + ;
+            IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + ;
+            IIf(::lComments, " /* Open Workarea */", ""), .F.)
       ENDIF
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
          RETURN NIL
@@ -197,7 +209,11 @@ METHOD SR_MYSQL:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
    ::aFields := aFields
 
    FOR EACH aFld IN ::aFields
+#ifdef __XHARBOUR__
+      aFld[FIELD_ENUM] := hb_enumIndex()
+#else
       aFld[FIELD_ENUM] := aFld:__enumIndex()
+#endif
    NEXT
 
    IF lReSelect .AND. !lLoadCache
@@ -206,24 +222,27 @@ METHOD SR_MYSQL:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecn
 
 RETURN aFields
 
+//-------------------------------------------------------------------------------------------------------------------//
+
 METHOD SR_MYSQL:LastError()
 
    IF ::hStmt != NIL
       RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + SR_MYSResStatus(::hDbc) + " - " + SR_MYSErrMsg(::hDbc)
    ENDIF
 
-RETURN "(" + allTrim(Str(::nRetCode)) + ") " + SR_MYSErrMsg(::hDbc)
+RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + SR_MYSErrMsg(::hDbc)
 
-METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
+//-------------------------------------------------------------------------------------------------------------------//
 
-   //LOCAL hEnv := 0 (variable not used)
-   LOCAL hDbc //:= 0 (value not used)
+METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, ;
+   nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
+
+   LOCAL hDbc
    LOCAL nret
-   //LOCAL cVersion := "" (variable not used)
-   LOCAL cSystemVers := ""
-   //LOCAL cBuff := "" (variable not used)
+   LOCAL cSystemVers
    LOCAL nVersionp
 
+   // parameters not used
    HB_SYMBOL_UNUSED(cDSN)
    HB_SYMBOL_UNUSED(cUser)
    HB_SYMBOL_UNUSED(cPassword)
@@ -245,8 +264,6 @@ METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
       ::nRetCode := nRet
       ::nSystemID := 0
       SR_MsgLogFile("Connection Error")
-      //nVersionp := MINIMAL_MYSQL_SUPPORTED - 100 (local variable/value not used)
-      HB_SYMBOL_UNUSED(cSystemVers)
       RETURN SELF
    ENDIF
 
@@ -258,7 +275,8 @@ METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
    nVersionp := SR_MYSVERS(hDbc)
 
    IF !::lQueryOnly .AND. nVersionp < MINIMAL_MYSQL_SUPPORTED
-      SR_MsgLogFile("Connection Error: MySQL version not supported : " + cSystemVers + " / minimun is " + Str(MINIMAL_MYSQL_SUPPORTED))
+      SR_MsgLogFile("Connection Error: MySQL version not supported : " + cSystemVers + " / minimun is " + ;
+         Str(MINIMAL_MYSQL_SUPPORTED))
       ::End()
       ::nSystemID := 0
       ::nRetCode := -1
@@ -273,6 +291,8 @@ METHOD SR_MYSQL:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuf
 
 RETURN SELF
 
+//-------------------------------------------------------------------------------------------------------------------//
+
 METHOD SR_MYSQL:End()
 
    ::Commit(.T.)
@@ -284,11 +304,15 @@ METHOD SR_MYSQL:End()
 
 RETURN ::Super:End()
 
+//-------------------------------------------------------------------------------------------------------------------//
+
 METHOD SR_MYSQL:Commit(lNoLog)
 
    ::Super:Commit(lNoLog)
 
 RETURN (::nRetCode := SR_MYSCommit(::hDbc))
+
+//-------------------------------------------------------------------------------------------------------------------//
 
 METHOD SR_MYSQL:RollBack()
 
@@ -296,10 +320,11 @@ METHOD SR_MYSQL:RollBack()
 
 RETURN (::nRetCode := SR_MYSRollBack(::hDbc))
 
+//-------------------------------------------------------------------------------------------------------------------//
+
 METHOD SR_MYSQL:ExecuteRaw(cCommand)
 
-   IF Upper(Left(LTrim(cCommand), 6)) == "SELECT" .OR. ;
-      Upper(Left(LTrim(cCommand), 5)) == "SHOW "
+   IF Upper(Left(LTrim(cCommand), 6)) == "SELECT" .OR. Upper(Left(LTrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
    ELSE
       ::lResultSet := .F.
@@ -309,11 +334,13 @@ METHOD SR_MYSQL:ExecuteRaw(cCommand)
 
 RETURN SR_MYSResultStatus(::hDbc)
 
+//-------------------------------------------------------------------------------------------------------------------//
+
 METHOD SR_MYSQL:GetAffectedRows()
 RETURN SR_MYSAFFECTEDROWS(::hDbc)
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 #include "sr_mysql_bind.cpp"
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//

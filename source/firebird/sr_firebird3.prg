@@ -1,7 +1,5 @@
-//
 // SQLRDD Firebird Connection Class
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -44,13 +42,18 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+// for xHarbour compatibility
+#ifndef HB_SYMBOL_UNUSED
+#define HB_SYMBOL_UNUSED(symbol) (symbol := (symbol))
+#endif
+
 #include <hbclass.ch>
 #include <common.ch>
-// #include "compat.ch"
+#include <error.ch>
+
 #include "sqlodbc.ch"
 #include "sqlrdd.ch"
 #include "sqlrddpp.ch"
-#include <error.ch>
 #include "msg.ch"
 #include "firebird.ch"
 #include "sqlrddsetup.ch"
@@ -58,13 +61,14 @@
 #define DEBUGSESSION     .F.
 #define ARRAY_BLOCK      500
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 CLASS SR_FIREBIRD3 FROM SR_CONNECTION
 
    Data aCurrLine
 
-   METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
+   METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, ;
+      nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
    METHOD End()
    METHOD LastError()
    METHOD Commit()
@@ -76,10 +80,11 @@ CLASS SR_FIREBIRD3 FROM SR_CONNECTION
    METHOD FieldGet(nField, aFields, lTranslate)
    METHOD Getline(aFields, lTranslate, aArray)
    METHOD MoreResults(aArray, lTranslate)
+   METHOD CreateDatabase(cDatabaseName, cUserName, cPassword, nPageSize, cCharset, nDialect)
 
 ENDCLASS
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:Getline(aFields, lTranslate, aArray)
 
@@ -105,7 +110,7 @@ METHOD SR_FIREBIRD3:Getline(aFields, lTranslate, aArray)
 
 RETURN aArray
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:FieldGet(nField, aFields, lTranslate)
 
@@ -117,7 +122,7 @@ METHOD SR_FIREBIRD3:FieldGet(nField, aFields, lTranslate)
 
 RETURN ::aCurrLine[nField]
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:FetchRaw(lTranslate, aFields)
 
@@ -129,12 +134,13 @@ METHOD SR_FIREBIRD3:FetchRaw(lTranslate, aFields)
       ::nRetCode := SR_FBFetch3(::hEnv)
       ::aCurrLine := NIL
    ELSE
-      ::RunTimeErr("", "FBFetch - Invalid cursor state" + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
+      ::RunTimeErr("", "FBFetch - Invalid cursor state" + SR_CRLF + SR_CRLF + ;
+         "Last command sent to database : " + SR_CRLF + ::cLastComm)
    ENDIF
 
 RETURN ::nRetCode
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:AllocStatement()
 
@@ -147,7 +153,7 @@ METHOD SR_FIREBIRD3:AllocStatement()
 
 RETURN SQL_SUCCESS
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
@@ -157,15 +163,14 @@ METHOD SR_FIREBIRD3:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, c
    LOCAL nLen := 0
    LOCAL nNull := 0
    LOCAL cName
-   //LOCAL _nLen (variable not used)
+   //LOCAL _nLen (variable disabled)
    LOCAL _nDec
    LOCAL nPos
    LOCAL cType
    LOCAL nLenField
-   LOCAL aFields //:= {} (value not used)
+   LOCAL aFields
    LOCAL nDec := 0
    LOCAL nRet
-   //LOCAL cVlr := "" (variable not used)
    LOCAL aLocalPrecision := {}
 
    DEFAULT lReSelect TO .T.
@@ -179,8 +184,12 @@ METHOD SR_FIREBIRD3:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, c
          nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       ELSE
          // DOON'T remove "+0"
-         ::Exec("select a.rdb$field_name, b.rdb$field_precision + 0 from rdb$relation_fields a, rdb$fields b where a.rdb$relation_name = '" + StrTran(cTable, Chr(34), "") + "' and a.rdb$field_source = b.rdb$field_name", .F., .T., @aLocalPrecision)
-         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
+         ::Exec("select a.rdb$field_name, b.rdb$field_precision + 0 from rdb$relation_fields a, " + ;
+            "rdb$fields b where a.rdb$relation_name = '" + StrTran(cTable, Chr(34), "") + ;
+            "' and a.rdb$field_source = b.rdb$field_name", .F., .T., @aLocalPrecision)
+         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + ;
+            IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + ;
+            IIf(::lComments, " /* Open Workarea */", ""), .F.)
       ENDIF
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
          RETURN NIL
@@ -188,7 +197,8 @@ METHOD SR_FIREBIRD3:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, c
    ENDIF
 
    IF (::nRetCode := SR_FBNumResultCols3(::hEnv, @nFields)) != SQL_SUCCESS
-      ::RunTimeErr("", "FBNumResultCols Error" + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
+      ::RunTimeErr("", "FBNumResultCols Error" + SR_CRLF + SR_CRLF + ;
+         "Last command sent to database : " + SR_CRLF + ::cLastComm)
       RETURN NIL
    ENDIF
 
@@ -200,29 +210,29 @@ METHOD SR_FIREBIRD3:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, c
       nDec := 0
 
       IF (::nRetCode := SR_FBDescribeCol3(::hEnv, n, @cName, @nType, @nLen, @nDec, @nNull)) != SQL_SUCCESS
-         ::RunTimeErr("", "FBDescribeCol Error" + SR_CRLF + ::LastError() + SR_CRLF + "Last command sent to database : " + ::cLastComm)
+         ::RunTimeErr("", "FBDescribeCol Error" + SR_CRLF + ::LastError() + SR_CRLF + ;
+            "Last command sent to database : " + ::cLastComm)
          RETURN NIL
-      ELSE
-         //_nLen := nLen (variable not used)
-         _nDec := nDec
-
-         cName := Upper(AllTrim(cName))
-         nPos := AScan(aLocalPrecision, {|x|RTrim(x[1]) == cName})
-         cType := ::SQLType(nType, cName, nLen)
-         nLenField := ::SQLLen(nType, nLen, @nDec)
-         IF nPos > 0 .AND. aLocalPrecision[nPos, 2] > 0
-            nLenField := aLocalPrecision[nPos, 2]
-         ELSEIF (nType == SQL_DOUBLE .OR. nType == SQL_FLOAT .OR. nType == SQL_NUMERIC)
-            nLenField := 19
-         ENDIF
-
-         IF cType == "U"
-            ::RuntimeErr("", SR_Msg(21) + cName + " : " + Str(nType))
-         ELSE
-            aFields[n] := {cName, cType, nLenField, nDec, nNull >= 1, nType, , n, _nDec, ,}
-         ENDIF
-
       ENDIF
+
+      _nDec := nDec
+
+      cName := Upper(AllTrim(cName))
+      nPos := AScan(aLocalPrecision, {|x|RTrim(x[1]) == cName})
+      cType := ::SQLType(nType, cName, nLen)
+      nLenField := ::SQLLen(nType, nLen, @nDec)
+      IF nPos > 0 .AND. aLocalPrecision[nPos, 2] > 0
+         nLenField := aLocalPrecision[nPos, 2]
+      ELSEIF nType == SQL_DOUBLE .OR. nType == SQL_FLOAT .OR. nType == SQL_NUMERIC
+         nLenField := 19
+      ENDIF
+
+      IF cType == "U"
+         ::RuntimeErr("", SR_Msg(21) + cName + " : " + Str(nType))
+      ELSE
+         aFields[n] := {cName, cType, nLenField, nDec, nNull >= 1, nType, , n, _nDec, ,}
+      ENDIF
+
    NEXT n
 
    ::aFields := aFields
@@ -233,7 +243,7 @@ METHOD SR_FIREBIRD3:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, c
 
 RETURN aFields
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:LastError()
 
@@ -244,15 +254,16 @@ METHOD SR_FIREBIRD3:LastError()
 
 RETURN AllTrim(cMsgError) + " - Native error code " + AllTrim(Str(nType))
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
-METHOD SR_FIREBIRD3:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
-   cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
+METHOD SR_FIREBIRD3:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, ;
+   nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
 
    LOCAL nRet
    LOCAL hEnv
    LOCAL cSystemVers
 
+   // parameters not used
    HB_SYMBOL_UNUSED(cDSN)
    HB_SYMBOL_UNUSED(cUser)
    HB_SYMBOL_UNUSED(cPassword)
@@ -271,14 +282,15 @@ METHOD SR_FIREBIRD3:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMa
 
    IF nRet != SQL_SUCCESS
       ::nRetCode := nRet
-      SR_MsgLogFile("Connection Error: " + AllTrim(Str(nRet)) + " (check fb.log) - Database: " + ::cDtb + " - Username : " + ::cUser + " (Password not shown for security)")
+      SR_MsgLogFile("Connection Error: " + AllTrim(Str(nRet)) + " (check fb.log) - Database: " + ::cDtb + ;
+         " - Username : " + ::cUser + " (Password not shown for security)")
       RETURN SELF
-   ELSE
-      ::cConnect := cConnect
-      cTargetDB := StrTran(SR_FBVERSION3(hEnv), "(access method)", "")
-      cSystemVers := SubStr(cTargetDB, At("Firebird ", cTargetDB) + 9, 3)
-      //tracelog("cTargetDB", cTargetDB, "cSystemVers", cSystemVers)
    ENDIF
+
+   ::cConnect := cConnect
+   cTargetDB := StrTran(SR_FBVERSION3(hEnv), "(access method)", "")
+   cSystemVers := SubStr(cTargetDB, At("Firebird ", cTargetDB) + 9, 3)
+   //tracelog("cTargetDB", cTargetDB, "cSystemVers", cSystemVers)
 
    nRet := SR_FBBeginTransaction3(hEnv)
 
@@ -296,16 +308,16 @@ METHOD SR_FIREBIRD3:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMa
 
 RETURN SELF
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:End()
 
    ::Commit()
-   SR_FBClose(::hEnv)
+   SR_FBClose3(::hEnv)
 
 RETURN ::Super:End()
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:Commit()
 
@@ -314,7 +326,7 @@ METHOD SR_FIREBIRD3:Commit()
 
 RETURN (::nRetCode := SR_FBBeginTransaction3(::hEnv))
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:RollBack()
 
@@ -322,7 +334,7 @@ METHOD SR_FIREBIRD3:RollBack()
 
 RETURN (::nRetCode := SR_FBRollBackTransaction3(::hEnv))
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:ExecuteRaw(cCommand)
 
@@ -338,20 +350,17 @@ METHOD SR_FIREBIRD3:ExecuteRaw(cCommand)
 
 RETURN nRet
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_FIREBIRD3:MoreResults(aArray, lTranslate)
 
    LOCAL nRet
-   //LOCAL i (not used)
    LOCAL n
    LOCAL nvalue := -1
 
-   //STATIC aFieldsMore (not used)
-
    DEFAULT lTranslate TO .T.
 
-   nRet := SR_FBMoreResults(::hEnv, @nValue)
+   nRet := SR_FBMoreResults3(::hEnv, @nValue)
 
    IF nRet == SQL_SUCCESS
 
@@ -366,8 +375,13 @@ METHOD SR_FIREBIRD3:MoreResults(aArray, lTranslate)
 
 RETURN nRet
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
+
+METHOD SR_FIREBIRD3:CreateDatabase(cDatabaseName, cUserName, cPassword, nPageSize, cCharset, nDialect)
+RETURN SR_FBCREATEDB3(cDatabaseName, cUserName, cPassword, nPageSize, cCharset, nDialect)
+
+//----------------------------------------------------------------------------//
 
 #include "sr_firebird3_bind.cpp"
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//

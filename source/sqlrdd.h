@@ -1,7 +1,5 @@
-//
 // SQLRDD C Header
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -61,64 +59,65 @@
 
 #define SUPERTABLE (&sqlrddSuper)
 
-/*
- *  SQL WORKAREA
- */
+#ifdef __XHARBOUR__
+#define HB_LONG LONG
+#define HB_ULONG ULONG
+#endif
 
-struct _SQLAREA
+// SQL WORKAREA
+
+typedef struct _SQLAREA
 {
   AREA area;
 
-  /*
-   *  SQLRDD's additions to the workarea structure
-   *
-   *  Warning: The above section MUST match WORKAREA exactly!  Any
-   *  additions to the structure MUST be added below
-   */
-  PHB_CODEPAGE cdPageCnv; /* Area's codepage convert pointer */
-  char *szDataFileName;   /* file name */
-  HB_LONG hOrdCurrent;    /* current index order */
-  bool shared;
-  bool readonly;      /* only SELECT allowed */
-  bool creating;      /* HB_TRUE when creating table */
-  bool firstinteract; /* HB_TRUE when workarea was not used yet */
-  bool isam;          /* ISAM Simulator ? */
-  bool wasdel;
-  bool initialized; /* Workarea Initialization done */
-  bool sqlfilter;   /* SET FILTER converted to SQL */
+  //  SQLRDD's additions to the workarea structure
+  //
+  //  Warning: The above section MUST match WORKAREA exactly!  Any
+  //  additions to the structure MUST be added below
+  PHB_CODEPAGE cdPageCnv; // Area's codepage convert pointer
+  char *szDataFileName;   // file name
+  HB_LONG hOrdCurrent;    // current index order
+  HB_BOOL shared;
+  HB_BOOL readonly;      // only SELECT allowed
+  HB_BOOL creating;      // HB_TRUE when creating table
+  HB_BOOL firstinteract; // HB_TRUE when workarea was not used yet
+  HB_BOOL isam;          // ISAM Simulator ?
+  HB_BOOL wasdel;
+  HB_BOOL initialized; // Workarea Initialization done
+  HB_BOOL sqlfilter;   // SET FILTER converted to SQL
 
-  PHB_ITEM oWorkArea;  /* SQL Workarea object */
-  PHB_ITEM aInfo;      /* Status array */
-  PHB_ITEM aBuffer;    /* Record buffer */
-  PHB_ITEM aOrders;    /* Indexes */
-  PHB_ITEM aStruct;    /* Table xBase structure */
-  PHB_ITEM aLocked;    /* Locked lines */
-  PHB_ITEM aCreate;    /* Structure received by dbCreate() */
-  PHB_ITEM aCache;     /* Workarea recordset cache */
-  PHB_ITEM aOldBuffer; /* Last workarea buffer */
-  PHB_ITEM aEmptyBuff; /* Empty buffer to be in eof()+1 */
+  PHB_ITEM oWorkArea;  // SQL Workarea object
+  PHB_ITEM aInfo;      // Status array
+  PHB_ITEM aBuffer;    // Record buffer
+  PHB_ITEM aOrders;    // Indexes
+  PHB_ITEM aStruct;    // Table xBase structure
+  PHB_ITEM aLocked;    // Locked lines
+  PHB_ITEM aCreate;    // Structure received by dbCreate()
+  PHB_ITEM aCache;     // Workarea recordset cache
+  PHB_ITEM aOldBuffer; // Last workarea buffer
+  PHB_ITEM aEmptyBuff; // Empty buffer to be in eof()+1
   PHB_ITEM aSelectList;
 
-  HB_ULONG ulhRecno;   /* Recno position in field list */
-  HB_ULONG ulhDeleted; /* Deleted position in field list */
+  HB_ULONG ulhRecno;   // Recno position in field list
+  HB_ULONG ulhDeleted; // Deleted position in field list
 
-  int *uiBufferIndex;   /* Field offset in fields array */
-  int *uiFieldList;     /* Keeps a field list for SELECT statements */
-  int iFieldListStatus; /* field list status - see sqlprototypes.h */
+  int *uiBufferIndex;   // Field offset in fields array
+  int *uiFieldList;     // Keeps a field list for SELECT statements
+  int iFieldListStatus; // field list status - see sqlprototypes.h
 
-  LPDBRELINFO lpdbPendingRel; /* Pointer to parent rel struct */
-  char editMask[MAX_FIELDS];  /* Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD */
-};
+  LPDBRELINFO lpdbPendingRel; // Pointer to parent rel struct
+  char editMask[MAX_FIELDS];  // Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD
 
-using SQLAREA = _SQLAREA;
-using LPSQLAREA = SQLAREA *;
+} SQLAREA;
+
+typedef SQLAREA *LPSQLAREA;
 
 #ifndef SQLAREAP
 #define SQLAREAP LPSQLAREA
 #endif
 
-/* prototypes */
+// prototypes
 
-void commonError(AREAP ThisDb, HB_USHORT uiGenCode, HB_USHORT uiSubCode, const char *filename);
+void SR_commonError(AREAP ThisDb, HB_USHORT uiGenCode, HB_USHORT uiSubCode, const char *filename);
 
-#endif
+#endif // SQLRDD_H

@@ -1,3 +1,5 @@
+// TODO: add copyright here
+
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,11 +41,15 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+#ifdef __XHARBOUR__
+#xtranslate HB_ADEL([<x,...>]) => ADEL(<x>)
+#endif
+
 #include <hbclass.ch>
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FUNCTION cJoin(aArray, cString)
+FUNCTION SR_cJoin(aArray, cString)
 
    LOCAL result := ""
    LOCAL i
@@ -57,7 +63,7 @@ FUNCTION cJoin(aArray, cString)
 
 RETURN result
 
-FUNCTION xSelect(aArray, bSelector)
+FUNCTION SR_xSelect(aArray, bSelector)
 
    LOCAL newArray := Array(Len(aArray))
 
@@ -65,15 +71,15 @@ FUNCTION xSelect(aArray, bSelector)
 
 RETURN newArray
 
-FUNCTION xSelectMany(aArray, bSelector)
+FUNCTION SR_xSelectMany(aArray, bSelector)
 
    LOCAL newArray := {}
 
-   AEval(aArray, {|x|aAddRange(newArray, Eval(bSelector, x))})
+   AEval(aArray, {|x|SR_aAddRange(newArray, Eval(bSelector, x))})
 
 RETURN newArray
 
-FUNCTION aWhere(aArray, bPredicate)
+FUNCTION SR_aWhere(aArray, bPredicate)
 
    LOCAL item
    LOCAL newArray := {}
@@ -86,7 +92,7 @@ FUNCTION aWhere(aArray, bPredicate)
 
 RETURN newArray
 
-FUNCTION xFirst(aArray, bPredicate)
+FUNCTION SR_xFirst(aArray, bPredicate)
 
    LOCAL i := AScan(aArray, bPredicate)
 
@@ -96,7 +102,7 @@ FUNCTION xFirst(aArray, bPredicate)
 
 RETURN aArray[i]
 
-FUNCTION xFirstOrDefault(aArray)
+FUNCTION SR_xFirstOrDefault(aArray)
 
    IF Len(aArray) == 0
       RETURN NIL
@@ -104,7 +110,7 @@ FUNCTION xFirstOrDefault(aArray)
 
 RETURN aArray[1]
 
-FUNCTION aDistinct(aArray, bSelector)
+FUNCTION SR_aDistinct(aArray, bSelector)
 
    LOCAL item
    LOCAL newArray := {}
@@ -121,7 +127,7 @@ FUNCTION aDistinct(aArray, bSelector)
 
 RETURN newArray
 
-PROCEDURE aAddRange(aArray1, aArray2)
+PROCEDURE SR_aAddRange(aArray1, aArray2)
 
    LOCAL item
 
@@ -131,7 +137,7 @@ PROCEDURE aAddRange(aArray1, aArray2)
 
 RETURN
 
-PROCEDURE aAddDistinct(aArray1, xValue, bSelector)
+PROCEDURE sr_aAddDistinct(aArray1, xValue, bSelector)
 
    LOCAL id
 
@@ -145,17 +151,17 @@ PROCEDURE aAddDistinct(aArray1, xValue, bSelector)
 
 RETURN
 
-PROCEDURE aAddRangeDistinct(aArray1, aArray2, bSelector)
+PROCEDURE sr_aAddRangeDistinct(aArray1, aArray2, bSelector)
 
    LOCAL item
 
    FOR EACH item IN aArray2
-      aAddDistinct(aArray1, item, bSelector)
+      SR_aAddDistinct(aArray1, item, bSelector)
    NEXT
 
 RETURN
 
-PROCEDURE RemoveAll(aArray, bPredicate)
+PROCEDURE SR_RemoveAll(aArray, bPredicate)
 
    LOCAL i
 
@@ -168,12 +174,12 @@ PROCEDURE RemoveAll(aArray, bPredicate)
 
 RETURN
 
-FUNCTION aReplaceNilBy(aArray, xValue)
+FUNCTION SR_aReplaceNilBy(aArray, xValue)
 RETURN AEval(aArray, {|x, n|IIf(x == NIL, aArray[n] := xValue, NIL)})
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS Dictionary
+CLASS SR_Dictionary
 
    HIDDEN:
    DATA aInternArray INIT {}
@@ -206,7 +212,6 @@ CLASS Dictionary
    METHOD Clear()
 
    EXPORTED:
-   //METHOD lContainsKey()
    METHOD lContainsKey(xKey)
 
 ENDCLASS
@@ -214,7 +219,7 @@ ENDCLASS
 // nMode = 1 : If the key exist, an exception is thrown
 // nMode = 2 : If the key exist, the method does nothing
 // nMode = 3 : If the key exist, the value is replaced
-METHOD Dictionary:aAdd(xKey, xValue, nMode)
+METHOD SR_Dictionary:aAdd(xKey, xValue, nMode)
 
    LOCAL lContainsKey := ::lContainsKey(xKey)
 
@@ -223,7 +228,7 @@ METHOD Dictionary:aAdd(xKey, xValue, nMode)
    ENDIF
    DO CASE
    CASE !lContainsKey
-      AAdd(::aInternArray, KeyValuePair():new(xKey, xValue))
+      AAdd(::aInternArray, SR_KeyValuePair():new(xKey, xValue))
    CASE nMode == 1 .AND. lContainsKey
       _SR_Throw(ErrorNew(, , , , "The given key already exists in the dictionary"))
    CASE nMode == 3 .AND. lContainsKey
@@ -232,9 +237,9 @@ METHOD Dictionary:aAdd(xKey, xValue, nMode)
 
 RETURN NIL
 
-METHOD Dictionary:GetKeyValuePair(xKey)
+METHOD SR_Dictionary:GetKeyValuePair(xKey)
 
-   LOCAL result := xFirst(::aInternArray, {|y|y:xKey == xKey})
+   LOCAL result := SR_xFirst(::aInternArray, {|y|y:xKey == xKey})
 
    IF result == NIL
       _SR_Throw(ErrorNew(, , , , "The key " + cstr(xKey) + " was not found."))
@@ -242,22 +247,22 @@ METHOD Dictionary:GetKeyValuePair(xKey)
 
 RETURN result
 
-METHOD Dictionary:At(nIndex)
+METHOD SR_Dictionary:At(nIndex)
 RETURN ::aInternArray[nIndex]
 
-METHOD Dictionary:xValue(xKey)
+METHOD SR_Dictionary:xValue(xKey)
 RETURN ::GetKeyValuePair(xKey):xValue
 
-METHOD Dictionary:SetValue(xKey, xValue)
+METHOD SR_Dictionary:SetValue(xKey, xValue)
 
    ::GetKeyValuePair(xKey):xValue := xValue
 
 RETURN NIL
 
-METHOD Dictionary:nIndexOfKey(xKey)
+METHOD SR_Dictionary:nIndexOfKey(xKey)
 RETURN AScan(::aInternArray, {|x|x:xKey == xKey})
 
-METHOD Dictionary:Remove(xKey)
+METHOD SR_Dictionary:Remove(xKey)
 
    LOCAL nIndex := ::nIndexOfKey(xKey)
 
@@ -267,18 +272,18 @@ METHOD Dictionary:Remove(xKey)
 
 RETURN hb_ADel(::aInternArray, nIndex, .T.)
 
-METHOD Dictionary:Clear()
+METHOD SR_Dictionary:Clear()
 
    ::aInternArray := {}
 
 RETURN NIL
 
-METHOD Dictionary:lContainsKey(xKey)
+METHOD SR_Dictionary:lContainsKey(xKey)
 RETURN ::nIndexOfKey(xKey) > 0
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS KeyValuePair
+CLASS SR_KeyValuePair
 
    EXPORTED:
    DATA xKey readonly
@@ -289,7 +294,7 @@ CLASS KeyValuePair
 
 ENDCLASS
 
-METHOD KeyValuePair:new(pKey, pValue)
+METHOD SR_KeyValuePair:new(pKey, pValue)
 
    ::xKey := pKey
    ::xValue := pValue
@@ -298,10 +303,10 @@ RETURN SELF
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FUNCTION ToDictionary(aArray, bKeySelector)
+FUNCTION SR_ToDictionary(aArray, bKeySelector)
 
    LOCAL item
-   LOCAL result := Dictionary():new()
+   LOCAL result := SR_Dictionary():new()
 
    FOR EACH item IN aArray
       result:aadd(Eval(bKeySelector, item), item)
@@ -309,7 +314,7 @@ FUNCTION ToDictionary(aArray, bKeySelector)
 
 RETURN result
 
-FUNCTION GetFileName(cPath)
+FUNCTION SR_GetFileName(cPath)
 
    LOCAL aGroups
    LOCAL cRegEx := "^(?:(\w:(?:\\|/)?)((?:.+?(?:\\|/))*))?(\w+?)(\.\w+)?$"

@@ -1,7 +1,5 @@
-//
 // C Header for SQL Parser
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -60,7 +58,7 @@
 #define PARSE_ALL_QUERY 0
 #define isalnum_(c) (isalnum(c) || c == '_')
 
-struct sql_stmt_s
+typedef struct sql_stmt_s
 {
   int command;
   int numParam;
@@ -72,11 +70,9 @@ struct sql_stmt_s
   const char *errPtr;
   PHB_ITEM pArray;
   PHB_ITEM pTemp;
-};
+} sql_stmt;
 
-using sql_stmt = sql_stmt_s;
-
-/* Prototypes */
+// Prototypes
 
 PHB_ITEM SQLpCodeGenInt(int code);
 PHB_ITEM SQLpCodeGenItemInt(PHB_ITEM value, int code);
@@ -87,4 +83,4 @@ PHB_ITEM SQLpCodeGenArrayIntInt(PHB_ITEM pArray, int code, int code2);
 PHB_ITEM SQLpCodeGenArrayInt(PHB_ITEM pArray, int code);
 PHB_ITEM SQLpCodeGenArrayJoin(PHB_ITEM pArray1, PHB_ITEM pArray2);
 
-#endif
+#endif // SQL_PARSER_INCLUDED

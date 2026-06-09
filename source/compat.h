@@ -1,8 +1,6 @@
-//
 // SQLRDD - Harbour/xHarbour compatibility definitions
 // (c) copyright xHarbour.com Inc. http://www.xHarbour.com
 // Author: Przemyslaw Czerpak (druzus/at/poczta.onet.pl)
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -56,11 +54,23 @@
 #include <hbvm.h>
 #include <hbstack.h>
 #include <hbdate.h>
+#ifndef __XHARBOUR__
 #include <hbapicls.h>
+#endif
+
+#ifdef __XHARBOUR__
+#define HB_SCHAR SCHAR
+#define HB_LONGLONG LONGLONG
+#define HB_ULONGLONG ULONGLONG
+#define HB_EVALINFO EVALINFO
+#define hb_vmCDP() hb_cdppage()
+#include <hbfast.h>
+#include <hashapi.h>
+#endif
 
 HB_EXTERN_BEGIN
 
-extern void sr_TraceLog(const char *sFile, const char *sTraceMsg, ...);
+extern void SR_TraceLog(const char *sFile, const char *sTraceMsg, ...);
 
 HB_EXTERN_END
 
@@ -99,4 +109,4 @@ HB_EXTERN_END
 // #define hb_dynsymLock()
 // #define hb_dynsymUnlock()
 
-#endif /* _SQL_RDD_COMPAT_H */
+#endif // _SQL_RDD_COMPAT_H

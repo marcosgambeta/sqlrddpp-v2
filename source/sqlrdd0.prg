@@ -1,7 +1,5 @@
-//
 // SQLRDD Startup
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -44,28 +42,46 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+// xHarbour compatibility
+#ifdef __XHARBOUR__
+#xtranslate HB_HASH([<x,...>]) => hash(<x>)
+#xtranslate HB_HALLOCATE([<x,...>]) => hallocate(<x>)
+#xtranslate HB_HPOS([<x,...>]) => hgetpos(<x>)
+#xtranslate HB_HVALUEAT([<x,...>]) => hgetvalueat(<x>)
+#xtranslate HB_HVALUEAT([<x,...>]) => hsetvalueat(<x>)
+#xtranslate HB_HDELAT([<x,...>]) => hdelat(<x>)
+#xtranslate HB_HEVAL([<x,...>]) => heval(<x>)
+#endif
+
+// for xHarbour compatibility
+#ifndef HB_SYMBOL_UNUSED
+#define HB_SYMBOL_UNUSED(symbol) (symbol := (symbol))
+#endif
+
 #include <common.ch>
 #include <error.ch>
 #include <rddsys.ch>
 #include <hbclass.ch>
 
 #include "sqlrddpp.ch"
-// #include "compat.ch"
 #include "sqlrdd.ch"
 #include "sqlodbc.ch"
 #include "msg.ch"
 
 #define HB_FALSE 0
 #define HB_TRUE 1
-
+//REQUEST XHB_LIB
 REQUEST HB_Deserialize
 REQUEST HB_Serialize
 
 // Need this modules linked
 REQUEST SR_WORKAREA
 
-STATIC s_aConnections
-STATIC s_nActiveConnection
+#ifndef __XHARBOUR__
+STATIC s_mutex := hb_mutexcreate()
+#endif
+STATIC s_aConnections := {}
+STATIC s_nActiveConnection := 0
 
 STATIC s_lTblMgmnt := .F.
 STATIC s_EvalFilters := .F.
@@ -93,32 +109,32 @@ STATIC s_lErrorOnGotoToInvalidRecord := .F.
 
 STATIC s_lUseNullsFirst := .T.
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 PROCEDURE SR_Init()
 RETURN
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetCnn(nConnection)
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
 
    IF SR_CheckCnn(nConnection)
-      DEFAULT s_aConnections TO {}
+      //DEFAULT s_aConnections TO {}
       RETURN s_aConnections[nConnection]
    ENDIF
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_CheckCnn(nConnection)
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
 
    IF nConnection > Len(s_aConnections) .OR. nConnection == 0
       RETURN .F.
@@ -126,25 +142,25 @@ FUNCTION SR_CheckCnn(nConnection)
 
 RETURN .T.
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetConnection(nConnection)
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
 
    SR_CheckConnection(nConnection)
 
 RETURN s_aConnections[nConnection]
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_CheckConnection(nConnection)
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
 
    IF nConnection > Len(s_aConnections) .OR. nConnection == 0 .OR. nConnection < 0
       RETURN SR_RuntimeErr("SR_CheckConnection()", SR_Msg(7))
@@ -152,14 +168,14 @@ FUNCTION SR_CheckConnection(nConnection)
 
 RETURN s_aConnections[nConnection]
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetNextQuery(cSql)
 
    LOCAL cOld
 
-   DEFAULT s_aConnections TO {}
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_aConnections TO {}
+   //DEFAULT s_nActiveConnection TO 0
 
    SR_CheckConnection(s_nActiveConnection)
    cOld := s_aConnections[s_nActiveConnection]:cNextQuery
@@ -170,26 +186,30 @@ FUNCTION SR_SetNextQuery(cSql)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetSyntheticIndexMinimun()
 
    LOCAL nRet := s_nSyntheticIndexMinimun
 
-   DEFAULT s_aConnections TO {}
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_aConnections TO {}
+   //DEFAULT s_nActiveConnection TO 0
 
    SWITCH s_aConnections[s_nActiveConnection]:nSystemID
    CASE SQLRDD_RDBMS_POSTGR
    CASE SQLRDD_RDBMS_ORACLE
       EXIT
+#ifdef __XHARBOUR__
+   DEFAULT
+#else
    OTHERWISE
+#endif
       nRet := 10
    ENDSWITCH
 
 RETURN nRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetSyntheticIndexMinimun(nSet)
 
@@ -201,7 +221,7 @@ FUNCTION SR_SetSyntheticIndexMinimun(nSet)
 
 RETURN nOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_CheckMgmntInd(nSet)
 
@@ -213,7 +233,7 @@ FUNCTION SR_CheckMgmntInd(nSet)
 
 RETURN nOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetSyntheticIndex(lSet)
 
@@ -225,13 +245,13 @@ FUNCTION SR_SetSyntheticIndex(lSet)
 
 RETURN lOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetSyntheticIndex()
 
 RETURN s_lSyntheticInd
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetSVIndex(cSet)
 
@@ -246,7 +266,7 @@ FUNCTION SR_SetSVIndex(cSet)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetSVIndex()
 
@@ -256,7 +276,7 @@ FUNCTION SR_GetSVIndex()
 
 RETURN cRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetFastOpen(lSet)
 
@@ -268,7 +288,7 @@ FUNCTION SR_SetFastOpen(lSet)
 
 RETURN lOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetExclusiveManagement(lSet)
 
@@ -280,7 +300,7 @@ FUNCTION SR_SetExclusiveManagement(lSet)
 
 RETURN lOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetTblSpaceData(cSet)
 
@@ -298,7 +318,7 @@ FUNCTION SR_SetTblSpaceData(cSet)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetTblSpaceIndx(cSet)
 
@@ -316,7 +336,7 @@ FUNCTION SR_SetTblSpaceIndx(cSet)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetTblSpaceLob(cSet)
 
@@ -334,7 +354,7 @@ FUNCTION SR_SetTblSpaceLob(cSet)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetRDDTemp(cSet)
 
@@ -346,30 +366,30 @@ FUNCTION SR_SetRDDTemp(cSet)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetFastOpen()
 
 RETURN s_lFastOpenWA
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetActiveConnection()
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
 
 RETURN s_nActiveConnection
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetActiveConnection(nCnn)
 
    LOCAL nOld
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    nOld := s_nActiveConnection
    DEFAULT nCnn TO 1
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
 
    IF nCnn != 0 .AND. nCnn <= Len(s_aConnections)
       s_nActiveConnection := nCnn
@@ -379,7 +399,7 @@ FUNCTION SR_SetActiveConnection(nCnn)
 
 RETURN nOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAutoCommit, lNoSetEnv, nTimeout)
 
@@ -387,13 +407,17 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
    LOCAL oConnect
    LOCAL oConnect2
 
+#ifndef __XHARBOUR__
+   hb_mutexlock(s_mutex)
+#endif
+
    DEFAULT nType TO CONNECT_ODBC
    DEFAULT lAutoCommit TO .F.
    DEFAULT lCounter TO .F.
    DEFAULT cOwner TO ""
    DEFAULT lNoSetEnv TO .F.
-   DEFAULT s_aConnections TO {}
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_aConnections TO {}
+   //DEFAULT s_nActiveConnection TO 0
 
    // The macro execution is used to NOT link the connection class if we don't need it
    // The programmer MUST declare the needed connection class using REQUEST in PRG source
@@ -460,11 +484,15 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
       oConnect2 := &("SR_FIREBIRD5()")
 #endif
       EXIT
-   CASE CONNECT_MARIA
-   CASE CONNECT_MARIA_NOEXLOCK
+   //CASE CONNECT_MARIA (deprecated)
+   CASE CONNECT_MARIADB
+   //CASE CONNECT_MARIA_NOEXLOCK (deprecated)
+   CASE CONNECT_MARIADB_NOEXLOCK
 #ifndef MYSQLRDD
-      oConnect := &("SR_MARIA()")
-      oConnect2 := &("SR_MARIA()")
+      //oConnect := &("SR_MARIA()") (deprecated)
+      oConnect := &("SR_MARIADB()")
+      //oConnect2 := &("SR_MARIA()") (deprecated)
+      oConnect2 := &("SR_MARIADB()")
 #endif
       EXIT
    CASE CONNECT_ODBC_QUERY_ONLY
@@ -501,21 +529,34 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
       oConnect:lQueryOnly := .T.
 #endif
       EXIT
-   CASE CONNECT_MARIA_QUERY_ONLY
+   //CASE CONNECT_MARIA_QUERY_ONLY (deprecated)
+   CASE CONNECT_MARIADB_QUERY_ONLY
 #ifndef MYSQLRDD
-      oConnect := &("SR_MARIA()")
+      //oConnect := &("SR_MARIA()") (deprecated)
+      oConnect := &("SR_MARIADB()")
       oConnect:lQueryOnly := .T.
 #endif
       EXIT
+#ifdef __XHARBOUR__
+   DEFAULT
+#else
    OTHERWISE
+#endif
       SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + Str(nType))
+#ifndef __XHARBOUR__
+      hb_mutexunlock(s_mutex)
+#endif
       RETURN -1
    ENDSWITCH
 
    IF HB_IsObject(oConnect)
-      oConnect:Connect("", cUser, cPassword, 1, cOwner, 4000, .F., cDSN, 50, "ANSI", 0, 0, 0, lCounter, lAutoCommit, nTimeout)
+      oConnect:Connect("", cUser, cPassword, 1, cOwner, 4000, .F., cDSN, 50, "ANSI", 0, 0, 0, lCounter, lAutoCommit, ;
+         nTimeout)
    ELSE
       SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + Str(nType))
+#ifndef __XHARBOUR__
+      hb_mutexunlock(s_mutex)
+#endif
       RETURN -1
    ENDIF
 
@@ -526,7 +567,8 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
       // Create other connections to the database
 
       IF nType < CONNECT_NOEXLOCK
-         oConnect:oSqlTransact := oConnect2:Connect("", cUser, cPassword, 1, cOwner, 4000, .F., cDSN, 50, "ANSI", 0, 0, 0, .T., lAutoCommit, nTimeout)
+         oConnect:oSqlTransact := oConnect2:Connect("", cUser, cPassword, 1, cOwner, 4000, .F., cDSN, 50, "ANSI", ;
+            0, 0, 0, .T., lAutoCommit, nTimeout)
          oConnect2:nConnectionType := nType
       ELSEIF nType < CONNECT_QUERY_ONLY
          lNoSetEnv := .F.
@@ -546,10 +588,16 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
 
       IF !lNoSetEnv
          IF Empty(SR_SetEnvSQLRDD(oConnect))
+#ifndef __XHARBOUR__
+            hb_mutexunlock(s_mutex)
+#endif
             RETURN -1
          ENDIF
       ELSE
          IF Empty(SR_SetEnvMinimal(oConnect))
+#ifndef __XHARBOUR__
+            hb_mutexunlock(s_mutex)
+#endif
             RETURN -1
          ENDIF
       ENDIF
@@ -572,9 +620,13 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
 
    ENDIF
 
+#ifndef __XHARBOUR__
+   hb_mutexunlock(s_mutex)
+#endif
+
 RETURN nRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ReloadFieldModifiers(oConnect)
 
@@ -594,7 +646,7 @@ FUNCTION SR_ReloadFieldModifiers(oConnect)
          FOR EACH aField IN aRet
             IF aField[1] != cLast
                IF "." $ cLast
-                  cLast := Upper(SubStr(cLast, At(".", cLast) + 1))
+                  cLast := Upper(SubSTr(cLast, At(".", cLast) + 1))
                ENDIF
                oConnect:aFieldModifier[AllTrim(cLast)] := aFlds
                aFlds := {}
@@ -616,7 +668,7 @@ FUNCTION SR_ReloadFieldModifiers(oConnect)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
 
@@ -627,7 +679,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
    LOCAL cStartingVersion
    LOCAL cSql
    LOCAL lOld
-   
+
    HB_SYMBOL_UNUSED(cRet)
 
    FOR i := 1 TO 2
@@ -662,13 +714,16 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          // Locking system housekeeping
 
          aRet := {}
-         oCnn:Exec("select sid from " + IIf(oCnn:lCluster, "g", "") + "v$session where AUDSID = sys_context('USERENV','sessionid')", .T., .T., @aRet)
+         oCnn:Exec("select sid from " + IIf(oCnn:lCluster, "g", "") + ;
+            "v$session where AUDSID = sys_context('USERENV','sessionid')", .T., .T., @aRet)
 
          IF Len(aRet) > 0
             oCnn:uSid := Val(Str(aRet[1, 1], 8, 0))
          ENDIF
 
-         oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ = " + Str(oCnn:uSid) + " OR SPID_ NOT IN (select " + Chr(34) + "AUDSID" + Chr(34) + " from " + IIf(oCnn:lCluster, "g", "") + "v$session)", .F.)
+         oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ = " + Str(oCnn:uSid) + ;
+            " OR SPID_ NOT IN (select " + Chr(34) + "AUDSID" + Chr(34) + " from " + ;
+            IIf(oCnn:lCluster, "g", "") + "v$session)", .F.)
          oCnn:Commit()
          EXIT
 
@@ -705,13 +760,15 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          oCnn:Exec("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")
          // Locking system housekeeping
          aRet := {}
-         oCnn:Exec("SELECT convert( char(30), login_time, 21 ) FROM MASTER.DBO.SYSPROCESSES where SPID = @@SPID", .F., .T., @aRet)
+         oCnn:Exec("SELECT convert( char(30), login_time, 21 ) FROM MASTER.DBO.SYSPROCESSES where SPID = @@SPID", ;
+            .F., .T., @aRet)
 
          IF Len(aRet) > 0
             oCnn:cLoginTime := AllTrim(aRet[1, 1])
          ENDIF
 
-         oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ = @@SPID OR convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)", .F.)
+         oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS WHERE SPID_ = @@SPID OR convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)", .F.)
          oCnn:Commit()
          EXIT
 
@@ -723,15 +780,19 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
          EXIT
 
       CASE SQLRDD_RDBMS_POSTGR
+#if 0
+         // Select disabled. Table 'SQ_NRECNO' do not exist.
          IF SR_UseSequences() .AND. i == 1
             aRet := {}
             oCnn:Exec("SELECT * FROM SQ_NRECNO", .F., .T., @aRet)
             oCnn:Commit()
          ENDIF
+#endif
          oCnn:Exec("SET CLIENT_ENCODING to 'LATIN1'", .F., .T., @aRet)
          oCnn:Exec("SET xmloption to 'DOCUMENT'", .F., .T., @aRet)
          // Locking system housekeeping
-         oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ = (select pg_backend_pid()) OR SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))", .F.)
+         oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS WHERE SPID_ = (select pg_backend_pid()) OR SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))", .F.)
          oCnn:Commit()
          EXIT
 
@@ -753,28 +814,35 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
             oConnect:Exec("insert into " + SR_GetToolsOwner() + "dual (dummy) values (0)", .F.)
             oConnect:Commit()
 
-            cSql := "create function " + SR_GetToolsOwner() + e"NEXTVAL(sequenceName VARCHAR(50))\r\n for " + SR_GetToolsOwner() + e"SequenceControler \r\n"
-            cSql += e"returns INT \r\n LANGUAGE OBJECTSCRIPT \r\n {\r\n New nextVal \r\n Set nextVal = $Increment(^" + SR_GetToolsOwner() + 'SequenceControler("Sequences",sequenceName))' + e"\r\n"
+            cSql := "create function " + SR_GetToolsOwner() + e"NEXTVAL(sequenceName VARCHAR(50))\r\n for " + ;
+               SR_GetToolsOwner() + e"SequenceControler \r\n"
+            cSql += e"returns INT \r\n LANGUAGE OBJECTSCRIPT \r\n {\r\n New nextVal \r\n Set nextVal = $Increment(^" + ;
+               SR_GetToolsOwner() + 'SequenceControler("Sequences",sequenceName))' + e"\r\n"
             cSql += e"Set ^CacheTemp.SequenceControler($Job,sequenceName)=nextVal \r\n Quit nextVal \r\n }"
 
             oConnect:Exec(cSql, .T.)
             oConnect:Commit()
 
-            cSql := "create function " + SR_GetToolsOwner() + e"CURRVAL(sequenceName VARCHAR(50))\r\n for " + SR_GetToolsOwner() + e"SequenceControler \r\n  returns INT \r\n LANGUAGE OBJECTSCRIPT \r\n  { \r\n  Quit $Get(^CacheTemp.SequenceControler($Job,sequenceName)) \r\n  }"
+            cSql := "create function " + SR_GetToolsOwner() + e"CURRVAL(sequenceName VARCHAR(50))\r\n for " + ;
+               SR_GetToolsOwner() + e"SequenceControler \r\n  returns INT \r\n LANGUAGE OBJECTSCRIPT \r\n  { \r\n  Quit $Get(^CacheTemp.SequenceControler($Job,sequenceName)) \r\n  }"
 
             oConnect:Exec(cSql, .T.)
             oConnect:Commit()
 
-            cSql := "create procedure " + SR_GetToolsOwner() + e"RESET(sequenceName VARCHAR(50))\r\n for " + SR_GetToolsOwner() + e"SequenceControler \r\n LANGUAGE OBJECTSCRIPT \r\n  { \r\n  Kill ^" + SR_GetToolsOwner() + 'SequenceControler("Sequences",sequenceName)' + e" \r\n  }"
+            cSql := "create procedure " + SR_GetToolsOwner() + e"RESET(sequenceName VARCHAR(50))\r\n for " + ;
+               SR_GetToolsOwner() + e"SequenceControler \r\n LANGUAGE OBJECTSCRIPT \r\n  { \r\n  Kill ^" + ;
+               SR_GetToolsOwner() + 'SequenceControler("Sequences",sequenceName)' + e" \r\n  }"
 
             oConnect:Exec(cSql, .T.)
             oConnect:Commit()
 
-            cSql := "create function " + SR_GetToolsOwner() + e"JOB()\r\n for " + SR_GetToolsOwner() + e"JOB \r\n  returns INT \r\n LANGUAGE OBJECTSCRIPT \r\n  { \r\n  Quit $Job \r\n  }"
+            cSql := "create function " + SR_GetToolsOwner() + e"JOB()\r\n for " + SR_GetToolsOwner() + ;
+               e"JOB \r\n  returns INT \r\n LANGUAGE OBJECTSCRIPT \r\n  { \r\n  Quit $Job \r\n  }"
             oConnect:Exec(cSql, .T.)
             oConnect:Commit()
 
-            cSql := "create function " + SR_GetToolsOwner() + e"JOBLIST()\r\n for " + SR_GetToolsOwner() + e"JOB \r\n  returns %String \r\n LANGUAGE OBJECTSCRIPT \r\n  { \r\n"
+            cSql := "create function " + SR_GetToolsOwner() + e"JOBLIST()\r\n for " + SR_GetToolsOwner() + ;
+               e"JOB \r\n  returns %String \r\n LANGUAGE OBJECTSCRIPT \r\n  { \r\n"
             cSql += [Set lista=""] + e"\r\n Do \r\n { \r\n" + [Set rs=##class(%ResultSet).%New("%SYSTEM.Process:CONTROLPANEL")] + e"\r\n" + [Set ok=rs.Execute("")] + e"\r\n"
             cSql += e"If 'ok Quit\r\n \r\n Set i=1\r\n  While rs.Next() \r\n{\r\n Set pid=rs.GetData(2) \r\n"
             cSql += [If pid>0 Set $Piece(lista,",",i)=pid] + e"\r\n Set i=i+1 \r\n } \r\n Do rs.Close() \r\n } While 0 \r\n"
@@ -806,41 +874,55 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Commit()
       oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTVERSION", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTVERSION (VERSION_ CHAR(20), SIGNATURE_ CHAR(20))", .F.)
+      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + ;
+         "SR_MGMNTVERSION (VERSION_ CHAR(20), SIGNATURE_ CHAR(20))", .F.)
       oConnect:Commit()
 
       IF oConnect:nSystemID == SQLRDD_RDBMS_AZURE
-         oConnect:Exec("CREATE CLUSTERED INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTVERSION01 ON " + SR_GetToolsOwner() + "SR_MGMNTVERSION ( VERSION_ )", .F.)
+         oConnect:Exec("CREATE CLUSTERED INDEX " + ;
+            IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + ;
+            "SR_MGMNTVERSION01 ON " + SR_GetToolsOwner() + "SR_MGMNTVERSION ( VERSION_ )", .F.)
          oConnect:Commit()
       ENDIF
 
-      oConnect:Exec("INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTVERSION (VERSION_, SIGNATURE_) VALUES ('" + HB_SR__MGMNT_VERSION + "', '" + DTOS(DATE()) + " " + TIME() + "')", .T.)
+      oConnect:Exec("INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTVERSION (VERSION_, SIGNATURE_) VALUES ('" + ;
+         HB_SR__MGMNT_VERSION + "', '" + DToS(Date()) + " " + Time() + "')", .T.)
       oConnect:Commit()
       oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTINDEXES", .F.)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTINDEXES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), IDXNAME_ CHAR(64), PHIS_NAME_ CHAR(64), IDXKEY_ VARCHAR(254), IDXFOR_ VARCHAR(254), IDXCOL_ CHAR(3), TAG_ CHAR(30), TAGNUM_ CHAR(6) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED ", " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX01 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( TABLE_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED ", " ") + " INDEX " + ;
+         IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX01 ON " + ;
+         SR_GetToolsOwner() + "SR_MGMNTINDEXES ( TABLE_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTINDEX02 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( IDXNAME_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + ;
+         "SR_MGMNTINDEX02 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( IDXNAME_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES", .F.)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED ", " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED ", " ") + " INDEX " + ;
+         IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + ;
+         IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + ;
+         SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + ;
+         IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + ;
+         SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + ;
+         IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + ;
+         SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
 
       // Caché - should add dual table ,like Oracle
 
@@ -853,7 +935,8 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + ;
+         "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
       oConnect:Commit()
       oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
       oConnect:Commit()
@@ -874,15 +957,18 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       SWITCH oConnect:nSystemID
       CASE SQLRDD_RDBMS_MSSQL7
       CASE SQLRDD_RDBMS_AZURE
-         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMERIC(6), LOGIN_TIME_ DATETIME )", .F.)
+         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMERIC(6), LOGIN_TIME_ DATETIME )", .F.)
          EXIT
       CASE SQLRDD_RDBMS_POSTGR
       CASE SQLRDD_RDBMS_SYBASE
       CASE SQLRDD_RDBMS_CACHE
-         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMERIC(6), LOGIN_TIME_ TIMESTAMP )", .F.)
+         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMERIC(6), LOGIN_TIME_ TIMESTAMP )", .F.)
          EXIT
       CASE SQLRDD_RDBMS_ORACLE
-         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMBER(8), LOGIN_TIME_ TIMESTAMP )", .F.)
+         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMBER(8), LOGIN_TIME_ TIMESTAMP )", .F.)
          EXIT
       CASE SQLRDD_RDBMS_IBMDB2
       CASE SQLRDD_RDBMS_MYSQL
@@ -894,18 +980,28 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       CASE SQLRDD_RDBMS_FIREBR3
       CASE SQLRDD_RDBMS_FIREBR4
       CASE SQLRDD_RDBMS_FIREBR5
-         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ DECIMAL(8), LOGIN_TIME_ TIMESTAMP )", .F.)
+         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ DECIMAL(8), LOGIN_TIME_ TIMESTAMP )", .F.)
          EXIT
+#ifdef __XHARBOUR__
+      DEFAULT
+#else
       OTHERWISE
-         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ CHAR(10), LOGIN_TIME_ CHAR(50))", .F.)
+#endif
+         oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ CHAR(10), LOGIN_TIME_ CHAR(50))", .F.)
       ENDSWITCH
 
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE," CLUSTERED " ," ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE," CLUSTERED " ," ") + " INDEX " + ;
+         IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS01 ON " + ;
+         SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( WSID_, LOCK_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + ;
+         "SR_MGMNTLOCKS02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( WSID_, LOCK_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLOCKS03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( SPID_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + ;
+         "SR_MGMNTLOCKS03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( SPID_ )", .F.)
       oConnect:Commit()
 
       oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
@@ -919,7 +1015,9 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_ CHAR(50), COLUMN_ CHAR(50), TYPE_ CHAR(1), LEN_ CHAR(8), DEC_ CHAR(8) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLANG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_, COLUMN_ )", .F.)
+      oConnect:Exec("CREATE " + IIf(oConnect:nSystemID == SQLRDD_RDBMS_AZURE, " CLUSTERED " , " ") + " INDEX " + ;
+         IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTLANG01 ON " + ;
+         SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_, COLUMN_ )", .F.)
       oConnect:Commit()
 
       oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
@@ -933,17 +1031,22 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + ;
+         "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
 
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + ;
+         "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + ;
+         "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
 
       oConnect:Commit()
       oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:Exec("CREATE INDEX " + IIf(oConnect:nSystemID != SQLRDD_RDBMS_ORACLE, "", SR_GetToolsOwner()) + ;
+         "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + ;
+         "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
 
       oConnect:Commit()
       oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
@@ -971,7 +1074,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
 
       lOld := SR_UseDeleteds(.F.)
 
-      dbCreate("SR_MGMNTLOGCHG", { { "SPID_",        "N", 12, 0 }, ;
+      DBCreate("SR_MGMNTLOGCHG", { { "SPID_",        "N", 12, 0 }, ;
                                    { "WPID_",        "N", 12, 0 }, ;
                                    { "TYPE_",        "C",  2, 0 }, ;
                                    { "APPUSER_",     "C", 50, 0 }, ;
@@ -1049,7 +1152,7 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
 
 RETURN cRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 STATIC FUNCTION SR_SetEnvMinimal(oConnect)
 
@@ -1116,14 +1219,15 @@ STATIC FUNCTION SR_SetEnvMinimal(oConnect)
 
 RETURN cRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ReloadMLHash(oConnect)
 
    LOCAL aRet := {}
    LOCAL aCol
 
-   oConnect:Exec("SELECT TABLE_ , COLUMN_, TYPE_, LEN_, DEC_ FROM " + SR_GetToolsOwner() + "SR_MGMNTLANG", .F., .T., @aRet)
+   oConnect:Exec("SELECT TABLE_ , COLUMN_, TYPE_, LEN_, DEC_ FROM " + SR_GetToolsOwner() + ;
+      "SR_MGMNTLANG", .F., .T., @aRet)
    oConnect:Commit()
 
    s_hMultilangColumns := hb_Hash()
@@ -1135,17 +1239,17 @@ FUNCTION SR_ReloadMLHash(oConnect)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
-FUNCTION AddToMLHash(aField)
+FUNCTION SR_AddToMLHash(aField)
 
    s_hMultilangColumns[PadR(aField[1], 50) + PadR(aField[2], 50)] := aField
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
-FUNCTION GetMLHash(cTab, cCol)
+FUNCTION SR_GetMLHash(cTab, cCol)
 
    LOCAL cKey := PadR(Upper(cTab), 50) + PadR(Upper(cCol), 50)
    LOCAL nPos := hb_HPos(s_hMultilangColumns, cKey)
@@ -1156,7 +1260,7 @@ FUNCTION GetMLHash(cTab, cCol)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ErrorOnGotoToInvalidRecord(l)
 
@@ -1168,6 +1272,8 @@ FUNCTION SR_ErrorOnGotoToInvalidRecord(l)
 
 RETURN lOld
 
+//-------------------------------------------------------------------------------------------------------------------//
+
 FUNCTION SR_UseNullsFirst(l)
 
    LOCAL lOld := s_lUseNullsFirst
@@ -1178,12 +1284,12 @@ FUNCTION SR_UseNullsFirst(l)
 
 RETURN lOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_TblMgmnt()
 RETURN s_lTblMgmnt
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetTblMgmnt(lOpt)
 
@@ -1193,7 +1299,7 @@ FUNCTION SR_SetTblMgmnt(lOpt)
 
 RETURN lOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_EvalFilters(lEval)
 
@@ -1205,7 +1311,7 @@ FUNCTION SR_EvalFilters(lEval)
 
 RETURN lOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_RecnoName(cName)
 
@@ -1217,7 +1323,7 @@ FUNCTION SR_RecnoName(cName)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_MaxRowCache(n)
 
@@ -1229,7 +1335,7 @@ FUNCTION SR_MaxRowCache(n)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_FetchSize(n)
 
@@ -1241,7 +1347,7 @@ FUNCTION SR_FetchSize(n)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_DeletedName(cName)
 
@@ -1253,7 +1359,7 @@ FUNCTION SR_DeletedName(cName)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ExistTable(cTableName, cOwner, oCnn)
 
@@ -1295,7 +1401,7 @@ FUNCTION SR_ExistTable(cTableName, cOwner, oCnn)
 
 RETURN .F.
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ExistIndex(cIndexName, cOwner)
 
@@ -1313,7 +1419,8 @@ FUNCTION SR_ExistIndex(cIndexName, cOwner)
    cIndexName := SR_ParseFileName(aRet[TABLE_INFO_TABLE_NAME])
 
    aRet := {}
-   nRet := oCnn:Exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
+   nRet := oCnn:Exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + ;
+      Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
 
    IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) > 0
       RETURN .T.
@@ -1321,7 +1428,7 @@ FUNCTION SR_ExistIndex(cIndexName, cOwner)
 
 RETURN .F.
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_File(cTableName)
 
@@ -1336,20 +1443,27 @@ FUNCTION SR_File(cTableName)
 
 RETURN SR_ExistTable(cTableName) .OR. SR_ExistIndex(cTableName)
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_EndConnection(nConnection)
 
    LOCAL oCnn
    LOCAL uRet
 
-   DEFAULT s_nActiveConnection TO 0
+#ifndef __XHARBOUR__
+   hb_mutexlock(s_mutex)
+#endif
+
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
 
    SR_CheckConnection(nConnection)
 
    IF nConnection > Len(s_aConnections) .OR. nConnection == 0 .OR. nConnection < 0
+#ifndef __XHARBOUR__
+      hb_mutexunlock(s_mutex)
+#endif
       RETURN NIL
    ENDIF
 
@@ -1371,15 +1485,19 @@ FUNCTION SR_EndConnection(nConnection)
 
    s_nActiveConnection := Len(s_aConnections)
 
+#ifndef __XHARBOUR__
+   hb_mutexunlock(s_mutex)
+#endif
+
 RETURN uRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetConnectionInfo(nConnection, nInfo)
 
    LOCAL oCnn
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
    SR_CheckConnection(nConnection)
    oCnn := SR_GetConnection()
@@ -1395,13 +1513,13 @@ FUNCTION SR_GetConnectionInfo(nConnection, nInfo)
 
 RETURN ""
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_StartLog(nConnection)
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
    SR_CheckConnection(nConnection)
    s_aConnections[nConnection]:lTraceToDBF := .T.
    IF s_aConnections[nConnection]:oSqlTransact != NIL
@@ -1410,13 +1528,13 @@ FUNCTION SR_StartLog(nConnection)
 
 RETURN .T.
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_StartTrace(nConnection)
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
    SR_CheckConnection(nConnection)
    s_aConnections[nConnection]:lTraceToScreen := .T.
    IF s_aConnections[nConnection]:oSqlTransact != NIL
@@ -1425,13 +1543,13 @@ FUNCTION SR_StartTrace(nConnection)
 
 RETURN .T.
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_StopLog(nConnection)
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
    SR_CheckConnection(nConnection)
    s_aConnections[nConnection]:lTraceToDBF := .F.
    IF s_aConnections[nConnection]:oSqlTransact != NIL
@@ -1440,13 +1558,13 @@ FUNCTION SR_StopLog(nConnection)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_StopTrace(nConnection)
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
    SR_CheckConnection(nConnection)
    s_aConnections[nConnection]:lTraceToScreen := .F.
    IF s_aConnections[nConnection]:oSqlTransact != NIL
@@ -1455,36 +1573,36 @@ FUNCTION SR_StopTrace(nConnection)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetTimeTrace(nConnection, nMilisseconds)
 
    LOCAL nOld
 
-   DEFAULT s_nActiveConnection TO 0
+   //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
    SR_CheckConnection(nConnection)
    DEFAULT nMilisseconds TO s_aConnections[nConnection]:nTimeTraceMin
    nOld := s_aConnections[nConnection]:nTimeTraceMin
    s_aConnections[nConnection]:nTimeTraceMin := nMilisseconds
-   
+
    HB_SYMBOL_UNUSED(nOld)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 Procedure SR_End()
 
-   DEFAULT s_aConnections TO {}
+   //DEFAULT s_aConnections TO {}
    DO WHILE Len(s_aConnections) > 0
       SR_EndConnection(Len(s_aConnections))
    ENDDO
 
 Return
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION _SR_UnRegister(oWA)
 
@@ -1502,7 +1620,7 @@ FUNCTION _SR_UnRegister(oWA)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION _SR_Register(oWA)
 
@@ -1518,7 +1636,7 @@ FUNCTION _SR_Register(oWA)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION _SR_ScanExec(oWA, bExpr)
 
@@ -1530,7 +1648,7 @@ FUNCTION _SR_ScanExec(oWA, bExpr)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION _SR_ScanExecAll(bExpr)
 
@@ -1538,7 +1656,7 @@ FUNCTION _SR_ScanExecAll(bExpr)
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetUniqueSystemID()
 
@@ -1550,7 +1668,7 @@ FUNCTION SR_GetUniqueSystemID()
 
 RETURN AllTrim(SR_Val2Char(SR_GetCurrInstanceID())) + "__" + StrZero(i1, 8) + "__" + StrZero(i2, 8)
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetInternalID()
 
@@ -1568,7 +1686,7 @@ FUNCTION SR_GetInternalID()
 
 RETURN s_cIntenalID
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetCollation(cName)
 
@@ -1580,7 +1698,7 @@ FUNCTION SR_SetCollation(cName)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_DropIndex(cIndexName, cOwner)
 
@@ -1594,7 +1712,9 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
    LOCAL oWA
    LOCAL lTag := .F.
    LOCAL cIndex
-   LOCAL ctempIndex //:= "" (value not used)
+   LOCAL ctempIndex := ""
+
+   HB_SYMBOL_UNUSED(ctempIndex)
 
    oCnn := SR_GetConnection()
 
@@ -1618,14 +1738,17 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
    ENDIF
 
    aRet := {}
-   nRet := oCnn:Exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
+   nRet := oCnn:Exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + ;
+      "SR_MGMNTINDEXES WHERE IDXNAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
    IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) == 0
       // Index does not exist
       aRet := {}
-      nRet := oCnn:Exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE PHIS_NAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
+      nRet := oCnn:Exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + ;
+         "SR_MGMNTINDEXES WHERE PHIS_NAME_ = '" + Upper(AllTrim(cIndexName)) + "'", .F., .T., @aRet)
       IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) == 0
          aRet := {}
-         nRet := oCnn:Exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TAG_ = '" + AllTrim(ctempIndex) + "'", .F., .T., @aRet)
+         nRet := oCnn:Exec("SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + ;
+            SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TAG_ = '" + AllTrim(ctempIndex) + "'", .F., .T., @aRet)
          IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) == 0
             RETURN .F.
          ELSE
@@ -1635,12 +1758,14 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
    ENDIF
 
    cFileName := RTrim(aRet[1, 1])
-   cIndex    := RTrim(aRet[1, 2])
-   cIdxName  := RTrim(aRet[1, 3])
+   cIndex := RTrim(aRet[1, 2])
+   cIdxName := RTrim(aRet[1, 3])
    IF lTag
-      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + cFileName + "' AND PHIS_NAME_ = '" + cIndex + "'" + IIf(oCnn:lComments," /* Wipe index info */",""), .F.)
+      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + cFileName + ;
+         "' AND PHIS_NAME_ = '" + cIndex + "'" + IIf(oCnn:lComments, " /* Wipe index info */", ""), .F.)
    ELSE
-      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + cFileName + "' AND IDXNAME_ = '" + cIdxName + "'" + IIf(oCnn:lComments," /* Wipe index info */",""), .F.)
+      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + cFileName + ;
+         "' AND IDXNAME_ = '" + cIdxName + "'" + IIf(oCnn:lComments, " /* Wipe index info */", ""), .F.)
    ENDIF
    oCnn:Commit()
 
@@ -1656,18 +1781,25 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
          EXIT
       CASE SQLRDD_RDBMS_MYSQL
       CASE SQLRDD_RDBMS_MARIADB
-         oCnn:Exec("DROP INDEX " + cPhisicalName + " ON " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
+         oCnn:Exec("DROP INDEX " + cPhisicalName + " ON " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + ;
+            IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
          EXIT
       CASE SQLRDD_RDBMS_ORACLE
          IF Len(aIndex[6]) > 4 .AND. SubStr(aIndex[6], 4, 1) == "@"
-            oCnn:Exec("DROP INDEX " + cOwner + "A$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
+            oCnn:Exec("DROP INDEX " + cOwner + "A$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + ;
+               IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
             oCnn:Commit()
-            oCnn:Exec("DROP INDEX " + cOwner + "D$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
+            oCnn:Exec("DROP INDEX " + cOwner + "D$" + SubStr(aIndex[6], 1, 3) + SubStr(cFileName, 1, 25) + ;
+               IIf(oCnn:lComments, " /* Drop VIndex */", ""), .F.)
             oCnn:Commit()
          ENDIF
          oCnn:Exec("DROP INDEX " + cPhisicalName + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
          EXIT
+#ifdef __XHARBOUR__
+      DEFAULT
+#else
       OTHERWISE
+#endif
          oCnn:Exec("DROP INDEX " + cPhisicalName + IIf(oCnn:lComments, " /* DROP Index */", ""), .F.)
       ENDSWITCH
 
@@ -1682,7 +1814,7 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
             oWA:DropColumn("INDFOR_" + SubStr(aIndex[5], 2, 3), .F.)
          ENDIF
 
-         TEMPDROPCO->(dbCLoseArea())
+         TEMPDROPCO->(DBCloseArea())
       ENDIF
    NEXT
 
@@ -1691,13 +1823,15 @@ FUNCTION SR_DropIndex(cIndexName, cOwner)
 
 RETURN .T.
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_DropTable(cFileName, cOwner)
 
    LOCAL oCnn
    LOCAL lRet
-   LOCAL aRet //:= {} (value not used)
+   LOCAL aRet := {}
+
+   HB_SYMBOL_UNUSED(aRet)
 
    oCnn := SR_GetConnection()
 
@@ -1721,29 +1855,38 @@ FUNCTION SR_DropTable(cFileName, cOwner)
 
    // Drop the table
 
-   lRet := oCnn:Exec("DROP TABLE " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + IIf(oCnn:nSystemID == SQLRDD_RDBMS_ORACLE, " CASCADE CONSTRAINTS", "") + IIf(oCnn:lComments, " /* drop table */", ""), .T.) == SQL_SUCCESS
+   lRet := oCnn:Exec("DROP TABLE " + cOwner + SR_DBQUALIFY(cFileName, oCnn:nSystemID) + ;
+      IIf(oCnn:nSystemID == SQLRDD_RDBMS_ORACLE, " CASCADE CONSTRAINTS", "") + ;
+      IIf(oCnn:lComments, " /* drop table */", ""), .T.) == SQL_SUCCESS
    oCnn:Commit()
 
    IF lRet
-      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe index info */", ""), .F.)
+      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + ;
+         Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe index info */", ""), .F.)
       oCnn:Commit()
-      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + ;
+         Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLANG WHERE TABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLANG WHERE TABLE_ = '" + ;
+         Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS WHERE TABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS WHERE TABLE_ = '" + ;
+         Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS WHERE SOURCETABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS WHERE SOURCETABLE_ = '" + ;
+         Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS WHERE SOURCETABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS WHERE SOURCETABLE_ = '" + ;
+         Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
-      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS WHERE SOURCETABLE_ = '" + Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
+      oCnn:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS WHERE SOURCETABLE_ = '" + ;
+         Upper(cFileName) + "'" + IIf(oCnn:lComments, " /* Wipe table info */", ""), .F.)
       oCnn:Commit()
    ENDIF
 
 RETURN lRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ListIndex(cFilename)
 
@@ -1758,16 +1901,18 @@ FUNCTION SR_ListIndex(cFilename)
    cFilename := SR_ParseFileName(AllTrim(aRet[TABLE_INFO_TABLE_NAME]))
 
    aRet := {}
-   nRet := oCnn:Exec("SELECT IDXNAME_,PHIS_NAME_,IDXKEY_,IDXFOR_,IDXCOL_,TAG_,TAGNUM_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TABLE_ = '" + AllTrim(Upper(cFilename)) + "'", .F., .T., @aRet)
-   HB_SYMBOL_UNUSED(nRet)
+   nRet := oCnn:Exec("SELECT IDXNAME_,PHIS_NAME_,IDXKEY_,IDXFOR_,IDXCOL_,TAG_,TAGNUM_ FROM " + SR_GetToolsOwner() + ;
+      "SR_MGMNTINDEXES WHERE TABLE_ = '" + AllTrim(Upper(cFilename)) + "'", .F., .T., @aRet)
 
    FOR i := 1 TO Len(aRet)
       aRet[i, 1] := AllTrim(aRet[i, 1])
    NEXT i
 
+   HB_SYMBOL_UNUSED(nRet)
+
 RETURN aRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
 
@@ -1800,14 +1945,16 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
    cNewName := SR_ParseFileName(AllTrim(aRet[TABLE_INFO_TABLE_NAME]))
 
    aRet := {}
-   nRet := oCnn:Exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + Upper(cTable) + "'", .F., .T., @aRet)
+   nRet := oCnn:Exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + ;
+      Upper(cTable) + "'", .F., .T., @aRet)
    IF (nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO) .AND. Len(aRet) == 0
       // Table does not exist
       RETURN .F.
    ENDIF
 
    aRet := {}
-   nRet := oCnn:Exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + Upper(cNewName) + "'", .F., .T., @aRet)
+   nRet := oCnn:Exec("SELECT * FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES WHERE TABLE_ = '" + ;
+      Upper(cNewName) + "'", .F., .T., @aRet)
    HB_SYMBOL_UNUSED(nRet)
    IF Len(aRet) > 0
       // Destination EXISTS !!
@@ -1827,21 +1974,24 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
    CASE SQLRDD_RDBMS_MYSQL
    CASE SQLRDD_RDBMS_MARIADB
       IF oCnn:nSystemID == SQLRDD_RDBMS_POSTGR
-         nRet := oCnn:Exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cTable + "_sq", oCnn:nSystemID) + " RENAME TO " + cOwner + SR_DBQUALIFY(cNewName+"_sq", oCnn:nSystemID), .F.)
+         nRet := oCnn:Exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cTable + "_sq", oCnn:nSystemID) + ;
+            " RENAME TO " + cOwner + SR_DBQUALIFY(cNewName+"_sq", oCnn:nSystemID), .F.)
          HB_SYMBOL_UNUSED(nRet)
       ENDIF
 
-      nRet := oCnn:Exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cTable, oCnn:nSystemID) + " RENAME TO " + cOwner + SR_DBQUALIFY(cNewName, oCnn:nSystemID), .F.)
+      nRet := oCnn:Exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cTable, oCnn:nSystemID) + ;
+         " RENAME TO " + cOwner + SR_DBQUALIFY(cNewName, oCnn:nSystemID), .F.)
       IF nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO
          lOk := .T.
       ENDIF
 
       IF oCnn:nSystemID == SQLRDD_RDBMS_POSTGR
-         nRet := oCnn:Exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cNewName, oCnn:nSystemID) + " ALTER COLUMN " + SR_RecnoName() + " SET DEFAULT nextval('" + Lower(cNewName) + "_sq'::regclass)")
+         nRet := oCnn:Exec("ALTER TABLE " + cOwner + SR_DBQUALIFY(cNewName, oCnn:nSystemID) + ;
+            " ALTER COLUMN " + SR_RecnoName() + " SET DEFAULT nextval('" + Lower(cNewName) + "_sq'::regclass)")
          HB_SYMBOL_UNUSED(nRet)
       ENDIF
       IF oCnn:nSystemID == SQLRDD_RDBMS_ORACLE
-         nRet := oCnn:Exec("RENAME " + cOwner + cTable + "_sq" + " TO " + cOwner + cNewName+"_sq", .F.)
+         nRet := oCnn:Exec("RENAME " + cOwner + cTable + "_sq" + " TO " + cOwner + cNewName + "_sq", .F.)
          HB_SYMBOL_UNUSED(nRet)
       ENDIF
       EXIT
@@ -1849,20 +1999,22 @@ FUNCTION SR_RenameTable(cTable, cNewName, cOwner)
    ENDSWITCH
 
    IF lOk
-      oCnn:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTINDEXES SET TABLE_ = '" + cNewName + "' WHERE TABLE_ = '" + cTable + "'", .F.)
-      oCnn:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTTABLES SET TABLE_ = '" + cNewName + "' WHERE TABLE_ = '" + cTable + "'", .F.)
+      oCnn:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTINDEXES SET TABLE_ = '" + cNewName + ;
+         "' WHERE TABLE_ = '" + cTable + "'", .F.)
+      oCnn:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTTABLES SET TABLE_ = '" + cNewName + ;
+         "' WHERE TABLE_ = '" + cTable + "'", .F.)
       oCnn:Commit()
    ENDIF
 
 RETURN lOk
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ListTables(cOwner)
 
 RETURN (SR_GetConnection()):ListCatTables(cOwner)
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ListCreatedTables()
 
@@ -1873,13 +2025,14 @@ FUNCTION SR_ListCreatedTables()
 
    oCnn := SR_GetConnection()
    nRet := oCnn:Exec("SELECT TABLE_ FROM " + SR_GetToolsOwner() + "SR_MGMNTTABLES", .F., .T., @aRet)
-   HB_SYMBOL_UNUSED(nRet)
 
    AEval(aRet, {|x|AAdd(aRet2, AllTrim(x[1])) })
 
+   HB_SYMBOL_UNUSED(nRet)
+
 RETURN aRet2
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetToolsOwner(cOwner)
 
@@ -1902,7 +2055,7 @@ FUNCTION SR_SetToolsOwner(cOwner)
 
 RETURN cOld
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_GetToolsOwner()
 
@@ -1917,57 +2070,57 @@ FUNCTION SR_GetToolsOwner()
 
 RETURN s_cToolsOwner
 
-/*------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
-SQLRDD Exclusive Lock management and Lock behavior
---------------------------------------------------
+// SQLRDD Exclusive Lock management and Lock behavior
+// --------------------------------------------------
+//
+// We use internally 2 different connections to manage locks.
+// Connection information:
+//
+// 1 - Transactional connection (regular queries)
+// 2 - Autocommit connection (used for counters and "one query" transactions)
+//
+// SetLocks function steps, using SQLRDD system table SR_MGMNTLOCKS:
+//
+// * For Microsoft SQL Server:
+// ---------------------------
+//
+// At application startup, perform the following housekeeping routine:
+//
+// "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ = @@SPID OR SPID_ + LOGIN_TIME_ NOT IN (SELECT SPID + LOGIN_TIME FROM MASTER.DBO.SYSPROCESSES)"
+//
+// 1 - Try to INSERT the string to be locked using connection 2; Commit;
+// 2 - If success, LOCK is acquired
+// 3 - If it fails, run housekeeping "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (SELECT SPID FROM MASTER.DBO.SYSPROCESSES)"; Commit;
+// 4 - Try INSERT again;
+// 5 - If succefull, lock is acquired;
+// 6 - If not succefull, lock is denied;
+//
+// * For Oracle:
+// -------------
+//
+// Housekeeping expression is:
+// "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ = sys_context('USERENV','sessionid') OR SPID_ NOT IN (select "AUDSID" from v$session)"
+//
+// Step 3 query is:
+// "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (select "AUDSID" from v$session)"; Commit;
+//
+// * For Postgres:
+// ---------------
+//
+// Housekeeping expression is:
+// "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ = (select pg_backend_pid()) OR SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))"
+//
+// Step 3 query is:
+// "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))"; Commit;
+//
+//
+// ReleaseLocks function steps:
+//
+// 1 - Delete the line using connection 2; Commit;
 
-We use internally 2 different connections to manage locks.
-Connection information:
-
-1 - Transactional connection (regular queries)
-2 - Autocommit connection (used for counters and "one query" transactions)
-
-SetLocks function steps, using SQLRDD system table SR_MGMNTLOCKS:
-
-* For Microsoft SQL Server:
----------------------------
-
-At application startup, perform the following housekeeping routine:
-
-"DELETE FROM SR_MGMNTLOCKS WHERE SPID_ = @@SPID OR SPID_ + LOGIN_TIME_ NOT IN (SELECT SPID + LOGIN_TIME FROM MASTER.DBO.SYSPROCESSES)"
-
-1 - Try to INSERT the string to be locked using connection 2; Commit;
-2 - If success, LOCK is acquired
-3 - If it fails, run housekeeping "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (SELECT SPID FROM MASTER.DBO.SYSPROCESSES)"; Commit;
-4 - Try INSERT again;
-5 - If succefull, lock is acquired;
-6 - If not succefull, lock is denied;
-
-* For Oracle:
--------------
-
-Housekeeping expression is:
-"DELETE FROM SR_MGMNTLOCKS WHERE SPID_ = sys_context('USERENV','sessionid') OR SPID_ NOT IN (select "AUDSID" from v$session)"
-
-Step 3 query is:
-"DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (select "AUDSID" from v$session)"; Commit;
-
-* For Postgres:
----------------
-
-Housekeeping expression is:
-"DELETE FROM SR_MGMNTLOCKS WHERE SPID_ = (select pg_backend_pid()) OR SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))"
-
-Step 3 query is:
-"DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))"; Commit;
-
-
-ReleaseLocks function steps:
-
-1 - Delete the line using connection 2; Commit;
-
-------------------------------------------------------------------------*/
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_SetLocks(uLocks, oCnn, nRetries)
 
@@ -2003,16 +2156,24 @@ FUNCTION SR_SetLocks(uLocks, oCnn, nRetries)
       SWITCH oCnn:nSystemID
       CASE SQLRDD_RDBMS_MSSQL7
       CASE SQLRDD_RDBMS_AZURE
-         cIns := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_, LOGIN_TIME_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + "', @@SPID, '" + oCnn:oSqlTransact:cLoginTime + "' )"
+         cIns := "INSERT INTO " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_, LOGIN_TIME_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + ;
+            "', @@SPID, '" + oCnn:oSqlTransact:cLoginTime + "' )"
          cDel := "DELETE FROM SR_MGMNTLOCKS WHERE convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)"
          EXIT
       CASE SQLRDD_RDBMS_ORACLE
-         cIns := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + "', " + Str(oCnn:uSid) + " )"
-         cDel := "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (select " + Chr(34) + "AUDSID" + Chr(34) + " from " + IIf(oCnn:lCluster, "g", "") + "v$session)"
+         cIns := "INSERT INTO " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + ;
+            "', " + Str(oCnn:uSid) + " )"
+         cDel := "DELETE FROM SR_MGMNTLOCKS WHERE SPID_ NOT IN (select " + Chr(34) + "AUDSID" + Chr(34) + " from " + ;
+            IIf(oCnn:lCluster, "g", "") + "v$session)"
          EXIT
       CASE SQLRDD_RDBMS_POSTGR
-         cIns := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + "', (select pg_backend_pid()) )"
-         cDel := "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))"
+         cIns := "INSERT INTO " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + ;
+            "', (select pg_backend_pid()) )"
+         cDel := "DELETE FROM " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))"
          EXIT
       CASE SQLRDD_RDBMS_IBMDB2
          EXIT
@@ -2060,7 +2221,8 @@ FUNCTION SR_SetLocks(uLocks, oCnn, nRetries)
          CASE SQLRDD_RDBMS_POSTGR
          CASE SQLRDD_RDBMS_IBMDB2
          CASE SQLRDD_RDBMS_AZURE
-            cSql := "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE LOCK_ = '" + cValue + "' AND WSID_ = '" + SR_GetInternalID() + "'"
+            cSql := "DELETE FROM " + SR_GetToolsOwner() + ;
+               "SR_MGMNTLOCKS WHERE LOCK_ = '" + cValue + "' AND WSID_ = '" + SR_GetInternalID() + "'"
             EXIT
          ENDSWITCH
          oCnn:oSqlTransact:Exec(cSql, .F.)
@@ -2070,7 +2232,7 @@ FUNCTION SR_SetLocks(uLocks, oCnn, nRetries)
 
 RETURN lRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ReleaseLocks(uLocks, oCnn)
 
@@ -2102,7 +2264,8 @@ FUNCTION SR_ReleaseLocks(uLocks, oCnn)
       CASE SQLRDD_RDBMS_POSTGR
       CASE SQLRDD_RDBMS_IBMDB2
       CASE SQLRDD_RDBMS_AZURE
-         cSql := "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE LOCK_ = '" + cValue + "' AND WSID_ = '" + SR_GetInternalID() + "'"
+         cSql := "DELETE FROM " + SR_GetToolsOwner() + ;
+            "SR_MGMNTLOCKS WHERE LOCK_ = '" + cValue + "' AND WSID_ = '" + SR_GetInternalID() + "'"
          EXIT
       ENDSWITCH
 
@@ -2112,7 +2275,7 @@ FUNCTION SR_ReleaseLocks(uLocks, oCnn)
 
 RETURN lRet
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_ListLocks(oCnn, lAll)
 
@@ -2129,7 +2292,9 @@ FUNCTION SR_ListLocks(oCnn, lAll)
 
    SWITCH oCnn:oSqlTransact:nSystemID
    CASE SQLRDD_RDBMS_ORACLE
-      oCnn:oSqlTransact:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select " + Chr(34) + "SID" + Chr(34) + " from " + IIf(oCnn:lCluster, "g", "") + "v$session)", .F.)
+      oCnn:oSqlTransact:Exec("DELETE FROM " + SR_GetToolsOwner() + ;
+         "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select " + Chr(34) + "SID" + Chr(34) + " from " + ;
+         IIf(oCnn:lCluster, "g", "") + "v$session)", .F.)
       EXIT
    CASE SQLRDD_RDBMS_INGRES
       EXIT
@@ -2140,28 +2305,33 @@ FUNCTION SR_ListLocks(oCnn, lAll)
    CASE SQLRDD_RDBMS_MSSQL7
    CASE SQLRDD_RDBMS_MSSQL6
    CASE SQLRDD_RDBMS_AZURE
-      oCnn:oSqlTransact:Exec("DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)", .F.)
+      oCnn:oSqlTransact:Exec("DELETE FROM " + SR_GetToolsOwner() + ;
+         "SR_MGMNTLOCKS WHERE convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)", .F.)
       EXIT
    CASE SQLRDD_RDBMS_MYSQL
    CASE SQLRDD_RDBMS_MARIADB
       EXIT
    CASE SQLRDD_RDBMS_POSTGR
-      oCnn:oSqlTransact:Exec("DELETE FROM  " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))", .F.)
+      oCnn:oSqlTransact:Exec("DELETE FROM  " + SR_GetToolsOwner() + ;
+         "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))", .F.)
       EXIT
    ENDSWITCH
 
    oCnn:oSqlTransact:Commit()
-   oCnn:oSqlTransact:Exec("SELECT LOCK_, WSID_, SPID_ FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS" + IIf(lAll, " WHERE WSID_ = '" + SR_GetInternalID() + "'", ""), .F., .T., @aLocks)
+   oCnn:oSqlTransact:Exec("SELECT LOCK_, WSID_, SPID_ FROM " + SR_GetToolsOwner() + ;
+      "SR_MGMNTLOCKS" + IIf(lAll, " WHERE WSID_ = '" + SR_GetInternalID() + "'", ""), .F., .T., @aLocks)
 
 RETURN aLocks
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
-FUNCTION DetectDBFromDSN(cConnect)
+#if 0
+FUNCTION DetectDBFromDSN(cConnect) // deprecated
 
 RETURN SR_DetectDBFromDSN(cConnect)
+#endif
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_DetectDBFromDSN(cConnect)
 
@@ -2172,7 +2342,38 @@ FUNCTION SR_DetectDBFromDSN(cConnect)
 
    FOR EACH aItem IN aCon
       aToken := hb_atokens(aItem,"=")
-      cBuff = Upper(aToken[1])
+      cBuff := Upper(aToken[1])
+#ifdef __XHARBOUR__
+      DO CASE
+      CASE cBuff == "OCI"
+         RETURN CONNECT_ORACLE
+      CASE cBuff == "OCI2"
+         RETURN CONNECT_ORACLE2
+      CASE cBuff == "PGS"
+         RETURN CONNECT_POSTGRES
+      CASE cBuff == "MYSQL"
+         RETURN CONNECT_MYSQL
+      CASE cBuff == "MARIA"
+         //RETURN CONNECT_MARIA (deprecated)
+         RETURN CONNECT_MARIADB
+      CASE cBuff == "FB" .OR. ;
+           cBuff == "FIREBIRD" .OR. ;
+           cBuff == "IB"
+         RETURN CONNECT_FIREBIRD
+      CASE cBuff == "FB3" .OR. ;
+           cBuff == "FIREBIRD3"
+         RETURN CONNECT_FIREBIRD3
+      CASE cBuff == "FB4" .OR. ;
+           cBuff == "FIREBIRD4"
+         RETURN CONNECT_FIREBIRD4
+      CASE cBuff == "FB5" .OR. ;
+           cBuff == "FIREBIRD5"
+         RETURN CONNECT_FIREBIRD5
+      CASE cBuff == "DSN" .OR. ;
+           cBuff == "DRIVER"
+         RETURN CONNECT_ODBC
+      ENDCASE
+#else
       SWITCH cBuff
       CASE "OCI"
          RETURN CONNECT_ORACLE
@@ -2183,7 +2384,8 @@ FUNCTION SR_DetectDBFromDSN(cConnect)
       CASE "MYSQL"
          RETURN CONNECT_MYSQL
       CASE "MARIA"
-         RETURN CONNECT_MARIA
+         //RETURN CONNECT_MARIA (deprecated)
+         RETURN CONNECT_MARIADB
       CASE "FB"
       CASE "FIREBIRD"
       CASE "IB"
@@ -2201,30 +2403,31 @@ FUNCTION SR_DetectDBFromDSN(cConnect)
       CASE "DRIVER"
          RETURN CONNECT_ODBC
       ENDSWITCH
+#endif
    NEXT
 
 RETURN SQLRDD_RDBMS_UNKNOW
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 #pragma BEGINDUMP
 
 #include "compat.h"
 
-static bool s_fMultiLang = false;
-static bool s_fShutDown = false;
-static bool s_fGoTopOnScope = true;
-static bool s_fSerializedAsString = false;
-static bool s_fHideRecno = true;
-static bool s_fHideHistoric = false;
-static bool s_fUseDeleteds = true;
+static HB_BOOL s_fMultiLang = HB_FALSE;
+static HB_BOOL s_fShutDown = HB_FALSE;
+static HB_BOOL s_fGoTopOnScope = HB_TRUE;
+static HB_BOOL s_fSerializedAsString = HB_FALSE;
+static HB_BOOL s_fHideRecno = HB_TRUE;
+static HB_BOOL s_fHideHistoric = HB_FALSE;
+static HB_BOOL s_fUseDeleteds = HB_TRUE;
 // Culik added new global to tell if we will serialize arrays as json or xml
-static bool s_fSerializeArrayAsJson = false;
+static HB_BOOL s_fSerializeArrayAsJson = HB_FALSE;
 // Culik added new global to tell if we are using sqlverser 2008 or newer
-static bool s_fSql2008newTypes = false;
+static HB_BOOL s_fSql2008newTypes = HB_FALSE;
 
-static bool s_iOldPgsBehavior = false;
-static bool s_fShortasNum = false;
+static HB_BOOL s_iOldPgsBehavior = HB_FALSE;
+static HB_BOOL s_fShortasNum = HB_FALSE;
 
 HB_BOOL HB_EXPORT sr_isMultilang(void)
 {
@@ -2261,7 +2464,7 @@ HB_FUNC(SR_SETGOTOPONSCOPE)
 {
   hb_retl(s_fGoTopOnScope);
   if (HB_ISLOG(1)) {
-     s_fGoTopOnScope = hb_parl(1);
+    s_fGoTopOnScope = hb_parl(1);
   }
 }
 
@@ -2274,7 +2477,7 @@ HB_FUNC(SR_SETSERIALIZEDSTRING)
 {
   hb_retl(s_fSerializedAsString);
   if (HB_ISLOG(1)) {
-     s_fSerializedAsString = hb_parl(1);
+    s_fSerializedAsString = hb_parl(1);
   }
 }
 
@@ -2313,7 +2516,7 @@ HB_FUNC(SR_USEDELETEDS)
 {
   hb_retl(s_fUseDeleteds);
   if (HB_ISLOG(1)) {
-     s_fUseDeleteds = hb_parl(1);
+    s_fUseDeleteds = hb_parl(1);
   }
 }
 
@@ -2353,7 +2556,7 @@ HB_FUNC(SR_SETSQL2008NEWTYPES)
   }
 }
 
-HB_FUNC(SETPGSOLDBEHAVIOR)
+HB_FUNC(SR_SETPGSOLDBEHAVIOR)
 {
   int iOld = s_iOldPgsBehavior;
   if (HB_ISLOG(1)) {
@@ -2368,7 +2571,7 @@ HB_BOOL HB_EXPORT sr_fShortasNum(void)
   return s_fShortasNum;
 }
 
-HB_FUNC(SETFIREBIRDUSESHORTASNUM)
+HB_FUNC(SR_SETFIREBIRDUSESHORTASNUM)
 {
   int iOld = s_fShortasNum;
   if (HB_ISLOG(1)) {
@@ -2379,13 +2582,13 @@ HB_FUNC(SETFIREBIRDUSESHORTASNUM)
 
 #pragma ENDDUMP
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 FUNCTION SR_Version()
 
-RETURN HB_SR__VERSION_STRING + ", Build " + AllTrim(Strzero(HB_SQLRDD_BUILD, 4)) + ", " + HB_SR__MGMNT_VERSION
+RETURN HB_SR__VERSION_STRING + ", Build " + AllTrim(StrZero(HB_SQLRDD_BUILD, 4)) + ", " + HB_SR__MGMNT_VERSION
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//
 
 EXIT PROCEDURE SQLRDD_ShutDown()
 
@@ -2393,4 +2596,4 @@ EXIT PROCEDURE SQLRDD_ShutDown()
 
 RETURN
 
-//------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------//

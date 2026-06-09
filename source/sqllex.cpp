@@ -1,8 +1,6 @@
-//
 // SQLPARSER
 // SQL Lexer
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -48,27 +46,22 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include "sqlrddpp.h"
-
 #include "compat.h"
 
 #include "hbsql.h"
 
 #include <ctype.h>
 
-#include "sqly.h" /* Bison-generated include */
+#include "sqly.h" // Bison-generated include
 #include "msg.ch"
 
-/* #define DEBUG_YYLEX */
+// #define DEBUG_YYLEX
 
-/* Protypes */
+// Protypes
 
 int sqlyylex(YYSTYPE *yylvaluep, void *s);
 
-/*
- *
- *  Lexical Analyzer
- *
- */
+// Lexical Analyzer
 
 int sql_yylex(YYSTYPE *yylvaluep, void *s)
 {
@@ -91,20 +84,20 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
   const char *queryPtr = stmt->queryPtr;
   const char *queryEnd = stmt->query + stmt->queryLen;
 
-  /* Remove starting spaces */
+  // Remove starting spaces
 
   while (queryEnd > queryPtr && (isspace(*queryPtr) || *queryPtr == '\n' || *queryPtr == '\r' || *queryPtr == '\t')) {
     ++queryPtr;
   }
 
-  /* Check for the end of the command */
+  // Check for the end of the command
 
   stmt->queryPtr = stmt->errPtr = queryPtr;
   if (queryPtr == queryEnd) {
     return EOF;
   }
 
-  /* Check for a number */
+  // Check for a number
 
   if ((*queryPtr == '-' && ((*(queryPtr + 1)) >= '0' && (*(queryPtr + 1)) <= '9')) ||
       (*queryPtr == '.' && ((*(queryPtr + 1)) >= '0' && (*(queryPtr + 1)) <= '9')) ||
@@ -134,7 +127,7 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
     }
 
     if (queryPtr == queryEnd || (*queryPtr != '.' && *queryPtr != 'E' && *queryPtr != 'e')) {
-      /* Integer */
+      // Integer
       int n;
       if (sscanf(stmt->queryPtr, " %d%n", &lvalp->int_val, &n) != 1) {
         stmt->errMsg = SQL_PARSER_ERROR_NUMBER_INTEGER;
@@ -142,12 +135,12 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
       }
       stmt->queryPtr += n;
       if (stmt->queryPtr > queryEnd) {
-        /* Jee... */
-        /* queryPtr = queryEnd; */
+        // Jee...
+        // queryPtr = queryEnd;
       }
       return INTEGERVAL;
     } else {
-      /* Real value */
+      // Real value
       int n;
       if (sscanf(stmt->queryPtr, " %lf%n", &lvalp->real_val, &n) != 1) {
         stmt->errMsg = SQL_PARSER_ERROR_NUMBER_FLOAT;
@@ -155,20 +148,20 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
       }
       stmt->queryPtr += n;
       if (stmt->queryPtr > queryEnd) {
-        /* It may never happen */
-        /* queryPtr = queryEnd; */
+        // It may never happen
+        // queryPtr = queryEnd;
       }
       return REALVAL;
     }
   }
 
-  /* Check for a String */
+  // Check for a String
 
   if (*queryPtr == '\'') {
 
     char quoteChar = *queryPtr++;
     char c;
-    /* int stringLen = 0; */
+    // int stringLen = 0;
     while (queryPtr < queryEnd) {
       c = *queryPtr++;
       if (c == '\\') {
@@ -188,16 +181,16 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         stmt->queryPtr = queryPtr;
         return STRINGVAL;
       }
-      /* ++stringLen; */
+      // ++stringLen;
     }
     stmt->errMsg = SQL_PARSER_ERROR_STRING;
     return ERRORVAL;
   }
 
-  /* Check for a QUOTED IDENT */
+  // Check for a QUOTED IDENT
 
   if (*queryPtr == '"') {
-    /*  This is a string  */
+    //  This is a string
     char quoteChar = *queryPtr++;
     char c;
     while (queryPtr < queryEnd) {
@@ -213,10 +206,10 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
     return ERRORVAL;
   }
 
-  /* Check for a DATE */
+  // Check for a DATE
 
   if (*queryPtr == '[') {
-    /*  This is a string  */
+    //  This is a string
     if (queryPtr + 9 < queryEnd && queryPtr[9] == ']') {
       memcpy(szDate, stmt->queryPtr + 1, 8);
       szDate[8] = 0;
@@ -229,7 +222,7 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
     return ERRORVAL;
   }
 
-  /* Check for BINDVAR */
+  // Check for BINDVAR
 
   if (*queryPtr == ':') {
     ++queryPtr;
@@ -237,7 +230,7 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
     return BINDVAR;
   }
 
-  /* Operators */
+  // Operators
 
   if (*queryPtr == '+') {
     ++queryPtr;
@@ -674,8 +667,8 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         stmt->queryPtr = queryPtr + 5;
         return WHERE;
       }
-      break;
-    }  
+      break; // TODO: unnecessary break
+    }
     }
 
     while (queryPtr < queryEnd && isalnum_(*queryPtr)) {

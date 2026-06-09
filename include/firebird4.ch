@@ -1,7 +1,5 @@
-//
 // SQLRDD Firebird native constants
 // Copyright (c) 2004 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -61,8 +59,8 @@
 #define IB_SQL_TYPE_TIME                      560
 #define IB_SQL_TYPE_DATE                      570
 #define IB_SQL_INT64                          580
-#define IB_SQL_DATE                        IB_SQL_TIMESTAMP
-#define IB_SQL_BOOLEAN                      32764
+#define IB_SQL_DATE                           IB_SQL_TIMESTAMP
+#define IB_SQL_BOOLEAN                        32764
 
 #define IB_DIALECT_V5                         1
 #define IB_DIALECT_V6_TRANSITION              2

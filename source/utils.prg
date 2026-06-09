@@ -1,7 +1,5 @@
-//
 // SQLRDD Utilities
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -44,15 +42,34 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+// xHarbour compatibility
+#ifdef __XHARBOUR__
+#xtranslate HB_HASH([<x,...>]) => hash(<x>)
+#xtranslate HB_HALLOCATE([<x,...>]) => hallocate(<x>)
+#xtranslate HB_HPOS([<x,...>]) => hgetpos(<x>)
+#xtranslate HB_HVALUEAT([<x,...>]) => hgetvalueat(<x>)
+#xtranslate HB_HVALUEAT([<x,...>]) => hsetvalueat(<x>)
+#xtranslate HB_HDELAT([<x,...>]) => hdelat(<x>)
+#xtranslate HB_HEVAL([<x,...>]) => heval(<x>)
+#xtranslate HB_TTOS([<x>]) => TTOS(<x>)
+#xtranslate HB_TTOC([<x,...>]) => TTOC(<x>)
+#xtranslate HB_DATETIME([<x,...>]) => DATETIME(<x>)
+#endif
+
+// for xHarbour compatibility
+#ifndef HB_SYMBOL_UNUSED
+#define HB_SYMBOL_UNUSED(symbol) (symbol := (symbol))
+#endif
+
 #include <hbclass.ch>
 #include <common.ch>
-// #include "compat.ch"
+#include <fileio.ch>
+#include <error.ch>
+
 #include "sqlodbc.ch"
 #include "sqlrdd.ch"
 #include "sqlrddpp.ch"
-#include <fileio.ch>
 #include "msg.ch"
-#include <error.ch>
 #include "sqlrddsetup.ch"
 
 REQUEST HB_Deserialize
@@ -307,12 +324,12 @@ FUNCTION SR_ChangeStruct(cTableName, aNewStruct)
 
       FOR i := 1 TO Len(oWA:aFields)
          IF (n := AScan(aNewStruct, {|x|x[1] == oWA:aFields[i, 1]})) == 0
-            HB_SYMBOL_UNUSED(n) // Variable 'N' is assigned but not used
             IF (!oWA:aFields[i, 1] == oWA:cRecnoName) .AND. (!oWA:aFields[i, 1] == oWA:cDeletedName) .AND. oWA:oSql:nSystemID != SQLRDD_RDBMS_IBMDB2
                AAdd(aToDrop, AClone(oWA:aFields[i]))
                SR_LogFile("changestruct.log", {oWA:cFileName, "Will drop:", oWA:aFields[i, 1]})
             ENDIF
          ENDIF
+         HB_SYMBOL_UNUSED(n)
       NEXT i
       IF Len(aDirect) > 0 .AND. ( ;
               oWA:oSql:nSystemID == SQLRDD_RDBMS_FIREBR ;
@@ -484,7 +501,7 @@ RETURN dOld
 
 Init Procedure SR_IniDtAtiv()
 
-   s_DtAtiv := date()
+   s_DtAtiv := Date()
 
 Return
 
@@ -492,7 +509,9 @@ Return
 
 FUNCTION SR_SetCreateAsHistoric(l)
 
-   //LOCAL lOld := s_lCreateAsHistoric (variable not used)
+   LOCAL lOld := s_lCreateAsHistoric
+   
+   HB_SYMBOL_UNUSED(lOld)
 
    IF HB_IsLogical(l) 
       s_lCreateAsHistoric := l
@@ -521,66 +540,6 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
    LOCAL cRet
    LOCAL cOldSet := SET(_SET_DATEFORMAT)
 
-#if 0 // TODO: old code for reference (to be deleted)
-   Do Case
-   Case cType $ "CM" .AND. nSystemID == SQLRDD_RDBMS_ORACLE
-      RETURN "'" + RTrim(StrTran(uData, "'", "'||" + "CHR(39)" + "||'")) + "'"
-   Case cType $ "CM" .AND. nSystemID == SQLRDD_RDBMS_MSSQL7
-      RETURN "'" + RTrim(StrTran(uData, "'", "'" + "'")) + "'"
-   Case cType $ "CM" .AND. nSystemID == SQLRDD_RDBMS_POSTGR
-      RETURN "E'" + StrTran(RTrim(StrTran(uData, "'", "'" + "'")), "\", "\\") + "'"
-   Case cType $ "CM"
-      RETURN "'" + RTrim(StrTran(uData, "'", "")) + "'"
-   Case cType == "D" .AND. nSystemID == SQLRDD_RDBMS_ORACLE
-      RETURN "TO_DATE('" + RTrim(DToS(uData)) + "','YYYYMMDD')"
-   Case cType == "D" .AND. (nSystemID == SQLRDD_RDBMS_IBMDB2 .OR. nSystemID == SQLRDD_RDBMS_ADABAS)
-        RETURN "'" + Transform(DToS(uData), "@R 9999-99-99") + "'"
-   Case cType == "D" .AND. nSystemID == SQLRDD_RDBMS_SQLBAS
-      RETURN "'" + SR_dtosDot(uData) + "'"
-   Case cType == "D" .AND. nSystemID == SQLRDD_RDBMS_INFORM
-      RETURN "'" + SR_dtoUS(uData) + "'"
-   Case cType == "D" .AND. nSystemID == SQLRDD_RDBMS_INGRES
-      RETURN "'" + SR_dtoDot(uData) + "'"
-   Case cType == "D" .AND. (nSystemID == SQLRDD_RDBMS_FIREBR .OR. nSystemID == SQLRDD_RDBMS_FIREBR3)
-      RETURN "'" + Transform(DToS(uData), "@R 9999/99/99") + "'"
-   Case cType == "D" .AND. nSystemID == SQLRDD_RDBMS_CACHE
-      RETURN "{d '" + Transform(DToS(IIf(Year(uData) < 1850, SToD("18500101"), uData)), "@R 9999-99-99") + "'}"
-   Case cType == "D"
-      RETURN "'" + DToS(uData) + "'"
-   Case cType == "N"
-      RETURN LTrim(Str(uData))
-   Case cType == "L" .AND. (nSystemID == SQLRDD_RDBMS_POSTGR .OR. nSystemID == SQLRDD_RDBMS_FIREBR3)
-      RETURN IIf(uData, "true", "false")
-   Case cType == "L" .AND. nSystemID == SQLRDD_RDBMS_INFORM
-      RETURN IIf(uData, "'t'", "'f'")
-   Case cType == "L"
-      RETURN IIf(uData, "1", "0")
-   case ctype == "T"  .AND. nSystemID == SQLRDD_RDBMS_POSTGR
-      IF Empty(uData)
-         RETURN 'NULL'
-      ENDIF
-
-      RETURN "'" + Transform(hb_TToS(uData), '@R 9999-99-99 99:99:99') + "'"
-   case ctype == "T" .AND. nSystemID == SQLRDD_RDBMS_ORACLE
-      IF Empty(uData)
-         RETURN 'NULL'
-      ENDIF
-      RETURN " TIMESTAMP '" + Transform(hb_TToS(uData), "@R 9999-99-99 99:99:99") + "'"
-   Case cType == 'T'
-      IF Empty(uData)
-         RETURN 'NULL'
-      ENDIF
-      Set(_SET_DATEFORMAT, "yyyy-mm-dd")
-      cRet := hb_ttoc(uData)
-      Set(_SET_DATEFORMAT, cOldSet)
-      RETURN "'" + cRet + "'"
-
-   OtherWise
-      cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, nSystemID)
-   EndCase
-#endif
-
    SWITCH cType
 
    CASE "C"
@@ -592,7 +551,11 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
          RETURN "'" + RTrim(StrTran(uData, "'", "'" + "'")) + "'"
       CASE SQLRDD_RDBMS_POSTGR
          RETURN "E'" + StrTran(RTrim(StrTran(uData, "'", "'" + "'")), "\", "\\") + "'"
+#ifdef __XHARBOUR__
+      DEFAULT
+#else
       OTHERWISE
+#endif
          RETURN "'" + RTrim(StrTran(uData, "'", "")) + "'"
       ENDSWITCH
 
@@ -616,7 +579,11 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
          RETURN "'" + Transform(DToS(uData), "@R 9999/99/99") + "'"
       CASE SQLRDD_RDBMS_CACHE
          RETURN "{d '" + Transform(DToS(IIf(Year(uData) < 1850, SToD("18500101"), uData)), "@R 9999-99-99") + "'}"
+#ifdef __XHARBOUR__
+      DEFAULT
+#else
       OTHERWISE
+#endif
          RETURN "'" + DToS(uData) + "'"
       ENDSWITCH
 
@@ -632,7 +599,11 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
          RETURN IIf(uData, "true", "false")
       CASE SQLRDD_RDBMS_INFORM
          RETURN IIf(uData, "'t'", "'f'")
+#ifdef __XHARBOUR__
+      DEFAULT
+#else
       OTHERWISE
+#endif
          RETURN IIf(uData, "1", "0")
       ENDSWITCH
 
@@ -642,17 +613,25 @@ STATIC FUNCTION SR_SubQuoted(cType, uData, nSystemID)
       ENDIF
       SWITCH nSystemID
       CASE SQLRDD_RDBMS_POSTGR
-         RETURN "'" + Transform(hb_TToS(uData), "@R 9999-99-99 99:99:99") + "'"
+         RETURN "'" + Transform(hb_ttos(uData), "@R 9999-99-99 99:99:99") + "'"
       CASE SQLRDD_RDBMS_ORACLE
-         RETURN " TIMESTAMP '" + Transform(hb_TToS(uData), "@R 9999-99-99 99:99:99") + "'"
+         RETURN " TIMESTAMP '" + Transform(hb_ttos(uData), "@R 9999-99-99 99:99:99") + "'"
+#ifdef __XHARBOUR__
+      DEFAULT
+#else
       OTHERWISE
+#endif
          Set(_SET_DATEFORMAT, "yyyy-mm-dd")
-         cRet := hb_TToC(uData)
+         cRet := hb_ttoc(uData)
          Set(_SET_DATEFORMAT, cOldSet)
          RETURN "'" + cRet + "'"
       ENDSWITCH
 
+#ifdef __XHARBOUR__
+   DEFAULT
+#else
    OTHERWISE
+#endif
       cRet := SR_STRTOHEX(HB_Serialize(uData))
       RETURN SR_SubQuoted("C", SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, nSystemID)
 
@@ -677,6 +656,32 @@ FUNCTION SR_WriteTimeLog(cComm, oCnn, nLimisencos)
 
    HB_SYMBOL_UNUSED(oCnn)
 
+#ifdef __XHARBOUR__
+   TRY
+
+      IF !sr_PhFile("long_qry.dbf")
+         DBCreate("long_qry.dbf", TRACE_STRUCT, "DBFNTX")
+      ENDIF
+
+      DO WHILE .T.
+         DBUseArea(.T., "DBFNTX", "long_qry.dbf", "LONG_QRY", .T., .F.)
+         IF !NetErr()
+            exit
+         ENDIF
+         hb_idleSleep(500 / 1000)
+      ENDDO
+
+      LONG_QRY->(DBAppend())
+      REPLACE LONG_QRY->DATA         WITH Date()
+      REPLACE LONG_QRY->HORA         WITH Time()
+      REPLACE LONG_QRY->COMANDO      WITH cComm
+      REPLACE LONG_QRY->CUSTO        WITH nLimisencos
+      LONG_QRY->(DBCloseArea())
+
+   CATCH
+
+   END
+#else
    BEGIN SEQUENCE WITH __BreakBlock()
 
       IF !sr_PhFile("long_qry.dbf")
@@ -701,6 +706,7 @@ FUNCTION SR_WriteTimeLog(cComm, oCnn, nLimisencos)
    RECOVER
 
    END SEQUENCE
+#endif
 
    DBSelectArea(nAlAtual)
 
@@ -747,6 +753,31 @@ FUNCTION SR_WriteDbLog(cComm, oCnn)
 
    DEFAULT cComm TO ""
 
+#ifdef __XHARBOUR__
+   TRY
+
+      IF !sr_phFile("sqllog.dbf")
+         DBCreate("sqllog.dbf", TRACE_STRUCT, "DBFNTX")
+      ENDIF
+
+      DO WHILE .T.
+         DBUseArea(.T., "DBFNTX", "sqllog.dbf", "SQLLOG", .T., .F.)
+         IF !NetErr()
+            EXIT
+         ENDIF
+         hb_idleSleep(500 / 1000)
+      ENDDO
+
+      SQLLOG->(DBAppend())
+      REPLACE SQLLOG->DATA         WITH Date()
+      REPLACE SQLLOG->HORA         WITH Time()
+      REPLACE SQLLOG->COMANDO      WITH cComm
+      SQLLOG->(DBCloseArea())
+
+   CATCH
+
+   END
+#else
    BEGIN SEQUENCE WITH __BreakBlock()
 
       IF !sr_phFile("sqllog.dbf")
@@ -770,6 +801,7 @@ FUNCTION SR_WriteDbLog(cComm, oCnn)
    RECOVER
 
    END SEQUENCE
+#endif
 
    DBSelectArea(nAlAtual)
 
@@ -830,7 +862,11 @@ FUNCTION SR_Val2CharQ(uData)
       RETURN "{Object}"
    CASE "B"
       RETURN "{||Block}"
+#ifdef __XHARBOUR__
+   DEFAULT
+#else
    OTHERWISE
+#endif
       RETURN "NIL"
    ENDSWITCH
 
@@ -873,7 +909,11 @@ FUNCTION SR_BlankVar(cType, nLen, nDec)
          CASE 6
             nVal := 0.000000
             EXIT
+#ifdef __XHARBOUR__
+         DEFAULT
+#else
          OTHERWISE
+#endif
             nVal := 0.00
          ENDSWITCH
          RETURN nVal
@@ -988,7 +1028,7 @@ RETURN ""
 
 //------------------------------------------------------------------------
 
-FUNCTION IsSQLWorkarea()
+FUNCTION SR_IsSQLWorkarea()
 
 RETURN "*" + SR_GetRddName() + "*" $ "*SQLRDD*ODBCRDD*SQLEX*"
 
@@ -1140,7 +1180,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------
 
-CLASS SqlFastHash
+CLASS SR_SqlFastHash
 
    DATA hHash
    DATA nPartSize
@@ -1157,13 +1197,13 @@ ENDCLASS
 
 //------------------------------------------------------------------------
 
-METHOD SqlFastHash:Haeval(bExpr)
+METHOD SR_SqlFastHash:Haeval(bExpr)
 
 RETURN hb_Heval(::hHash, bExpr)
 
 //------------------------------------------------------------------------
 
-METHOD SqlFastHash:New(nPartSize)
+METHOD SR_SqlFastHash:New(nPartSize)
 
    ::nPartSize := nPartSize
    ::hHash := {=>}
@@ -1175,7 +1215,7 @@ RETURN Self
 
 //------------------------------------------------------------------------
 
-METHOD SqlFastHash:Insert(uHashKey, xValue)
+METHOD SR_SqlFastHash:Insert(uHashKey, xValue)
 
    IF Len(::hHash) > HASH_TABLE_SIZE
       ::hHash := {=>}          // Reset hash table
@@ -1188,14 +1228,18 @@ RETURN .T.
 
 //------------------------------------------------------------------------
 
-METHOD SqlFastHash:Find(uHashKey, nIndex, nPart)
+METHOD SR_SqlFastHash:Find(uHashKey, nIndex, nPart)
 
    LOCAL aData
 
    nIndex := hb_HPos(::hHash, uHashKey)
 
    IF nIndex > 0
+#ifdef __XHARBOUR__
+      aData := HGETVALUEAT(::hHash, nIndex)
+#else
       aData := hb_HValueAt(::hHash, nIndex)
+#endif
    ENDIF
 
    nPart := 1     // Compatible with old version
@@ -1204,9 +1248,11 @@ RETURN aData
 
 //------------------------------------------------------------------------
 
-METHOD SqlFastHash:Delete(uHashKey)
+METHOD SR_SqlFastHash:Delete(uHashKey)
 
-   LOCAL nIndex //:= 0 (value not used)
+   LOCAL nIndex := 0
+   
+   HB_SYMBOL_UNUSED(nIndex)
 
    nIndex := hb_HPos(::hHash, uHashKey)
 
@@ -1219,14 +1265,20 @@ RETURN .F.
 
 //------------------------------------------------------------------------
 
-METHOD SqlFastHash:Update(uHashKey, uValue)
+METHOD SR_SqlFastHash:Update(uHashKey, uValue)
 
-   LOCAL nIndex //:= 0 (value not used)
+   LOCAL nIndex := 0
+   
+   HB_SYMBOL_UNUSED(nIndex)
 
    nIndex := hb_HPos(::hHash, uHashKey)
 
    IF nIndex > 0
+#ifdef __XHARBOUR__
+      HSETVALUEAT(::hHash, nIndex, uValue)
+#else
       hb_HValueAt(::hHash, nIndex, uValue)
+#endif
       RETURN .T.
    ENDIF
 
@@ -1234,11 +1286,15 @@ RETURN .F.
 
 //------------------------------------------------------------------------
 
-METHOD SqlFastHash:UpdateIndex(nPos, nPart, uValue)
+METHOD SR_SqlFastHash:UpdateIndex(nPos, nPart, uValue)
 
    // nPart not used - Compatible with old version
    HB_SYMBOL_UNUSED(nPart)
+#ifdef __XHARBOUR__
+   HSETVALUEAT(::hHash, nPos, uValue)
+#else
    hb_HValueAt(::hHash, nPos, uValue)
+#endif
 
 RETURN .F.
 
@@ -1261,8 +1317,8 @@ FUNCTION SR_BeginTransaction(nCnn)
       oCnn:nTransacCount ++
 
       IF oCnn:nSystemID == SQLRDD_RDBMS_CACHE
-         oCnn:exec("START TRANSACTION %COMMITMODE EXPLICIT ISOLATION LEVEL READ COMMITTED")
-//         oCnn:exec("START TRANSACTION %COMMITMODE EXPLICIT")
+         oCnn:Exec("START TRANSACTION %COMMITMODE EXPLICIT ISOLATION LEVEL READ COMMITTED")
+//         oCnn:Exec("START TRANSACTION %COMMITMODE EXPLICIT")
       ENDIF
 
    ENDIF
@@ -1470,7 +1526,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------
 
-FUNCTION dbCount()
+FUNCTION SR_dbCount()
 
    IF IS_SQLRDD
       RETURN (Select())->(dbInfo(DBI_INTERNAL_OBJECT)):KeyCount()
@@ -1498,11 +1554,11 @@ RETURN cErrorLog
 
 // Alert() copied as SQLBINDBYVAL() -> DEMO banner protection
 
-//#include <hbsetup.ch>
-#include <box.ch>
+//#include "hbsetup.ch"
+#include "box.ch"
 #include <common.ch>
 #include <inkey.ch>
-#include <setcurs.ch>
+#include "setcurs.ch"
 
 // TOFIX: Clipper defines a clipped window for Alert() [vszakats]
 
@@ -1519,7 +1575,7 @@ RETURN cErrorLog
 
 #define INRANGE(xLo, xVal, xHi)       (xVal >= xLo .AND. xVal <= xHi)
 
-FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
+FUNCTION SR_SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
 
    LOCAL nChoice
    LOCAL aSay
@@ -1628,7 +1684,11 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
       CASE "B"
          xMessage := "{||...}"
          EXIT
+#ifdef __XHARBOUR__
+      DEFAULT
+#else
       OTHERWISE
+#endif
          xMessage := "NIL"
       ENDSWITCH
 
@@ -1641,7 +1701,7 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
       FOR EACH xMessage IN aSay
 
          IF (nLen := Len(xMessage)) > 58
-            HB_SYMBOL_UNUSED(nLen) // Variable 'NLEN' is assigned but not used
+            HB_SYMBOL_UNUSED(nLen)
             FOR nPos := 58 TO 1 STEP -1
                IF xMessage[nPos] $ (" " + Chr(9))
                   EXIT
@@ -1653,12 +1713,20 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
             ENDIF
 
             sCopy := xMessage
+#ifdef __XHARBOUR__
+            aSay[hb_EnumIndex()] := RTrim(Left(xMessage, nPos))
+#else
             aSay[xMessage:__EnumIndex()] := RTrim(Left(xMessage, nPos))
+#endif
 
             IF Len(aSay) == xMessage:__EnumIndex()
                AAdd(aSay, SubStr(sCopy, nPos + 1))
             ELSE
+#ifdef __XHARBOUR__
+               aIns(aSay, hb_EnumIndex() + 1, SubStr(sCopy, nPos + 1), .T.)
+#else
                aIns(aSay, xMessage:__EnumIndex() + 1, SubStr(sCopy, nPos + 1), .T.)
+#endif
             ENDIF
         ENDIF
       NEXT
@@ -1835,7 +1903,11 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
       nCount := Len(aSay)
       FOR EACH cEval IN aSay
          OutStd(cEval)
+#ifdef __XHARBOUR__
+         IF hb_EnumIndex() < nCount
+#else
          IF cEval:__EnumIndex() < nCount
+#endif
             OutStd(hb_OSNewLine())
          ENDIF
       NEXT
@@ -1844,7 +1916,11 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
       nCount := Len(aOptionsOK)
       FOR EACH cEval IN aOptionsOK
          OutStd(cEval)
+#ifdef __XHARBOUR__
+         IF hb_EnumIndex() < nCount
+#else
          IF cEval:__EnumIndex() < nCount
+#endif
             OutStd(", ")
          ENDIF
       NEXT
@@ -1864,7 +1940,11 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
             nChoice := 0
             lWhile := .F.
             EXIT
+#ifdef __XHARBOUR__
+         DEFAULT
+#else
          OTHERWISE
+#endif
             IF Upper(Chr(nKey)) $ aHotkey
                nChoice := AScan(aHotkey, {|x|x == Upper(Chr(nKey))})
                lWhile := .F.
@@ -1894,7 +1974,11 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
       DispBox(nInitRow, nInitCol, nInitRow + Len(aSay) + 3, nInitCol + nWidth + 1, B_SINGLE + " ", cColorNorm)
 
       FOR EACH cEval IN aSay
+#ifdef __XHARBOUR__
+         DispOutAt(nInitRow + hb_EnumIndex(), nInitCol + 1 + Int(((nWidth - Len(cEval)) / 2) + .5), cEval, cColorNorm)
+#else
          DispOutAt(nInitRow + cEval:__EnumIndex(), nInitCol + 1 + Int(((nWidth - Len(cEval)) / 2) + .5), cEval, cColorNorm)
+#endif
       NEXT
 
       // choice loop
@@ -1903,7 +1987,11 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
 
          nCount := Len(aSay)
          FOR EACH cEval IN aOptionsOK
+#ifdef __XHARBOUR__
+            DispOutAt(nInitRow + nCount + 2, aPos[hb_EnumIndex()], " " + cEval + " ", cColorNorm)
+#else
             DispOutAt(nInitRow + nCount + 2, aPos[cEval:__EnumIndex()], " " + cEval + " ", cColorNorm)
+#endif
          NEXT
          DispOutAt(nInitRow + nCount + 2, aPos[nChoice], " " + aOptionsOK[nChoice] + " ", cColorHigh)
 
@@ -1926,9 +2014,15 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
             nPos := 0
             nCount := Len(aSay)
             FOR EACH cEval IN aOptionsOK
+#ifdef __XHARBOUR__
+               IF nMRow == nInitRow + nCount + 2 .AND. ;
+                  INRANGE(aPos[hb_EnumIndex()], nMCol, aPos[hb_EnumIndex()] + Len(cEval) + 2 - 1)
+                  nPos := hb_EnumIndex()
+#else
                IF nMRow == nInitRow + nCount + 2 .AND. ;
                   INRANGE(aPos[cEval:__EnumIndex()], nMCol, aPos[cEval:__EnumIndex()] + Len(cEval) + 2 - 1)
                   nPos := cEval:__EnumIndex()
+#endif
                   EXIT
                ENDIF
             NEXT
@@ -1958,7 +2052,11 @@ FUNCTION SQLBINDBYVAL(xMessage, aOptions, cColorNorm, nDelay)
                nDelay := 0
             ENDIF
             EXIT
+#ifdef __XHARBOUR__
+         DEFAULT
+#else
          OTHERWISE
+#endif
             IF Upper(Chr(nKey)) $ aHotkey
                nChoice := AScan(aHotkey, {|x|x == Upper(Chr(nKey))})
                lWhile := .F.
@@ -2015,7 +2113,11 @@ STATIC FUNCTION COLORLETTER(cColor)
   CASE 13 ; cColor := "RB+" ; EXIT
   CASE 14 ; cColor := "GR+" ; EXIT
   CASE 15 ; cColor := "W+"  ; EXIT
+#ifdef __XHARBOUR__
+  DEFAULT
+#else
   OTHERWISE
+#endif
      cColor := "W+" // 15 is the max.
   ENDSWITCH
 
@@ -2083,8 +2185,8 @@ RETURN .F.
 
 HB_FUNC(SR_PHFILE)
 {
-  auto pFile = hb_param(1, HB_IT_STRING);
-  hb_retl((pFile && hb_itemGetCLen(pFile) < HB_PATH_MAX - 1) ? hb_spFile(hb_itemGetCPtr(pFile), NULL) : false);
+   PHB_ITEM pFile = hb_param(1, HB_IT_STRING);
+   hb_retl((pFile && hb_itemGetCLen(pFile) < HB_PATH_MAX - 1) ? hb_spFile(hb_itemGetCPtr(pFile), SR_NULLPTR) : HB_FALSE);
 }
 
 #PRAGMA ENDDUMP
@@ -2133,7 +2235,7 @@ FUNCTION SR_SetFieldDefault(cTable, cField, cDefault)
       ENDIF
    ENDIF
    IF oCnn:nSystemId == SQLRDD_RDBMS_POSTGR
-      oCnn:exec(cSql, , .F.)
+      oCnn:Exec(cSql, , .F.)
       oCnn:Commit()
    ENDIF
 

@@ -1,7 +1,5 @@
-//
 // SQL Code Generator
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -44,37 +42,40 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
-// #include "compat.ch"
+// for xHarbour compatibility
+#ifndef HB_SYMBOL_UNUSED
+#define HB_SYMBOL_UNUSED(symbol) (symbol := (symbol))
+#endif
+
 #include <error.ch>
+
 #include "sqlrdd.ch"
 #include "sqlrddpp.ch"
 #include "msg.ch"
 #include "hbsql.ch"
 #include "sqlrddsetup.ch"
 
-/*
-* Readble Macros
-*/
+// Readble Macros
 
 #define cJoinWords(nType, nSystemID)    s_aJoinWords[nSystemID,nType]
 
-#define  SKIPFWD            nIP++;uData:=apCode[nIP]
-#define  PARAM_SOLV         IIf(HB_IsBlock(aParam[uData+1]),Eval(aParam[uData+1]),aParam[uData+1])
-#define  RECURSIVE_CALL     nIP++;cSql+=SR_SQLCodeGen2(apCode,aParam,nSystemId,lIdent,@nIP,nContext,@nSpaces,lParseTableName);Exit
-#define  GETPARAM           cSql+=IIf(uData+1<=Len(aParam),PARAM_SOLV,"##PARAM_"+StrZero(uData+1,3)+"_NOT_SUPPLIED##");nIP++;Exit
-#define  GETPARAM_QUOTED    cSql+=IIf(uData+1<=Len(aParam),SR_DBQUALIFY(PARAM_SOLV, nSystemID),"##PARAM_"+StrZero(uData+1,3)+"_NOT_SUPPLIED##");nIP++;Exit
-#define  GETPARAM_VALUE     cSql+=IIf(uData+1<=Len(aParam),SR_SQLQuotedString(PARAM_SOLV,nSystemID),"##PARAM_"+StrZero(uData+1,3)+"_NOT_SUPPLIED##");nIP++;Exit
-#define  GETPARAM_VAL_2     uData:=IIf(uData+1<=Len(aParam),SR_DBQUALIFY(PARAM_SOLV,nSystemID),"##PARAM_"+StrZero(uData+1,3)+"_NOT_SUPPLIED##")
-#define  GETPARAM_VALNN     cSql+=IIf(uData+1<=Len(aParam),SR_SQLQuotedString(PARAM_SOLV,nSystemID,.T.),"##PARAM_"+StrZero(uData+1,3)+"_NOT_NULL_NOT_SUPPLIED##");nIP++;Exit
-#define  FIX_PRE_WHERE      IIf(nContext==SQL_CONTEXT_SELECT_PRE_WHERE,(nContext:=SQL_CONTEXT_SELECT_WHERE,cSql+=" WHERE "),IIf(nContext==SQL_CONTEXT_SELECT_PRE_WHERE2,(nContext:=SQL_CONTEXT_SELECT_WHERE,cSql+=" AND "),))
-#define  PASSTHROUGH        nIP++;EXIT
-#define  IDENTSPACE         space(nSpaces)
-//#define  TABLE_OPTIMIZER    IIf(nSystemId==SQLRDD_RDBMS_MSSQL7,IIf(lLocking," WITH (UPDLOCK)", " WITH (NOLOCK)"),"")
-#define  TABLE_OPTIMIZER    IIf(nSystemId==SQLRDD_RDBMS_MSSQL7,IIf(lLocking," WITH (UPDLOCK)", ""),"")
-#define  COMMAND_OPTIMIZER  IIf(nSystemId==SQLRDD_RDBMS_SYBASE,IIf(lLocking,"", " AT ISOLATION READ UNCOMMITTED "),"")
-#define  SELECT_OPTIMIZER1  ""
-#define  SELECT_OPTIMIZER2  IIf(nSystemId==SQLRDD_RDBMS_ORACLE,IIf(lLocking," FOR UPDATE", ""),"")
-#define  NEWLINE            IIf(lIdent,SR_CRLF,"")
+#define SKIPFWD            nIP++;uData:=apCode[nIP]
+#define PARAM_SOLV         IIf(HB_IsBlock(aParam[uData+1]),Eval(aParam[uData+1]),aParam[uData+1])
+#define RECURSIVE_CALL     nIP++;cSql+=SR_SQLCodeGen2(apCode,aParam,nSystemId,lIdent,@nIP,nContext,@nSpaces,lParseTableName);Exit
+#define GETPARAM           cSql+=IIf(uData+1<=Len(aParam),PARAM_SOLV,"##PARAM_"+StrZero(uData+1,3)+"_NOT_SUPPLIED##");nIP++;Exit
+#define GETPARAM_QUOTED    cSql+=IIf(uData+1<=Len(aParam),SR_DBQUALIFY(PARAM_SOLV, nSystemID),"##PARAM_"+StrZero(uData+1,3)+"_NOT_SUPPLIED##");nIP++;Exit
+#define GETPARAM_VALUE     cSql+=IIf(uData+1<=Len(aParam),SR_SQLQuotedString(PARAM_SOLV,nSystemID),"##PARAM_"+StrZero(uData+1,3)+"_NOT_SUPPLIED##");nIP++;Exit
+#define GETPARAM_VAL_2     uData:=IIf(uData+1<=Len(aParam),SR_DBQUALIFY(PARAM_SOLV,nSystemID),"##PARAM_"+StrZero(uData+1,3)+"_NOT_SUPPLIED##")
+#define GETPARAM_VALNN     cSql+=IIf(uData+1<=Len(aParam),SR_SQLQuotedString(PARAM_SOLV,nSystemID,.T.),"##PARAM_"+StrZero(uData+1,3)+"_NOT_NULL_NOT_SUPPLIED##");nIP++;Exit
+#define FIX_PRE_WHERE      IIf(nContext==SQL_CONTEXT_SELECT_PRE_WHERE,(nContext:=SQL_CONTEXT_SELECT_WHERE,cSql+=" WHERE "),IIf(nContext==SQL_CONTEXT_SELECT_PRE_WHERE2,(nContext:=SQL_CONTEXT_SELECT_WHERE,cSql+=" AND "),))
+#define PASSTHROUGH        nIP++;EXIT
+#define IDENTSPACE         space(nSpaces)
+//#define TABLE_OPTIMIZER    IIf(nSystemId==SQLRDD_RDBMS_MSSQL7,IIf(lLocking," WITH (UPDLOCK)", " WITH (NOLOCK)"),"")
+#define TABLE_OPTIMIZER    IIf(nSystemId==SQLRDD_RDBMS_MSSQL7,IIf(lLocking," WITH (UPDLOCK)", ""),"")
+#define COMMAND_OPTIMIZER  IIf(nSystemId==SQLRDD_RDBMS_SYBASE,IIf(lLocking,"", " AT ISOLATION READ UNCOMMITTED "),"")
+#define SELECT_OPTIMIZER1  ""
+#define SELECT_OPTIMIZER2  IIf(nSystemId==SQLRDD_RDBMS_ORACLE,IIf(lLocking," FOR UPDATE", ""),"")
+#define NEWLINE            IIf(lIdent,SR_CRLF,"")
 
 #xtranslate Default(<Var>, <xVal>) => IIf(<Var> == NIL, <Var> := <xVal>, NIL)
 
@@ -85,12 +86,10 @@ STATIC s_nRecordNum := 0
 STATIC s_bNextRecord
 STATIC s_aJoinWords
 
-/*
-* SQL Code generation
-*/
+// SQL Code generation
 
 FUNCTION SR_SQLCodeGen(apCode, aParam, nSystemId, lIdent, lParseTableName)
-RETURN   SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, , , , lParseTableName)
+RETURN SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, , , , lParseTableName)
 
 STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext, nSpaces, lParseTableName)
 
@@ -111,9 +110,9 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
    LOCAL lLocking := .F.
    LOCAL nLen := Len(apCode)
    LOCAL bError := Errorblock()
-   //LOCAL aLJoins := {}             /* A, B, Expression */ (variable not used)
-   LOCAL aTables := {}             /* TableName */
-   LOCAL aQualifiedTables := {}             /* Owner.TableName */
+   LOCAL aLJoins := {}             // A, B, Expression
+   LOCAL aTables := {}             // TableName
+   LOCAL aQualifiedTables := {}             // Owner.TableName
    LOCAL aAlias := {}
    LOCAL aOuters := {}
    LOCAL cSqlCols := ""
@@ -141,7 +140,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
 
       DO WHILE .T.
 
-         IF nIp > nLen .OR. nDepht < 0    /* nDepht controls recursivity */
+         IF nIp > nLen .OR. nDepht < 0    // nDepht controls recursivity
             EXIT
          ENDIF
 
@@ -355,7 +354,6 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                RECURSIVE_CALL
             ELSE
                SKIPFWD
-               HB_SYMBOL_UNUSED(uData)
                uData := "(" + SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, @nIP, nContext, @nSpaces, lParseTableName)
                AAdd(aTables, uData)
                AAdd(aQualifiedTables, uData)
@@ -389,7 +387,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
             Case SQLRDD_RDBMS_MARIADB
                cSql += "CURDATE() "
                EXIT
+#ifdef __XHARBOUR__
+            DEFAULT
+#else
             OTHERWISE
+#endif
                cSql += "CURRENT_DATE "
             ENDSWITCH
             PASSTHROUGH
@@ -410,7 +412,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
             CASE SQLRDD_RDBMS_MSSQL7
                cSql += "AVG("
                EXIT
+#ifdef __XHARBOUR__
+            DEFAULT
+#else
             OTHERWISE
+#endif
                cSql += "AVERAGE("
             ENDSWITCH
             RECURSIVE_CALL
@@ -431,7 +437,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
             Case SQLRDD_RDBMS_MARIADB
                cSql += "COALESCE("
                EXIT
+#ifdef __XHARBOUR__
+            DEFAULT
+#else
             OTHERWISE
+#endif
                cSql += "ISNULL("
             ENDSWITCH
             RECURSIVE_CALL
@@ -458,7 +468,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
             CASE SQLRDD_RDBMS_SYBASE
                cSql += "SUBSTRING("
                EXIT
+#ifdef __XHARBOUR__
+            DEFAULT
+#else
             OTHERWISE
+#endif
                cSql += "SUBSTR("
             ENDSWITCH
             RECURSIVE_CALL
@@ -469,7 +483,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
             CASE SQLRDD_RDBMS_SYBASE
                cSql += "SUBSTRING("
                EXIT
+#ifdef __XHARBOUR__
+            DEFAULT
+#else
             OTHERWISE
+#endif
                cSql += "SUBSTR("
             ENDSWITCH
             RECURSIVE_CALL
@@ -483,7 +501,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
             CASE SQLRDD_RDBMS_MSSQL7
                cSql += "dbo.trim("
                EXIT
+#ifdef __XHARBOUR__
+            DEFAULT
+#else
             OTHERWISE
+#endif
                cSql += "TRIM("
             ENDSWITCH
             RECURSIVE_CALL
@@ -548,7 +570,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                   cSql += " NULLS FIRST"
                ENDIF
                EXIT
+#ifdef __XHARBOUR__
+            DEFAULT
+#else
             OTHERWISE
+#endif
                SKIPFWD
                cSql += SR_DBQUALIFY(uData, nSystemID) + " ASC"
                IF nSystemId == SQLRDD_RDBMS_ORACLE
@@ -579,7 +605,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                   cSql += " NULLS FIRST"
                ENDIF
                EXIT
+#ifdef __XHARBOUR__
+            DEFAULT
+#else
             OTHERWISE
+#endif
                SKIPFWD
                cSql += SR_DBQUALIFY(uData, nSystemID) + " DESC"
                IF nSystemId == SQLRDD_RDBMS_ORACLE
@@ -608,7 +638,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
             PASSTHROUGH
          CASE SQL_PCODE_SELECT_UNION
 
-            /* FROM and JOIN will be included now */
+            // FROM and JOIN will be included now
 
             IF !Empty(cSqlCols)
 
@@ -621,12 +651,20 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                ASort(aOuters,,, {|x, y|x[1] > y[1] .AND. x[2] > y[2]})
 
                FOR EACH outer IN aOuters
+#ifdef __XHARBOUR__
+                  IF outer[1] != cAtual .AND. hb_enumIndex() > 1
+#else
                   IF outer[1] != cAtual .AND. outer:__enumIndex() > 1
+#endif
                      cSql += ", "
                      cSql += SR_CRLF
                   ELSEIF outer[1] = cAtual .AND. outer[2] = cAtual2
                      cSql += " AND "
+#ifdef __XHARBOUR__
+                  ELSEIF hb_enumIndex() > 1
+#else
                   ELSEIF outer:__enumIndex() > 1
+#endif
                      cSql += SR_CRLF
                   ENDIF
 
@@ -692,7 +730,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                ENDIF
 
                FOR EACH cTbl IN aQualifiedTables
+#ifdef __XHARBOUR__
+                  cSql += cTbl + " " + aAlias[hb_enumIndex()] + " " + IIf(Left(cTbl, 1) != "(", TABLE_OPTIMIZER, "") + IIf(hb_enumIndex() < Len(aTables), "," + NEWLINE + IDENTSPACE + "  ", "")
+#else
                   cSql += cTbl + " " + aAlias[cTbl:__enumIndex()] + " " + IIf(Left(cTbl, 1) != "(", TABLE_OPTIMIZER, "") + IIf(cTbl:__enumIndex() < Len(aTables), "," + NEWLINE + IDENTSPACE + "  ", "")
+#endif
                NEXT
 
                cSql += cTmp + cTrailler
@@ -702,8 +744,8 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
 
             cSql += NEWLINE + IDENTSPACE + " UNION" + NEWLINE + IDENTSPACE + "  "
 
-            //aLJoins := {}             /* A, B, Expression */ (variable not used)
-            aTables := {}             /* TableName */
+            aLJoins := {}             // A, B, Expression
+            aTables := {}             // TableName
             aQualifiedTables := {}
             aAlias := {}
             aOuters := {}
@@ -714,7 +756,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
 
          CASE SQL_PCODE_SELECT_UNION_ALL
 
-            /* FROM and JOIN will be included now */
+            // FROM and JOIN will be included now
 
             IF !Empty(cSqlCols)
 
@@ -734,11 +776,19 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                      //ELSEIF outer[1] = cAtual .AND. outer[2] = cAtual2
                      IF outer[1] = cAtual .AND. outer[2] = cAtual2
                         cSql += " AND "
+#ifdef __XHARBOUR__
+                     ELSEIF hb_enumIndex() > 1
+#else
                      ELSEIF outer:__enumIndex() > 1
+#endif
                         cSql += SR_CRLF
                      ENDIF
 
+#ifdef __XHARBOUR__
+                     IF hb_enumIndex() = 1
+#else
                      IF outer:__enumIndex() = 1
+#endif
                         //IF outer[1] != cAtual
                         nPos := AScan(aAlias, SR_DBQUALIFY(outer[1], nSystemID))
                         IF nPos == 0
@@ -774,12 +824,20 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                   ASort(aOuters, , , {|x, y|x[1] > y[1] .AND. x[2] > y[2]})
 
                   FOR EACH outer IN aOuters
+#ifdef __XHARBOUR__
+                     IF outer[1] != cAtual .AND. hb_enumIndex() > 1
+#else
                      IF outer[1] != cAtual .AND. outer:__enumIndex() > 1
+#endif
                         cSql += ", "
                         cSql += SR_CRLF
                      ELSEIF outer[1] = cAtual .AND. outer[2] = cAtual2
                         cSql += " AND "
+#ifdef __XHARBOUR__
+                     ELSEIF hb_enumIndex() > 1
+#else
                      ELSEIF outer:__enumIndex() > 1
+#endif
                         cSql += SR_CRLF
                      ENDIF
 
@@ -847,7 +905,11 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                ENDIF
 
                FOR EACH cTbl IN aQualifiedTables
+#ifdef __XHARBOUR__
+                  cSql += cTbl + " " + aAlias[hb_enumIndex()] + " " + IIf(Left(cTbl, 1) != "(", TABLE_OPTIMIZER, "") + IIf(hb_enumIndex() < Len(aTables), "," + NEWLINE + IDENTSPACE + "  ", "")
+#else
                   cSql += cTbl + " " + aAlias[cTbl:__enumIndex()] + " " + IIf(Left(cTbl, 1) != "(", TABLE_OPTIMIZER, "") + IIf(cTbl:__enumIndex() < Len(aTables), "," + NEWLINE + IDENTSPACE + "  ", "")
+#endif
                NEXT
 
                cSql += cTmp + cTrailler
@@ -855,8 +917,8 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
 
             ENDIF
 
-            //aLJoins := {}             /* A, B, Expression */ (variable not used)
-            aTables := {}             /* TableName */
+            aLJoins := {}             // A, B, Expression
+            aTables := {}             // TableName
             aQualifiedTables := {}
             aAlias := {}
             aOuters := {}
@@ -1005,7 +1067,6 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                SKIPFWD
                aOuters[Len(aOuters), 3] += SR_DBQUALIFY(aOuters[Len(aOuters), 2], nSystemID) + "." + SR_DBQUALIFY(uData, nSystemID)
                SKIPFWD
-               HB_SYMBOL_UNUSED(uData)
             ELSE
                BREAK SQL_SINTAX_ERROR_OUTER_JOIN
             ENDIF
@@ -1044,14 +1105,17 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                SKIPFWD
                aOuters[Len(aOuters), 3] += SR_DBQUALIFY(aOuters[Len(aOuters), 2], nSystemID) + "." + SR_DBQUALIFY(uData, nSystemID)
                SKIPFWD
-               HB_SYMBOL_UNUSED(uData)
             ELSE
                BREAK SQL_SINTAX_ERROR_OUTER_JOIN
             ENDIF
 
             EXIT
 
+#ifdef __XHARBOUR__
+         DEFAULT
+#else
          OTHERWISE
+#endif
             nIP++
          ENDSWITCH
 
@@ -1059,7 +1123,7 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
 
       cSql += SELECT_OPTIMIZER2
 
-      /* FROM and JOIN will be included now */
+      // FROM and JOIN will be included now
 
       IF !Empty(cSqlCols)
 
@@ -1079,11 +1143,19 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
                //ELSEIF outer[1] = cAtual .AND. outer[2] = cAtual2
                IF outer[1] = cAtual .AND. outer[2] = cAtual2
                   cSql += " AND "
+#ifdef __XHARBOUR__
+               ELSEIF hb_enumIndex() > 1
+#else
                ELSEIF outer:__enumIndex() > 1
+#endif
                   cSql += SR_CRLF
                ENDIF
 
+#ifdef __XHARBOUR__
+               IF hb_enumIndex() = 1
+#else
                IF outer:__enumIndex() = 1
+#endif
                   //IF outer[1] != cAtual
                   nPos := AScan(aAlias, SR_DBQUALIFY(outer[1], nSystemID))
                   IF nPos == 0
@@ -1119,12 +1191,20 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
             ASort(aOuters, , , {|x, y|x[1] > y[1] .AND. x[2] > y[2]})
 
             FOR EACH outer IN aOuters
+#ifdef __XHARBOUR__
+               IF outer[1] != cAtual .AND. hb_enumIndex() > 1
+#else
                IF outer[1] != cAtual .AND. outer:__enumIndex() > 1
+#endif
                   cSql += ", "
                   cSql += SR_CRLF
                ELSEIF outer[1] = cAtual .AND. outer[2] = cAtual2
                   cSql += " AND "
+#ifdef __XHARBOUR__
+               ELSEIF hb_enumIndex() > 1
+#else
                ELSEIF outer:__enumIndex() > 1
+#endif
                   cSql += SR_CRLF
                ENDIF
 
@@ -1192,12 +1272,15 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
          ENDIF
 
          FOR EACH cTbl IN aQualifiedTables
+#ifdef __XHARBOUR__
+            cSql += cTbl + " " + aAlias[hb_enumIndex()] + " " + IIf(Left(cTbl, 1) != "(", TABLE_OPTIMIZER, "") + IIf(hb_enumIndex() < Len(aTables), "," + NEWLINE + IDENTSPACE + "  ", "")
+#else
             cSql += cTbl + " " + aAlias[cTbl:__enumIndex()] + " " + IIf(Left(cTbl, 1) != "(", TABLE_OPTIMIZER, "") + IIf(cTbl:__enumIndex() < Len(aTables), "," + NEWLINE + IDENTSPACE + "  ", "")
+#endif
          NEXT
 
          cSql += cTmp + cTrailler
-         cTrailler := "" // (value not used)
-         HB_SYMBOL_UNUSED(cTrailler)
+         cTrailler := ""
 
       ENDIF
 
@@ -1215,11 +1298,13 @@ STATIC FUNCTION SR_SQLCodeGen2(apCode, aParam, nSystemId, lIdent, nIP, nContext,
       nSpaces -= 2
    ENDIF
 
+   HB_SYMBOL_UNUSED(aLJoins)
+   HB_SYMBOL_UNUSED(uData)
+   HB_SYMBOL_UNUSED(cTrailler)
+
    RETURN cSQL
 
-/*
-* Quoting xBase DataTypes
-*/
+// Quoting xBase DataTypes
 
 FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
 
@@ -1237,49 +1322,6 @@ FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
       RETURN "'" + " " + "'"
    ENDIF
 
-#if 0 // TODO: old code for reference (to be deleted)
-   DO CASE
-   CASE cType $ "CM" .AND. nSystemID == SQLRDD_RDBMS_POSTGR
-      RETURN [E'] + RTrim(SR_ESCAPESTRING(uData, nSystemID)) + "'"
-   CASE cType $ "CM"
-      RETURN "'" + RTrim(SR_ESCAPESTRING(uData, nSystemID)) + "'"
-   CASE cType == "D" .AND. nSystemID == SQLRDD_RDBMS_ORACLE
-      RETURN ("TO_DATE('" + RTrim(DToS(uData)) + "','YYYYMMDD')")
-   CASE cType == "D" .AND. (nSystemID == SQLRDD_RDBMS_IBMDB2 .OR. nSystemID == SQLRDD_RDBMS_ADABAS )
-      RETURN ("'" + Transform(DToS(uData), "@R 9999-99-99") + "'")
-   CASE cType == "D" .AND. nSystemID == SQLRDD_RDBMS_SQLBAS
-      RETURN ("'" + SR_dtosdot(uData) + "'")
-   CASE cType == "D" .AND. nSystemID == SQLRDD_RDBMS_INFORM
-      RETURN ("'" + SR_dtoUS(uData) + "'")
-   CASE cType == "D" .AND. nSystemID == SQLRDD_RDBMS_INGRES
-      RETURN ("'" + SR_dtoDot(uData) + "'")
-   CASE cType == "D" .AND. (nSystemID == SQLRDD_RDBMS_FIREBR .OR. nSystemID == SQLRDD_RDBMS_FIREBR3)
-      RETURN "'" + Transform(DToS(uData), "@R 9999/99/99") + "'"
-   CASE cType == "D" .AND. nSystemID == SQLRDD_RDBMS_CACHE
-      RETURN "{d '" + Transform(DToS(IIf(Year(uData) < 1850, SToD("18500101"), uData)), "@R 9999-99-99") + "'}"
-   CASE cType == "D" .AND. (nSystemID == SQLRDD_RDBMS_MYSQL .OR. nSystemID == SQLRDD_RDBMS_MARIADB)
-      RETURN ("str_to_date( '" + DToS(uData) + "', '%Y%m%d' )")
-   CASE cType == "D"
-      RETURN ("'" + DToS(uData) + "'")
-   CASE cType == "N"
-      RETURN LTrim(Str(uData))
-   CASE cType == "L" .AND. nSystemID == SQLRDD_RDBMS_POSTGR
-      RETURN IIf(uData, "true", "false")
-   CASE cType == "L" .AND. nSystemID == SQLRDD_RDBMS_INFORM
-      RETURN IIf(uData, "'t'", "'f'")
-   Case cType == "L"
-      RETURN IIf(uData, "1", "0")
-   CASE cType == "A"
-      FOR EACH uElement IN uData
-         cRet += IIf(Empty(cRet), "", ", ") + SR_SQLQuotedString(uElement, nSystemID, lNotNull)
-      NEXT
-      RETURN cRet
-   CASE cType == "O"
-      cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN SR_SQLQuotedString(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, nSystemID, lNotNull)
-   ENDCASE
-#endif
-
    SWITCH cType
 
    CASE "C"
@@ -1296,7 +1338,7 @@ FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
          RETURN "TO_DATE('" + RTrim(DToS(uData)) + "','YYYYMMDD')"
       CASE SQLRDD_RDBMS_IBMDB2
       CASE SQLRDD_RDBMS_ADABAS
-         RETURN "'" + transform(DToS(uData), "@R 9999-99-99") + "'"
+         RETURN "'" + Transform(DToS(uData), "@R 9999-99-99") + "'"
       CASE SQLRDD_RDBMS_SQLBAS
          RETURN "'" + SR_dtosdot(uData) + "'"
       CASE SQLRDD_RDBMS_INFORM
@@ -1313,7 +1355,11 @@ FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
       CASE SQLRDD_RDBMS_MYSQL
       CASE SQLRDD_RDBMS_MARIADB
          RETURN "str_to_date( '" + DToS(uData) + "', '%Y%m%d' )"
+#ifdef __XHARBOUR__
+      DEFAULT
+#else
       OTHERWISE
+#endif
          RETURN "'" + DToS(uData) + "'"
       ENDSWITCH
 
@@ -1326,7 +1372,11 @@ FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
          RETURN IIf(uData, "true", "false")
       CASE SQLRDD_RDBMS_INFORM
          RETURN IIf(uData, "'t'", "'f'")
+#ifdef __XHARBOUR__
+      DEFAULT
+#else
       OTHERWISE
+#endif
          RETURN IIf(uData, "1", "0")
       ENDSWITCH
 
@@ -1344,9 +1394,7 @@ FUNCTION SR_SQLQuotedString(uData, nSystemID, lNotNull)
 
 RETURN "NULL"
 
-/*
-*   SQLBASE date format
-*/
+// SQLBASE date format
 
 FUNCTION SR_dtosdot(dData)
 
@@ -1354,9 +1402,7 @@ FUNCTION SR_dtosdot(dData)
 
 RETURN SubStr(cData, 1, 4) + "-" + SubStr(cData, 5, 2) + "-" + SubStr(cData, 7, 2)
 
-/*
-*  YYYY.MM.DD
-*/
+// YYYY.MM.DD
 
 FUNCTION SR_dtoDot(dData)
 
@@ -1364,9 +1410,7 @@ FUNCTION SR_dtoDot(dData)
 
 RETURN SubStr(cData, 1, 4) + "." + SubStr(cData, 5, 2) + "." + SubStr(cData, 7, 2)
 
-/*
-*  MMDDYYYY
-*/
+// MMDDYYYY
 
 FUNCTION SR_dtous(dData)
 
@@ -1374,9 +1418,7 @@ FUNCTION SR_dtous(dData)
 
 RETURN SubStr(cData, 5, 2) + SubStr(cData, 7, 2) + SubStr(cData, 1, 4)
 
-/*
-* Error Handler
-*/
+// Error Handler
 
 STATIC FUNCTION SR_SQLParseError(arg1, arg2, cDescr, nCode, cOper, oError)
 
@@ -1405,12 +1447,9 @@ STATIC FUNCTION SR_SQLParseError(arg1, arg2, cDescr, nCode, cOper, oError)
 
 RETURN uRet
 
-/*
-* SQL Filters
-*
-*  Expected filter format example:  "<ALIAS>.ColumnName IS NULL"
-*
-*/
+// SQL Filters
+//
+//  Expected filter format example:  "<ALIAS>.ColumnName IS NULL"
 
 STATIC FUNCTION SR_SolveFilters(aFilters, aRet, cAlias, nSystemID)
 
@@ -1433,9 +1472,7 @@ STATIC FUNCTION SR_SolveFilters(aFilters, aRet, cAlias, nSystemID)
 
 RETURN .T.
 
-/*
-* Startup settings
-*/
+// Startup settings
 
 PROCEDURE __SR_StartSQL()
 
@@ -1447,7 +1484,7 @@ PROCEDURE __SR_StartSQL()
 
 RETURN
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 FUNCTION SR_SetTableInfoBlock(b)
 
@@ -1459,7 +1496,7 @@ FUNCTION SR_SetTableInfoBlock(b)
 
 RETURN .T.
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 FUNCTION SR_SetIndexInfoBlock(b)
 
@@ -1471,19 +1508,19 @@ FUNCTION SR_SetIndexInfoBlock(b)
 
 RETURN .T.
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 FUNCTION SR_GetTableInfoBlock()
 
 RETURN s_bTableInfo
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 FUNCTION SR_GetIndexInfoBlock()
 
 RETURN s_bIndexInfo
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 FUNCTION SR_SetNextRecordBlock(b)
 
@@ -1495,15 +1532,13 @@ FUNCTION SR_SetNextRecordBlock(b)
 
 RETURN .T.
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 FUNCTION SR_GetNextRecordBlock()
 
 RETURN s_bNextRecord
 
-/*
-* Version Report
-*/
+// Version Report
 
 FUNCTION SR_ParserVersion()
 
@@ -1511,12 +1546,7 @@ FUNCTION SR_ParserVersion()
 
 RETURN nVers
 
-
-/*
-*
-*   Debug Functions
-*
-*/
+// Debug Functions
 
 FUNCTION SR_pCodeDescr(nCode)
 
@@ -1616,18 +1646,20 @@ FUNCTION SR_pCodeDescr(nCode)
 
 RETURN nCode
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 FUNCTION SR_TableAttr(cTableName, nSystemID)
 
-   /* Translates "c:\data\accounts\chart.dbf" to "DATA_ACCONTS_CHART" */
+   // Translates "c:\data\accounts\chart.dbf" to "DATA_ACCONTS_CHART"
 
    LOCAL aRet
-   LOCAL cOwner //:= "" (value not used)
+   LOCAL cOwner := ""
    LOCAL cSlash
+   
+   HB_SYMBOL_UNUSED(cOwner)
 
    IF SubStr(cTableName, 2, 1) == ":"
-      /* Remove drive letter */
+      // Remove drive letter
       cTableName := SubStr(cTableName, 3)
    ENDIF
 
@@ -1680,11 +1712,11 @@ FUNCTION SR_TableAttr(cTableName, nSystemID)
 
 RETURN aRet
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 FUNCTION SR_IndexAttr(cTableName, nSystemID)
 
-   /* Translates "c:\data\accounts\chart.dbf" to "DATA_ACCONTS_CHART" */
+   // Translates "c:\data\accounts\chart.dbf" to "DATA_ACCONTS_CHART"
 
    LOCAL aRet
    LOCAL cSlash
@@ -1692,7 +1724,7 @@ FUNCTION SR_IndexAttr(cTableName, nSystemID)
    HB_SYMBOL_UNUSED(nSystemID)
 
    IF SubStr(cTableName, 2, 1) == ":"
-      /* Remove drive letter */
+      // Remove drive letter
       cTableName := SubStr(cTableName, 3)
    ENDIF
 
@@ -1726,7 +1758,7 @@ FUNCTION SR_IndexAttr(cTableName, nSystemID)
 
 RETURN aRet
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 STATIC FUNCTION SR_IsComparOp(nOp)
 
@@ -1746,7 +1778,7 @@ STATIC FUNCTION SR_IsComparOp(nOp)
 
 RETURN .F.
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 STATIC FUNCTION SR_IsComparNullOp(nOp)
 
@@ -1758,7 +1790,7 @@ STATIC FUNCTION SR_IsComparNullOp(nOp)
 
 RETURN .F.
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 
 STATIC FUNCTION SR_ComparOpText(nOp)
 
@@ -1799,4 +1831,4 @@ STATIC FUNCTION SR_ComparOpText(nOp)
 
 RETURN cSql
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------

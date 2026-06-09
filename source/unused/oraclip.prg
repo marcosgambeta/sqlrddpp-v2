@@ -1,3 +1,5 @@
+// TODO: add copyright here
+
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,10 +43,22 @@
 
 REQUEST ADS
 
-#include "sqlrdd.ch"
-#include "sqlodbc.ch"
+// xHarbour compatibility
+#ifdef __XHARBOUR__
+#xtranslate HB_HASH([<x,...>]) => hash(<x>)
+#xtranslate HB_HALLOCATE([<x,...>]) => hallocate(<x>)
+#xtranslate HB_HPOS([<x,...>]) => hgetpos(<x>)
+#xtranslate HB_HVALUEAT([<x,...>]) => hgetvalueat(<x>)
+#xtranslate HB_HVALUEAT([<x,...>]) => hsetvalueat(<x>)
+#xtranslate HB_HDELAT([<x,...>]) => hdelat(<x>)
+#xtranslate HB_HEVAL([<x,...>]) => heval(<x>)
+#endif
+
 #include <common.ch>
 #include <hbclass.ch>
+
+#include "sqlrdd.ch"
+#include "sqlodbc.ch"
 #include "ads.ch"
 
 STATIC s_aOraclipHash := hb_hash()
@@ -53,7 +67,7 @@ STATIC s_nIdCursor := 1
 STATIC s_hplVars := {}
 STATIC s_nlasterror := 0
 STATIC s_lReleaseBind := .F.
-STATIC s_aDestroyFiles := {} // variable not used
+STATIC s_aDestroyFiles := {} // not used
 
 FUNCTION OraExecSql(n, c, adata)
 
@@ -357,7 +371,7 @@ FUNCTION OraUpdate(nCursor, cTabAutos, aCols, aDadosAlt, cWhere, aChave)
    LOCAL cbind
    LOCAL nPos
 
-   nPos := AScan(acols, {|x|Upper(x) == "ROWID"})
+   nPos := AScan(acols,{|x|Upper(x) == "ROWID"})
    FOR n := 1 TO Len(aDadosAlt)
       IF nPos >0
          IF nPos != n
@@ -1684,7 +1698,7 @@ STATIC FUNCTION ExecuteSql(csql, cursor, n)
    // END SEQUENCE
    // IF nError > 0
    nError := Sqlo_Execute(SR_GetConnection():hdbc, cSql)
-   //nError := SR_GetConnection():ExecuteRaw(cSql)
+   //nError := SR_GetConnection():executeraw(cSql)
    cursor := GETORAHANDLE(SR_GetConnection():hdbc)
    // ENDIF
 
@@ -1846,40 +1860,37 @@ RETURN NIL
 #include <hbapi.h>
 #include <hbapiitm.h>
 
-using sqlo_stmt_handle_t = int;
+typedef int sqlo_stmt_handle_t;
 
-struct _ORA_BIND_COLS
+typedef struct _ORA_BIND_COLS
 {
-   char * col_name;
-   short sVal;
-   double dValue;
-   int iType;
-   ULONG ulValue;
-   char sDate[7];
-   int iValue;
-   char sValue[31];
-//    OCIRowId * RowId;
-};
+  char *col_name;
+  short sVal;
+  double dValue;
+  int iType;
+  ULONG ulValue;
+  char sDate[7];
+  int iValue;
+  char sValue[31];
+  // OCIRowId *RowId;
+} ORA_BIND_COLS;
 
-using ORA_BIND_COLS = _ORA_BIND_COLS;
-
-struct _OCI_SESSION
+typedef struct _OCI_SESSION
 {
-   int dbh;                      // Connection handler
-   int stmt;                     // Current statement handler
-   int status;                   // Execution return value
-   int numcols;                  // Result set columns
-   char server_version[128];
-   //bellow for bind vars
-   sqlo_stmt_handle_t stmtParam;
-   ORA_BIND_COLS * pLink;
-   unsigned int ubBindNum;
-   sqlo_stmt_handle_t stmtParamRes;
-   unsigned int uRows;
-};
+  int dbh;                      // Connection handler
+  int stmt;                     // Current statement handler
+  int status;                   // Execution return value
+  int numcols;                  // Result set columns
+  char server_version[128];
+  // bellow for bind vars
+  sqlo_stmt_handle_t stmtParam;
+  ORA_BIND_COLS *pLink;
+  unsigned int ubBindNum;
+  sqlo_stmt_handle_t stmtParamRes;
+  unsigned int uRows;
+} OCI_SESSION;
 
-using OCI_SESSION = _OCI_SESSION;
-using POCI_SESSION = OCI_SESSION *;
+typedef OCI_SESSION * POCI_SESSION;
 
 HB_FUNC(GETORAHANDLE)
 {
@@ -1892,11 +1903,11 @@ HB_FUNC(GETORAHANDLE)
 
 HB_FUNC(SETORAHANDLE)
 {
-  OCI_SESSION *p = (OCI_SESSION *)hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
+  OCI_SESSION *p  = (OCI_SESSION *)hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
 
   if (p) {
     p->stmt = hb_parni(2);
   }
 }
 
-#pragma BEGINDUMP
+#pragma ENDDUMP

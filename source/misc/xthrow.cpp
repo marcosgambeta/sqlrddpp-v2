@@ -1,8 +1,5 @@
-//
 // Throw() compatibility function
-//
 // Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -55,7 +52,7 @@
 
 HB_FUNC(_SR_THROW)
 {
-  auto pError = hb_param(1, HB_IT_ANY);
+  PHB_ITEM pError = hb_param(1, HB_IT_ANY);
 
   if (pError && HB_IS_OBJECT(pError)) {
     PHB_ITEM pResult = hb_errLaunchSubst(pError);

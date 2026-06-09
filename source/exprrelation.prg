@@ -1,3 +1,5 @@
+// TODO: add copyright here
+
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,47 +41,62 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
-#include "sqlrdd.ch"
+// for xHarbour compatibility
+#ifndef HB_SYMBOL_UNUSED
+#define HB_SYMBOL_UNUSED(symbol) (symbol := (symbol))
+#endif
+
 #include <hbclass.ch>
+
+#include "sqlrdd.ch"
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FUNCTION NewDbSetRelation(cAlias, bRelation, cRelation, lScoped)
+FUNCTION SR_NewDbSetRelation(cAlias, bRelation, cRelation, lScoped)
 
    DbSetRelation(cAlias, bRelation, cRelation, lScoped)
-   RelationManager():new():AddRelation(EnchancedRelationFactory():new(), Alias(), cAlias, cRelation)
+   SR_RelationManager():new():AddRelation(SR_EnchancedRelationFactory():new(), Alias(), cAlias, cRelation)
 
 RETURN NIL
 
-FUNCTION NewdbClearRelation()
+FUNCTION SR_NewdbClearRelation()
 
    dbClearRelation()
-   RelationManager():new():Clear(Alias())
+   SR_RelationManager():new():Clear(Alias())
 
 RETURN NIL
 
-FUNCTION Newdbclearfilter()
+FUNCTION SR_Newdbclearfilter()
 
    dbclearfilter()
-   oGetWorkarea(Alias()):cFilterExpression := ""
+   SR_oGetWorkarea(Alias()):cFilterExpression := ""
 
 RETURN NIL
 
-FUNCTION oGetWorkarea(cAlias)
+FUNCTION SR_oGetWorkarea(cAlias)
 
    LOCAL result
    LOCAL oErr
 
+#ifdef __XHARBOUR__
+   TRY
+      result := &cAlias->(dbInfo(DBI_INTERNAL_OBJECT))
+   CATCH oErr
+      oErr:Description += " (cAlias: " + cstr(cAlias) + ")"
+      throw(oErr)
+   END
+#else
    BEGIN SEQUENCE WITH __BreakBlock()
       result := &cAlias->(dbInfo(DBI_INTERNAL_OBJECT))
    RECOVER USING oErr
       oErr:Description += " (cAlias: " + cstr(cAlias) + ")"
       _SR_Throw(oErr)
    END SEQUENCE
+#endif
 
 RETURN result
 
-PROCEDURE SelectFirstAreaNotInUse()
+PROCEDURE SR_SelectFirstAreaNotInUse()
 
    LOCAL nArea
 
@@ -94,7 +111,7 @@ RETURN
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS RelationBase
+CLASS SR_RelationBase
 
    EXPORTED:
    DATA oWorkarea1
@@ -106,7 +123,7 @@ ENDCLASS
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS IndirectRelation FROM RelationBase
+CLASS SR_IndirectRelation FROM SR_RelationBase
 
    EXPORTED:
    DATA aDirectRelations INIT {}
@@ -121,7 +138,7 @@ ENDCLASS
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS DirectRelation FROM RelationBase
+CLASS SR_DirectRelation FROM SR_RelationBase
 
    EXPORTED:
    DATA oClipperExpression READONLY
@@ -131,36 +148,36 @@ CLASS DirectRelation FROM RelationBase
 
 ENDCLASS
 
-METHOD DirectRelation:new(pWorkarea1, pWorkarea2, pExpression)
+METHOD SR_DirectRelation:new(pWorkarea1, pWorkarea2, pExpression)
 
    IF HB_IsChar(pWorkarea1)
-      ::oWorkarea1 := oGetWorkarea(pWorkarea1)
+      ::oWorkarea1 := SR_oGetWorkarea(pWorkarea1)
    ELSE
       ::oWorkarea1 := pWorkarea1
    ENDIF
    IF HB_IsChar(pWorkarea2)
-      ::oWorkarea2 := oGetWorkarea(pWorkarea2)
+      ::oWorkarea2 := SR_oGetWorkarea(pWorkarea2)
    ELSE
       ::oWorkarea2 := pWorkarea2
    ENDIF
 
-   ::oClipperExpression := ClipperExpression():new(::oWorkarea1:cAlias, pExpression, .T.)
+   ::oClipperExpression := SR_ClipperExpression():new(::oWorkarea1:cAlias, pExpression, .T.)
 
 RETURN SELF
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS RelationFactory
+CLASS SR_RelationFactory
 
    EXPORTED:
-   METHOD NewDirectRelation(pWorkarea1, pWorkarea2, pExpression) INLINE DirectRelation():new(pWorkarea1, pWorkarea2, pExpression)
+   METHOD NewDirectRelation(pWorkarea1, pWorkarea2, pExpression) INLINE SR_DirectRelation():new(pWorkarea1, pWorkarea2, pExpression)
 
    EXPORTED:
    METHOD new()
 
 ENDCLASS
 
-METHOD RelationFactory:new()
+METHOD SR_RelationFactory:new()
 
    STATIC instance
 
@@ -172,10 +189,10 @@ RETURN instance
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS RelationManager
+CLASS SR_RelationManager
 
    HIDDEN:
-   DATA oInternDictionary INIT Dictionary():new()
+   DATA oInternDictionary INIT SR_Dictionary():new()
 
    HIDDEN:
    DATA aDirectRelations INIT {}
@@ -197,7 +214,7 @@ CLASS RelationManager
 
 ENDCLASS
 
-METHOD RelationManager:new()
+METHOD SR_RelationManager:new()
 
    STATIC instance
 
@@ -207,14 +224,14 @@ METHOD RelationManager:new()
 
 RETURN instance
 
-METHOD RelationManager:Clear(cAlias)
+METHOD SR_RelationManager:Clear(cAlias)
 
    ::oInternDictionary:Clear()
    RemoveAll(::aDirectRelations, {|y|Lower(y:oWorkarea1:cAlias) == Lower(cAlias)})
 
 RETURN NIL
 
-METHOD RelationManager:AddRelation(oFactory, pAlias1, pAlias2, pExpression)
+METHOD SR_RelationManager:AddRelation(oFactory, pAlias1, pAlias2, pExpression)
 
    LOCAL cAlias1 := Upper(pAlias1)
    LOCAL cAlias2 := Upper(pAlias2)
@@ -230,7 +247,7 @@ METHOD RelationManager:AddRelation(oFactory, pAlias1, pAlias2, pExpression)
 
 RETURN NIL
 
-METHOD RelationManager:GetRelations(cAlias1, cAlias2)
+METHOD SR_RelationManager:GetRelations(cAlias1, cAlias2)
 
    LOCAL result := {}
    LOCAL r
@@ -250,14 +267,14 @@ METHOD RelationManager:GetRelations(cAlias1, cAlias2)
             IF cAlias2 == Upper(oDirectRelation:oWorkarea2:cAlias)
                AAdd(result, oDirectRelation)
             ELSE
-               r := IndirectRelation():new()
+               r := SR_IndirectRelation():new()
                AAdd(r:aDirectRelations, oDirectRelation)
-               aAddRange(result, ::BuildRelations(r, oDirectRelation:oWorkarea2:cAlias, cAlias2))
+               SR_aAddRange(result, ::BuildRelations(r, oDirectRelation:oWorkarea2:cAlias, cAlias2))
             ENDIF
          ENDIF
       NEXT i
       IF dico2 == NIL
-         dico2 := Dictionary():new()
+         dico2 := SR_Dictionary():new()
          dico2:aadd(cAlias2, result)
          ::oInternDictionary:aadd(cAlias1, dico2 , 3)
       ELSE
@@ -267,7 +284,7 @@ METHOD RelationManager:GetRelations(cAlias1, cAlias2)
 
 RETURN result
 
-METHOD RelationManager:BuildRelations(oIndirectRelation, cAlias1, cAlias2)
+METHOD SR_RelationManager:BuildRelations(oIndirectRelation, cAlias1, cAlias2)
 
    LOCAL result := {}
    LOCAL r
@@ -282,7 +299,7 @@ METHOD RelationManager:BuildRelations(oIndirectRelation, cAlias1, cAlias2)
       oDirectRelation := ::aDirectRelations[i]
       IF cAlias1 == Upper(oDirectRelation:oWorkarea1:cAlias)
          oDirectRelation := ::aDirectRelations[i]
-         r := IndirectRelation():new()
+         r := SR_IndirectRelation():new()
          FOR j := 1 TO Len(oIndirectRelation:aDirectRelations)
              AAdd(r:aDirectRelations, oIndirectRelation:aDirectRelations[j])
          NEXT j
@@ -292,7 +309,7 @@ METHOD RelationManager:BuildRelations(oIndirectRelation, cAlias1, cAlias2)
          IF oDirectRelation:oWorkarea2:cAlias == cAlias2
             AAdd(result, r)
          ELSE
-            aAddRange(result, ::BuildRelations(r, oDirectRelation:oWorkarea2:cAlias, cAlias2))
+            SR_aAddRange(result, ::BuildRelations(r, oDirectRelation:oWorkarea2:cAlias, cAlias2))
          ENDIF
       ENDIF
    NEXT i
@@ -301,7 +318,7 @@ RETURN result
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS DbIndex
+CLASS SR_DbIndex
 
    HIDDEN:
    DATA _aInfos
@@ -341,20 +358,20 @@ CLASS DbIndex
 
 ENDCLASS
 
-METHOD DbIndex:new(pWorkarea, pName)
+METHOD SR_DbIndex:new(pWorkarea, pName)
 
    IF HB_IsChar(pWorkarea)
-      ::oWorkarea := oGetWorkarea(pWorkarea)
+      ::oWorkarea := SR_oGetWorkarea(pWorkarea)
    ELSE
       ::oWorkarea := pWorkarea
    ENDIF
    ::_cName := Upper(pName)
-   ::_aInfos := aWhere(pWorkarea:aIndex, {|x|x[10] == ::_cName})[1]
-   ::oClipperExpression := ClipperExpression():new(::oWorkarea:cAlias, ::_aInfos[4], ::lIsSynthetic)
+   ::_aInfos := SR_aWhere(pWorkarea:aIndex, {|x|x[10] == ::_cName})[1]
+   ::oClipperExpression := SR_ClipperExpression():new(::oWorkarea:cAlias, ::_aInfos[4], ::lIsSynthetic)
 
 RETURN SELF
 
-METHOD DbIndex:lIsSynthetic()
+METHOD SR_DbIndex:lIsSynthetic()
 
    IF ::_lIsSynthetic == NIL
       ::_lIsSynthetic := (::_aInfos[9] == "")
@@ -362,7 +379,7 @@ METHOD DbIndex:lIsSynthetic()
 
 RETURN ::_lIsSynthetic
 
-METHOD DbIndex:aDbFields()
+METHOD SR_DbIndex:aDbFields()
 
    LOCAL i
 
@@ -370,7 +387,7 @@ METHOD DbIndex:aDbFields()
       ::_aDbFields := {}
       IF ::lIsSynthetic()
          // ::oClipperExpression:nLength will evaluate the index expression which is a bit slow. It would be nice to have access to the legnth of a synthetic index.
-         AAdd(::_aDbFields, DbField():new(HB_RegExAtX(".*\[(.*?)\]", ::_aInfos[1], .F.)[2, 1], "C", ::oClipperExpression:nLength)) //the way to get the name of the field that contains the synthetic index isn't very clean... We also suppose that the synthtic index has a fix length
+         AAdd(::_aDbFields, SR_DbField():new(HB_RegExAtX(".*\[(.*?)\]", ::_aInfos[1], .F.)[2, 1], "C", ::oClipperExpression:nLength)) //the way to get the name of the field that contains the synthetic index isn't very clean... We also suppose that the synthtic index has a fix length
       ELSE
          FOR i := 1 TO Len(::_aInfos[3]) - 1 // not SR_RECNO
             AAdd(::_aDbFields, ::oWorkarea:GetFieldByName(::_aInfos[3][i][1]))
@@ -380,7 +397,7 @@ METHOD DbIndex:aDbFields()
 
 RETURN ::_aDbFields
 
-METHOD DbIndex:nLength()
+METHOD SR_DbIndex:nLength()
 
    LOCAL item
 
@@ -395,7 +412,7 @@ RETURN ::_nLength
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS DbField
+CLASS SR_DbField
 
    EXPORTED:
    DATA cName READONLY
@@ -411,7 +428,7 @@ CLASS DbField
 
 ENDCLASS
 
-METHOD DbField:new(pName, pType, pLength)
+METHOD SR_DbField:new(pName, pType, pLength)
 
    ::cName := pName
    ::cType := pType
@@ -421,7 +438,7 @@ RETURN SELF
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CLASS ClipperExpression
+CLASS SR_ClipperExpression
 
    EXPORTED:
    DATA lIgnoreRelations
@@ -451,16 +468,14 @@ CLASS ClipperExpression
    ACCESS nLength
 
    EXPORTED:
-   //METHOD Evaluate()
    METHOD Evaluate(lIgnoreRelations)
 
    EXPORTED:
-   //METHOD new(pContext, pValue)
    METHOD new(pContext, pValue, pIgnoreRelations)
 
 ENDCLASS
 
-METHOD ClipperExpression:new(pContext, pValue, pIgnoreRelations)
+METHOD SR_ClipperExpression:new(pContext, pValue, pIgnoreRelations)
 
    ::cContext := pContext
    ::cValue := pValue
@@ -468,7 +483,7 @@ METHOD ClipperExpression:new(pContext, pValue, pIgnoreRelations)
 
 RETURN SELF
 
-METHOD ClipperExpression:cEvaluation()
+METHOD SR_ClipperExpression:cEvaluation()
 
    IF ::_cEvaluation == NIL
       ::_cEvaluation := cstr(::Evaluate(::lIgnoreRelations))
@@ -476,21 +491,38 @@ METHOD ClipperExpression:cEvaluation()
 
 RETURN NIL
 
-METHOD ClipperExpression:Evaluate(lIgnoreRelations)
+METHOD SR_ClipperExpression:Evaluate(lIgnoreRelations)
 
-   //LOCAL nSeconds (not used)
+   LOCAL nSeconds
    LOCAL save_slct
    LOCAL Result
    LOCAL oErr
 
    // can be very slow with relations...
-   //nseconds := seconds() (not used)
+   nseconds := Seconds()
 
+#ifdef __XHARBOUR__
+   TRY
+      IF PCount() == 1 .AND. lIgnoreRelations
+         save_slct := Select()
+         SR_SelectFirstAreaNotInUse()
+         USE &(SR_oGetWorkarea(::cContext):cFileName) VIA "SQLRDD" ALIAS "AliasWithoutRelation"
+         result := &(::cValue)
+         CLOSE ("AliasWithoutRelation")
+         Select(save_slct)
+      ELSE
+         result := &(::cContext)->(&(::cValue))
+      ENDIF
+   CATCH oErr
+      oErr:description += ";The value unseccessfully evaluated was : " + ::cValue   + ";"
+      throw(oErr)
+   END
+#else
    BEGIN SEQUENCE WITH __BreakBlock()
       IF PCount() == 1 .AND. lIgnoreRelations
          save_slct := Select()
-         SelectFirstAreaNotInUse()
-         USE &(oGetWorkarea(::cContext):cFileName) VIA "SQLRDD" ALIAS "AliasWithoutRelation"
+         SR_SelectFirstAreaNotInUse()
+         USE &(SR_oGetWorkarea(::cContext):cFileName) VIA "SQLRDD" ALIAS "AliasWithoutRelation"
          result := &(::cValue)
          CLOSE ("AliasWithoutRelation")
          Select(save_slct)
@@ -501,10 +533,13 @@ METHOD ClipperExpression:Evaluate(lIgnoreRelations)
       oErr:description += ";The value unseccessfully evaluated was : " + ::cValue   + ";"
       _SR_Throw(oErr)
    END SEQUENCE
+#endif
+
+   HB_SYMBOL_UNUSED(nseconds)
 
 RETURN result
 
-METHOD ClipperExpression:cType()
+METHOD SR_ClipperExpression:cType()
 
    IF ::_cType == NIL
       ::_cType := ValType(::cEvaluation())
@@ -512,7 +547,7 @@ METHOD ClipperExpression:cType()
 
 RETURN ::_cType
 
-METHOD ClipperExpression:nLength()
+METHOD SR_ClipperExpression:nLength()
 
    IF ::_nLength == NIL
       ::_nLength := Len(::cEvaluation())
@@ -540,23 +575,23 @@ FUNCTION ExtendWorkarea() // TODO: requires xhbcls.ch (to be deleted)
 RETURN NIL
 #endif
 
-FUNCTION ExtendWorkarea() // do not requires xhbcls.ch
+FUNCTION SR_ExtendWorkarea() // do not requires xhbcls.ch
 
    __clsAddMsg(SR_WORKAREA():classH, "aIndexes", __cls_IncData(SR_WORKAREA():classH), 32 + 1, NIL,)
-   __clsAddMsg(SR_WORKAREA():classH, "GetIndexes", @GetIndexes(), 0, NIL,)
-   __clsAddMsg(SR_WORKAREA():classH, "GetControllingIndex", @GetControllingIndex(), 0, NIL,)
+   __clsAddMsg(SR_WORKAREA():classH, "GetIndexes", @SR_GetIndexes(), 0, NIL,)
+   __clsAddMsg(SR_WORKAREA():classH, "GetControllingIndex", @SR_GetControllingIndex(), 0, NIL,)
 
    __clsAddMsg(SR_WORKAREA():classH, "aDbFields", __cls_IncData(SR_WORKAREA():classH), 32 + 1, NIL,)
-   __clsAddMsg(SR_WORKAREA():classH, "GetFields", @GetFields(), 0, NIL,)
-   __clsAddMsg(SR_WORKAREA():classH, "GetFieldByName", @GetFieldByName(), 0, NIL,)
+   __clsAddMsg(SR_WORKAREA():classH, "GetFields", @SR_GetFields(), 0, NIL,)
+   __clsAddMsg(SR_WORKAREA():classH, "GetFieldByName", @SR_GetFieldByName(), 0, NIL,)
 
    __clsAddMsg(SR_WORKAREA():classH, "cFilterExpression", __cls_IncData(SR_WORKAREA():classH), 32 + 1, NIL,)
 
-   __clsModMsg(SR_WORKAREA():classH, "ParseForClause", @NewParseForClause())
+   __clsModMsg(SR_WORKAREA():classH, "ParseForClause", @SR_NewParseForClause())
 
 RETURN NIL
 
-FUNCTION GetIndexes(lOrdered)
+FUNCTION SR_GetIndexes(lOrdered)
 
    LOCAL self := HB_QSelf()
    LOCAL i
@@ -566,7 +601,7 @@ FUNCTION GetIndexes(lOrdered)
       ::aIndexes := {}
       FOR i := 1 TO Len(::aIndex)
          IF hb_regexLike("^\w+$", ::aIndex[i, 10])
-            AAdd(::aIndexes, DbIndex():new(self, ::aIndex[i, 10]))
+            AAdd(::aIndexes, SR_DbIndex():new(self, ::aIndex[i, 10]))
          ENDIF
       NEXT i
    ENDIF
@@ -576,7 +611,7 @@ FUNCTION GetIndexes(lOrdered)
 
 RETURN ::aIndexes
 
-FUNCTION GetControllingIndex()
+FUNCTION SR_GetControllingIndex()
 
    LOCAL self := HB_QSelf()
    LOCAL aIndexes := ::GetIndexes(.F.)
@@ -588,7 +623,7 @@ FUNCTION GetControllingIndex()
 
 RETURN aIndexes[nIndex]
 
-FUNCTION GetFields()
+FUNCTION SR_GetFields()
 
    LOCAL self := HB_QSelf()
    LOCAL i
@@ -608,21 +643,21 @@ FUNCTION GetFields()
       ::aDbFields := Array(nCount)
       AFields(_aNames, _aTypes, _aLengths)
       FOR i := 1 TO nCount
-         ::aDbFields[i] := DbField():new(_aNames[i], _aTypes[i], _aLengths[i])
+         ::aDbFields[i] := SR_DbField():new(_aNames[i], _aTypes[i], _aLengths[i])
       NEXT i
       Select(save_slct)
    ENDIF
 
 RETURN ::aDbFields
 
-FUNCTION GetFieldByName(cName)
+FUNCTION SR_GetFieldByName(cName)
 
    LOCAL self := HB_QSelf()
 
-RETURN xFirst(::GetFields(), {|x|Lower(x:cName) == Lower(cName)})
+RETURN SR_xFirst(::GetFields(), {|x|Lower(x:cName) == Lower(cName)})
 
 // should be implemented : GetTranslations() and lFixVariables
-FUNCTION NewParseForClause(cFor, lFixVariables)
+FUNCTION SR_NewParseForClause(cFor, lFixVariables)
 
    LOCAL self := HB_QSelf()
    LOCAL oParser
@@ -631,8 +666,8 @@ FUNCTION NewParseForClause(cFor, lFixVariables)
 
    ::cFilterExpression := cFor
 
-   oParser := ConditionParser():new(::cAlias)
-   otranslator := MSSQLExpressionTranslator():new(::cAlias, lFixVariables, .T.)
+   oParser := SR_ConditionParser():new(::cAlias)
+   otranslator := SR_MSSQLExpressionTranslator():new(::cAlias, lFixVariables, .T.)
 
    oCondition := oParser:Parse(cFor)
 

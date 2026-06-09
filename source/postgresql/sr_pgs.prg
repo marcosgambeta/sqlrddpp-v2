@@ -1,7 +1,5 @@
-//
 // SQLRDD Postgres Native Connection Class
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -44,27 +42,32 @@
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
 
+// for xHarbour compatibility
+#ifndef HB_SYMBOL_UNUSED
+#define HB_SYMBOL_UNUSED(symbol) (symbol := (symbol))
+#endif
+
 #include <hbclass.ch>
 #include <common.ch>
-// #include "compat.ch"
+#include <error.ch>
+
 #include "sqlodbc.ch"
 #include "sqlrdd.ch"
 #include "sqlrddpp.ch"
-#include <error.ch>
 #include "msg.ch"
 #include "pgs.ch"
 #include "sqlrddsetup.ch"
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 CLASS SR_PGS FROM SR_CONNECTION
 
    Data aCurrLine
 
-   METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
+   METHOD ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, ;
+      nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
    METHOD End()
    METHOD LastError()
-   //METHOD Commit()
    METHOD Commit(lNoLog)
    METHOD RollBack()
    METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
@@ -79,7 +82,7 @@ CLASS SR_PGS FROM SR_CONNECTION
 
 ENDCLASS
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:MoreResults(aArray, lTranslate)
 
@@ -88,7 +91,7 @@ METHOD SR_PGS:MoreResults(aArray, lTranslate)
 
 RETURN -1
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:Getline(aFields, lTranslate, aArray)
 
@@ -99,7 +102,7 @@ METHOD SR_PGS:Getline(aFields, lTranslate, aArray)
    IF aArray == NIL
       aArray := Array(Len(aFields))
    ELSEIF Len(aArray) != Len(aFields)
-      aSize(aArray, Len(aFields))
+      ASize(aArray, Len(aFields))
    ENDIF
 
    IF ::aCurrLine == NIL
@@ -114,19 +117,19 @@ METHOD SR_PGS:Getline(aFields, lTranslate, aArray)
 
 RETURN aArray
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:FieldGet(nField, aFields, lTranslate)
 
    IF ::aCurrLine == NIL
       DEFAULT lTranslate TO .T.
-      ::aCurrLine := array(LEN(aFields))
+      ::aCurrLine := Array(Len(aFields))
       SR_PGSLINEPROCESSED(::hDbc, 4096, aFields, ::lQueryOnly, ::nSystemID, lTranslate, ::aCurrLine)
    ENDIF
 
 RETURN ::aCurrLine[nField]
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:FetchRaw(lTranslate, aFields)
 
@@ -138,12 +141,13 @@ METHOD SR_PGS:FetchRaw(lTranslate, aFields)
       ::nRetCode := SR_PGSFetch(::hDbc)
       ::aCurrLine := NIL
    ELSE
-      ::RunTimeErr("", "PGSFetch - Invalid cursor state" + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
+      ::RunTimeErr("", "SR_PGSFetch - Invalid cursor state" + SR_CRLF + SR_CRLF + ;
+         "Last command sent to database : " + SR_CRLF + ::cLastComm)
    ENDIF
 
 RETURN ::nRetCode
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:FreeStatement()
 
@@ -154,17 +158,15 @@ METHOD SR_PGS:FreeStatement()
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName)
 
    LOCAL nFields
-   LOCAL aFields := {}
+   LOCAL aFields
    LOCAL nRet
    LOCAL cTbl
    LOCAL cOwner := "public"
-
-   HB_SYMBOL_UNUSED(aFields)
 
    DEFAULT lReSelect TO .T.
    DEFAULT lLoadCache TO .F.
@@ -176,7 +178,9 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
       IF !Empty(cCommand)
          nRet := ::Execute(cCommand + IIf(::lComments, " /* Open Workarea with custom SQL command */", ""), .F.)
       ELSE
-         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + IIf(::lComments, " /* Open Workarea */", ""), .F.)
+         nRet := ::Execute("SELECT A.* FROM " + cTable + " A " + ;
+            IIf(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + ;
+            IIf(::lComments, " /* Open Workarea */", ""), .F.)
       ENDIF
       IF nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
          RETURN NIL
@@ -184,7 +188,8 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
    ENDIF
 
    IF SR_PGSResultStatus(::hStmt) != SQL_SUCCESS
-      ::RunTimeErr("", "SqlNumResultCols Error" + SR_CRLF + SR_CRLF + "Last command sent to database : " + SR_CRLF + ::cLastComm)
+      ::RunTimeErr("", "SqlNumResultCols Error" + SR_CRLF + SR_CRLF + ;
+         "Last command sent to database : " + SR_CRLF + ::cLastComm)
       RETURN NIL
    ENDIF
 
@@ -213,7 +218,7 @@ METHOD SR_PGS:IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoN
 
 RETURN aFields
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:LastError()
 
@@ -223,14 +228,14 @@ METHOD SR_PGS:LastError()
 
 RETURN "(" + AllTrim(Str(::nRetCode)) + ") " + SR_PGSErrMsg(::hDbc)
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
-METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, ;
-   cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
+METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, ;
+   nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit)
 
    LOCAL hDbc
    LOCAL nret
-   LOCAL cSystemVers := ""
+   LOCAL cSystemVers
    LOCAL aRet := {}
    LOCAL aVersion
    LOCAL cmatch
@@ -239,8 +244,7 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
    LOCAL s_reEnvVar := HB_RegexComp("(\d+\.\d+\.\d+)")
    LOCAL cString
 
-   HB_SYMBOL_UNUSED(cSystemVers)
-
+   // parameters not used
    HB_SYMBOL_UNUSED(cDSN)
    HB_SYMBOL_UNUSED(cUser)
    HB_SYMBOL_UNUSED(cPassword)
@@ -257,10 +261,12 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
 
    DEFAULT ::cPort TO 5432
 
-   cConnect := "host=" + ::cHost + " user=" + ::cUser + " password=" + ::cPassword + " dbname=" + ::cDTB + " port=" + Str(::cPort, 6)
+   cConnect := "host=" + ::cHost + " user=" + ::cUser + " password=" + ::cPassword + " dbname=" + ::cDTB + ;
+      " port=" + Str(::cPort, 6)
 
    IF !Empty(::sslcert)
-      cConnect += " sslmode=prefer sslcert=" + ::sslcert + " sslkey=" + ::sslkey + " sslrootcert=" + ::sslrootcert + " sslcrl=" + ::sslcrl
+      cConnect += " sslmode=prefer sslcert=" + ::sslcert + " sslkey=" + ::sslkey + " sslrootcert=" + ::sslrootcert + ;
+         " sslcrl=" + ::sslcrl
    ENDIF
 
    hDbc := SR_PGSConnect(cConnect)
@@ -296,7 +302,9 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
    ::nSystemID := SQLRDD_RDBMS_POSTGR
    ::cTargetDB := Upper(cTargetDB)
 
-   // IF !("7.3" $ cSystemVers .OR. "7.4" $ cSystemVers .OR. "8.0" $ cSystemVers .OR. "8.1" $ cSystemVers .OR. "8.2" $ cSystemVers .OR. "8.3" $ cSystemVers .OR. "8.4" $ cSystemVers .OR. "9.0" $ cSystemVers or. "9.1" $ cSystemVers)
+   // IF !("7.3" $ cSystemVers .OR. "7.4" $ cSystemVers .OR. "8.0" $ cSystemVers .OR. "8.1" $ cSystemVers .OR. ;
+   //    "8.2" $ cSystemVers .OR. "8.3" $ cSystemVers .OR. "8.4" $ cSystemVers .OR. "9.0" $ cSystemVers .OR. ;
+   //    "9.1" $ cSystemVers)
 
    IF !((Val(aversion[1]) == 7 .AND. Val(aversion[2]) >= 3) .OR. (Val(aversion[1]) >= 8))
       ::End()
@@ -314,9 +322,17 @@ METHOD SR_PGS:ConnectRaw(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff,
       ::uSid := Val(Str(aRet[1, 1], 8, 0))
    ENDIF
 
+   // Open initial transaction block. The rest of SQLRDD assumes the connection
+   // is always inside a transaction (since Commit/RollBack emit COMMIT;BEGIN and
+   // BEGIN respectively). Without this initial BEGIN, the very first Commit()
+   // after connect would trigger "there is no transaction in progress".
+   IF !Empty(::nSystemID)
+      ::Exec("BEGIN", .F.)
+   ENDIF
+
 RETURN Self
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:End()
 
@@ -333,25 +349,72 @@ METHOD SR_PGS:End()
 
 RETURN NIL
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:Commit(lNoLog)
 
+   LOCAL nStat
+
    ::Super:Commit(lNoLog)
 
-RETURN (::nRetCode := ::Exec("COMMIT;BEGIN", .F.))
+   // PostgreSQL emits the warning "there is no transaction in progress"
+   // whenever COMMIT/ROLLBACK is sent while the backend is not inside a
+   // transaction block. PQtransactionStatus() is available since libpq 7.3,
+   // so this check is safe for every supported server version (8.0+).
+   //   PQTRANS_IDLE    (0) - no transaction; only BEGIN, no COMMIT
+   //   PQTRANS_INTRANS (2) - clean transaction; COMMIT then BEGIN
+   //   PQTRANS_INERROR (3) - failed transaction; must ROLLBACK, then BEGIN
+   //   PQTRANS_ACTIVE  (1) / PQTRANS_UNKNOWN (4) - leave it alone
+   nStat := SR_PGSTransStatus(::hDbc)
 
-//------------------------------------------------------------------------
-
-METHOD SR_PGS:RollBack()
-
-   ::Super:RollBack()
-   ::nRetCode := SR_PGSRollBack(::hDbc)
-   ::Exec("BEGIN", .F.)
+   SWITCH nStat
+   CASE 0 // PQTRANS_IDLE
+      ::nRetCode := ::Exec("BEGIN", .F.)
+      EXIT
+   CASE 2 // PQTRANS_INTRANS
+      ::nRetCode := ::Exec("COMMIT;BEGIN", .F.)
+      EXIT
+   CASE 3 // PQTRANS_INERROR
+      ::nRetCode := ::Exec("ROLLBACK;BEGIN", .F.)
+      EXIT
+#ifdef __XHARBOUR__
+   DEFAULT
+#else
+   OTHERWISE
+#endif
+      // PQTRANS_ACTIVE or PQTRANS_UNKNOWN: do not interfere
+      ::nRetCode := SQL_SUCCESS
+   ENDSWITCH
 
 RETURN ::nRetCode
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
+
+METHOD SR_PGS:RollBack()
+
+   LOCAL nStat
+
+   ::Super:RollBack()
+
+   nStat := SR_PGSTransStatus(::hDbc)
+
+   // Only issue ROLLBACK if there is actually a transaction to roll back.
+   // Then reopen with BEGIN so the connection remains inside a transaction
+   // block as the rest of SQLRDD expects.
+   IF nStat == 2 .OR. nStat == 3 // INTRANS or INERROR
+      ::nRetCode := SR_PGSRollBack(::hDbc)
+   ELSE
+      ::nRetCode := SQL_SUCCESS
+   ENDIF
+
+   // Open a fresh transaction only if we are now idle
+   IF SR_PGSTransStatus(::hDbc) == 0 // PQTRANS_IDLE
+      ::Exec("BEGIN", .F.)
+   ENDIF
+
+RETURN ::nRetCode
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:ExecuteRaw(cCommand)
 
@@ -365,7 +428,7 @@ METHOD SR_PGS:ExecuteRaw(cCommand)
 
 RETURN SR_PGSResultStatus(::hStmt)
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:AllocStatement()
 
@@ -379,13 +442,13 @@ METHOD SR_PGS:AllocStatement()
 
 RETURN SQL_SUCCESS
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 METHOD SR_PGS:GetAffectedRows()
 RETURN SR_PGSAFFECTEDROWS(::hDbc)
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 #include "sr_pgs_bind.cpp"
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------//

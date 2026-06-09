@@ -5,8 +5,6 @@
 #define SQLRDDPP_H
 
 // Define SR_NULLPTR:
-#define SR_NULLPTR nullptr
-#if 0
 // If the compiler is a C++ compiler and the standard is C++11 or upper, define SR_NULLPTR as nullptr.
 // If the compiler is a C compiler and the standard is C23 or upper, define SR_NULLPTR as nullptr.
 // Otherwise, define SR_NULLPTR as '((void *)0)'.
@@ -27,13 +25,13 @@
 #define SR_NULLPTR ((void *)0)
 #endif
 #endif
-#endif
+
+// Supported Database Engines (RDBMS)
 
 // NOTES:
 // Needs to be kept in sync with the sqlrddpp.ch file.
 // These constants are deprecated. If necessary, change
-// your C code to use SQLRDD_RDBMS_* and/or your C++ code
-// to use SQLRDD::RDBMS::*.
+// your C/C++ code to use SQLRDD_RDBMS_*.
 #define SYSTEMID_UNKNOW                0
 #define SYSTEMID_ORACLE                1
 #define SYSTEMID_MSSQL6                2
@@ -58,35 +56,29 @@
 #define SYSTEMID_FIREBR4              21
 #define SYSTEMID_FIREBR5              22
 
-namespace SQLRDD {
-  namespace RDBMS {
-    // NOTE: needs to be kept in sync with the sqlrddpp.ch file
-    enum ID : int {
-      UNKNOW = 0,
-      ORACLE = 1,
-      MSSQL6 = 2,
-      MSSQL7 = 3,
-      SQLANY = 4,
-      SYBASE = 5,
-      ACCESS = 6,
-      INGRES = 7,
-      SQLBAS = 8,
-      ADABAS = 9,
-      INFORM = 10,
-      IBMDB2 = 11,
-      MYSQL = 12,
-      POSTGR = 13,
-      FIREBR = 14,
-      CACHE = 15,
-      OTERRO = 16,
-      PERVASIVE = 17,
-      AZURE = 18,
-      MARIADB = 19,
-      FIREBR3 = 20,
-      FIREBR4 = 21,
-      FIREBR5 = 22
-    };
-  }
-}
+// NOTE: needs to be kept in sync with the sqlrddpp.ch file
+#define SQLRDD_RDBMS_UNKNOW                0
+#define SQLRDD_RDBMS_ORACLE                1
+#define SQLRDD_RDBMS_MSSQL6                2
+#define SQLRDD_RDBMS_MSSQL7                3
+#define SQLRDD_RDBMS_SQLANY                4
+#define SQLRDD_RDBMS_SYBASE                5
+#define SQLRDD_RDBMS_ACCESS                6
+#define SQLRDD_RDBMS_INGRES                7
+#define SQLRDD_RDBMS_SQLBAS                8
+#define SQLRDD_RDBMS_ADABAS                9
+#define SQLRDD_RDBMS_INFORM               10
+#define SQLRDD_RDBMS_IBMDB2               11
+#define SQLRDD_RDBMS_MYSQL                12
+#define SQLRDD_RDBMS_POSTGR               13
+#define SQLRDD_RDBMS_FIREBR               14
+#define SQLRDD_RDBMS_CACHE                15
+#define SQLRDD_RDBMS_OTERRO               16
+#define SQLRDD_RDBMS_PERVASIVE            17
+#define SQLRDD_RDBMS_AZURE                18
+#define SQLRDD_RDBMS_MARIADB              19
+#define SQLRDD_RDBMS_FIREBR3              20
+#define SQLRDD_RDBMS_FIREBR4              21
+#define SQLRDD_RDBMS_FIREBR5              22
 
 #endif // SQLRDDPP_H

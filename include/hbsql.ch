@@ -1,8 +1,6 @@
-//
 // SQLPARSER
 // PRG level pCode Header for SQL Parser (used from C also)
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -67,6 +65,7 @@
 #define SQL_PCODE_COLUMN_NAME_BINDVAR        11
 #define SQL_PCODE_COLUMN_NAME_PARAM          12
 #define SQL_PCODE_COLUMN_PARAM_NOTNULL       13
+
 
 #define SQL_PCODE_LOCK                       20
 #define SQL_PCODE_NOLOCK                     21
@@ -184,5 +183,6 @@
 #define SQL_CONTEXT_INSERT                11
 #define SQL_CONTEXT_UPDATE                21
 #define SQL_CONTEXT_DELETE                31
+
 
 #endif // HBSQL_CH

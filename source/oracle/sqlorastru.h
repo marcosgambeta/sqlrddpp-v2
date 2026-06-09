@@ -1,3 +1,8 @@
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2, or (at your option)
+// any later version.
+
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,7 +60,7 @@
 #endif
 
 #ifdef SQLORA2
-struct _ORA_BIND_COLS2
+typedef struct _ORA_BIND_COLS2
 {
   char *col_name;
   char *bindname;
@@ -68,10 +73,10 @@ struct _ORA_BIND_COLS2
   HB_LONGLONG lValue;
   OCI_Date *date;
   int iFieldSize;
-};
-using ORA_BIND_COLS2 = _ORA_BIND_COLS2;
+} ORA_BIND_COLS2;
+
 #else
-struct _ORA_BIND_COLS
+typedef struct _ORA_BIND_COLS
 {
   char *col_name;
   char *bindname;
@@ -84,11 +89,10 @@ struct _ORA_BIND_COLS
   HB_LONGLONG lValue;
   OCI_Date *date;
   int iFieldSize;
-};
-using ORA_BIND_COLS = _ORA_BIND_COLS;
+} ORA_BIND_COLS;
 #endif
 
-struct _OCI_ORASESSION
+typedef struct _OCI_ORASESSION
 {
   OCI_Connection *cn;
   OCI_Statement *stmt;
@@ -103,9 +107,7 @@ struct _OCI_ORASESSION
   ORA_BIND_COLS *pLink;
 #endif
   unsigned int ubBindNum;
-};
-
-using OCI_ORASESSION = _OCI_ORASESSION;
-using POCI_ORASESSION = OCI_ORASESSION *;
+} OCI_ORASESSION;
+typedef OCI_ORASESSION *POCI_ORASESSION;
 
 #endif

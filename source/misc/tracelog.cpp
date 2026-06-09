@@ -1,8 +1,6 @@
-//
 // SQLRDD - Harbour/xHarbour compatibility functions
 // (c) copyright xHarbour.com Inc. http://www.xHarbour.com
 // Author: Przemyslaw Czerpak (druzus/at/poczta.onet.pl)
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -47,7 +45,7 @@
 
 #include "compat.h"
 
-void sr_TraceLog(const char *szFile, const char *szTraceMsg, ...)
+void SR_TraceLog(const char *szFile, const char *szTraceMsg, ...)
 {
   if (szTraceMsg) {
     FILE *hFile = hb_fopen(szFile ? szFile : "trace.log", "a");

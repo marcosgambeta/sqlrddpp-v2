@@ -90,4 +90,6 @@ sqlrddpp-v2.hbx
 
 {allmsvc}-cflag=/D_CRT_SECURE_NO_WARNINGS
 
+-cflag=-D_HB_API_INTERNAL_
+
 -cpp

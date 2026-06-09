@@ -1,7 +1,5 @@
-//
 // SQLRDD PRG Header (ODBC DEFINES)
 // Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
-//
 
 // $BEGIN_LICENSE$
 // This program is free software; you can redistribute it and/or modify
@@ -43,9 +41,6 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.
 // $END_LICENSE$
-
-#ifndef SQLODBC_CH
-#define SQLODBC_CH
 
 // TODO: revise and remove duplicates
 
@@ -305,5 +300,3 @@
    //#define SQL_FAKE_NUM                        -102
 
 #endif
-
-#endif // SQLODBC_CH
