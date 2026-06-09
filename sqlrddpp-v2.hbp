@@ -87,9 +87,8 @@ source/postgresql/sr_pgs.prg
 sqlrddpp-v2.hbx
 
 {allgcc}-cflag=-fpermissive
-
+{allgcc}-cflag=-Wno-write-strings
 {allmsvc}-cflag=/D_CRT_SECURE_NO_WARNINGS
-
 -cflag=-D_HB_API_INTERNAL_
 
 -cpp
