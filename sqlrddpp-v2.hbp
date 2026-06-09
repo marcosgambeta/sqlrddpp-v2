@@ -62,6 +62,7 @@ source/firebird/sr_firebird5.prg
 
 # MariaDB
 source/mariadb/sr_mariadb.prg
+#source/mariadb/sr_mariadb_bind.cpp
 
 # MySQL
 source/mysql/sr_mysql.prg
