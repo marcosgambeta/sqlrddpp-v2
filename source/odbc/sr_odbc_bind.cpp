@@ -623,7 +623,7 @@ HB_FUNC_STATIC(SR_ODBCLINEPROCESSED)
                          hb_paramError(3));
   }
 
-  lLen = (HB_LONG)(hb_pcount() > 1 ? hb_parnl(2) : 4096);
+  lLen = static_cast<HB_LONG>(hb_pcount() > 1 ? hb_parnl(2) : 4096);
 
   if (lLen <= 0) {
     hb_errRT_BASE_SubstR(EG_ARG, 1111, SR_NULLPTR, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
@@ -739,7 +739,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
     for (i = 1; i <= cols; i++) {
       HB_ITEM temp{};
       bOut = SR_NULLPTR;
-      lInitBuff = (HB_LONG)lLen;
+      lInitBuff = static_cast<HB_LONG>(lLen);
       lLenOut = 0;
       iReallocs = 0;
       //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
@@ -804,7 +804,7 @@ HB_FUNC_STATIC(SR_NUMRES)
   SQLHSTMT hstmt = SR_PAR_SQLHSTMT(1);
 
   RETCODE wResult = SQLNumResultCols(hstmt, &nCols);
-  hb_stornl((HB_LONG)nCols, 2);
+  hb_stornl(static_cast<HB_LONG>(nCols), 2);
   hb_retni(wResult);
 
   // Execute the SQL statement and return any errors or warnings.
@@ -932,7 +932,7 @@ HB_FUNC_STATIC(SR_COLATTRIBUTE)
 
   if (wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO) {
     // hb_storclen((LPSTR) bBuffer, static_cast<int>(wBufLen), 4);
-    // hb_stornl((HB_LONG) wBufLen, 6);
+    // hb_stornl(static_cast<HB_LONG>(wBufLen), 6);
     hb_stornint(wNumPtr, 7);
   }
 
@@ -975,8 +975,8 @@ HB_FUNC_STATIC(SR_GETINFO)
 
 HB_FUNC_STATIC(SR_SETCONNECTATTR)
 {
-  // hb_retnl((HB_LONG) SQLSetConnectAttr((SQLHDBC) hb_parptr(1), (UWORD) hb_parnl(2),
-  //    (HB_ULONG) HB_ISCHAR(3) ? static_cast<SQLPOINTER>(hb_parcx(3)) : static_cast<SQLPOINTER>(hb_parnl(3)), hb_parni(4)));
+  // hb_retnl(static_cast<HB_LONG>(SQLSetConnectAttr((SQLHDBC) hb_parptr(1), (UWORD) hb_parnl(2),
+  //    (HB_ULONG) HB_ISCHAR(3) ? static_cast<SQLPOINTER>(hb_parcx(3)) : static_cast<SQLPOINTER>(hb_parnl(3)), hb_parni(4))));
 #if ODBCVER >= 0x0300
   hb_retni(SQLSetConnectAttr(SR_PAR_SQLHDBC(1), SR_PAR_SQLINTEGER(2),
                              HB_ISCHAR(3) ? static_cast<SQLPOINTER>(const_cast<char *>(hb_parc(3))) : reinterpret_cast<SQLPOINTER>((HB_PTRUINT)hb_parnint(3)),

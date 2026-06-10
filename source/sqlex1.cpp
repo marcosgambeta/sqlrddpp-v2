@@ -919,7 +919,7 @@ static void FeedCurrentRecordToBindings(SQLEXAREAP thiswa)
         newFieldData = true;
       }
 
-      if (IndexBind->lFieldPosDB == (HB_LONG)(thiswa->ulhRecno)) {
+      if (IndexBind->lFieldPosDB == static_cast<HB_LONG>(thiswa->ulhRecno)) {
         hb_itemPutNL(pFieldData, thiswa->recordList[thiswa->recordListPos]);
       }
 
@@ -1265,7 +1265,7 @@ static HB_ERRCODE getWhereExpression(SQLEXAREAP thiswa, int iListType)
           pFieldData = hb_arrayGetItemPtr(thiswa->aBuffer, BindStructure->lFieldPosWA);
         }
 
-        if (BindStructure->lFieldPosDB == (HB_LONG)(thiswa->ulhRecno)) {
+        if (BindStructure->lFieldPosDB == static_cast<HB_LONG>(thiswa->ulhRecno)) {
           pTemp = hb_itemNew(SR_NULLPTR);
           hb_itemPutNL(pTemp, thiswa->recordList[thiswa->recordListPos]);
           pFieldData = pTemp;
@@ -1743,7 +1743,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
   // Check for maximum buffer pool size
 
-  if (((HB_LONG)hb_hashLen(thiswa->hBufferPool)) > s_bufferPoolSize) {
+  if ((static_cast<HB_LONG>(hb_hashLen(thiswa->hBufferPool))) > s_bufferPoolSize) {
     hb_hashNew(thiswa->hBufferPool);
     hb_hashPreallocate(thiswa->hBufferPool, (HB_ULONG)(s_bufferPoolSize * 1.2));
   }
@@ -1851,7 +1851,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
     iIndex = 1; // Recno is the 1st so we have 1 position offset
 
     if (thiswa->ulhDeleted > 0) {
-      if (((HB_LONG)(thiswa->recordList[thiswa->recordListPos])) == lCurrRecord) {
+      if ((static_cast<HB_LONG>(thiswa->recordList[thiswa->recordListPos])) == lCurrRecord) {
         SQLCHAR szValue[2];
         res = SQLGetData(thiswa->hStmtBuffer, 2, SQL_C_CHAR, szValue, 2, SR_NULLPTR);
         if (res == SQL_ERROR) {
@@ -1908,7 +1908,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 #endif
 
     // Feeds current record when it is found
-    if (((HB_LONG)(thiswa->recordList[thiswa->recordListPos])) == lCurrRecord) {
+    if ((static_cast<HB_LONG>(thiswa->recordList[thiswa->recordListPos])) == lCurrRecord) {
       hb_arrayCopy(aRecord, thiswa->aBuffer, SR_NULLPTR, SR_NULLPTR, SR_NULLPTR);
     }
     hb_itemRelease(aRecord);
@@ -2167,7 +2167,7 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREAP thiswa)
   }
 
   if (thiswa->lEofAt) {
-    SELF_GOTO((AREAP)thiswa, (HB_LONG)thiswa->lEofAt);
+    SELF_GOTO((AREAP)thiswa, static_cast<HB_LONG>(thiswa->lEofAt));
     if (thiswa->bReverseIndex != s_bOldReverseIndex) {
       thiswa->recordListDirection = LIST_BACKWARD;
       SR_getOrderByExpression(thiswa, false);
@@ -2319,7 +2319,7 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREAP thiswa)
   }
 
   if (thiswa->lBofAt) {
-    SELF_GOTO((AREAP)thiswa, (HB_LONG)thiswa->lBofAt);
+    SELF_GOTO((AREAP)thiswa, static_cast<HB_LONG>(thiswa->lBofAt));
     if (thiswa->bReverseIndex != s_bOldReverseIndex) {
       thiswa->recordListDirection = LIST_FORWARD;
       SR_getOrderByExpression(thiswa, false);
@@ -2935,13 +2935,13 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
 
   if (HB_IS_NIL(itemTemp)) {
     getMissingColumn(thiswa, hb_arrayGetItemPtr(thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1]),
-                     (HB_LONG)(thiswa->uiBufferIndex[fieldNum - 1]));
+                     static_cast<HB_LONG>(thiswa->uiBufferIndex[fieldNum - 1]));
     hb_itemRelease(itemTemp);
     itemTemp = hb_itemArrayGet(thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1]);
   }
   if (HB_IS_STRING(itemTemp)) {
     char *bBuffer = (char *)hb_itemGetCPtr(itemTemp); // const char * to char *
-    HB_LONG lLenBuff = (HB_LONG)hb_itemGetCLen(itemTemp);
+    HB_LONG lLenBuff = static_cast<HB_LONG>(hb_itemGetCLen(itemTemp));
     PHB_ITEM pTemp;
     if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
       if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
@@ -3725,7 +3725,7 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREAP thiswa, HB_USHORT uiIndex, LPDBORDER
 
   HB_TRACE(HB_TR_DEBUG, ("sqlExOrderInfo(%p, %hu, %p)", thiswa, uiIndex, pInfo));
 
-  lIndexes = (HB_LONG)hb_itemSize(thiswa->aOrders);
+  lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
 
   if (lIndexes) {
     switch (uiIndex) {
@@ -4227,7 +4227,7 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
     valbuf = (char *)hb_xgrab(9);
     val2 = hb_itemGetDS(pKey, valbuf);
   } else if (HB_IS_NUMBER(pKey)) {
-    PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, (HB_LONG)len1);
+    PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, static_cast<HB_LONG>(len1));
     val2 = valbuf = hb_itemStr(pKey, pLen, SR_NULLPTR);
     len2 = (HB_BYTE)strlen(val2);
     hb_itemRelease(pLen);
@@ -4250,7 +4250,7 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
   case HB_IT_INTEGER:
   case HB_IT_LONG:
   case HB_IT_DOUBLE: {
-    PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, (HB_LONG)len1);
+    PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, static_cast<HB_LONG>(len1));
     val2 = valbuf = hb_itemStr(pKey, pLen, SR_NULLPTR);
     len2 = (HB_BYTE)strlen(val2);
     hb_itemRelease(pLen);

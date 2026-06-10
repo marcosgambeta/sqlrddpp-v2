@@ -589,7 +589,7 @@ static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
     valbuf = (char *)hb_xgrab(9);
     val2 = hb_itemGetDS(pKey, valbuf);
   } else if (HB_IS_NUMBER(pKey)) {
-    PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, (HB_LONG)len1);
+    PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, static_cast<HB_LONG>(len1));
     val2 = valbuf = hb_itemStr(pKey, pLen, SR_NULLPTR);
     len2 = (HB_BYTE)strlen(val2);
     hb_itemRelease(pLen);
@@ -986,7 +986,7 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip)
       hb_arraySetL(thiswa->aInfo, AINFO_EOF, bEof);
       return ConcludeSkipraw(thiswa, lToSkip);
     } else if (hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE) + lToSkip > 0 &&
-               hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE) + lToSkip <= (HB_LONG)hb_arrayLen(thiswa->aCache)) {
+               hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE) + lToSkip <= static_cast<HB_LONG>(hb_arrayLen(thiswa->aCache))) {
       sqlGetBufferFromCache2(thiswa, hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE) + lToSkip);
       hb_arraySetL(thiswa->aInfo, AINFO_BOF, false);
       hb_arraySetL(thiswa->aInfo, AINFO_EOF, false);
@@ -1006,7 +1006,7 @@ static HB_ERRCODE sqlSkipRaw(SQLAREAP thiswa, HB_LONG lToSkip)
       thiswa->area.fBof = true;
       thiswa->area.fEof = false;
       return ConcludeSkipraw(thiswa, lToSkip);
-    } else if (hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE) + lToSkip > (HB_LONG)hb_arrayLen(thiswa->aCache)) {
+    } else if (hb_arrayGetNL(thiswa->aInfo, AINFO_NPOSCACHE) + lToSkip > static_cast<HB_LONG>(hb_arrayLen(thiswa->aCache))) {
       hb_arraySetL(thiswa->aInfo, AINFO_BOF, false);
       sqlGetCleanBuffer(thiswa);
     }
@@ -2669,7 +2669,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
   }
   }
 
-  lIndexes = (HB_LONG)hb_itemSize(thiswa->aOrders);
+  lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
 
   if (lIndexes) {
     // Exists opened orders ?
@@ -2989,7 +2989,7 @@ static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem
   // SR_TraceLog(SR_NULLPTR, "sqlScopeInfo, nScope: %i\n", nScope);
 
   hb_itemClear(pItem);
-  lIndexes = (HB_LONG)hb_itemSize(thiswa->aOrders);
+  lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
 
   if (lIndexes) {
     // Exists opened orders ?
@@ -3359,7 +3359,7 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
     return false;
   }
 
-  numFields = (HB_LONG)hb_itemSize(thiswa->aStruct);
+  numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));
@@ -3465,7 +3465,7 @@ static HB_BOOL SetFields(SQLAREAP thiswa)
     return false;
   }
 
-  numFields = (HB_LONG)hb_itemSize(thiswa->aStruct);
+  numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));

@@ -462,7 +462,7 @@ HB_FUNC_STATIC(SR_PGSQUERYATTR)
     // nullable = PQgetisnull(session->stmt, row,PQfnumber(session->stmt, PQfname(session->stmt, row)));
 
     if (typmod < 0L) {
-      typmod = (HB_LONG)PQfsize(session->stmt, row);
+      typmod = static_cast<HB_LONG>(PQfsize(session->stmt, row));
     }
 /*
 #if 0
@@ -1036,7 +1036,7 @@ HB_FUNC_STATIC(SR_PGSLINEPROCESSED)
     return;
   }
 
-  cols = (HB_LONG)hb_arrayLen(pFields);
+  cols = static_cast<HB_LONG>(hb_arrayLen(pFields));
 
   for (i = 0; i < cols; i++) {
     //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)

@@ -539,7 +539,7 @@ HB_FUNC_STATIC(SR_MYSRESULTSTATUS)
     break;
   }
   }
-  hb_retnl((HB_LONG)ret);
+  hb_retnl(static_cast<HB_LONG>(ret));
 }
 
 //----------------------------------------------------------------------------//

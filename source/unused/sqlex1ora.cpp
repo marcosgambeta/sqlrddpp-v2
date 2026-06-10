@@ -949,7 +949,7 @@ static void FeedCurrentRecordToBindings(SQLEXORAAREAP thiswa)
         newFieldData = true;
       }
 
-      if (IndexBind->lFieldPosDB == (HB_LONG)(thiswa->sqlarea.ulhRecno)) {
+      if (IndexBind->lFieldPosDB == static_cast<HB_LONG>(thiswa->sqlarea.ulhRecno)) {
         hb_itemPutNLL(pFieldData, thiswa->recordList[thiswa->recordListPos]);
       }
 
@@ -1269,7 +1269,7 @@ static HB_ERRCODE getWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType)
           pFieldData = hb_arrayGetItemPtr(thiswa->sqlarea.aBuffer, (HB_SIZE)BindStructure->lFieldPosWA);
         }
 
-        if (BindStructure->lFieldPosDB == (HB_LONG)(thiswa->sqlarea.ulhRecno)) {
+        if (BindStructure->lFieldPosDB == static_cast<HB_LONG>(thiswa->sqlarea.ulhRecno)) {
           pTemp = hb_itemNew(SR_NULLPTR);
           hb_itemPutNLL(pTemp, thiswa->recordList[thiswa->recordListPos]);
           pFieldData = pTemp;
@@ -2244,7 +2244,7 @@ static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
   }
 
   if (thiswa->lEofAt) {
-    SELF_GOTO(&thiswa->sqlarea.area, (HB_LONG)thiswa->lEofAt);
+    SELF_GOTO(&thiswa->sqlarea.area, static_cast<HB_LONG>(thiswa->lEofAt));
     if (thiswa->bReverseIndex != bOldReverseIndex) {
       thiswa->recordListDirection = LIST_BACKWARD;
       getOrderByExpressionOra(thiswa, false);
@@ -2394,7 +2394,7 @@ static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
   }
 
   if (thiswa->lBofAt) {
-    SELF_GOTO(&thiswa->sqlarea.area, (HB_LONG)thiswa->lBofAt);
+    SELF_GOTO(&thiswa->sqlarea.area, static_cast<HB_LONG>(thiswa->lBofAt));
     if (thiswa->bReverseIndex != bOldReverseIndex) {
       thiswa->recordListDirection = LIST_FORWARD;
       getOrderByExpressionOra(thiswa, false);
@@ -3004,7 +3004,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
 
   if (HB_IS_NIL(itemTemp)) {
     getMissingColumn(thiswa, hb_arrayGetItemPtr(thiswa->sqlarea.aBuffer, thiswa->sqlarea.uiBufferIndex[fieldNum - 1]),
-                     (HB_LONG)(thiswa->sqlarea.uiBufferIndex[fieldNum - 1]));
+                     static_cast<HB_LONG>(thiswa->sqlarea.uiBufferIndex[fieldNum - 1]));
     hb_itemRelease(itemTemp);
     itemTemp = hb_itemArrayGet(thiswa->sqlarea.aBuffer, thiswa->sqlarea.uiBufferIndex[fieldNum - 1]);
   }
@@ -4137,7 +4137,7 @@ static int sqlKeyCompareEx(SQLEXORAAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
     valbuf = (char *)hb_xgrab(9);
     val2 = hb_itemGetDS(pKey, valbuf);
   } else if (HB_IS_NUMBER(pKey)) {
-    PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, (HB_LONG)len1);
+    PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, static_cast<HB_LONG>(len1));
     val2 = valbuf = hb_itemStr(pKey, pLen, SR_NULLPTR);
     len2 = (HB_SIZE)strlen(val2);
     hb_itemRelease(pLen);
