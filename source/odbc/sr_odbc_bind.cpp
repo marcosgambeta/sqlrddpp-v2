@@ -878,7 +878,7 @@ HB_FUNC_STATIC(SR_DESCRIB)
   SQLSMALLINT lLen = SR_PAR_SQLSMALLINT(4);
   SQLSMALLINT wBufLen = SR_PAR_SQLSMALLINT(5);
   SQLSMALLINT wDataType = SR_PAR_SQLSMALLINT(6);
-  SQLULEN wColSize = (SQLULEN)hb_parnint(7);
+  SQLULEN wColSize = static_cast<SQLULEN>(hb_parnint(7));
   SQLSMALLINT wDecimals = SR_PAR_SQLSMALLINT(8);
   SQLSMALLINT wNullable = SR_PAR_SQLSMALLINT(9);
   // SQLTCHAR bBuffer[128] = {0};
@@ -983,7 +983,7 @@ HB_FUNC_STATIC(SR_SETCONNECTATTR)
                              HB_ISCHAR(3) ? static_cast<SQLINTEGER>(hb_parclen(3)) : static_cast<SQLINTEGER>(SQL_IS_INTEGER)));
 #else
   hb_retni(SQLSetConnectOption(SR_PAR_SQLHDBC(1), SR_PAR_SQLUSMALLINT(2),
-                               HB_ISCHAR(3) ? (SQLULEN)hb_parc(3) : (SQLULEN)hb_parnl(3)));
+                               HB_ISCHAR(3) ? static_cast<SQLULEN>(hb_parc(3)) : static_cast<SQLULEN>(hb_parnl(3))));
 #endif
 }
 
@@ -1011,7 +1011,7 @@ HB_FUNC_STATIC(SR_SETSTMTOPTION)
                           HB_ISCHAR(3) ? static_cast<SQLINTEGER>(hb_parclen(3)) : static_cast<SQLINTEGER>(SQL_IS_INTEGER)));
 #else
   hb_retni(SQLSetStmtOption(SR_PAR_SQLHSTMT(1), SR_PAR_SQLINTEGER(2),
-                            HB_ISCHAR(3) ? (SQLULEN)hb_parc(3) : (SQLULEN)hb_parnl(3)));
+                            HB_ISCHAR(3) ? static_cast<SQLULEN>(hb_parc(3)) : static_cast<SQLULEN>(hb_parnl(3))));
 #endif
 }
 
