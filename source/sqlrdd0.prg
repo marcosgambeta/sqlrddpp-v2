@@ -2356,6 +2356,8 @@ FUNCTION SR_DetectDBFromDSN(cConnect)
       CASE cBuff == "MARIA"
          //RETURN CONNECT_MARIA (deprecated)
          RETURN CONNECT_MARIADB
+      CASE cBuff == "MARIADB"
+         RETURN CONNECT_MARIADB
       CASE cBuff == "FB" .OR. ;
            cBuff == "FIREBIRD" .OR. ;
            cBuff == "IB"
@@ -2384,6 +2386,7 @@ FUNCTION SR_DetectDBFromDSN(cConnect)
       CASE "MYSQL"
          RETURN CONNECT_MYSQL
       CASE "MARIA"
+      CASE "MARIADB"
          //RETURN CONNECT_MARIA (deprecated)
          RETURN CONNECT_MARIADB
       CASE "FB"
