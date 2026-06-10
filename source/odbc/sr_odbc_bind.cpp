@@ -951,7 +951,7 @@ HB_FUNC_STATIC(SR_ERROR)
   SQLSMALLINT wLen;
 
   hb_retni(SQLError(SR_PAR_SQLHENV(1), SR_PAR_SQLHDBC(2), SR_PAR_SQLHSTMT(3), (SQLTCHAR *)bBuffer1,
-                    (SQLINTEGER *)&lError, (SQLTCHAR *)szErrorMsg, static_cast<SQLSMALLINT>(HB_SIZEOFARRAY(szErrorMsg)),
+                    static_cast<SQLINTEGER *>(&lError), (SQLTCHAR *)szErrorMsg, static_cast<SQLSMALLINT>(HB_SIZEOFARRAY(szErrorMsg)),
                     static_cast<SQLSMALLINT *>(&wLen)));
 
   hb_storc((char *)bBuffer1, 4);
@@ -1024,7 +1024,7 @@ HB_FUNC_STATIC(SR_GETCONNECTOPTION)
   SQLINTEGER lLen = 0;
   buffer[0] = SR_NULLPTR;
   hb_retni(SQLGetConnectAttr(SR_PAR_SQLHDBC(1), SR_PAR_SQLINTEGER(2), static_cast<SQLPOINTER>(buffer),
-                             static_cast<SQLINTEGER>(sizeof(buffer)), (SQLINTEGER *)&lLen));
+                             static_cast<SQLINTEGER>(sizeof(buffer)), static_cast<SQLINTEGER *>(&lLen)));
   hb_storclen((char *)buffer, lLen, 3);
 #else
   HB_BYTE bBuffer[512] = {0};
@@ -1069,7 +1069,7 @@ void SR_odbcErrorDiag(SQLHSTMT hStmt, const char *routine, const char *szSql, in
   Msg[0] = '\0';
 
   i = 1;
-  while ((SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, static_cast<SQLSMALLINT>(i), (SQLTCHAR *)SqlState, (SQLINTEGER *)&NativeError,
+  while ((SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, static_cast<SQLSMALLINT>(i), (SQLTCHAR *)SqlState, static_cast<SQLINTEGER *>(&NativeError),
                         (SQLTCHAR *)Msg, static_cast<SQLSMALLINT>(sizeof(Msg)), static_cast<SQLSMALLINT *>(&MsgLen))) != SQL_NO_DATA) {
     i++;
   }
