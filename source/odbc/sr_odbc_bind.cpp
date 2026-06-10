@@ -104,7 +104,7 @@ typedef unsigned char SQLTCHAR;
 #define SR_PAR_SQLHDBC(n) (SQLHDBC)hb_parptr(n)
 #define SR_PAR_SQLHENV(n) (SQLHENV)hb_parptr(n)
 #define SR_PAR_SQLHSTMT(n) (SQLHSTMT)hb_parptr(n)
-#define SR_PAR_SQLINTEGER(n) (SQLINTEGER)hb_parnl(n)
+#define SR_PAR_SQLINTEGER(n) static_cast<SQLINTEGER>(hb_parnl(n))
 #define SR_PAR_SQLSMALLINT(n) (SQLSMALLINT)hb_parni(n)
 #define SR_PAR_SQLUSMALLINT(n) (SQLUSMALLINT)hb_parni(n)
 
@@ -314,7 +314,7 @@ HB_FUNC_STATIC(SR_FREESTM)
 
 HB_FUNC_STATIC(SR_EXECDIR)
 {
-  hb_retni(SQLExecDirect(SR_PAR_SQLHSTMT(1), reinterpret_cast<SQLCHAR *>(const_cast<char *>(hb_parcx(2))), (SQLINTEGER)hb_parclen(2)));
+  hb_retni(SQLExecDirect(SR_PAR_SQLHSTMT(1), reinterpret_cast<SQLCHAR *>(const_cast<char *>(hb_parcx(2))), static_cast<SQLINTEGER>(hb_parclen(2))));
 }
 
 //----------------------------------------------------------------------------//
@@ -980,7 +980,7 @@ HB_FUNC_STATIC(SR_SETCONNECTATTR)
 #if ODBCVER >= 0x0300
   hb_retni(SQLSetConnectAttr(SR_PAR_SQLHDBC(1), SR_PAR_SQLINTEGER(2),
                              HB_ISCHAR(3) ? (SQLPOINTER)hb_parc(3) : (SQLPOINTER)(HB_PTRUINT)hb_parnint(3),
-                             HB_ISCHAR(3) ? (SQLINTEGER)hb_parclen(3) : (SQLINTEGER)SQL_IS_INTEGER));
+                             HB_ISCHAR(3) ? static_cast<SQLINTEGER>(hb_parclen(3)) : static_cast<SQLINTEGER>(SQL_IS_INTEGER)));
 #else
   hb_retni(SQLSetConnectOption(SR_PAR_SQLHDBC(1), SR_PAR_SQLUSMALLINT(2),
                                HB_ISCHAR(3) ? (SQLULEN)hb_parc(3) : (SQLULEN)hb_parnl(3)));
@@ -994,7 +994,7 @@ HB_FUNC_STATIC(SR_SETCONNECTOPTION)
 #if ODBCVER >= 0x0300
   hb_retni(SQLSetConnectAttr(SR_PAR_SQLHDBC(1), SR_PAR_SQLINTEGER(2),
                              HB_ISCHAR(3) ? (SQLPOINTER)hb_parc(3) : (SQLPOINTER)(HB_PTRUINT)hb_parnint(3),
-                             HB_ISCHAR(3) ? (SQLINTEGER)hb_parclen(3) : (SQLINTEGER)SQL_IS_INTEGER));
+                             HB_ISCHAR(3) ? static_cast<SQLINTEGER>(hb_parclen(3)) : static_cast<SQLINTEGER>(SQL_IS_INTEGER)));
 #else
   hb_retni(SQLSetConnectOption(SR_PAR_SQLHDBC(1), SR_PAR_SQLINTEGER(2),
                                HB_ISCHAR(3) ? (SQLPOINTER)hb_parc(3) : (SQLPOINTER)(HB_PTRUINT)hb_parnint(3)));
@@ -1008,7 +1008,7 @@ HB_FUNC_STATIC(SR_SETSTMTOPTION)
 #if ODBCVER >= 0x0300
   hb_retni(SQLSetStmtAttr(SR_PAR_SQLHSTMT(1), SR_PAR_SQLINTEGER(2),
                           HB_ISCHAR(3) ? (SQLPOINTER)hb_parc(3) : (SQLPOINTER)(HB_PTRUINT)hb_parnint(3),
-                          HB_ISCHAR(3) ? (SQLINTEGER)hb_parclen(3) : (SQLINTEGER)SQL_IS_INTEGER));
+                          HB_ISCHAR(3) ? static_cast<SQLINTEGER>(hb_parclen(3)) : static_cast<SQLINTEGER>(SQL_IS_INTEGER)));
 #else
   hb_retni(SQLSetStmtOption(SR_PAR_SQLHSTMT(1), SR_PAR_SQLINTEGER(2),
                             HB_ISCHAR(3) ? (SQLULEN)hb_parc(3) : (SQLULEN)hb_parnl(3)));
@@ -1024,7 +1024,7 @@ HB_FUNC_STATIC(SR_GETCONNECTOPTION)
   SQLINTEGER lLen = 0;
   buffer[0] = SR_NULLPTR;
   hb_retni(SQLGetConnectAttr(SR_PAR_SQLHDBC(1), SR_PAR_SQLINTEGER(2), (SQLPOINTER)buffer,
-                             (SQLINTEGER)sizeof(buffer), (SQLINTEGER *)&lLen));
+                             static_cast<SQLINTEGER>(sizeof(buffer)), (SQLINTEGER *)&lLen));
   hb_storclen((char *)buffer, lLen, 3);
 #else
   HB_BYTE bBuffer[512] = {0};

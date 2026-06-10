@@ -446,7 +446,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
       case SQL_C_BINARY: {
         SQLINTEGER nInd;
         InsertRecord->lIndPtr = SQL_NTS;
-        nInd = (SQLINTEGER)strlen((const char *)(InsertRecord->asChar.value));
+        nInd = static_cast<SQLINTEGER>(strlen((const char *)(InsertRecord->asChar.value)));
         res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
                                InsertRecord->asChar.size_alloc, 0, InsertRecord->asChar.value, nInd,
                                &(InsertRecord->lIndPtr));
@@ -746,7 +746,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
       case SQL_C_BINARY: {
         SQLINTEGER nInd;
         CurrRecord->lIndPtr = SQL_NTS;
-        nInd = (SQLINTEGER)strlen((const char *)(CurrRecord->asChar.value));
+        nInd = static_cast<SQLINTEGER>(strlen((const char *)(CurrRecord->asChar.value)));
         res =
             SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
                              CurrRecord->asChar.size_alloc, 0, CurrRecord->asChar.value, nInd, &(CurrRecord->lIndPtr));
