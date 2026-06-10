@@ -437,7 +437,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
       switch (InsertRecord->iCType) {
       case SQL_C_CHAR: {
         InsertRecord->lIndPtr = SQL_NTS;
-        res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT,
+        res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT,
                                static_cast<SQLSMALLINT>(InsertRecord->iCType), static_cast<SQLSMALLINT>(InsertRecord->iSQLType),
                                InsertRecord->ColumnSize, InsertRecord->DecimalDigits, InsertRecord->asChar.value, 0,
                                &(InsertRecord->lIndPtr));
@@ -447,14 +447,14 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
         SQLINTEGER nInd;
         InsertRecord->lIndPtr = SQL_NTS;
         nInd = static_cast<SQLINTEGER>(strlen((const char *)(InsertRecord->asChar.value)));
-        res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
+        res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
                                InsertRecord->asChar.size_alloc, 0, InsertRecord->asChar.value, nInd,
                                &(InsertRecord->lIndPtr));
         break;
       }
       case SQL_C_DOUBLE: {
         InsertRecord->lIndPtr = 0;
-        res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT,
+        res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT,
                                static_cast<SQLSMALLINT>(InsertRecord->iCType), static_cast<SQLSMALLINT>(InsertRecord->iSQLType),
                                InsertRecord->ColumnSize, InsertRecord->DecimalDigits, &(InsertRecord->asNumeric), 0,
                                &(InsertRecord->lIndPtr));
@@ -463,7 +463,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
       case SQL_C_TYPE_TIMESTAMP: {
         // DebugBreak();
         InsertRecord->lIndPtr = 0;
-        res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_TYPE_TIMESTAMP,
+        res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_TYPE_TIMESTAMP,
                                SQL_TYPE_TIMESTAMP, SQL_TIMESTAMP_LEN,
                                thiswa->nSystemID == SQLRDD_RDBMS_MSSQL7 || thiswa->nSystemID == SQLRDD_RDBMS_AZURE ? 3 : 0,
                                &(InsertRecord->asTimestamp), 0, &(InsertRecord->lIndPtr));
@@ -471,12 +471,12 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
       }
       case SQL_C_TYPE_DATE: {
         InsertRecord->lIndPtr = 0;
-        res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_TYPE_DATE,
+        res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_TYPE_DATE,
                                SQL_TYPE_DATE, SQL_DATE_LEN, 0, &(InsertRecord->asDate), 0, &(InsertRecord->lIndPtr));
         break;
       }
       case SQL_C_BIT: {
-        res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT,
+        res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT,
                                static_cast<SQLSMALLINT>(InsertRecord->iCType), static_cast<SQLSMALLINT>(InsertRecord->iSQLType),
                                InsertRecord->ColumnSize, InsertRecord->DecimalDigits, &(InsertRecord->asLogical), 0,
                                SR_NULLPTR);
@@ -738,7 +738,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
       case SQL_C_CHAR: {
         CurrRecord->lIndPtr = SQL_NTS;
         res =
-            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
+            SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
                              static_cast<SQLSMALLINT>(CurrRecord->iSQLType), CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
                              CurrRecord->asChar.value, 0, &(CurrRecord->lIndPtr));
         break;
@@ -748,14 +748,14 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
         CurrRecord->lIndPtr = SQL_NTS;
         nInd = static_cast<SQLINTEGER>(strlen((const char *)(CurrRecord->asChar.value)));
         res =
-            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
+            SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
                              CurrRecord->asChar.size_alloc, 0, CurrRecord->asChar.value, nInd, &(CurrRecord->lIndPtr));
         break;
       }
       case SQL_C_DOUBLE: {
         CurrRecord->lIndPtr = 0;
         res =
-            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
+            SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
                              static_cast<SQLSMALLINT>(CurrRecord->iSQLType), CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
                              &(CurrRecord->asNumeric), 0, &(CurrRecord->lIndPtr));
         break;
@@ -763,7 +763,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
       case SQL_C_TYPE_TIMESTAMP: {
         // DebugBreak();
         CurrRecord->lIndPtr = 0;
-        res = SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_TYPE_TIMESTAMP,
+        res = SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_TYPE_TIMESTAMP,
                                SQL_TYPE_TIMESTAMP, SQL_TIMESTAMP_LEN,
                                thiswa->nSystemID == SQLRDD_RDBMS_MSSQL7 || thiswa->nSystemID == SQLRDD_RDBMS_AZURE ? 3 : 0,
                                &(CurrRecord->asTimestamp), 0, &(CurrRecord->lIndPtr));
@@ -771,13 +771,13 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
       }
       case SQL_C_TYPE_DATE: {
         CurrRecord->lIndPtr = 0;
-        res = SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_TYPE_DATE,
+        res = SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_TYPE_DATE,
                                SQL_TYPE_DATE, SQL_DATE_LEN, 0, &(CurrRecord->asDate), 0, &(CurrRecord->lIndPtr));
         break;
       }
       case SQL_C_BIT: {
         res =
-            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
+            SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
                              static_cast<SQLSMALLINT>(CurrRecord->iSQLType), CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
                              &(CurrRecord->asLogical), 0, SR_NULLPTR);
         break; // TODO: unnecessary break
@@ -803,7 +803,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
   sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = ?", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
           CLOSE_QUALIFIER(thiswa));
   hb_xfree(temp);
-  res = SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)++iBind, SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0,
+  res = SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(++iBind), SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0,
                          &(thiswa->lUpdatedRecord), 0, SR_NULLPTR);
   if (CHECK_SQL_N_OK(res)) {
     SR_odbcErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);

@@ -533,7 +533,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
       BindStructure->lIndPtr = SQL_NTS;
 
       // Pointer may be changed during realloc, so parameter should be re-bound
-      res = SQLBindParameter(hStmt, (SQLUSMALLINT)BindStructure->iParNum, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
+      res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(BindStructure->iParNum), SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
                              BindStructure->asChar.size_alloc, 0, BindStructure->asChar.value, 0,
                              &(BindStructure->lIndPtr));
 
@@ -584,8 +584,8 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
 
     hb_dateDecode(hb_itemGetDL(pFieldData), &iYear, &iMonth, &iDay);
     BindStructure->asDate.year = static_cast<SQLSMALLINT>(iYear);
-    BindStructure->asDate.month = (SQLUSMALLINT)iMonth;
-    BindStructure->asDate.day = (SQLUSMALLINT)iDay;
+    BindStructure->asDate.month = static_cast<SQLUSMALLINT>(iMonth);
+    BindStructure->asDate.day = static_cast<SQLUSMALLINT>(iDay);
     break;
   }
   case SQL_C_TYPE_TIMESTAMP: {
@@ -618,11 +618,11 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
       hb_timeDecode(lMilliSec, &iHour, &iMinute, &seconds, &millisec);
 #endif
       BindStructure->asTimestamp.year = static_cast<SQLSMALLINT>(iYear);
-      BindStructure->asTimestamp.month = (SQLUSMALLINT)iMonth;
-      BindStructure->asTimestamp.day = (SQLUSMALLINT)iDay;
-      BindStructure->asTimestamp.hour = (SQLUSMALLINT)iHour;
-      BindStructure->asTimestamp.minute = (SQLUSMALLINT)iMinute;
-      BindStructure->asTimestamp.second = (SQLUSMALLINT)seconds;
+      BindStructure->asTimestamp.month = static_cast<SQLUSMALLINT>(iMonth);
+      BindStructure->asTimestamp.day = static_cast<SQLUSMALLINT>(iDay);
+      BindStructure->asTimestamp.hour = static_cast<SQLUSMALLINT>(iHour);
+      BindStructure->asTimestamp.minute = static_cast<SQLUSMALLINT>(iMinute);
+      BindStructure->asTimestamp.second = static_cast<SQLUSMALLINT>(seconds);
       BindStructure->asTimestamp.fraction = 0;
     }
     break;
@@ -837,13 +837,13 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
         if (!BindStructure->isArgumentNull) {
           switch (BindStructure->iCType) {
           case SQL_C_CHAR: {
-            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+            res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
                                    static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                    BindStructure->DecimalDigits, BindStructure->asChar.value, 0, SR_NULLPTR);
             break;
           }
           case SQL_C_DOUBLE: {
-            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+            res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
                                    static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                    BindStructure->DecimalDigits, &(BindStructure->asNumeric), 0, SR_NULLPTR);
             break;
@@ -860,19 +860,19 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
             //                        &(BindStructure->asTimestamp),
             //                        0,
             //                        0);
-            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_TYPE_TIMESTAMP,
+            res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_TYPE_TIMESTAMP,
                                    SQL_TYPE_TIMESTAMP, SQL_TIMESTAMP_LEN,
                                    thiswa->nSystemID == SQLRDD_RDBMS_MSSQL7 || thiswa->nSystemID == SQLRDD_RDBMS_AZURE ? 3 : 0,
                                    &(BindStructure->asTimestamp), 0, 0);
             break;
           }
           case SQL_C_TYPE_DATE: {
-            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, SQL_C_TYPE_DATE, SQL_TYPE_DATE,
+            res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_TYPE_DATE, SQL_TYPE_DATE,
                                    SQL_DATE_LEN, 0, &(BindStructure->asDate), 0, 0);
             break;
           }
           case SQL_C_BIT: {
-            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+            res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
                                    static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                    BindStructure->DecimalDigits, &(BindStructure->asLogical), 0, SR_NULLPTR);
             break; // TODO: unnecessary break

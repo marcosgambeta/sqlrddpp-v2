@@ -106,7 +106,7 @@ typedef unsigned char SQLTCHAR;
 #define SR_PAR_SQLHSTMT(n) (SQLHSTMT)hb_parptr(n)
 #define SR_PAR_SQLINTEGER(n) static_cast<SQLINTEGER>(hb_parnl(n))
 #define SR_PAR_SQLSMALLINT(n) static_cast<SQLSMALLINT>(hb_parni(n))
-#define SR_PAR_SQLUSMALLINT(n) (SQLUSMALLINT)hb_parni(n)
+#define SR_PAR_SQLUSMALLINT(n) static_cast<SQLUSMALLINT>(hb_parni(n))
 
 #ifdef __XHARBOUR__
 #define HB_LONG LONG
@@ -242,11 +242,11 @@ HB_FUNC_STATIC(SR_DRIVERC)
   RETCODE ret =
       SQLDriverConnect(SR_PAR_SQLHDBC(1), GetDesktopWindow(), reinterpret_cast<SQLCHAR *>(const_cast<char *>(hb_parcx(2))),
                        static_cast<SQLSMALLINT>(strlen(hb_parcx(2))), static_cast<SQLCHAR *>(bBuffer1), static_cast<SQLSMALLINT>(1024), (SQLSMALLINT *)&wLen,
-                       (SQLUSMALLINT)SQL_DRIVER_NOPROMPT); // SQL_DRIVER_COMPLETE);
+                       static_cast<SQLUSMALLINT>(SQL_DRIVER_NOPROMPT)); // SQL_DRIVER_COMPLETE);
 #elif defined(HB_OS_UNIX)
   RETCODE ret =
       SQLDriverConnect(SR_PAR_SQLHDBC(1), 0, static_cast<SQLCHAR *>(hb_parcx(2)), static_cast<SQLSMALLINT>(strlen(hb_parcx(2))),
-                       static_cast<SQLCHAR *>(bBuffer1), static_cast<SQLSMALLINT>(1024), (SQLSMALLINT *)&wLen, (SQLUSMALLINT)SQL_DRIVER_COMPLETE);
+                       static_cast<SQLCHAR *>(bBuffer1), static_cast<SQLSMALLINT>(1024), (SQLSMALLINT *)&wLen, static_cast<SQLUSMALLINT>(SQL_DRIVER_COMPLETE));
 #endif
   hb_storc((char *)bBuffer1, 3);
   hb_retni(ret);
@@ -750,7 +750,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
         hb_arraySetForward(pLine, i, &temp);
       } else {
         do {
-          wResult = SQLGetData(SR_PAR_SQLHSTMT(1), (SQLUSMALLINT)lIndex, static_cast<SQLSMALLINT>(SQL_CHAR), (PTR)bBuffer,
+          wResult = SQLGetData(SR_PAR_SQLHSTMT(1), static_cast<SQLUSMALLINT>(lIndex), static_cast<SQLSMALLINT>(SQL_CHAR), (PTR)bBuffer,
                                (SQLLEN)lLen, (SQLLEN *)&lLenOut);
           if (wResult == SQL_SUCCESS && iReallocs == 0) {
             sr_odbcFieldGet(hb_arrayGetItemPtr(pFields, i), &temp, (char *)bBuffer, lLenOut, 0, ulSystemID, bTranslate);
