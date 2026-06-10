@@ -565,7 +565,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
       break;
     }
 
-    BindStructure->asNumeric = (SQLDOUBLE)hb_itemGetND(pFieldData);
+    BindStructure->asNumeric = static_cast<SQLDOUBLE>(hb_itemGetND(pFieldData));
     break;
   }
   case SQL_C_TYPE_DATE: {
@@ -903,7 +903,7 @@ static void FeedCurrentRecordToBindings(SQLEXAREAP thiswa)
   if (thiswa->hOrdCurrent == 0) {
     // Natural order, pretty simple
     BindStructure = SR_GetBindStruct(thiswa, thiswa->IndexBindings[0]);
-    BindStructure->asNumeric = (SQLDOUBLE)SR_GetCurrentRecordNum(thiswa);
+    BindStructure->asNumeric = static_cast<SQLDOUBLE>(SR_GetCurrentRecordNum(thiswa));
   } else {
     IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
 
@@ -1251,7 +1251,7 @@ static HB_ERRCODE getWhereExpression(SQLEXAREAP thiswa, int iListType)
       sprintf(thiswa->sWhere, "\nWHERE A.%c%s%c %s ?", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
               CLOSE_QUALIFIER(thiswa), bDirectionFWD ? ">=" : "<=");
       BindStructure = SR_GetBindStruct(thiswa, IndexBind);
-      BindStructure->asNumeric = (SQLDOUBLE)SR_GetCurrentRecordNum(thiswa);
+      BindStructure->asNumeric = static_cast<SQLDOUBLE>(SR_GetCurrentRecordNum(thiswa));
       bWhere = true;
     } else {
       for (iCol = 1; iCol <= thiswa->indexLevel; iCol++) {

@@ -452,7 +452,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
       }
       case SQL_C_DOUBLE: {
         size = BindStructure->ColumnSize;
-        BindStructure->asNumeric = (SQLDOUBLE)hb_strVal(szKey, BindStructure->ColumnSize);
+        BindStructure->asNumeric = static_cast<SQLDOUBLE>(hb_strVal(szKey, BindStructure->ColumnSize));
         break;
       }
       case SQL_C_TYPE_TIMESTAMP: {
@@ -531,7 +531,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
         // To Do: Raise RT error
         return HB_FAILURE;
       }
-      BindStructure->asNumeric = (SQLDOUBLE)hb_itemGetND(pKey);
+      BindStructure->asNumeric = static_cast<SQLDOUBLE>(hb_itemGetND(pKey));
     } else if (HB_IS_DATE(pKey) || HB_IS_DATETIME(pKey)) {
       int iYear, iMonth, iDay;
       int iHour, iMinute;
