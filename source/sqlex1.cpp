@@ -628,7 +628,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
     break;
   }
   case SQL_C_BIT: {
-    BindStructure->asLogical = (SQLCHAR)hb_itemGetL(pFieldData);
+    BindStructure->asLogical = static_cast<SQLCHAR>(hb_itemGetL(pFieldData));
     break; // TODO: unnecessary break
   }
   }

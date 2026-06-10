@@ -568,7 +568,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
         // To Do: Raise RT error
         return HB_FAILURE;
       }
-      BindStructure->asLogical = (SQLCHAR)hb_itemGetL(pKey);
+      BindStructure->asLogical = static_cast<SQLCHAR>(hb_itemGetL(pKey));
     }
   }
 
