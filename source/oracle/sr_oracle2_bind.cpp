@@ -483,7 +483,7 @@ HB_FUNC_STATIC(SR_ORACLEINBINDPARAM2)
         hb_timeDecode(plMilliSec, &iHour, &iMin, &iSeconds, &mSec);
 #endif
 #ifdef __XHARBOUR__
-        OCI_DateSetDateTime(Stmt->pLink[iPos].date, iYear, iMonth, iDay, iHour, iMin, (int)dSec);
+        OCI_DateSetDateTime(Stmt->pLink[iPos].date, iYear, iMonth, iDay, iHour, iMin, static_cast<int>(dSec));
 #else
         OCI_DateSetDateTime(Stmt->pLink[iPos].date, iYear, iMonth, iDay, iHour, iMin, iSeconds);
 #endif
@@ -694,9 +694,9 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
       //             sr_escapeNumber(szResult, (HB_ULONG) lLen, (HB_ULONG) lDec, pItem);
       //             hb_itemPutNL(pItem,0);
       if (lDec > 0) {
-        hb_itemPutNDLen(pItem, 0, (int)lLen, (int)lDec);
+        hb_itemPutNDLen(pItem, 0, static_cast<int>(lLen), static_cast<int>(lDec));
       } else {
-        hb_itemPutNIntLen(pItem, 0, (int)lLen);
+        hb_itemPutNIntLen(pItem, 0, static_cast<int>(lLen));
       }
       break;
     }
@@ -741,9 +741,9 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
     case SQL_NUMERIC: {
       if (lDec > 0) {
         lLen -= (lDec + 1);
-        hb_itemPutNDLen(pItem, OCI_GetDouble(rs, iField), (int)lLen, (int)lDec);
+        hb_itemPutNDLen(pItem, OCI_GetDouble(rs, iField), static_cast<int>(lLen), static_cast<int>(lDec));
       } else {
-        hb_itemPutNIntLen(pItem, OCI_GetBigInt(rs, iField), (int)lLen);
+        hb_itemPutNIntLen(pItem, OCI_GetBigInt(rs, iField), static_cast<int>(lLen));
       }
       break;
     }

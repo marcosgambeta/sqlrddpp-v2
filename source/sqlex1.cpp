@@ -467,7 +467,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
   switch (BindStructure->iCType) {
   case SQL_C_CHAR: {
     int nTrim, i;
-    int size = (int)hb_itemGetCLen(pFieldData);
+    int size = static_cast<int>(hb_itemGetCLen(pFieldData));
     const char *pszText = hb_itemGetCPtr(pFieldData);
 
     nTrim = size;
@@ -504,7 +504,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
   }
   case SQL_C_BINARY: {
     int nTrim, i;
-    int size = (int)hb_itemGetCLen(pFieldData);
+    int size = static_cast<int>(hb_itemGetCLen(pFieldData));
     const char *pszText = hb_itemGetCPtr(pFieldData);
 
     nTrim = size;
@@ -686,7 +686,7 @@ void ReleaseInsertRecordStructure(SQLEXAREAP thiswa, int iCols)
   if (thiswa->InsertRecord) {
     int n;
     if (iCols == 0) {
-      iCols = (int)hb_arrayLen(thiswa->aFields);
+      iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
     }
     InsertRecord = thiswa->InsertRecord;
 
@@ -712,7 +712,7 @@ void ReleaseCurrRecordStructure(SQLEXAREAP thiswa, int iCols)
   if (thiswa->CurrRecord) {
     int n;
     if (iCols == 0) {
-      iCols = (int)hb_arrayLen(thiswa->aFields);
+      iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
     }
     CurrRecord = thiswa->CurrRecord;
 
@@ -736,7 +736,7 @@ void ReleaseColStatements(SQLEXAREAP thiswa, int iCols)
   int i;
   if (thiswa->colStmt) {
     if (iCols == 0) {
-      iCols = (int)hb_arrayLen(thiswa->aFields);
+      iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
     }
 
     for (i = 0; i < iCols; i++) {
@@ -1081,7 +1081,7 @@ void SR_SetIndexBindStructure(SQLEXAREAP thiswa)
   if (thiswa->hOrdCurrent > 0) {
     pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
     pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
-    thiswa->indexColumns = (int)hb_arrayLen(pColumns);
+    thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
     // Alloc memory for binding structures
     thiswa->IndexBindings[thiswa->hOrdCurrent] = (INDEXBINDP)hb_xgrab(thiswa->indexColumns * sizeof(INDEXBIND));
@@ -1123,7 +1123,7 @@ void SR_SetCurrRecordStructure(SQLEXAREAP thiswa)
   // HB_BOOL bNullable, bMultiLang, bIsMemo;
   HB_BOOL bMultiLang;
 
-  iCols = (int)hb_arrayLen(thiswa->aFields);
+  iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
   thiswa->CurrRecord = (COLUMNBINDP)hb_xgrab(iCols * sizeof(COLUMNBIND));
   memset(thiswa->CurrRecord, 0, iCols * sizeof(COLUMNBIND));
@@ -1141,7 +1141,7 @@ void SR_SetCurrRecordStructure(SQLEXAREAP thiswa)
       cType = 'M';
     }
 
-    BindStructure->iSQLType = (int)lType;
+    BindStructure->iSQLType = static_cast<int>(lType);
     BindStructure->isNullable = hb_arrayGetL(pFieldStruct, FIELD_NULLABLE);
     BindStructure->isBoundNULL = false;
     BindStructure->isArgumentNull = false;
@@ -1637,7 +1637,7 @@ HB_BOOL SR_getColumnList(SQLEXAREAP thiswa)
       for (n = 1; n <= thiswa->area.uiFieldCount; n++) {
         pField = thiswa->area.lpFields + n - 1;
         fName = (char *)hb_dynsymName((PHB_DYNS)pField->sym);
-        len = (int)strlen(fName);
+        len = static_cast<int>(strlen(fName));
         memset(colName, 0, HB_SYMBOL_NAME_LEN);
         hb_xmemcpy(colName, fName, len);
         colName = SR_QualifyName(colName, thiswa);
@@ -1674,7 +1674,7 @@ HB_BOOL SR_getColumnList(SQLEXAREAP thiswa)
       if (thiswa->uiFieldList[n - 1]) {
         pField = thiswa->area.lpFields + n - 1;
         fName = (char *)hb_dynsymName((PHB_DYNS)pField->sym);
-        len = (int)strlen(fName);
+        len = static_cast<int>(strlen(fName));
         memset(colName, 0, HB_SYMBOL_NAME_LEN);
         hb_xmemcpy(colName, fName, len);
         colName = SR_QualifyName(colName, thiswa);
@@ -2047,7 +2047,7 @@ static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa)
     if (thiswa->hOrdCurrent > 0) {
       pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
       pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
-      thiswa->indexColumns = (int)hb_arrayLen(pColumns);
+      thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
     } else {
       thiswa->indexColumns = 1; // Natural order, RECNO
     }
@@ -2707,8 +2707,8 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREAP thiswa, HB_LONG lToSkip)
     // Cache was unsuccessful, so get a new list from database
 
     if (thiswa->hOrdCurrent > 0) {
-      thiswa->indexColumns = (int)hb_arrayLen(
-          hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent), INDEX_FIELDS));
+      thiswa->indexColumns = static_cast<int>(hb_arrayLen(
+          hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent), INDEX_FIELDS)));
     } else {
       thiswa->indexColumns = 1; // Natural order, RECNO
     }
@@ -2838,10 +2838,10 @@ static HB_ERRCODE sqlExDeleteRec(SQLEXAREAP thiswa)
     if (thiswa->ulhDeleted > 0 && sr_UseDeleteds()) {
       sprintf(thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i", thiswa->sTable, thiswa->sDeletedName,
               thiswa->iTCCompat >= 2 ? '*' : 'T', thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ",
-              thiswa->sRecnoName, (int)SR_GetCurrentRecordNum(thiswa));
+              thiswa->sRecnoName, static_cast<int>(SR_GetCurrentRecordNum(thiswa)));
     } else {
       sprintf(thiswa->sSql, "DELETE FROM %s WHERE %s = %i", thiswa->sTable, thiswa->sRecnoName,
-              (int)SR_GetCurrentRecordNum(thiswa));
+              static_cast<int>(SR_GetCurrentRecordNum(thiswa)));
     }
 
     res = SQLAllocStmt((HDBC)thiswa->hDbc, &(thiswa->hStmt));
@@ -3238,7 +3238,7 @@ static HB_ERRCODE sqlExRecall(SQLEXAREAP thiswa)
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
     sprintf(thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i", thiswa->sTable, thiswa->sDeletedName, ' ',
             thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ", thiswa->sRecnoName,
-            (int)SR_GetCurrentRecordNum(thiswa));
+            static_cast<int>(SR_GetCurrentRecordNum(thiswa)));
 
     res = SQLAllocStmt((HDBC)thiswa->hDbc, &(thiswa->hStmt));
     if (CHECK_SQL_N_OK(res)) {
@@ -3643,8 +3643,8 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
   }
 
   if (thiswa->hOrdCurrent > 0) {
-    thiswa->indexColumns = (int)hb_arrayLen(
-        hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent), INDEX_FIELDS));
+    thiswa->indexColumns = static_cast<int>(hb_arrayLen(
+        hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent), INDEX_FIELDS)));
     s_bOldReverseIndex = thiswa->bReverseIndex;
     thiswa->bReverseIndex = hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX);
     if (thiswa->IndexBindings[thiswa->hOrdCurrent]) {
@@ -3671,7 +3671,7 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
 static HB_ERRCODE sqlExOrderCreate(SQLEXAREAP thiswa, LPDBORDERCREATEINFO pOrderCreateInfo)
 {
   HB_ERRCODE err;
-  int iLen = (int)hb_arrayLen(thiswa->aFields);
+  int iLen = static_cast<int>(hb_arrayLen(thiswa->aFields));
   thiswa->lBofAt = 0;
   thiswa->lEofAt = 0;
   thiswa->indexLevel = -1;
@@ -3682,7 +3682,7 @@ static HB_ERRCODE sqlExOrderCreate(SQLEXAREAP thiswa, LPDBORDERCREATEINFO pOrder
   // (FOR clause or Synthetic Index) all allocated structures for binding
   // columns are now invalid and will GPF when unalloc
 
-  if (iLen != (int)hb_arrayLen(thiswa->aFields)) {
+  if (iLen != static_cast<int>(hb_arrayLen(thiswa->aFields))) {
     // Release structures
     ReleaseColStatements(thiswa, iLen);
     ReleaseInsertRecordStructure(thiswa, iLen);
@@ -3738,7 +3738,7 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREAP thiswa, HB_USHORT uiIndex, LPDBORDER
         SR_odbcErrorDiagRTE(thiswa->hStmt, "OrdKeyCount", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
         uiError = HB_FAILURE;
       } else {
-        pInfo->itmResult = hb_itemPutNI(pInfo->itmResult, (int)lValue);
+        pInfo->itmResult = hb_itemPutNI(pInfo->itmResult, static_cast<int>(lValue));
         uiError = HB_SUCCESS;
       }
       break;

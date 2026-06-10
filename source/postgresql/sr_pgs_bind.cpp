@@ -155,7 +155,7 @@ HB_FUNC_STATIC(SR_PGSSTATUS2)
     return;
   }
 
-  hb_retni((int)PQstatus(session->dbh));
+  hb_retni(static_cast<int>(PQstatus(session->dbh)));
 }
 
 //----------------------------------------------------------------------------//
@@ -171,7 +171,7 @@ HB_FUNC_STATIC(SR_PGSRESULTSTATUS)
     return;
   }
 
-  ret = (int)PQresultStatus(res);
+  ret = static_cast<int>(PQresultStatus(res));
 
   switch (ret) {
   case PGRES_EMPTY_QUERY: {
@@ -231,11 +231,11 @@ HB_FUNC_STATIC(SR_PGSEXEC)
 
   session->ifetch = -1;
   session->numcols = PQnfields(session->stmt);
-  ret = (int)PQresultStatus(session->stmt);
+  ret = static_cast<int>(PQresultStatus(session->stmt));
 
   switch (ret) {
   case PGRES_COMMAND_OK: {
-    session->iAffectedRows = (int)atoi(PQcmdTuples(session->stmt));
+    session->iAffectedRows = static_cast<int>(atoi(PQcmdTuples(session->stmt)));
     break;
   }
   default: {
@@ -268,7 +268,7 @@ HB_FUNC_STATIC(SR_PGSFETCH)
       if (session->ifetch > iTpl) {
         hb_retni(SQL_NO_DATA_FOUND);
       } else {
-        session->iAffectedRows = (int)iTpl;
+        session->iAffectedRows = static_cast<int>(iTpl);
         hb_retni(SQL_SUCCESS);
       }
     } else {
@@ -416,7 +416,7 @@ HB_FUNC_STATIC(SR_PGSTRANSSTATUS)
     return;
   }
 
-  hb_retni((int)PQtransactionStatus(session->dbh));
+  hb_retni(static_cast<int>(PQtransactionStatus(session->dbh)));
 }
 
 //----------------------------------------------------------------------------//
@@ -456,7 +456,7 @@ HB_FUNC_STATIC(SR_PGSQUERYATTR)
     hb_arraySetNL(atemp, FIELD_ENUM, row + 1);
 
     // Data type, len, dec
-    type = (int)PQftype(session->stmt, row);
+    type = static_cast<int>(PQftype(session->stmt, row));
     typmod = PQfmod(session->stmt, row);
 
     // nullable = PQgetisnull(session->stmt, row,PQfnumber(session->stmt, PQfname(session->stmt, row)));
@@ -496,7 +496,7 @@ HB_FUNC_STATIC(SR_PGSQUERYATTR)
       if (typmod >= 4) {
         fieldLen = typmod - 4;
       } else {
-        fieldLen = (int)PQfsize(session->stmt, row);
+        fieldLen = static_cast<int>(PQfsize(session->stmt, row));
         if (fieldLen <= 0) {
           fieldLen = 254;
         }

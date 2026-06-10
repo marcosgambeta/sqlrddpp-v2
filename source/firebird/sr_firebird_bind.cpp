@@ -191,20 +191,20 @@ HB_FUNC_STATIC(SR_FBCONNECT)
   i = 0;
   dpb[i++] = isc_dpb_version1;
   dpb[i++] = isc_dpb_user_name;
-  len = (int)strlen(user);
+  len = static_cast<int>(strlen(user));
   dpb[i++] = (char)len;
   memcpy(&(dpb[i]), user, len);
   i += len;
 
   dpb[i++] = isc_dpb_password;
-  len = (int)strlen(passwd);
+  len = static_cast<int>(strlen(passwd));
   dpb[i++] = (char)len;
   memcpy(&(dpb[i]), passwd, len);
   i += len;
 
   if (charset != SR_NULLPTR) {
     dpb[i++] = isc_dpb_lc_ctype;
-    len = (int)strlen(charset);
+    len = static_cast<int>(strlen(charset));
     dpb[i++] = (char)len;
     memcpy(&(dpb[i]), charset, len);
     i += len;
@@ -745,7 +745,7 @@ HB_FUNC_STATIC(SR_FBGETDATA)
         isc_decode_timestamp((ISC_TIMESTAMP ISC_FAR *)var->sqldata, &times);
         hb_snprintf(date_s, sizeof(date_s), "%04d-%02d-%02d %02d:%02d:%02d.%04d", times.tm_year + 1900,
                     times.tm_mon + 1, times.tm_mday, times.tm_hour, times.tm_min, times.tm_sec,
-                    (int)(((ISC_TIMESTAMP *)var->sqldata)->timestamp_time % 10000));
+                    static_cast<int>(((ISC_TIMESTAMP *)var->sqldata)->timestamp_time % 10000));
         {
           long lJulian, lMilliSec;
           hb_timeStampStrGetDT(date_s, &lJulian, &lMilliSec);
@@ -757,7 +757,7 @@ HB_FUNC_STATIC(SR_FBGETDATA)
         long lMilliSec;
         isc_decode_sql_time((ISC_TIME ISC_FAR *)var->sqldata, &times);
         hb_snprintf(date_s, sizeof(date_s), "%02d:%02d:%02d.%04d", times.tm_hour, times.tm_min, times.tm_sec,
-                    (int)((*((ISC_TIME *)var->sqldata)) % 10000));
+                    static_cast<int>((*((ISC_TIME *)var->sqldata)) % 10000));
         // hb_storc(date_s, 3);
         lMilliSec = hb_timeUnformat(date_s, SR_NULLPTR); // TOCHECK:
                                                          //             hb_itemPutTDT(pItem, 0, lMilliSec);
@@ -1216,7 +1216,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED)
   HB_SIZE lLen, lDec;
 
   if (session != SR_NULLPTR) {
-    cols = (int)hb_arrayLen(pFields);
+    cols = static_cast<int>(hb_arrayLen(pFields));
 
     for (icol = 1; icol <= cols; icol++) {
       //        HB_LONG lType;
@@ -1258,7 +1258,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED)
             isc_decode_timestamp((ISC_TIMESTAMP ISC_FAR *)var->sqldata, &times);
             hb_snprintf(date_s, sizeof(date_s), "%04d-%02d-%02d %02d:%02d:%02d.%04d", times.tm_year + 1900,
                         times.tm_mon + 1, times.tm_mday, times.tm_hour, times.tm_min, times.tm_sec,
-                        (int)(((ISC_TIMESTAMP *)var->sqldata)->timestamp_time % 10000));
+                        static_cast<int>(((ISC_TIMESTAMP *)var->sqldata)->timestamp_time % 10000));
 
             // sprintf(p, "%*s ", 24, date_s);
 
@@ -1270,7 +1270,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED)
           case IB_SQL_TYPE_TIME: {
             isc_decode_sql_time((ISC_TIME ISC_FAR *)var->sqldata, &times);
             hb_snprintf(date_s, sizeof(date_s), "%02d:%02d:%02d.%04d", times.tm_hour, times.tm_min, times.tm_sec,
-                        (int)((*((ISC_TIME *)var->sqldata)) % 10000));
+                        static_cast<int>((*((ISC_TIME *)var->sqldata)) % 10000));
 
             sr_FBFieldGet(hb_arrayGetItemPtr(pFields, icol), &temp, (char *)date_s, strlen(date_s), /*bQueryOnly,*/ /*ulSystemID,*/
                        bTranslate);
@@ -1353,7 +1353,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED)
             //                   SR_TraceLog("fb.log","valor float = %lf data %s\n",*(float ISC_FAR *)
             //                   (var->sqldata),data); sr_FBFieldGet(hb_arrayGetItemPtr(pFields, icol), temp, (char *)
             //                   data, strlen(data), /*bQueryOnly,*/ /*ulSystemID,*/ bTranslate);
-            hb_itemPutNDLen(&temp, *(float ISC_FAR *)(var->sqldata), (int)lLen, (int)lDec);
+            hb_itemPutNDLen(&temp, *(float ISC_FAR *)(var->sqldata), static_cast<int>(lLen), static_cast<int>(lDec));
             hb_arraySetForward(pRet, icol, &temp);
             break;
           }
@@ -1363,7 +1363,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED)
             //                   SR_TraceLog("fb.log","valor double = %lf data %s\n",*(float ISC_FAR *)
             //                   (var->sqldata),data); sr_FBFieldGet(hb_arrayGetItemPtr(pFields, icol), temp, (char *)
             //                   data, strlen(data), /*bQueryOnly,*/ /*ulSystemID,*/ bTranslate);
-            hb_itemPutNDLen(&temp, *(double ISC_FAR *)(var->sqldata), (int)lLen, (int)lDec);
+            hb_itemPutNDLen(&temp, *(double ISC_FAR *)(var->sqldata), static_cast<int>(lLen), static_cast<int>(lDec));
             hb_arraySetForward(pRet, icol, &temp);
             break;
           }

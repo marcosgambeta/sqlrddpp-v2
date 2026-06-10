@@ -315,7 +315,7 @@ HB_BOOL SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel)
 
     pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
     pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
-    thiswa->indexColumns = (int)hb_arrayLen(pColumns);
+    thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
     // Free the statements we are about to recreate
 
@@ -398,7 +398,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
   if (HB_IS_STRING(pKey)) {
     // parse Key string and split it in index fields
 
-    lenKey = (int)hb_itemGetCLen(pKey);
+    lenKey = static_cast<int>(hb_itemGetCLen(pKey));
     szKey = hb_itemGetCPtr(pKey);
     *queryLevel = thiswa->indexColumns;
 
@@ -409,7 +409,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
       switch (BindStructure->iCType) {
       case SQL_C_CHAR: {
         int nTrim, index;
-        size = lenKey > (int)(BindStructure->ColumnSize) ? ((int)(BindStructure->ColumnSize)) : lenKey;
+        size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
         nTrim = size;
 
         // RTrim() the string value
@@ -463,7 +463,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
         char datemask[9] = "10000101";
         char *mask = datemask;
         // DebugBreak();
-        size = lenKey > (int)(BindStructure->ColumnSize) ? ((int)(BindStructure->ColumnSize)) : lenKey;
+        size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
 
         // Must fix partial date seek
         for (iPos = 0; iPos < size; iPos++) {
@@ -492,7 +492,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
         char datemask[9] = "10000101";
         char *mask = datemask;
 
-        size = lenKey > (int)(BindStructure->ColumnSize) ? ((int)(BindStructure->ColumnSize)) : lenKey;
+        size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
 
         // Must fix partial date seek
         for (iPos = 0; iPos < size; iPos++) {

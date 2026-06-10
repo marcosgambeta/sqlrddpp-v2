@@ -89,7 +89,7 @@ HB_FUNC(SR_SQLPARSE) // SqlParse(cCommand, @nError, @nErrorPos)
         hb_itemPutNI((PHB_ITEM)hb_param(2, HB_IT_ANY), stmt->errMsg);
       }
       if (HB_ISBYREF(3)) {
-        hb_itemPutNI((PHB_ITEM)hb_param(3, HB_IT_ANY), (int)(stmt->queryPtr - sqlIniPos));
+        hb_itemPutNI((PHB_ITEM)hb_param(3, HB_IT_ANY), static_cast<int>(stmt->queryPtr - sqlIniPos));
       }
     }
     hb_itemRelease(hb_itemReturnForward(stmt->pArray));
@@ -107,7 +107,7 @@ int SqlParse(sql_stmt *stmt, const char *query, int queryLen)
     return 0;
   }
   if (!queryLen) {
-    queryLen = (int)strlen(query) + 1;
+    queryLen = static_cast<int>(strlen(query)) + 1;
   }
 
   stmt->query = query;
@@ -258,17 +258,17 @@ HB_FUNC(SR_STRTOHEX)
   }
 
   cStr = hb_parc(1);
-  len = (int)hb_parclen(1);
+  len = static_cast<int>(hb_parclen(1));
   outbuff = (char *)hb_xgrab((len * 2) + 1);
   c = outbuff;
 
   for (i = 0; i < len; i++) {
 
-    iNum = (int)cStr[i];
+    iNum = static_cast<int>(cStr[i]);
     c[0] = '0';
     c[1] = '0';
 
-    iCipher = (int)(iNum % 16);
+    iCipher = static_cast<int>(iNum % 16);
 
     if (iCipher < 10) {
       c[1] = '0' + (char)iCipher;
@@ -299,7 +299,7 @@ char *sr_Hex2Str(const char *cStr, int len, int *lenOut)
   int i, nalloc;
   int iCipher, iNum;
 
-  nalloc = (int)(len / 2);
+  nalloc = static_cast<int>(len / 2);
   outbuff = (char *)hb_xgrab(nalloc + 1);
 
   for (i = 0; i < nalloc; i++) {
@@ -357,7 +357,7 @@ HB_FUNC(SR_HEXTOSTR)
     return;
   }
 
-  outbuff = sr_Hex2Str(hb_parc(1), (int)hb_parclen(1), &nalloc);
+  outbuff = sr_Hex2Str(hb_parc(1), static_cast<int>(hb_parclen(1)), &nalloc);
   hb_retclen_buffer(outbuff, nalloc);
 }
 
@@ -693,14 +693,14 @@ HB_FUNC(SR_ESCAPENUM)
   for (iPos = 0; iPos < iSize; iPos++) {
     if (FromBuffer[iPos] == ',') {
       ToBuffer[iPos] = '.';
-      iDecPos = (int)iPos;
+      iDecPos = static_cast<int>(iPos);
     } else {
       ToBuffer[iPos] = FromBuffer[iPos];
     }
 
     if (ToBuffer[iPos] == '.') {
       bInteger = false;
-      iDecPos = (int)iPos;
+      iDecPos = static_cast<int>(iPos);
     }
 
     if (ToBuffer[iPos] == 'E' && (iPos + 2) <= iSize) { // 1928773.3663E+003
@@ -761,14 +761,14 @@ HB_FUNC(SR_ESCAPENUM)
 
     if (!iOverflow) {
       double dValue = (double)lValue;
-      hb_retnlen(dValue, (int)len, (int)dec);
+      hb_retnlen(dValue, static_cast<int>(len), static_cast<int>(dec));
     } else {
       double dValue = hb_strVal(ToBuffer, iSize);
-      hb_retnlen(dValue, (int)len, (int)dec);
+      hb_retnlen(dValue, static_cast<int>(len), static_cast<int>(dec));
     }
   } else {
     double dValue = hb_strVal(ToBuffer, iSize);
-    hb_retnlen(dValue, (int)len, (int)dec);
+    hb_retnlen(dValue, static_cast<int>(len), static_cast<int>(dec));
   }
   hb_xfree(ToBuffer);
 }
@@ -796,14 +796,14 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
   for (iPos = 0; iPos < iSize; iPos++) {
     if (FromBuffer[iPos] == ',') {
       ToBuffer[iPos] = '.';
-      iDecPos = (int)iPos;
+      iDecPos = static_cast<int>(iPos);
     } else {
       ToBuffer[iPos] = FromBuffer[iPos];
     }
 
     if (ToBuffer[iPos] == '.') {
       bInteger = false;
-      iDecPos = (int)iPos;
+      iDecPos = static_cast<int>(iPos);
     }
 
     if (ToBuffer[iPos] == 'E' && (iPos + 2) <= iSize) { // 1928773.3663E+003
@@ -864,14 +864,14 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
 
     if (!iOverflow) {
       double dValue = (double)lValue;
-      hb_itemPutNLen(pRet, dValue, (int)len, (int)dec);
+      hb_itemPutNLen(pRet, dValue, static_cast<int>(len), static_cast<int>(dec));
     } else {
       double dValue = hb_strVal(ToBuffer, iSize);
-      hb_itemPutNLen(pRet, dValue, (int)len, (int)dec);
+      hb_itemPutNLen(pRet, dValue, static_cast<int>(len), static_cast<int>(dec));
     }
   } else {
     double dValue = hb_strVal(ToBuffer, iSize);
-    hb_itemPutNLen(pRet, dValue, (int)len, (int)dec);
+    hb_itemPutNLen(pRet, dValue, static_cast<int>(len), static_cast<int>(dec));
   }
   hb_xfree(ToBuffer);
   return pRet;
