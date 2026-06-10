@@ -583,7 +583,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
     }
 
     hb_dateDecode(hb_itemGetDL(pFieldData), &iYear, &iMonth, &iDay);
-    BindStructure->asDate.year = (SQLSMALLINT)iYear;
+    BindStructure->asDate.year = static_cast<SQLSMALLINT>(iYear);
     BindStructure->asDate.month = (SQLUSMALLINT)iMonth;
     BindStructure->asDate.day = (SQLUSMALLINT)iDay;
     break;
@@ -617,7 +617,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
       hb_dateDecode(lJulian, &iYear, &iMonth, &iDay);
       hb_timeDecode(lMilliSec, &iHour, &iMinute, &seconds, &millisec);
 #endif
-      BindStructure->asTimestamp.year = (SQLSMALLINT)iYear;
+      BindStructure->asTimestamp.year = static_cast<SQLSMALLINT>(iYear);
       BindStructure->asTimestamp.month = (SQLUSMALLINT)iMonth;
       BindStructure->asTimestamp.day = (SQLUSMALLINT)iDay;
       BindStructure->asTimestamp.hour = (SQLUSMALLINT)iHour;
@@ -816,8 +816,8 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
 
     BindStructure = SR_GetBindStruct(thiswa, IndexBind);
 
-    res = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, (SQLSMALLINT)BindStructure->iCType,
-                           (SQLSMALLINT)BindStructure->iSQLType, BindStructure->ColumnSize,
+    res = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+                           static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                            BindStructure->DecimalDigits, &(BindStructure->asNumeric), 0, SR_NULLPTR);
 
     if (CHECK_SQL_N_OK(res)) {
@@ -837,14 +837,14 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
         if (!BindStructure->isArgumentNull) {
           switch (BindStructure->iCType) {
           case SQL_C_CHAR: {
-            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, (SQLSMALLINT)BindStructure->iCType,
-                                   (SQLSMALLINT)BindStructure->iSQLType, BindStructure->ColumnSize,
+            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+                                   static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                    BindStructure->DecimalDigits, BindStructure->asChar.value, 0, SR_NULLPTR);
             break;
           }
           case SQL_C_DOUBLE: {
-            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, (SQLSMALLINT)BindStructure->iCType,
-                                   (SQLSMALLINT)BindStructure->iSQLType, BindStructure->ColumnSize,
+            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+                                   static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                    BindStructure->DecimalDigits, &(BindStructure->asNumeric), 0, SR_NULLPTR);
             break;
           }
@@ -872,8 +872,8 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
             break;
           }
           case SQL_C_BIT: {
-            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, (SQLSMALLINT)BindStructure->iCType,
-                                   (SQLSMALLINT)BindStructure->iSQLType, BindStructure->ColumnSize,
+            res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+                                   static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                    BindStructure->DecimalDigits, &(BindStructure->asLogical), 0, SR_NULLPTR);
             break; // TODO: unnecessary break
           }
@@ -1148,7 +1148,7 @@ void SR_SetCurrRecordStructure(SQLEXAREAP thiswa)
     BindStructure->lFieldPosDB = i;
     BindStructure->lFieldPosWA = hb_arrayGetNL(pFieldStruct, FIELD_WAOFFSET);
     BindStructure->ColumnSize = (SQLUINTEGER)hb_itemGetNI(pFieldLen);
-    BindStructure->DecimalDigits = (SQLSMALLINT)hb_itemGetNI(pFieldDec);
+    BindStructure->DecimalDigits = static_cast<SQLSMALLINT>(hb_itemGetNI(pFieldDec));
     BindStructure->colName = SR_QualifyName(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
     BindStructure->isMemo = cType == 'M';
 

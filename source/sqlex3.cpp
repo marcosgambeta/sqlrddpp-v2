@@ -471,7 +471,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
         }
 
         hb_compStrToNum(datemask, 4, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
-        BindStructure->asTimestamp.year = (SQLSMALLINT)lVal;
+        BindStructure->asTimestamp.year = static_cast<SQLSMALLINT>(lVal);
         mask += 4;
         hb_compStrToNum(mask, 2, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
         BindStructure->asTimestamp.month = (SQLUSMALLINT)lVal;
@@ -500,7 +500,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
         }
 
         hb_compStrToNum(datemask, 4, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
-        BindStructure->asDate.year = (SQLSMALLINT)lVal;
+        BindStructure->asDate.year = static_cast<SQLSMALLINT>(lVal);
         mask += 4;
         hb_compStrToNum(mask, 2, &lVal, &dVal, SR_NULLPTR, SR_NULLPTR);
         BindStructure->asDate.month = (SQLUSMALLINT)lVal;
@@ -539,7 +539,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
       hb_dateDecode(hb_itemGetDL(pKey), &iYear, &iMonth, &iDay);
 
       if (BindStructure->iCType == SQL_C_TYPE_DATE) {
-        BindStructure->asDate.year = (SQLSMALLINT)iYear;
+        BindStructure->asDate.year = static_cast<SQLSMALLINT>(iYear);
         BindStructure->asDate.month = (SQLUSMALLINT)iMonth;
         BindStructure->asDate.day = (SQLUSMALLINT)iDay;
       } else if (BindStructure->iCType == SQL_C_TYPE_TIMESTAMP) {
@@ -552,7 +552,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
         hb_itemGetTDT(pKey, &lJulian, &lMilliSec);
         hb_timeDecode(lMilliSec, &iHour, &iMinute, &seconds, &millisec);
 #endif
-        BindStructure->asTimestamp.year = (SQLSMALLINT)iYear;
+        BindStructure->asTimestamp.year = static_cast<SQLSMALLINT>(iYear);
         BindStructure->asTimestamp.month = (SQLUSMALLINT)iMonth;
         BindStructure->asTimestamp.day = (SQLUSMALLINT)iDay;
         BindStructure->asTimestamp.hour = (SQLUSMALLINT)iHour;
@@ -609,14 +609,14 @@ void SR_BindSeekStmt(SQLEXAREAP thiswa, int queryLevel)
       }
       switch (BindStructure->iCType) {
       case SQL_C_CHAR: {
-        res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, (SQLSMALLINT)BindStructure->iCType,
-                               (SQLSMALLINT)BindStructure->iSQLType, BindStructure->ColumnSize,
+        res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+                               static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                BindStructure->DecimalDigits, BindStructure->asChar.value, 0, SR_NULLPTR);
         break;
       }
       case SQL_C_DOUBLE: {
-        res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, (SQLSMALLINT)BindStructure->iCType,
-                               (SQLSMALLINT)BindStructure->iSQLType, BindStructure->ColumnSize,
+        res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+                               static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                BindStructure->DecimalDigits, &(BindStructure->asNumeric), 0, SR_NULLPTR);
         break;
       }
@@ -640,8 +640,8 @@ void SR_BindSeekStmt(SQLEXAREAP thiswa, int queryLevel)
         break;
       }
       case SQL_C_BIT: {
-        res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, (SQLSMALLINT)BindStructure->iCType,
-                               (SQLSMALLINT)BindStructure->iSQLType, BindStructure->ColumnSize,
+        res = SQLBindParameter(hStmt, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
+                               static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                BindStructure->DecimalDigits, &(BindStructure->asLogical), 0, SR_NULLPTR);
         break; // TODO: unnecessary break
       }

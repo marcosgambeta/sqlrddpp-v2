@@ -270,7 +270,7 @@ void SR_CreateInsertStmt(SQLEXAREAP thiswa)
     InsertRecord->lFieldPosDB = i;
     InsertRecord->lFieldPosWA = lFieldPosWA;
     InsertRecord->ColumnSize = (SQLUINTEGER)hb_itemGetNI(pFieldLen);
-    InsertRecord->DecimalDigits = (SQLSMALLINT)hb_itemGetNI(pFieldDec);
+    InsertRecord->DecimalDigits = static_cast<SQLSMALLINT>(hb_itemGetNI(pFieldDec));
     InsertRecord->isArgumentNull = false;
     InsertRecord->isMemo = bIsMemo;
     InsertRecord->isMultiLang = bMultiLang;
@@ -438,7 +438,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
       case SQL_C_CHAR: {
         InsertRecord->lIndPtr = SQL_NTS;
         res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT,
-                               (SQLSMALLINT)InsertRecord->iCType, (SQLSMALLINT)InsertRecord->iSQLType,
+                               static_cast<SQLSMALLINT>(InsertRecord->iCType), static_cast<SQLSMALLINT>(InsertRecord->iSQLType),
                                InsertRecord->ColumnSize, InsertRecord->DecimalDigits, InsertRecord->asChar.value, 0,
                                &(InsertRecord->lIndPtr));
         break;
@@ -455,7 +455,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
       case SQL_C_DOUBLE: {
         InsertRecord->lIndPtr = 0;
         res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT,
-                               (SQLSMALLINT)InsertRecord->iCType, (SQLSMALLINT)InsertRecord->iSQLType,
+                               static_cast<SQLSMALLINT>(InsertRecord->iCType), static_cast<SQLSMALLINT>(InsertRecord->iSQLType),
                                InsertRecord->ColumnSize, InsertRecord->DecimalDigits, &(InsertRecord->asNumeric), 0,
                                &(InsertRecord->lIndPtr));
         break;
@@ -477,7 +477,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
       }
       case SQL_C_BIT: {
         res = SQLBindParameter(thiswa->hStmtInsert, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT,
-                               (SQLSMALLINT)InsertRecord->iCType, (SQLSMALLINT)InsertRecord->iSQLType,
+                               static_cast<SQLSMALLINT>(InsertRecord->iCType), static_cast<SQLSMALLINT>(InsertRecord->iSQLType),
                                InsertRecord->ColumnSize, InsertRecord->DecimalDigits, &(InsertRecord->asLogical), 0,
                                SR_NULLPTR);
         break; // TODO: unnecessary break
@@ -738,8 +738,8 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
       case SQL_C_CHAR: {
         CurrRecord->lIndPtr = SQL_NTS;
         res =
-            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, (SQLSMALLINT)CurrRecord->iCType,
-                             (SQLSMALLINT)CurrRecord->iSQLType, CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
+            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
+                             static_cast<SQLSMALLINT>(CurrRecord->iSQLType), CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
                              CurrRecord->asChar.value, 0, &(CurrRecord->lIndPtr));
         break;
       }
@@ -755,8 +755,8 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
       case SQL_C_DOUBLE: {
         CurrRecord->lIndPtr = 0;
         res =
-            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, (SQLSMALLINT)CurrRecord->iCType,
-                             (SQLSMALLINT)CurrRecord->iSQLType, CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
+            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
+                             static_cast<SQLSMALLINT>(CurrRecord->iSQLType), CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
                              &(CurrRecord->asNumeric), 0, &(CurrRecord->lIndPtr));
         break;
       }
@@ -777,8 +777,8 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
       }
       case SQL_C_BIT: {
         res =
-            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, (SQLSMALLINT)CurrRecord->iCType,
-                             (SQLSMALLINT)CurrRecord->iSQLType, CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
+            SQLBindParameter(thiswa->hStmtUpdate, (SQLUSMALLINT)iBind, SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
+                             static_cast<SQLSMALLINT>(CurrRecord->iSQLType), CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
                              &(CurrRecord->asLogical), 0, SR_NULLPTR);
         break; // TODO: unnecessary break
       }
