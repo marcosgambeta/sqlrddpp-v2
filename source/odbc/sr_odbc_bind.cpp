@@ -751,7 +751,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
       } else {
         do {
           wResult = SQLGetData(SR_PAR_SQLHSTMT(1), static_cast<SQLUSMALLINT>(lIndex), static_cast<SQLSMALLINT>(SQL_CHAR), (PTR)bBuffer,
-                               (SQLLEN)lLen, (SQLLEN *)&lLenOut);
+                               static_cast<SQLLEN>(lLen), (SQLLEN *)&lLenOut);
           if (wResult == SQL_SUCCESS && iReallocs == 0) {
             sr_odbcFieldGet(hb_arrayGetItemPtr(pFields, i), &temp, (char *)bBuffer, lLenOut, 0, ulSystemID, bTranslate);
             hb_arraySetForward(pLine, i, &temp);
@@ -925,7 +925,7 @@ HB_FUNC_STATIC(SR_COLATTRIBUTE)
   SQLSMALLINT lLen = SR_PAR_SQLSMALLINT(5);
   char *bBuffer = (char *)hb_xgrab(lLen);
   SQLSMALLINT wBufLen = SR_PAR_SQLSMALLINT(6);
-  SQLLEN wNumPtr = (SQLLEN)hb_parnint(7);
+  SQLLEN wNumPtr = static_cast<SQLLEN>(hb_parnint(7));
   RETCODE wResult =
       SQLColAttribute(SR_PAR_SQLHSTMT(1), SR_PAR_SQLUSMALLINT(2), SR_PAR_SQLUSMALLINT(3), (SQLPOINTER)bBuffer,
                       SR_PAR_SQLSMALLINT(5), (SQLSMALLINT *)&wBufLen, (SQLLEN *)&wNumPtr);
