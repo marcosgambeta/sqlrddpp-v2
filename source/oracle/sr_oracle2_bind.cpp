@@ -338,7 +338,7 @@ HB_FUNC_STATIC(SR_SQLO2_EXECDIRECT)
 HB_FUNC_STATIC(SR_SQLO2_EXECUTE)
 {
   GET_OCI_SESSION(session, 1);
-  HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : HB_FALSE;
+  HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
   if (session != SR_NULLPTR) {
     char *stm = (char *)hb_parc(2);
     if (lStmt) {
@@ -382,8 +382,8 @@ HB_FUNC_STATIC(SR_ORACLEINBINDPARAM2)
   int iFieldSize = hb_parni(4);
   int iPos = iParamNum - 1;
   int ret = SQL_ERROR;
-  HB_BOOL lStmt = HB_ISLOG(7) ? hb_parl(7) : HB_FALSE;
-  HB_BOOL isNull = HB_ISLOG(8) ? hb_parl(8) : HB_FALSE;
+  HB_BOOL lStmt = HB_ISLOG(7) ? hb_parl(7) : false;
+  HB_BOOL isNull = HB_ISLOG(8) ? hb_parl(8) : false;
 
   HB_SYMBOL_UNUSED(lStmt);
 
@@ -596,7 +596,7 @@ HB_FUNC_STATIC(SR_ORACLEPREPARE2)
 {
   GET_OCI_SESSION(session, 1);
   const char *szSql = hb_parc(2);
-  HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : HB_FALSE;
+  HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
   int ret = -1;
 
   if (session != SR_NULLPTR) {
@@ -710,7 +710,7 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
       break;
     }
     case SQL_BIT: {
-      hb_itemPutL(pItem, HB_FALSE);
+      hb_itemPutL(pItem, false);
       break;
     }
       // #ifdef SQLRDD_TOPCONN
@@ -810,8 +810,8 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
       break;
     }
     case SQL_BIT: {
-      // hb_itemPutL(pItem, bBuffer[0] == '1' ? HB_TRUE : HB_FALSE);
-      hb_itemPutL(pItem, OCI_GetBigInt(rs, iField) == 1 ? HB_TRUE : HB_FALSE);
+      // hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
+      hb_itemPutL(pItem, OCI_GetBigInt(rs, iField) == 1 ? true : false);
       break;
     }
       // #ifdef SQLRDD_TOPCONN
@@ -1210,7 +1210,7 @@ HB_FUNC_STATIC(SR_SQLO2_ORACLESETLOBPREFETCH) // TODO: not used in SQLRDD source
   if (session != SR_NULLPTR) {
     hb_retl(OCI_SetDefaultLobPrefetchSize(session->cn, (unsigned int)hb_parni(2)));
   } else {
-    hb_retl(HB_FALSE);
+    hb_retl(false);
   }
 }
 #endif
@@ -1223,7 +1223,7 @@ HB_FUNC_STATIC(SR_SQLO2_SETSTATEMENTCACHESIZE)
   if (session != SR_NULLPTR) {
     hb_retl(OCI_SetStatementCacheSize(session->cn, (unsigned int)hb_parni(2)));
   } else {
-    hb_retl(HB_FALSE);
+    hb_retl(false);
   }
 }
 

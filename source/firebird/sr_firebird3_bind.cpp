@@ -760,7 +760,7 @@ HB_FUNC_STATIC(SR_FBGETDATA3)
   char res_buffer[20];
   HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
   short length;
-  HB_BOOL bEnd = HB_FALSE;
+  HB_BOOL bEnd = false;
   XSQLVAR *var;
   VARY *vary;
 
@@ -780,7 +780,7 @@ HB_FUNC_STATIC(SR_FBGETDATA3)
         break;
       }
       case IB_SQL_BOOLEAN: {
-        hb_storl(var->sqldata[0] == FB_TRUE ? HB_TRUE : HB_FALSE, 3);
+        hb_storl(var->sqldata[0] == FB_TRUE ? true : false, 3);
         break;
       }
       case IB_SQL_VARYING: {
@@ -898,7 +898,7 @@ HB_FUNC_STATIC(SR_FBGETDATA3)
             num_segments = isc_vax_integer(resp, length);
             break;
           case isc_info_truncated:
-            bEnd = HB_TRUE;
+            bEnd = true;
             break;
           default:
             break;
@@ -1073,7 +1073,7 @@ static void sr_FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
     }
     case SQL_BIT:
     case SQL_SMALLINT: {
-      hb_itemPutL(pItem, HB_FALSE);
+      hb_itemPutL(pItem, false);
       break;
     }
 #ifdef SQLRDD_TOPCONN
@@ -1184,10 +1184,10 @@ static void sr_FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
     }
     case SQL_BIT:
     case SQL_SMALLINT: {
-      hb_itemPutL(pItem, bBuffer[0] == (char)'t' || bBuffer[0] == (char)'T' || bBuffer[0] == 1 ? HB_TRUE : HB_FALSE);
-      // hb_itemPutL(pItem, hb_strVal(bBuffer, lLenBuff) > 0 ? HB_TRUE : HB_FALSE);
-      // hb_itemPutL(pItem, bBuffer[0] == '1' ? HB_TRUE : HB_FALSE);
-      // hb_itemPutL(pItem, hb_strValInt(bBuffer, &iOverflow) > 0 ? HB_TRUE : HB_FALSE);
+      hb_itemPutL(pItem, bBuffer[0] == (char)'t' || bBuffer[0] == (char)'T' || bBuffer[0] == 1 ? true : false);
+      // hb_itemPutL(pItem, hb_strVal(bBuffer, lLenBuff) > 0 ? true : false);
+      // hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
+      // hb_itemPutL(pItem, hb_strValInt(bBuffer, &iOverflow) > 0 ? true : false);
       break;
     }
 #ifdef SQLRDD_TOPCONN
@@ -1246,7 +1246,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED3)
   char res_buffer[20];
   HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
   short length;
-  HB_BOOL bEnd = HB_FALSE;
+  HB_BOOL bEnd = false;
   XSQLVAR *var;
   VARY *vary;
 
@@ -1293,9 +1293,9 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED3)
           }
           case IB_SQL_BOOLEAN: {
             // ISC_UCHAR udata = *(ISC_UCHAR ISC_FAR*) var->sqldata;
-            // hb_itemPutL(temp, udata == (ISC_UCHAR) "T" || udata == (ISC_UCHAR) "t" || udata == 1 ? HB_TRUE :
-            // HB_FALSE);
-            hb_itemPutL(&temp, (ISC_UCHAR)var->sqldata[0] == FB_TRUE ? HB_TRUE : HB_FALSE);
+            // hb_itemPutL(temp, udata == (ISC_UCHAR) "T" || udata == (ISC_UCHAR) "t" || udata == 1 ? true :
+            // false);
+            hb_itemPutL(&temp, (ISC_UCHAR)var->sqldata[0] == FB_TRUE ? true : false);
             hb_arraySetForward(pRet, icol, &temp);
             break;
           }
@@ -1439,7 +1439,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED3)
                 break;
               }
               case isc_info_truncated: {
-                bEnd = HB_TRUE;
+                bEnd = true;
                 break;
               }
               default: { // TODO: unnecessary default

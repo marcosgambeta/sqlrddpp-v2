@@ -79,8 +79,8 @@ typedef struct _SQLAREA
   HB_LONG hOrdCurrent;    // current index order
   HB_BOOL shared;
   HB_BOOL readonly;      // only SELECT allowed
-  HB_BOOL creating;      // HB_TRUE when creating table
-  HB_BOOL firstinteract; // HB_TRUE when workarea was not used yet
+  HB_BOOL creating;      // true when creating table
+  HB_BOOL firstinteract; // true when workarea was not used yet
   HB_BOOL isam;          // ISAM Simulator ?
   HB_BOOL wasdel;
   HB_BOOL initialized; // Workarea Initialization done

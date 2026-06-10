@@ -717,7 +717,7 @@ HB_FUNC_STATIC(SR_FBGETDATA)
   char res_buffer[20];
   HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
   short length;
-  HB_BOOL bEnd = HB_FALSE;
+  HB_BOOL bEnd = false;
   XSQLVAR *var;
   VARY *vary;
 
@@ -852,7 +852,7 @@ HB_FUNC_STATIC(SR_FBGETDATA)
             break;
           }
           case isc_info_truncated: {
-            bEnd = HB_TRUE;
+            bEnd = true;
             break;
           }
           default: { // TODO: default unnecessary
@@ -1029,7 +1029,7 @@ static void sr_FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const 
     }
     case SQL_BIT:
     case SQL_SMALLINT: {
-      hb_itemPutL(pItem, HB_FALSE);
+      hb_itemPutL(pItem, false);
       break;
     }
 #ifdef SQLRDD_TOPCONN
@@ -1140,9 +1140,9 @@ static void sr_FBFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const 
     }
     case SQL_BIT:
     case SQL_SMALLINT: {
-      hb_itemPutL(pItem, hb_strVal(bBuffer, lLenBuff) > 0 ? HB_TRUE : HB_FALSE);
-      // hb_itemPutL(pItem, bBuffer[0] == '1' ? HB_TRUE : HB_FALSE);
-      // hb_itemPutL(pItem, hb_strValInt(bBuffer, &iOverflow) > 0 ? HB_TRUE : HB_FALSE);
+      hb_itemPutL(pItem, hb_strVal(bBuffer, lLenBuff) > 0 ? true : false);
+      // hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
+      // hb_itemPutL(pItem, hb_strValInt(bBuffer, &iOverflow) > 0 ? true : false);
       break;
     }
 #ifdef SQLRDD_TOPCONN
@@ -1201,7 +1201,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED)
   char res_buffer[20];
   HB_LONG blob_size = 0L, num_segments = 0L, count, residual_size;
   short length;
-  HB_BOOL bEnd = HB_FALSE;
+  HB_BOOL bEnd = false;
   XSQLVAR *var;
   VARY *vary;
 
@@ -1393,7 +1393,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED)
                 break;
               }
               case isc_info_truncated: {
-                bEnd = HB_TRUE;
+                bEnd = true;
                 break;
               }
               default: { // TODO: default unnecessary

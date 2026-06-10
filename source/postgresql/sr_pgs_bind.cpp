@@ -607,7 +607,7 @@ HB_FUNC_STATIC(SR_PGSQUERYATTR)
     }
 
     // Nullable
-    hb_arraySetForward(atemp, FIELD_NULLABLE, hb_itemPutL(&temp, HB_FALSE));
+    hb_arraySetForward(atemp, FIELD_NULLABLE, hb_itemPutL(&temp, false));
 
     // add to main array
     hb_arraySetForward(ret, row + 1, atemp);
@@ -842,7 +842,7 @@ static void sr_PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
       break;
     }
     case SQL_BIT: {
-      hb_itemPutL(pItem, HB_FALSE);
+      hb_itemPutL(pItem, false);
       break;
     }
 #ifdef SQLRDD_TOPCONN
@@ -976,7 +976,7 @@ static void sr_PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
       break;
     }
     case SQL_BIT: {
-      hb_itemPutL(pItem, bBuffer[0] == 't' ? HB_TRUE : HB_FALSE);
+      hb_itemPutL(pItem, bBuffer[0] == 't' ? true : false);
       break;
     }
 #ifdef SQLRDD_TOPCONN

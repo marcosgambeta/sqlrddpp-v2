@@ -243,7 +243,7 @@ typedef struct _SQLEXAREA
   char sLimit2[50];   // String for recordset limit
 
   HB_BOOL bufferHot;     // Does it have to write buffer down to database ?
-  HB_BOOL bIsInsert;     // HB_TRUE if appending a new record
+  HB_BOOL bIsInsert;     // true if appending a new record
   HB_BOOL bConnVerified; // Already checked for ODBC connection ?
   HB_BOOL bReverseIndex; // If current index is in DESCENDING order
   // INDEXBINDP IndexBindings[MAX_INDEXES]; // Index column and prepared SQL expression handles for SKIP

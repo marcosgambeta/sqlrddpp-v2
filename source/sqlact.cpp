@@ -664,7 +664,7 @@ HB_FUNC(SR_ESCAPENUM)
   char SciNot[5] = {'\0', '\0', '\0', '\0', '\0'};
   HB_SIZE iSize, iPos;
   int iDecPos;
-  HB_BOOL bInteger = HB_TRUE;
+  HB_BOOL bInteger = true;
   HB_SIZE len, dec;
   double dMultpl;
 
@@ -699,12 +699,12 @@ HB_FUNC(SR_ESCAPENUM)
     }
 
     if (ToBuffer[iPos] == '.') {
-      bInteger = HB_FALSE;
+      bInteger = false;
       iDecPos = (int)iPos;
     }
 
     if (ToBuffer[iPos] == 'E' && (iPos + 2) <= iSize) { // 1928773.3663E+003
-      bInteger = HB_FALSE;
+      bInteger = false;
       if (FromBuffer[iPos + 1] == '-') {
         SciNot[0] = FromBuffer[iPos + 1];
       } else {
@@ -779,7 +779,7 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
   char SciNot[5] = {'\0', '\0', '\0', '\0', '\0'};
   HB_SIZE iSize, iPos;
   int iDecPos;
-  HB_BOOL bInteger = HB_TRUE;
+  HB_BOOL bInteger = true;
   double dMultpl;
 
   iSize = strlen(FromBuffer);
@@ -802,12 +802,12 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
     }
 
     if (ToBuffer[iPos] == '.') {
-      bInteger = HB_FALSE;
+      bInteger = false;
       iDecPos = (int)iPos;
     }
 
     if (ToBuffer[iPos] == 'E' && (iPos + 2) <= iSize) { // 1928773.3663E+003
-      bInteger = HB_FALSE;
+      bInteger = false;
       if (FromBuffer[iPos + 1] == '-') {
         SciNot[0] = FromBuffer[iPos + 1];
       } else {
@@ -1035,7 +1035,7 @@ HB_BOOL SR_itemEmpty(PHB_ITEM pItem)
     return !hb_itemGetL(pItem);
   }
   case HB_IT_BLOCK: {
-    return HB_FALSE;
+    return false;
   }
   case HB_IT_POINTER: {
     return hb_itemGetPtr(pItem) == SR_NULLPTR;
@@ -1051,7 +1051,7 @@ HB_BOOL SR_itemEmpty(PHB_ITEM pItem)
   }
 // #endif
   default: {
-    return HB_TRUE;
+    return true;
   }
   }
 }
@@ -1066,7 +1066,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
   int iTrim, iPos, iSize;
   sValue = SR_NULLPTR;
 
-  *bNullArgument = HB_FALSE;
+  *bNullArgument = false;
 
   if (SR_itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
       (((nSystemID == SQLRDD_RDBMS_POSTGR) && HB_IS_DATE(pFieldData)) ||
@@ -1078,12 +1078,12 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
       sValue[2] = 'L';
       sValue[3] = 'L';
       sValue[4] = '\0';
-      *bNullArgument = HB_TRUE;
+      *bNullArgument = true;
       return sValue;
     } else {
 #if 0 // TODO: old code for reference (to be deleted)
          if( HB_IS_STRING(pFieldData) && bTCCompat ) {
-            sValue = SR_QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, HB_FALSE, &iSizeOut);
+            sValue = SR_QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false, &iSizeOut);
             return sValue;
          } else if( HB_IS_STRING(pFieldData) ) {
             sValue = (char *) hb_xgrab(4);
@@ -1103,7 +1103,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
       case HB_IT_STRING:
       case HB_IT_MEMO: {
         if (bTCCompat) {
-          sValue = SR_QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, HB_FALSE,
+          sValue = SR_QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false,
                                          &iSizeOut);
           return sValue;
         } else {

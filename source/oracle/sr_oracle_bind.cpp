@@ -252,7 +252,7 @@ HB_FUNC_STATIC(SR_SQLO_EXECDIRECT)
 HB_FUNC_STATIC(SR_SQLO_EXECUTE)
 {
   GET_OCI_SESSION(session, 1);
-  HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : HB_FALSE;
+  HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
   if (session != SR_NULLPTR) {
     if (lStmt) {
       while (SQLO_STILL_EXECUTING == (session->status = sqlo_executeselect(session->stmt, 1))) {
@@ -532,7 +532,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
       break;
     }
     case SQL_BIT: {
-      hb_itemPutL(pItem, HB_FALSE);
+      hb_itemPutL(pItem, false);
       break;
     }
 #ifdef SQLRDD_TOPCONN
@@ -634,7 +634,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
       break;
     }
     case SQL_BIT: {
-      hb_itemPutL(pItem, bBuffer[0] == '1' ? HB_TRUE : HB_FALSE);
+      hb_itemPutL(pItem, bBuffer[0] == '1' ? true : false);
       break;
     }
 #ifdef SQLRDD_TOPCONN
@@ -828,8 +828,8 @@ HB_FUNC(SR_ORACLEINBINDPARAM)
   int iFieldSize = hb_parni(4);
   int iPos = iParamNum - 1;
   int ret = SQL_ERROR;
-  HB_BOOL lStmt = HB_ISLOG(7) ? hb_parl(7) : HB_FALSE;
-  HB_BOOL isNull = HB_ISLOG(8) ? hb_parl(8) : HB_FALSE;
+  HB_BOOL lStmt = HB_ISLOG(7) ? hb_parl(7) : false;
+  HB_BOOL isNull = HB_ISLOG(8) ? hb_parl(8) : false;
 
   if (Stmt != SR_NULLPTR) {
 
@@ -1034,7 +1034,7 @@ HB_FUNC(SR_ORACLEPREPARE)
 {
   GET_OCI_SESSION(session, 1);
   const char *szSql = hb_parc(2);
-  HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : HB_FALSE;
+  HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
 
   if (session != SR_NULLPTR) {
     if (lStmt) {
