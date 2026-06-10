@@ -409,7 +409,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
     }
     hb_xfree(colName);
 
-    res = SQLPrepare(thiswa->colStmt[lFieldPosDB - 1], (SQLCHAR *)sSql, SQL_NTS);
+    res = SQLPrepare(thiswa->colStmt[lFieldPosDB - 1], reinterpret_cast<SQLCHAR *>(sSql), SQL_NTS);
 
     if (CHECK_SQL_N_OK(res)) {
       return HB_FAILURE;
@@ -523,7 +523,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
     }
 
     if (nTrim >= BindStructure->asChar.size_alloc) {
-      BindStructure->asChar.value = (SQLCHAR *)hb_xrealloc(BindStructure->asChar.value, nTrim + 1);
+      BindStructure->asChar.value = static_cast<SQLCHAR *>(hb_xrealloc(BindStructure->asChar.value, nTrim + 1));
       BindStructure->asChar.size_alloc = nTrim + 1;
     }
 
@@ -1167,7 +1167,7 @@ void SR_SetCurrRecordStructure(SQLEXAREAP thiswa)
 
     switch (cType) {
     case 'C': {
-      BindStructure->asChar.value = (SQLCHAR *)hb_xgrabz(BindStructure->ColumnSize + 1);
+      BindStructure->asChar.value = static_cast<SQLCHAR *>(hb_xgrabz(BindStructure->ColumnSize + 1));
       // memset(BindStructure->asChar.value, 0, BindStructure->ColumnSize + 1); // Culik Zero all memory
       BindStructure->asChar.size_alloc = BindStructure->ColumnSize + 1;
       BindStructure->iCType = SQL_C_CHAR;
@@ -1176,7 +1176,7 @@ void SR_SetCurrRecordStructure(SQLEXAREAP thiswa)
     }
     case 'M': {
       BindStructure->iCType = SQL_C_BINARY;
-      BindStructure->asChar.value = (SQLCHAR *)hb_xgrabz(INITIAL_MEMO_ALLOC);
+      BindStructure->asChar.value = static_cast<SQLCHAR *>(hb_xgrabz(INITIAL_MEMO_ALLOC));
       // memset(BindStructure->asChar.value, 0, INITIAL_MEMO_ALLOC); // Culik Zero all memory
       BindStructure->asChar.size_alloc = INITIAL_MEMO_ALLOC;
       BindStructure->asChar.size = 0;
@@ -1504,7 +1504,7 @@ static HB_ERRCODE getRecordList(SQLEXAREAP thiswa, int iMax) // Returns true if 
     return HB_FAILURE;
   }
 
-  res = SQLExecDirect(thiswa->hStmt, (SQLCHAR *)thiswa->sSql, SQL_NTS);
+  res = SQLExecDirect(thiswa->hStmt, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS);
 
   if (res == SQL_ERROR) {
     return HB_FAILURE; // It means a fault in SQL statement
@@ -1573,7 +1573,7 @@ static HB_ERRCODE getFirstColumnAsLong(SQLEXAREAP thiswa, long *szValue) // Retu
     return HB_FAILURE;
   }
 
-  res = SQLExecDirect(thiswa->hStmt, (SQLCHAR *)thiswa->sSql, SQL_NTS);
+  res = SQLExecDirect(thiswa->hStmt, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS);
 
   if (res == SQL_ERROR) {
     return HB_FAILURE; // It means a fault in SQL statement
@@ -1793,7 +1793,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
       return HB_FAILURE;
     }
 
-    res = SQLPrepare(thiswa->hStmtBuffer, (SQLCHAR *)(thiswa->sSqlBuffer), SQL_NTS);
+    res = SQLPrepare(thiswa->hStmtBuffer, reinterpret_cast<SQLCHAR *>(thiswa->sSqlBuffer), SQL_NTS);
     if (CHECK_SQL_N_OK(res)) {
       return HB_FAILURE;
     }
@@ -2002,7 +2002,7 @@ HB_ERRCODE prepareRecordListQuery(SQLEXAREAP thiswa)
     return HB_FAILURE;
   }
 
-  if (CHECK_SQL_N_OK(SQLPrepare(hPrep, (SQLCHAR *)(thiswa->sSql), SQL_NTS))) {
+  if (CHECK_SQL_N_OK(SQLPrepare(hPrep, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS))) {
     return HB_FAILURE;
   }
 
@@ -2849,7 +2849,7 @@ static HB_ERRCODE sqlExDeleteRec(SQLEXAREAP thiswa)
       return HB_FAILURE;
     }
 
-    res = SQLExecDirect(thiswa->hStmt, (SQLCHAR *)thiswa->sSql, SQL_NTS);
+    res = SQLExecDirect(thiswa->hStmt, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS);
     if (res == SQL_ERROR) {
       return HB_FAILURE; // It means a fault in SQL statement
     }
@@ -3245,7 +3245,7 @@ static HB_ERRCODE sqlExRecall(SQLEXAREAP thiswa)
       return HB_FAILURE;
     }
 
-    res = SQLExecDirect(thiswa->hStmt, (SQLCHAR *)thiswa->sSql, SQL_NTS);
+    res = SQLExecDirect(thiswa->hStmt, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS);
     if (res == SQL_ERROR) {
       return HB_FAILURE; // It means a fault in SQL statement
     }

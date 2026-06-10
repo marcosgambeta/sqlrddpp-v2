@@ -268,7 +268,7 @@ HB_ERRCODE prepareSeekQuery(SQLEXAREAP thiswa, INDEXBINDP SeekBind)
     return HB_FAILURE;
   }
 
-  if (CHECK_SQL_N_OK(SQLPrepare(hPrep, (SQLCHAR *)(thiswa->sSql), SQL_NTS))) {
+  if (CHECK_SQL_N_OK(SQLPrepare(hPrep, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS))) {
     return HB_FAILURE;
   }
 

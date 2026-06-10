@@ -240,13 +240,13 @@ HB_FUNC_STATIC(SR_DRIVERC)
   SQLSMALLINT wLen;
 #if defined(HB_OS_WIN_32) || defined(HB_OS_WIN)
   RETCODE ret =
-      SQLDriverConnect(SR_PAR_SQLHDBC(1), GetDesktopWindow(), (SQLCHAR *)hb_parcx(2),
-                       (SQLSMALLINT)strlen(hb_parcx(2)), (SQLCHAR *)bBuffer1, (SQLSMALLINT)1024, (SQLSMALLINT *)&wLen,
+      SQLDriverConnect(SR_PAR_SQLHDBC(1), GetDesktopWindow(), reinterpret_cast<SQLCHAR *>(const_cast<char *>(hb_parcx(2))),
+                       (SQLSMALLINT)strlen(hb_parcx(2)), static_cast<SQLCHAR *>(bBuffer1), (SQLSMALLINT)1024, (SQLSMALLINT *)&wLen,
                        (SQLUSMALLINT)SQL_DRIVER_NOPROMPT); // SQL_DRIVER_COMPLETE);
 #elif defined(HB_OS_UNIX)
   RETCODE ret =
-      SQLDriverConnect(SR_PAR_SQLHDBC(1), 0, (SQLCHAR *)hb_parcx(2), (SQLSMALLINT)strlen(hb_parcx(2)),
-                       (SQLCHAR *)bBuffer1, (SQLSMALLINT)1024, (SQLSMALLINT *)&wLen, (SQLUSMALLINT)SQL_DRIVER_COMPLETE);
+      SQLDriverConnect(SR_PAR_SQLHDBC(1), 0, static_cast<SQLCHAR *>(hb_parcx(2)), (SQLSMALLINT)strlen(hb_parcx(2)),
+                       static_cast<SQLCHAR *>(bBuffer1), (SQLSMALLINT)1024, (SQLSMALLINT *)&wLen, (SQLUSMALLINT)SQL_DRIVER_COMPLETE);
 #endif
   hb_storc((char *)bBuffer1, 3);
   hb_retni(ret);
@@ -314,7 +314,7 @@ HB_FUNC_STATIC(SR_FREESTM)
 
 HB_FUNC_STATIC(SR_EXECDIR)
 {
-  hb_retni(SQLExecDirect(SR_PAR_SQLHSTMT(1), (SQLCHAR *)hb_parcx(2), (SQLINTEGER)hb_parclen(2)));
+  hb_retni(SQLExecDirect(SR_PAR_SQLHSTMT(1), reinterpret_cast<SQLCHAR *>(const_cast<char *>(hb_parcx(2))), (SQLINTEGER)hb_parclen(2)));
 }
 
 //----------------------------------------------------------------------------//
@@ -1084,7 +1084,7 @@ HB_FUNC_STATIC(SR_TABLES)
 {
   RETCODE ret;
   ret = SQLTables(SR_PAR_SQLHSTMT(1), SR_NULLPTR, SQL_NTS, SR_NULLPTR, SQL_NTS, SR_NULLPTR, SQL_NTS,
-                  (SQLCHAR *)"TABLE", 5);
+                  reinterpret_cast<SQLCHAR *>(const_cast<char *>("TABLE")), 5);
   hb_retni(ret);
 }
 
@@ -1129,7 +1129,7 @@ HB_FUNC_STATIC(SR_ODBCWRITEMEMO)
         break;
       }
 
-      retcode = SQLExecDirect(hStmt, (SQLCHAR *)szSql, SQL_NTS);
+      retcode = SQLExecDirect(hStmt, reinterpret_cast<SQLCHAR *>(szSql), SQL_NTS);
       if (!(retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)) {
         SR_odbcErrorDiag(hStmt, "SQLExecDirect", szSql, __LINE__);
         break;

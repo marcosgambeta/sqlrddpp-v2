@@ -291,7 +291,7 @@ void SR_CreateInsertStmt(SQLEXAREAP thiswa)
     switch (cType) {
     case 'M': {
       InsertRecord->iCType = SQL_C_BINARY;
-      InsertRecord->asChar.value = (SQLCHAR *)hb_xgrab(INITIAL_MEMO_ALLOC);
+      InsertRecord->asChar.value = static_cast<SQLCHAR *>(hb_xgrab(INITIAL_MEMO_ALLOC));
       InsertRecord->asChar.size_alloc = INITIAL_MEMO_ALLOC;
       InsertRecord->asChar.size = 0;
       InsertRecord->asChar.value[0] = '\0';
@@ -299,7 +299,7 @@ void SR_CreateInsertStmt(SQLEXAREAP thiswa)
       break;
     }
     case 'C': {
-      InsertRecord->asChar.value = (SQLCHAR *)hb_xgrab(InsertRecord->ColumnSize + 1);
+      InsertRecord->asChar.value = static_cast<SQLCHAR *>(hb_xgrab(InsertRecord->ColumnSize + 1));
       InsertRecord->asChar.size_alloc = InsertRecord->ColumnSize + 1;
       InsertRecord->iCType = SQL_C_CHAR;
       InsertRecord->asChar.size = 0;
@@ -409,7 +409,7 @@ HB_ERRCODE SR_PrepareInsertStmt(SQLEXAREAP thiswa)
     return HB_FAILURE;
   }
 
-  res = SQLPrepare(thiswa->hStmtInsert, (SQLCHAR *)(thiswa->sSql), SQL_NTS);
+  res = SQLPrepare(thiswa->hStmtInsert, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS);
 
   if (CHECK_SQL_N_OK(res)) {
     SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmt", thiswa->sSql, res, __LINE__, __FILE__);
@@ -644,7 +644,7 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREAP thiswa)
         return HB_FAILURE;
       }
 
-      _res = SQLPrepare(thiswa->hStmtNextval, (SQLCHAR *)(ident), SQL_NTS);
+      _res = SQLPrepare(thiswa->hStmtNextval, reinterpret_cast<SQLCHAR *>(ident), SQL_NTS);
       if (CHECK_SQL_N_OK(_res)) {
         SR_odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLPrepare", ident, _res, __LINE__, __FILE__);
         return HB_FAILURE;
@@ -810,7 +810,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
     return HB_FAILURE;
   }
 
-  res = SQLPrepare(thiswa->hStmtUpdate, (SQLCHAR *)(thiswa->sSql), SQL_NTS);
+  res = SQLPrepare(thiswa->hStmtUpdate, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS);
   if (CHECK_SQL_N_OK(res)) {
     SR_odbcErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
     return HB_FAILURE;

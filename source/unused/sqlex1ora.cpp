@@ -1852,7 +1852,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
       return HB_FAILURE;
     }
 
-    // res = SQLPrepare(thiswa->hStmtBuffer, (SQLCHAR *) (thiswa->sSqlBuffer), SQL_NTS);
+    // res = SQLPrepare(thiswa->hStmtBuffer, static_cast<SQLCHAR *>(thiswa->sSqlBuffer), SQL_NTS);
     if (!OCI_Prepare(thiswa->hStmtBuffer, (char *)(thiswa->sSqlBuffer))) {
       return HB_FAILURE;
     }
