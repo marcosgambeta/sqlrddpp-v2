@@ -241,12 +241,12 @@ HB_FUNC_STATIC(SR_DRIVERC)
 #if defined(HB_OS_WIN_32) || defined(HB_OS_WIN)
   RETCODE ret =
       SQLDriverConnect(SR_PAR_SQLHDBC(1), GetDesktopWindow(), reinterpret_cast<SQLCHAR *>(const_cast<char *>(hb_parcx(2))),
-                       static_cast<SQLSMALLINT>(strlen(hb_parcx(2))), static_cast<SQLCHAR *>(bBuffer1), static_cast<SQLSMALLINT>(1024), (SQLSMALLINT *)&wLen,
+                       static_cast<SQLSMALLINT>(strlen(hb_parcx(2))), static_cast<SQLCHAR *>(bBuffer1), static_cast<SQLSMALLINT>(1024), static_cast<SQLSMALLINT *>(&wLen),
                        static_cast<SQLUSMALLINT>(SQL_DRIVER_NOPROMPT)); // SQL_DRIVER_COMPLETE);
 #elif defined(HB_OS_UNIX)
   RETCODE ret =
       SQLDriverConnect(SR_PAR_SQLHDBC(1), 0, static_cast<SQLCHAR *>(hb_parcx(2)), static_cast<SQLSMALLINT>(strlen(hb_parcx(2))),
-                       static_cast<SQLCHAR *>(bBuffer1), static_cast<SQLSMALLINT>(1024), (SQLSMALLINT *)&wLen, static_cast<SQLUSMALLINT>(SQL_DRIVER_COMPLETE));
+                       static_cast<SQLCHAR *>(bBuffer1), static_cast<SQLSMALLINT>(1024), static_cast<SQLSMALLINT *>(&wLen), static_cast<SQLUSMALLINT>(SQL_DRIVER_COMPLETE));
 #endif
   hb_storc((char *)bBuffer1, 3);
   hb_retni(ret);
@@ -928,7 +928,7 @@ HB_FUNC_STATIC(SR_COLATTRIBUTE)
   SQLLEN wNumPtr = static_cast<SQLLEN>(hb_parnint(7));
   RETCODE wResult =
       SQLColAttribute(SR_PAR_SQLHSTMT(1), SR_PAR_SQLUSMALLINT(2), SR_PAR_SQLUSMALLINT(3), static_cast<SQLPOINTER>(bBuffer),
-                      SR_PAR_SQLSMALLINT(5), (SQLSMALLINT *)&wBufLen, (SQLLEN *)&wNumPtr);
+                      SR_PAR_SQLSMALLINT(5), static_cast<SQLSMALLINT *>(&wBufLen), (SQLLEN *)&wNumPtr);
 
   if (wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO) {
     // hb_storclen((LPSTR) bBuffer, static_cast<int>(wBufLen), 4);
@@ -952,7 +952,7 @@ HB_FUNC_STATIC(SR_ERROR)
 
   hb_retni(SQLError(SR_PAR_SQLHENV(1), SR_PAR_SQLHDBC(2), SR_PAR_SQLHSTMT(3), (SQLTCHAR *)bBuffer1,
                     (SQLINTEGER *)&lError, (SQLTCHAR *)szErrorMsg, static_cast<SQLSMALLINT>(HB_SIZEOFARRAY(szErrorMsg)),
-                    (SQLSMALLINT *)&wLen));
+                    static_cast<SQLSMALLINT *>(&wLen)));
 
   hb_storc((char *)bBuffer1, 4);
   hb_stornl(lError, 5);
@@ -966,7 +966,7 @@ HB_FUNC_STATIC(SR_GETINFO)
   char bBuffer[512] = {0};
   SQLSMALLINT wLen;
   RETCODE wResult = SQLGetInfo(SR_PAR_SQLHDBC(1), SR_PAR_SQLUSMALLINT(2), static_cast<SQLPOINTER>(bBuffer), static_cast<SQLSMALLINT>(512),
-                               (SQLSMALLINT *)&wLen);
+                               static_cast<SQLSMALLINT *>(&wLen));
   hb_storclen((char *)bBuffer, wLen, 3);
   hb_retni(wResult);
 }
@@ -1070,7 +1070,7 @@ void SR_odbcErrorDiag(SQLHSTMT hStmt, const char *routine, const char *szSql, in
 
   i = 1;
   while ((SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, static_cast<SQLSMALLINT>(i), (SQLTCHAR *)SqlState, (SQLINTEGER *)&NativeError,
-                        (SQLTCHAR *)Msg, static_cast<SQLSMALLINT>(sizeof(Msg)), (SQLSMALLINT *)&MsgLen)) != SQL_NO_DATA) {
+                        (SQLTCHAR *)Msg, static_cast<SQLSMALLINT>(sizeof(Msg)), static_cast<SQLSMALLINT *>(&MsgLen))) != SQL_NO_DATA) {
     i++;
   }
 
