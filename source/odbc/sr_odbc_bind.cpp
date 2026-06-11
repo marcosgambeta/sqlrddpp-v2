@@ -891,10 +891,10 @@ HB_FUNC_STATIC(SR_DESCRIB)
     lLen = 64;
   }
 
-  bBuffer = (SQLTCHAR *)hb_xgrab(lLen * sizeof(SQLTCHAR));
+  bBuffer = static_cast<SQLTCHAR *>(hb_xgrab(lLen * sizeof(SQLTCHAR)));
   bBuffer[0] = '\0';
 
-  wResult = SQLDescribeCol((HSTMT)hb_parptr(1), SR_PAR_SQLUSMALLINT(2), (SQLTCHAR *)bBuffer, lLen,
+  wResult = SQLDescribeCol((HSTMT)hb_parptr(1), SR_PAR_SQLUSMALLINT(2), static_cast<SQLTCHAR *>(bBuffer), lLen,
                            &wBufLen, &wDataType, &wColSize,
                            &wDecimals, &wNullable);
   if (wDataType == -8 && ulSystemID == SQLRDD_RDBMS_MYSQL) {
@@ -950,8 +950,8 @@ HB_FUNC_STATIC(SR_ERROR)
   SQLINTEGER lError;
   SQLSMALLINT wLen;
 
-  hb_retni(SQLError(SR_PAR_SQLHENV(1), SR_PAR_SQLHDBC(2), SR_PAR_SQLHSTMT(3), (SQLTCHAR *)bBuffer1,
-                    static_cast<SQLINTEGER *>(&lError), (SQLTCHAR *)szErrorMsg, static_cast<SQLSMALLINT>(HB_SIZEOFARRAY(szErrorMsg)),
+  hb_retni(SQLError(SR_PAR_SQLHENV(1), SR_PAR_SQLHDBC(2), SR_PAR_SQLHSTMT(3), static_cast<SQLTCHAR *>(bBuffer1),
+                    static_cast<SQLINTEGER *>(&lError), static_cast<SQLTCHAR *>(szErrorMsg), static_cast<SQLSMALLINT>(HB_SIZEOFARRAY(szErrorMsg)),
                     static_cast<SQLSMALLINT *>(&wLen)));
 
   hb_storc((char *)bBuffer1, 4);
@@ -1069,8 +1069,8 @@ void SR_odbcErrorDiag(SQLHSTMT hStmt, const char *routine, const char *szSql, in
   Msg[0] = '\0';
 
   i = 1;
-  while ((SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, static_cast<SQLSMALLINT>(i), (SQLTCHAR *)SqlState, static_cast<SQLINTEGER *>(&NativeError),
-                        (SQLTCHAR *)Msg, static_cast<SQLSMALLINT>(sizeof(Msg)), static_cast<SQLSMALLINT *>(&MsgLen))) != SQL_NO_DATA) {
+  while ((SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, static_cast<SQLSMALLINT>(i), static_cast<SQLTCHAR *>(SqlState), static_cast<SQLINTEGER *>(&NativeError),
+                        static_cast<SQLTCHAR *>(Msg), static_cast<SQLSMALLINT>(sizeof(Msg)), static_cast<SQLSMALLINT *>(&MsgLen))) != SQL_NO_DATA) {
     i++;
   }
 
