@@ -3745,7 +3745,7 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREAP thiswa, HB_USHORT uiIndex, LPDBORDER
     }
     case DBOI_POSITION:
     case DBOI_KEYNORAW: {
-      pInfo->itmResult = hb_itemPutNL(pInfo->itmResult, (long)(thiswa->recordListPos + 1));
+      pInfo->itmResult = hb_itemPutNL(pInfo->itmResult, static_cast<long>(thiswa->recordListPos + 1));
       uiError = HB_SUCCESS;
       break;
     }

@@ -339,7 +339,7 @@ HB_FUNC_STATIC(SR_PGSCOLS)
     return;
   }
 
-  hb_retnl((long)PQnfields(res));
+  hb_retnl(static_cast<long>(PQnfields(res)));
 }
 
 //----------------------------------------------------------------------------//

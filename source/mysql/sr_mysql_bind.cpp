@@ -599,7 +599,7 @@ HB_FUNC_STATIC(SR_MYSVERS)
     return;
   }
 
-  hb_retnl((long)mysql_get_server_version(session->dbh));
+  hb_retnl(static_cast<long>(mysql_get_server_version(session->dbh)));
 }
 
 //----------------------------------------------------------------------------//

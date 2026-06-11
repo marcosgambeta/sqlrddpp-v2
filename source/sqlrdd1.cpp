@@ -340,7 +340,7 @@ static void sqlGetCleanBuffer(SQLAREAP thiswa)
   hb_arraySetForward(thiswa->aInfo, AINFO_RECNO, &pCol);
   //hb_itemRelease(pCol);
   if (!thiswa->isam) {
-    hb_arraySetNL(thiswa->aInfo, AINFO_NPOSCACHE, (long)hb_arrayLen(thiswa->aCache) + 1);
+    hb_arraySetNL(thiswa->aInfo, AINFO_NPOSCACHE, static_cast<long>(hb_arrayLen(thiswa->aCache)) + 1);
   }
 }
 

@@ -161,7 +161,7 @@ static void fb_log_status3(PFB_SESSION session, const char *from)
     // util_output("%s%s", s, nl);
   }
 
-  session->errorcode = (long)session->status[1];
+  session->errorcode = static_cast<long>(session->status[1]);
   HB_SYMBOL_UNUSED(from);
 
   if (session->transac) {
