@@ -683,7 +683,7 @@ HB_FUNC(SR_XML_NODE_CLONE_TREE)
 // reads a data node
 static void mxml_node_read_data(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, int iStyle)
 {
-  char *buf = (char *)MXML_ALLOCATOR(MXML_ALLOC_BLOCK);
+  char *buf = static_cast<char *>(MXML_ALLOCATOR(MXML_ALLOC_BLOCK));
   int iAllocated = MXML_ALLOC_BLOCK;
   int iPos = 0;
   int chr;
@@ -750,7 +750,7 @@ static void mxml_node_read_data(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, i
 
       if (iPos >= iAllocated) {
         iAllocated += MXML_ALLOC_BLOCK;
-        buf = (char *)MXML_REALLOCATOR(buf, iAllocated);
+        buf = static_cast<char *>(MXML_REALLOCATOR(buf, iAllocated));
       }
     } else {
       mxml_refil_ungetc(ref, chr);
@@ -783,7 +783,7 @@ static void mxml_node_read_data(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, i
   hb_objSendMsg(pNode, "_NTYPE", 1, pItem);
 
   if (iAllocated > iPos + 1) {
-    buf = (char *)MXML_REALLOCATOR(buf, iPos + 1);
+    buf = static_cast<char *>(MXML_REALLOCATOR(buf, iPos + 1));
   }
 
   hb_itemPutCL(pItem, buf, iPos);
@@ -800,7 +800,7 @@ static MXML_STATUS mxml_node_read_name(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM
   int iPos = 0;
   int iStatus = 0;
 
-  buf = (char *)MXML_ALLOCATOR(MXML_ALLOC_BLOCK);
+  buf = static_cast<char *>(MXML_ALLOCATOR(MXML_ALLOC_BLOCK));
   iAllocated = MXML_ALLOC_BLOCK;
 
   while (iStatus < 2) {
@@ -840,7 +840,7 @@ static MXML_STATUS mxml_node_read_name(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM
 
     if (iPos >= iAllocated) {
       iAllocated += MXML_ALLOC_BLOCK;
-      buf = (char *)MXML_REALLOCATOR(buf, iAllocated);
+      buf = static_cast<char *>(MXML_REALLOCATOR(buf, iAllocated));
       if (!buf) {
         hbxml_set_doc_status(ref, doc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_NAMETOOLONG);
         return MXML_STATUS_MALFORMED;
@@ -856,7 +856,7 @@ static MXML_STATUS mxml_node_read_name(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM
 
   buf[iPos] = 0;
   if (iAllocated > iPos + 1) {
-    buf = (char *)MXML_REALLOCATOR(buf, iPos + 1);
+    buf = static_cast<char *>(MXML_REALLOCATOR(buf, iPos + 1));
   }
 
   pItem = hb_itemPutCL(SR_NULLPTR, buf, iPos);
@@ -904,7 +904,7 @@ static MXML_STATUS mxml_node_read_attributes(MXML_REFIL *ref, PHB_ITEM pNode, PH
 
 static void mxml_node_read_directive(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc)
 {
-  char *buf = (char *)MXML_ALLOCATOR(MXML_ALLOC_BLOCK);
+  char *buf = static_cast<char *>(MXML_ALLOCATOR(MXML_ALLOC_BLOCK));
 
   if (mxml_node_read_name(ref, pNode, doc) == MXML_STATUS_OK) {
     int iAllocated = MXML_ALLOC_BLOCK;
@@ -919,7 +919,7 @@ static void mxml_node_read_directive(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM d
 
       if (iPos >= iAllocated) {
         iAllocated += MXML_ALLOC_BLOCK;
-        buf = (char *)MXML_REALLOCATOR(buf, iAllocated);
+        buf = static_cast<char *>(MXML_REALLOCATOR(buf, iAllocated));
       }
 
       if (chr == MXML_LINE_TERMINATOR) {
@@ -934,7 +934,7 @@ static void mxml_node_read_directive(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM d
       buf[iPos] = 0;
       hb_objSendMsg(pNode, "_NTYPE", 1, pItem);
       if (iAllocated > iPos + 1) {
-        buf = (char *)MXML_REALLOCATOR(buf, iPos + 1);
+        buf = static_cast<char *>(MXML_REALLOCATOR(buf, iPos + 1));
       }
 
       hb_itemPutCL(pItem, buf, iPos);
@@ -960,7 +960,7 @@ static void mxml_node_read_pi(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc)
 
   // and then we'll put all the "data" into the data member, up to ?>
 
-  buf = (char *)MXML_ALLOCATOR(MXML_ALLOC_BLOCK);
+  buf = static_cast<char *>(MXML_ALLOCATOR(MXML_ALLOC_BLOCK));
   iAllocated = MXML_ALLOC_BLOCK;
 
   while (iStatus < 2) {
@@ -998,7 +998,7 @@ static void mxml_node_read_pi(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc)
 
     if (iPos == iAllocated) {
       iAllocated += MXML_ALLOC_BLOCK;
-      buf = (char *)MXML_REALLOCATOR(buf, iAllocated);
+      buf = static_cast<char *>(MXML_REALLOCATOR(buf, iAllocated));
     }
   }
 
@@ -1007,7 +1007,7 @@ static void mxml_node_read_pi(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc)
     buf[iPos] = 0;
     hb_objSendMsg(pNode, "_NTYPE", 1, pItem);
     if (iAllocated > iPos + 1) {
-      buf = (char *)MXML_REALLOCATOR(buf, iPos + 1);
+      buf = static_cast<char *>(MXML_REALLOCATOR(buf, iPos + 1));
     }
 
     hb_itemPutCL(pItem, buf, iPos);
@@ -1062,7 +1062,7 @@ static void mxml_node_read_comment(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc
 
   // we'll put all the comment into the data member, up to ->
 
-  buf = (char *)MXML_ALLOCATOR(MXML_ALLOC_BLOCK);
+  buf = static_cast<char *>(MXML_ALLOCATOR(MXML_ALLOC_BLOCK));
   iAllocated = MXML_ALLOC_BLOCK;
 
   while (iStatus < 3) {
@@ -1108,14 +1108,14 @@ static void mxml_node_read_comment(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc
 
     if (iPos == iAllocated) {
       iAllocated += MXML_ALLOC_BLOCK;
-      buf = (char *)MXML_REALLOCATOR(buf, iAllocated);
+      buf = static_cast<char *>(MXML_REALLOCATOR(buf, iAllocated));
     }
   }
 
   if (ref->status == MXML_STATUS_OK) {
     buf[iPos] = 0;
     if (iAllocated > iPos + 1) {
-      buf = (char *)MXML_REALLOCATOR(buf, iPos + 1);
+      buf = static_cast<char *>(MXML_REALLOCATOR(buf, iPos + 1));
     }
 
     hb_itemPutCL(pItem, buf, iPos);
@@ -1210,7 +1210,7 @@ static void mxml_node_read_cdata(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM pDoc)
   } else {
     int iPos = 0, iAllocated = MXML_ALLOC_BLOCK;
 
-    char *buf = (char *)MXML_ALLOCATOR(MXML_ALLOC_BLOCK);
+    char *buf = static_cast<char *>(MXML_ALLOCATOR(MXML_ALLOC_BLOCK));
 
     iStatus = 0;
 
@@ -1258,14 +1258,14 @@ static void mxml_node_read_cdata(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM pDoc)
 
       if (iPos == iAllocated) {
         iAllocated += MXML_ALLOC_BLOCK;
-        buf = (char *)MXML_REALLOCATOR(buf, iAllocated);
+        buf = static_cast<char *>(MXML_REALLOCATOR(buf, iAllocated));
       }
     }
 
     if (ref->status == MXML_STATUS_OK) {
       buf[iPos] = 0;
       if (iAllocated > iPos + 1) {
-        buf = (char *)MXML_REALLOCATOR(buf, iPos + 1);
+        buf = static_cast<char *>(MXML_REALLOCATOR(buf, iPos + 1));
       }
 
       hb_itemPutCL(pItem, buf, iPos);
@@ -1288,7 +1288,7 @@ static int mxml_node_read_closing(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc)
 
   hb_objSendMsg(pNode, "CNAME", 0);
   iLen = hb_parclen(-1) + 1;
-  buf = (char *)MXML_ALLOCATOR(iLen);
+  buf = static_cast<char *>(MXML_ALLOCATOR(iLen));
 
   chr = mxml_refil_getc(ref);
   while (chr != MXML_EOF && chr != '>' && chr != ' ' && iPos < iLen) {
@@ -1970,7 +1970,7 @@ static MXML_SGS *mxml_sgs_new()
     return SR_NULLPTR;
   }
 
-  ret->buffer = (char *)MXML_ALLOCATOR(MXML_ALLOC_BLOCK);
+  ret->buffer = static_cast<char *>(MXML_ALLOCATOR(MXML_ALLOC_BLOCK));
   if (ret->buffer == SR_NULLPTR) {
     MXML_DELETOR(ret);
     return SR_NULLPTR;
@@ -1998,7 +1998,7 @@ static MXML_STATUS mxml_sgs_append_char(MXML_SGS *sgs, char c)
   sgs->buffer[sgs->length++] = c;
 
   if (sgs->length >= sgs->allocated) {
-    char *buf = (char *)MXML_REALLOCATOR(sgs->buffer, sgs->allocated + MXML_ALLOC_BLOCK);
+    char *buf = static_cast<char *>(MXML_REALLOCATOR(sgs->buffer, sgs->allocated + MXML_ALLOC_BLOCK));
 
     if (buf == SR_NULLPTR) {
       return MXML_STATUS_ERROR;
@@ -2016,7 +2016,7 @@ static MXML_STATUS mxml_sgs_append_string_len(MXML_SGS *sgs, const char *s, HB_I
   if (slen > 0) {
     if (sgs->length + slen >= sgs->allocated) {
       HB_ISIZ blklen = ((sgs->length + slen) / MXML_ALLOC_BLOCK + 1) * MXML_ALLOC_BLOCK;
-      char *buf = (char *)MXML_REALLOCATOR(sgs->buffer, blklen);
+      char *buf = static_cast<char *>(MXML_REALLOCATOR(sgs->buffer, blklen));
 
       if (buf == SR_NULLPTR) {
         return MXML_STATUS_ERROR;
@@ -2046,7 +2046,7 @@ static char *mxml_sgs_extract(MXML_SGS *sgs)
   sgs->buffer[sgs->length] = 0;
 
   if (sgs->allocated > sgs->length + 1) {
-    sgs->buffer = (char *)MXML_REALLOCATOR(sgs->buffer, sgs->length + 1);
+    sgs->buffer = static_cast<char *>(MXML_REALLOCATOR(sgs->buffer, sgs->length + 1));
   }
 
   return sgs->buffer;

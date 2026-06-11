@@ -209,7 +209,7 @@ HB_FUNC_STATIC(SR_SQLO_DISCONNECT)
 HB_FUNC_STATIC(SR_SQLO_GETERRORDESCR)
 {
   GET_OCI_SESSION(session, 1);
-  hb_retc(session != SR_NULLPTR ? (char *)sqlo_geterror(session->dbh) : "Not connected to Oracle");
+  hb_retc(session != SR_NULLPTR ? const_cast<char *>(sqlo_geterror(session->dbh)) : "Not connected to Oracle");
 }
 
 //-----------------------------------------------------------------------------//
@@ -510,7 +510,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
     // database content is NULL
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = (char *)hb_xgrab(lLen + 1);
+      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
       szResult[lLen] = '\0';
       hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -553,7 +553,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
     switch (lType) {
     case SQL_CHAR: {
       HB_SIZE lPos;
-      char *szResult = (char *)hb_xgrab(lLen + 1);
+      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
 
       for (lPos = lLenBuff; lPos < lLen; lPos++) {
@@ -683,7 +683,7 @@ HB_FUNC_STATIC(SR_SQLO_LINE)
 
     for (i = 0; i < session->numcols; i++) {
       temp = hb_itemNew(SR_NULLPTR);
-      hb_arraySetForward(ret, i + 1, hb_itemPutCL(temp, (char *)line[i], lens[i]));
+      hb_arraySetForward(ret, i + 1, hb_itemPutCL(temp, static_cast<char *>(line[i]), lens[i]));
       hb_itemRelease(temp);
     }
   }
@@ -722,7 +722,7 @@ HB_FUNC_STATIC(SR_SQLO_LINEPROCESSED)
       temp = hb_itemNew(SR_NULLPTR);
 
       if (lIndex != 0) {
-        SQLO_FieldGet(hb_arrayGetItemPtr(pFields, i + 1), temp, (char *)line[lIndex - 1], lens[lIndex - 1], bQueryOnly,
+        SQLO_FieldGet(hb_arrayGetItemPtr(pFields, i + 1), temp, const_cast<char *>(line[lIndex - 1]), lens[lIndex - 1], bQueryOnly,
                       ulSystemID, bTranslate);
       }
       hb_arraySetForward(pRet, i + 1, temp);
@@ -945,7 +945,7 @@ HB_FUNC(SR_ORACLEINBINDPARAM)
       if (iFieldSize == 0) {
         iFieldSize = 1;
       }
-      Stmt->pLink[iPos].col_name = (char *)hb_xgrab(sizeof(char) * (iFieldSize + 1));
+      Stmt->pLink[iPos].col_name = static_cast<char *>(hb_xgrab(sizeof(char) * (iFieldSize + 1)));
       memset(Stmt->pLink[iPos].col_name, '\0', (iFieldSize + 1) * sizeof(char));
 
       if (HB_ISCHAR(6)) {

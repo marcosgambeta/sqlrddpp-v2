@@ -264,7 +264,7 @@ static void sr_MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
   if (lLenBuff <= 0) { // database content is NULL
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = (char *)hb_xgrab(lLen + 1);
+      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
       szResult[lLen] = '\0';
       hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -311,7 +311,7 @@ static void sr_MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
     switch (lType) {
     case SQL_CHAR: {
       HB_SIZE lPos;
-      char *szResult = (char *)hb_xgrab(lLen + 1);
+      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       memset(szResult, ' ', lLen);
       hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
       for (lPos = lLenBuff; lPos < lLen; lPos++) {
@@ -477,7 +477,7 @@ HB_FUNC_STATIC(SR_MARIADBLINEPROCESSED)
 
       if (lIndex != 0) {
         if (thisrow[lIndex - 1]) {
-          sr_MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), &TempItem, (char *)thisrow[lIndex - 1], lens[lIndex - 1],
+          sr_MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), &TempItem, static_cast<char *>(thisrow[lIndex - 1]), lens[lIndex - 1],
                        /*bQueryOnly,*/ /*ulSystemID,*/ bTranslate);
         } else {
           sr_MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), &TempItem, "", 0, /*bQueryOnly,*/ /*ulSystemID,*/ bTranslate);
@@ -554,7 +554,7 @@ HB_FUNC_STATIC(SR_MARIADBRESSTATUS)
     return;
   }
 
-  hb_retc((char *)mysql_error(session->dbh));
+  hb_retc(const_cast<char *>(mysql_error(session->dbh)));
 }
 
 //----------------------------------------------------------------------------//
@@ -617,7 +617,7 @@ HB_FUNC_STATIC(SR_MARIADBERRMSG)
     return;
   }
 
-  hb_retc((char *)mysql_error(session->dbh));
+  hb_retc(const_cast<char *>(mysql_error(session->dbh)));
 }
 
 //----------------------------------------------------------------------------//

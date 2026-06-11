@@ -556,7 +556,7 @@ static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 
   if (HB_IS_DATE(pKey)) {
     len2 = 8;
-    valbuf = (char *)hb_xgrab(9);
+    valbuf = static_cast<char *>(hb_xgrab(9));
     val2 = hb_itemGetDS(pKey, valbuf);
   } else if (HB_IS_NUMBER(pKey)) {
     PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, static_cast<HB_LONG>(len1));
@@ -1168,7 +1168,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     } else {
       PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR);
       HB_SIZE nLen = pField->uiLen, nSrcLen;
-      char *empty = (char *)hb_xgrab(nLen + 1);
+      char *empty = static_cast<char *>(hb_xgrab(nLen + 1));
 
       if (hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &nPos) ||
           hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &nPos) ||
@@ -1311,7 +1311,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     if (pField->uiType == HB_FT_STRING) {
       HB_SIZE nSize = hb_itemGetCLen(value), nLen = pField->uiLen;
 
-      cfield = (char *)hb_xgrab(nLen + 1);
+      cfield = static_cast<char *>(hb_xgrab(nLen + 1));
 #ifndef HB_CDP_SUPPORT_OFF
       hb_cdpnDup2(hb_itemGetCPtr(value), nSize, cfield, &nLen, thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP(),
                   thiswa->area.cdPage);
@@ -1556,12 +1556,12 @@ static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo)
 
   thiswa->creating = true;
 
-  thiswa->szDataFileName = (char *)hb_xgrab(strlen((char *)pCreateInfo->abName) + 1);
-  strcpy(thiswa->szDataFileName, (char *)pCreateInfo->abName);
+  thiswa->szDataFileName = static_cast<char *>(hb_xgrab(strlen(const_cast<char *>(pCreateInfo->abName)) + 1));
+  strcpy(thiswa->szDataFileName, const_cast<char *>(pCreateInfo->abName));
 
   pTable = hb_itemPutC(pTable, thiswa->szDataFileName);
   if (pCreateInfo->atomAlias) {
-    hb_itemPutC(pAlias, (char *)pCreateInfo->atomAlias);
+    hb_itemPutC(pAlias, const_cast<char *>(pCreateInfo->atomAlias));
   }
   hb_itemPutNL(pArea, pCreateInfo->uiArea);
 
@@ -1773,7 +1773,7 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
       }
     }
     if (thiswa->cdPageCnv) {
-      hb_itemPutC(pItem, (char *)thiswa->cdPageCnv->id);
+      hb_itemPutC(pItem, const_cast<char *>(thiswa->cdPageCnv->id));
     } else {
       hb_itemPutC(pItem, "");
     }
@@ -1970,13 +1970,13 @@ static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo)
 
   char szAlias[HB_RDD_MAX_ALIAS_LEN + 1];
 
-  thiswa->szDataFileName = (char *)hb_xgrab(strlen((char *)pOpenInfo->abName) + 1);
-  strcpy(thiswa->szDataFileName, (char *)pOpenInfo->abName);
+  thiswa->szDataFileName = static_cast<char *>(hb_xgrab(strlen((char *)pOpenInfo->abName) + 1));
+  strcpy(thiswa->szDataFileName, const_cast<char *>(pOpenInfo->abName));
 
   // Create default alias if necessary
   if (!pOpenInfo->atomAlias) {
     PHB_FNAME pFileName;
-    pFileName = hb_fsFNameSplit((char *)pOpenInfo->abName);
+    pFileName = hb_fsFNameSplit(const_cast<char *>(pOpenInfo->abName));
     hb_strncpyUpperTrim(szAlias, pFileName->szName, HB_RDD_MAX_ALIAS_LEN);
     pOpenInfo->atomAlias = szAlias;
     hb_xfree(pFileName);
@@ -2003,11 +2003,11 @@ static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo)
   hb_itemPutNL(&pArea, pOpenInfo->uiArea);
   hb_itemPutL(&pShared, thiswa->shared);
   hb_itemPutL(&pReadOnly, thiswa->readonly);
-  hb_itemPutC(pAlias, (char *)pOpenInfo->atomAlias);
+  hb_itemPutC(pAlias, const_cast<char *>(pOpenInfo->atomAlias));
 
 #ifndef HB_CDP_SUPPORT_OFF
   if (pOpenInfo->cdpId) {
-    thiswa->area.cdPage = hb_cdpFind((char *)pOpenInfo->cdpId);
+    thiswa->area.cdPage = hb_cdpFind(const_cast<char *>(pOpenInfo->cdpId));
     if (!thiswa->area.cdPage) {
       thiswa->area.cdPage = hb_vmCDP();
     }

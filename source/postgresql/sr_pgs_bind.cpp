@@ -820,7 +820,7 @@ static void sr_PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
   if (lLenBuff <= 0) { // database content is NULL
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = (char *)hb_xgrab(lLen + 1);
+      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
       szResult[lLen] = '\0';
       hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -867,7 +867,7 @@ static void sr_PGSFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
     switch (lType) {
     case SQL_CHAR: {
       HB_SIZE lPos;
-      char *szResult = (char *)hb_xgrab(lLen + 1);
+      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
       for (lPos = lLenBuff; lPos < lLen; lPos++) {
         szResult[lPos] = ' ';
@@ -1045,7 +1045,7 @@ HB_FUNC_STATIC(SR_PGSLINEPROCESSED)
 
     if (lIndex != 0) {
       col = PQgetvalue(session->stmt, session->ifetch, lIndex - 1);
-      sr_PGSFieldGet(hb_arrayGetItemPtr(pFields, i + 1), &temp, (char *)col, strlen(col), /*bQueryOnly,*/ /*ulSystemID,*/
+      sr_PGSFieldGet(hb_arrayGetItemPtr(pFields, i + 1), &temp, static_cast<char *>(col), strlen(col), /*bQueryOnly,*/ /*ulSystemID,*/
                   bTranslate);
     }
     hb_arraySetForward(pRet, i + 1, &temp);

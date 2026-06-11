@@ -449,7 +449,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
   // lType = hb_arrayGetNL(pFieldStruct, FIELD_DOMAIN);
   SR_odbcGetData((HSTMT)thiswa->colStmt[lFieldPosDB - 1], hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB), pFieldData, 0,
               thiswa->nSystemID, false, 1);
-  // SR_odbcFieldGet(hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB), pFieldData, (char *) bBuffer, lLenOut, 0,
+  // SR_odbcFieldGet(hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB), pFieldData, static_cast<char *>(bBuffer), lLenOut, 0,
   // thiswa->nSystemID, false);
 
   SQLFreeStmt(thiswa->colStmt[lFieldPosDB - 1], SQL_CLOSE);
@@ -1628,15 +1628,15 @@ HB_BOOL SR_getColumnList(SQLEXAREAP thiswa)
   //    and new query generated with new column list
   //    THIS IS STILL NOT IMPLEMENTED
 
-  colName = (char *)hb_xgrab(HB_SYMBOL_NAME_LEN + 1);
+  colName = static_cast<char *>(hb_xgrab(HB_SYMBOL_NAME_LEN + 1));
 
   if (thiswa->iColumnListStatus == FIELD_LIST_LEARNING) {
     if (!thiswa->sFields) {
-      thiswa->sFields = (char *)hb_xgrab(FIELD_LIST_SIZE * sizeof(char));
+      thiswa->sFields = static_cast<char *>(hb_xgrab(FIELD_LIST_SIZE * sizeof(char)));
       uiFlds = 0;
       for (n = 1; n <= thiswa->area.uiFieldCount; n++) {
         pField = thiswa->area.lpFields + n - 1;
-        fName = (char *)hb_dynsymName((PHB_DYNS)pField->sym);
+        fName = const_cast<char *>(hb_dynsymName((PHB_DYNS)pField->sym));
         len = static_cast<int>(strlen(fName));
         memset(colName, 0, HB_SYMBOL_NAME_LEN);
         hb_xmemcpy(colName, fName, len);
@@ -1668,12 +1668,12 @@ HB_BOOL SR_getColumnList(SQLEXAREAP thiswa)
              thiswa->iColumnListStatus == FIELD_LIST_NEW_VALUE_READ) {
     uiFlds = 0;
     if (!thiswa->sFields) {
-      thiswa->sFields = (char *)hb_xgrab(FIELD_LIST_SIZE * sizeof(char));
+      thiswa->sFields = static_cast<char *>(hb_xgrab(FIELD_LIST_SIZE * sizeof(char)));
     }
     for (n = 1; n <= thiswa->area.uiFieldCount; n++) {
       if (thiswa->uiFieldList[n - 1]) {
         pField = thiswa->area.lpFields + n - 1;
-        fName = (char *)hb_dynsymName((PHB_DYNS)pField->sym);
+        fName = const_cast<char *>(hb_dynsymName((PHB_DYNS)pField->sym));
         len = static_cast<int>(strlen(fName));
         memset(colName, 0, HB_SYMBOL_NAME_LEN);
         hb_xmemcpy(colName, fName, len);
@@ -1874,7 +1874,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
     hb_arrayNew(aRecord, hb_arrayLen(thiswa->aBuffer));
 
     for (i = 1; i <= thiswa->area.uiFieldCount; i++) {
-      // bBuffer = (char *) hb_xgrab(COLUMN_BLOCK_SIZE + 1);
+      // bBuffer = static_cast<char *>(hb_xgrab(COLUMN_BLOCK_SIZE + 1));
       // lLen = COLUMN_BLOCK_SIZE;
       // memset(bBuffer, 0, COLUMN_BLOCK_SIZE);
       // bOut = NULL;
@@ -2940,7 +2940,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
     itemTemp = hb_itemArrayGet(thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1]);
   }
   if (HB_IS_STRING(itemTemp)) {
-    char *bBuffer = (char *)hb_itemGetCPtr(itemTemp); // const char * to char *
+    char *bBuffer = const_cast<char *>(hb_itemGetCPtr(itemTemp)); // const char * to char *
     HB_LONG lLenBuff = static_cast<HB_LONG>(hb_itemGetCLen(itemTemp));
     PHB_ITEM pTemp;
     if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
@@ -3004,7 +3004,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
     } else {
       PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR);
       HB_SIZE nLen = pField->uiLen, nSrcLen;
-      char *empty = (char *)hb_xgrab(nLen + 1);
+      char *empty = static_cast<char *>(hb_xgrab(nLen + 1));
 
       if (hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &ulPos) ||
           hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &ulPos) ||
@@ -3161,7 +3161,7 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
     if (pField->uiType == HB_FT_STRING) {
       HB_SIZE nSize = hb_itemGetCLen(value), nLen = pField->uiLen;
 
-      cfield = (char *)hb_xgrab(nLen + 1);
+      cfield = static_cast<char *>(hb_xgrab(nLen + 1));
 #ifndef HB_CDP_SUPPORT_OFF
       hb_cdpnDup2(hb_itemGetCPtr(value), nSize, cfield, &nLen, thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP(),
                   thiswa->area.cdPage);
@@ -3481,14 +3481,14 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREAP thiswa)
   thiswa->bConnVerified = false;
   thiswa->recordList = (HB_ULONG *)hb_xgrab(RECORD_LIST_SIZE * sizeof(HB_ULONG));
   thiswa->lRecordToRetrieve = (HB_ULONG *)hb_xgrab(s_pageReadSize * sizeof(HB_ULONG));
-  thiswa->deletedList = (char *)hb_xgrab(RECORD_LIST_SIZE * sizeof(char));
-  thiswa->sSql = (char *)hb_xgrab(MAX_SQL_QUERY_LEN * sizeof(char));
+  thiswa->deletedList = static_cast<char *>(hb_xgrab(RECORD_LIST_SIZE * sizeof(char)));
+  thiswa->sSql = static_cast<char *>(hb_xgrab(MAX_SQL_QUERY_LEN * sizeof(char)));
   memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
-  thiswa->sSqlBuffer = (char *)hb_xgrab(MAX_SQL_QUERY_LEN / 5 * sizeof(char));
+  thiswa->sSqlBuffer = static_cast<char *>(hb_xgrab(MAX_SQL_QUERY_LEN / 5 * sizeof(char)));
   memset(thiswa->sSqlBuffer, 0, MAX_SQL_QUERY_LEN / 5 * sizeof(char));
-  thiswa->sOrderBy = (char *)hb_xgrab(MAX_SQL_QUERY_LEN / 20 * sizeof(char));
+  thiswa->sOrderBy = static_cast<char *>(hb_xgrab(MAX_SQL_QUERY_LEN / 20 * sizeof(char)));
   memset(thiswa->sOrderBy, 0, MAX_SQL_QUERY_LEN / 20 * sizeof(char));
-  thiswa->sWhere = (char *)hb_xgrab(MAX_SQL_QUERY_LEN / 10 * sizeof(char));
+  thiswa->sWhere = static_cast<char *>(hb_xgrab(MAX_SQL_QUERY_LEN / 10 * sizeof(char)));
   memset(thiswa->sWhere, 0, MAX_SQL_QUERY_LEN / 10 * sizeof(char));
   thiswa->InsertRecord = SR_NULLPTR;
   thiswa->CurrRecord = SR_NULLPTR;
@@ -4224,7 +4224,7 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 #if 0 // TODO: old code for reference (to be deleted)
   if (HB_IS_DATE(pKey)) {
     len2 = 8;
-    valbuf = (char *)hb_xgrab(9);
+    valbuf = static_cast<char *>(hb_xgrab(9));
     val2 = hb_itemGetDS(pKey, valbuf);
   } else if (HB_IS_NUMBER(pKey)) {
     PHB_ITEM pLen = hb_itemPutNL(SR_NULLPTR, static_cast<HB_LONG>(len1));
@@ -4243,7 +4243,7 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
   switch (hb_itemType(pKey)) {
   case HB_IT_DATE: {
     len2 = 8;
-    valbuf = (char *)hb_xgrab(9);
+    valbuf = static_cast<char *>(hb_xgrab(9));
     val2 = hb_itemGetDS(pKey, valbuf);
     break;
   }

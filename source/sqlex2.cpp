@@ -232,8 +232,8 @@ void SR_CreateInsertStmt(SQLEXAREAP thiswa)
   }
 
   InsertRecord = thiswa->InsertRecord;
-  sFields = (char *)hb_xgrab(FIELD_LIST_SIZE * sizeof(char));
-  sParams = (char *)hb_xgrab((FIELD_LIST_SIZE_PARAM) * sizeof(char));
+  sFields = static_cast<char *>(hb_xgrab(FIELD_LIST_SIZE * sizeof(char)));
+  sParams = static_cast<char *>(hb_xgrab((FIELD_LIST_SIZE_PARAM) * sizeof(char)));
   uiPos = 0;
   sFields[0] = '\0';
 
@@ -381,7 +381,7 @@ void SR_CreateInsertStmt(SQLEXAREAP thiswa)
   if (thiswa->sSql) {
     hb_xfree(thiswa->sSql);
   }
-  thiswa->sSql = (char *)hb_xgrab(MAX_SQL_QUERY_LEN * sizeof(char));
+  thiswa->sSql = static_cast<char *>(hb_xgrab(MAX_SQL_QUERY_LEN * sizeof(char)));
   memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   if (thiswa->nSystemID == SQLRDD_RDBMS_MSSQL7) {
     sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData(%s) VALUES (%s );%s", declare,

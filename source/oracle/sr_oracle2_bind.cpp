@@ -149,7 +149,7 @@ static HB_USHORT OCI_initilized = 0;
 static void err_handler(OCI_Error *err)
 {
   int err_type = OCI_ErrorGetType(err);
-  char *err_msg = (char *)OCI_ErrorGetString(err);
+  char *err_msg = static_cast<char *>(OCI_ErrorGetString(err));
 
   printf("%s - %s\n", err_type == OCI_ERR_WARNING ? "warning" : "error", err_msg);
 }
@@ -252,7 +252,7 @@ HB_FUNC_STATIC(SR_SQLO2_GETERRORDESCR)
   GET_OCI_SESSION(session, 1);
 
   if (session != SR_NULLPTR) {
-    hb_retc((char *)OCI_ErrorGetString(OCI_GetLastError()));
+    hb_retc(const_cast<char *>(OCI_ErrorGetString(OCI_GetLastError())));
   } else {
     hb_retc("Not connected to Oracle");
   }
@@ -340,7 +340,7 @@ HB_FUNC_STATIC(SR_SQLO2_EXECUTE)
   GET_OCI_SESSION(session, 1);
   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
   if (session != SR_NULLPTR) {
-    char *stm = (char *)hb_parc(2);
+    char *stm = const_cast<char *>(hb_parc(2));
     if (lStmt) {
       OCI_SetPrefetchSize(session->stmt, 100);
 
@@ -389,7 +389,7 @@ HB_FUNC_STATIC(SR_ORACLEINBINDPARAM2)
 
   if (Stmt != SR_NULLPTR) {
 
-    Stmt->pLink[iPos].bindname = (char *)hb_xgrabz(sizeof(char) * 10);
+    Stmt->pLink[iPos].bindname = static_cast<char *>(hb_xgrabz(sizeof(char) * 10));
     //      memset(Stmt->pLink[iPos].bindname,'\0',10 * sizeof(char));
     sprintf(Stmt->pLink[iPos].bindname, ":%i", iParamNum);
     Stmt->pLink[iPos].iFieldSize = iFieldSize;
@@ -494,7 +494,7 @@ HB_FUNC_STATIC(SR_ORACLEINBINDPARAM2)
       break;
     }
     default: {
-      Stmt->pLink[iPos].col_name = (char *)hb_xgrabz(sizeof(char) * (iFieldSize + 1));
+      Stmt->pLink[iPos].col_name = static_cast<char *>(hb_xgrabz(sizeof(char) * (iFieldSize + 1)));
       //            memset(Stmt->pLink[iPos].col_name,'\0',(iFieldSize + 1) * sizeof(char));
 
       if (HB_ISCHAR(6)) {
@@ -682,7 +682,7 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
   if (OCI_IsNull(rs, iField)) {
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = (char *)hb_xgrab(lLen + 1);
+      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
       szResult[lLen] = '\0';
       hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -730,10 +730,10 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
   } else {
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = (char *)hb_xgrab(lLen + 1);
+      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       memset(szResult, ' ', lLen);
       uiLen = OCI_GetDataLength(rs, iField);
-      hb_xmemcpy(szResult, (char *)OCI_GetString(rs, iField), uiLen);
+      hb_xmemcpy(szResult, const_cast<char *>(OCI_GetString(rs, iField)), uiLen);
       szResult[lLen] = '\0';
       hb_itemPutCLPtr(pItem, szResult, lLen);
       break;
@@ -756,7 +756,7 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
       break;
     }
     case SQL_LONGVARCHAR: {
-      char *bBuffer = (char *)OCI_GetString(rs, iField);
+      char *bBuffer = const_cast<char *>(OCI_GetString(rs, iField));
       HB_SIZE lLenBuff = strlen(bBuffer);
       if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
           (sr_lSerializeArrayAsJson())) {
@@ -863,7 +863,7 @@ HB_FUNC(SQLO2_LINE) // TODO: not used in SQLRDD source code
 
     for (i = 0; i < session->numcols; i++) {
       temp = hb_itemNew(SR_NULLPTR);
-      hb_arraySetForward(ret, i + 1, hb_itemPutCL(temp, (char *)line[i], lens[i]));
+      hb_arraySetForward(ret, i + 1, hb_itemPutCL(temp, static_cast<char *>(line[i]), lens[i]));
       hb_itemRelease(temp);
     }
   }
@@ -977,7 +977,7 @@ HB_FUNC_STATIC(SR_SQLO2_DESCRIBECOL) // ( hStmt, nCol, @cName, @nDataType, @nCol
 
     col = OCI_GetColumn(session->rs, ncol);
     nullok = OCI_GetColumnNullable(col);
-    name = (char *)OCI_GetColumnName(col);
+    name = const_cast<char *>(OCI_GetColumnName(col));
     prec = OCI_GetColumnPrecision(col);
     scale = OCI_GetColumnScale(col);
     dbsize = OCI_GetColumnSize(col);
@@ -1109,7 +1109,7 @@ HB_FUNC_STATIC(SR_ORACLEWRITEMEMO2)
     for (uiSize = 0; uiSize < uiLen; uiSize++) {
       PHB_ITEM pFieldDesc = hb_arrayGetItemPtr(pArray, uiSize + 1);
       char szSql[256] = {0};
-      char *sMemo = (char *)hb_arrayGetCPtr(pFieldDesc, 2);
+      char *sMemo = const_cast<char *>(hb_arrayGetCPtr(pFieldDesc, 2));
       const char *sField = hb_arrayGetCPtr(pFieldDesc, 1);
       OCI_Resultset *rs;
       sprintf(szSql, "UPDATE %s SET %s = EMPTY_CLOB() WHERE %s = %lu RETURNING %s INTO :b1", sTable, sField, sRecnoName,
