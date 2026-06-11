@@ -407,12 +407,6 @@ static HB_ERRCODE sqlFound(SQLAREAP thiswa, HB_BOOL *found)
 // (DBENTRYP_V)
 static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
 {
-  HB_LONG leof;
-  //PHB_ITEM eofat; (using stack instead of heap)
-  HB_ITEM eofat{};
-
-  //eofat = hb_itemNew(SR_NULLPTR);
-
   thiswa->lpdbPendingRel = SR_NULLPTR;
   thiswa->firstinteract = false;
   thiswa->wasdel = false;
@@ -421,9 +415,10 @@ static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
     hb_objSendMessage(thiswa->oWorkArea, s_pSym_WRITEBUFFER, 0);
   }
 
-  leof = hb_arrayGetNL(thiswa->aInfo, AINFO_EOF_AT);
+  HB_LONG leof = hb_arrayGetNL(thiswa->aInfo, AINFO_EOF_AT);
 
   if (hb_arrayGetNL(thiswa->aInfo, AINFO_EOF_AT)) {
+    HB_ITEM eofat{};
     hb_itemPutNL(&eofat, leof);
     hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGOTO, 1, &eofat);
   } else {
@@ -434,7 +429,6 @@ static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
   thiswa->area.fBottom = true;
   thiswa->area.fEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
   thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
-  //hb_itemRelease(eofat);
 
   SELF_SKIPFILTER(&thiswa->area, -1);
 
@@ -447,21 +441,17 @@ static HB_ERRCODE sqlGoBottom(SQLAREAP thiswa)
 // TODO: HB_LONG -> HB_ULONG
 static HB_ERRCODE sqlGoTo(SQLAREAP thiswa, HB_LONG recno)
 {
-  //PHB_ITEM pParam1; (using stack instead of heap)
-  HB_ITEM pParam1{};
-
   // Reset parent rel struct
   thiswa->lpdbPendingRel = SR_NULLPTR;
   thiswa->firstinteract = false;
   thiswa->wasdel = false;
 
-  //pParam1 = hb_itemPutNL(SR_NULLPTR, recno);
+  HB_ITEM pParam1{};
   hb_itemPutNL(&pParam1, recno);
   if (hb_arrayGetL(thiswa->aInfo, AINFO_HOT)) {
     hb_objSendMessage(thiswa->oWorkArea, s_pSym_WRITEBUFFER, 0);
   }
   hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGOTO, 1, &pParam1);
-  //hb_itemRelease(pParam1);
 
   thiswa->area.fEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
   thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
@@ -481,18 +471,18 @@ static HB_ERRCODE sqlGoToId(SQLAREAP thiswa, PHB_ITEM pItem)
 
   if (HB_IS_NUMERIC(pItem)) {
     return SELF_GOTO(&thiswa->area, hb_itemGetNL(pItem));
-  } else {
-    if (hb_arrayGetL(thiswa->aInfo, AINFO_HOT)) {
-      hb_objSendMessage(thiswa->oWorkArea, s_pSym_WRITEBUFFER, 0);
-    }
-
-    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGOTO, 1, pItem);
-
-    thiswa->area.fEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
-    thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
-
-    return HB_SUCCESS;
   }
+
+  if (hb_arrayGetL(thiswa->aInfo, AINFO_HOT)) {
+    hb_objSendMessage(thiswa->oWorkArea, s_pSym_WRITEBUFFER, 0);
+  }
+
+  hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGOTO, 1, pItem);
+
+  thiswa->area.fEof = hb_arrayGetL(thiswa->aInfo, AINFO_EOF);
+  thiswa->area.fBof = hb_arrayGetL(thiswa->aInfo, AINFO_BOF);
+
+  return HB_SUCCESS;
 }
 
 //------------------------------------------------------------------------
@@ -500,8 +490,6 @@ static HB_ERRCODE sqlGoToId(SQLAREAP thiswa, PHB_ITEM pItem)
 // (DBENTRYP_V)
 static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
 {
-  HB_LONG lbof;
-
   thiswa->lpdbPendingRel = SR_NULLPTR;
   thiswa->firstinteract = false;
   thiswa->wasdel = false;
@@ -510,14 +498,12 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
     hb_objSendMessage(thiswa->oWorkArea, s_pSym_WRITEBUFFER, 0);
   }
 
-  lbof = hb_arrayGetNL(thiswa->aInfo, AINFO_BOF_AT);
+  HB_LONG lbof = hb_arrayGetNL(thiswa->aInfo, AINFO_BOF_AT);
 
   if (lbof) {
-    //PHB_ITEM pBOF = hb_itemPutNL(SR_NULLPTR, lbof); (using stack instead of heap)
     HB_ITEM pBOF{};
     hb_itemPutNL(&pBOF, lbof);
     hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGOTO, 1, &pBOF);
-    //hb_itemRelease(pBOF);
   } else {
     hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGOTOP, 0);
   }
