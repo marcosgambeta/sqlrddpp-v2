@@ -972,19 +972,13 @@ HB_FUNC(SR_FBCREATEDB5)
   isc_tr_handle trans = 0;
   long status[20];
   char create_db[1024];
-  const char *db_name;
-  const char *username;
-  const char *passwd;
-  const char *charset;
-  int page;
-  int dialect;
 
-  db_name = hb_parcx(1);
-  username = hb_parcx(2);
-  passwd = hb_parcx(3);
-  page = hb_parni(4);
-  charset = hb_parc(5);
-  dialect = hb_parni(6);
+  const char *db_name = hb_parcx(1);
+  const char *username = hb_parcx(2);
+  const char *passwd = hb_parcx(3);
+  int page = hb_parni(4);
+  const char *charset = hb_parc(5);
+  int dialect = hb_parni(6);
 
   if (!dialect) {
     dialect = 3;
