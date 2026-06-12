@@ -8,6 +8,7 @@
 // If the compiler is a C++ compiler and the standard is C++11 or upper, define SR_NULLPTR as nullptr.
 // If the compiler is a C compiler and the standard is C23 or upper, define SR_NULLPTR as nullptr.
 // Otherwise, define SR_NULLPTR as '((void *)0)'.
+#if 0
 #if defined(__cplusplus)
 #if __cplusplus >= 201103L
 #define SR_NULLPTR nullptr
@@ -25,6 +26,8 @@
 #define SR_NULLPTR ((void *)0)
 #endif
 #endif
+#endif
+#define SR_NULLPTR nullptr
 
 // Supported Database Engines (RDBMS)
 
