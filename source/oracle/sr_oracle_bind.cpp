@@ -171,7 +171,7 @@ HB_FUNC_STATIC(SR_SQLO_CONNECT)
   } else {
     session->stmtParamRes = SQLO_STH_INIT;
     sqlo_server_version(session->dbh, session->server_version, sizeof(session->server_version));
-    hb_storptr((void *)session, 2);
+    hb_storptr(static_cast<void *>(session), 2);
     hb_retni(SQL_SUCCESS);
   }
 }
@@ -1121,7 +1121,7 @@ HB_FUNC_STATIC(SR_ORACLE_SAVE_HANDLE_ST) // TODO: not used in the SQLRDD source 
 {
   GET_OCI_SESSION(session, 1);
   if (session != nullptr) {
-    hb_retptr((void *)session->stmtParam);
+    hb_retptr(static_cast<void *>(session->stmtParam));
   }
 }
 #endif

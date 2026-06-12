@@ -538,7 +538,7 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
     }
     BindStructure->asChar.size = nTrim;
     // OCI_LobTruncate(BindStructure->lob1, 0);
-    // OCI_LobWrite(BindStructure->lob1, (void *) BindStructure->asChar.value, BindStructure->asChar.size);
+    // OCI_LobWrite(BindStructure->lob1, static_cast<void *>(BindStructure->asChar.value), BindStructure->asChar.size);
     break;
   }
   case SQL_C_NUMERIC: {

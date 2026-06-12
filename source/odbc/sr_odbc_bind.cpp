@@ -174,7 +174,7 @@ HB_FUNC(SR_INSTALLDSN)
     // create a new DSN
     hb_retl(SQLConfigDataSource(nullptr, ODBC_ADD_SYS_DSN, szDriver, szAttributes));
 
-    hb_xfree((void *)szAttributes);
+    hb_xfree(static_cast<void *>(szAttributes));
   }
 }
 
@@ -199,7 +199,7 @@ HB_FUNC(SR_UNINSTALLDSN)
     // remove the DSN if it already existed
     SQLConfigDataSource(nullptr, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
 
-    hb_xfree((void *)szAttributes);
+    hb_xfree(static_cast<void *>(szAttributes));
   }
 }
 
@@ -217,7 +217,7 @@ HB_FUNC_STATIC(SR_ALLOCEN)
 #endif
   // SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, static_cast<SQLPOINTER>(SQL_OV_ODBC3), 0);
   SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), SQL_IS_UINTEGER);
-  hb_storptr((void *)hEnv, 1);
+  hb_storptr(static_cast<void *>(hEnv), 1);
   hb_retni(ret);
 }
 
@@ -228,7 +228,7 @@ HB_FUNC_STATIC(SR_ALLOCCO)
   SQLHDBC hDbc;
   RETCODE ret = SQLAllocConnect(SR_PAR_SQLHENV(1), &hDbc);
 
-  hb_storptr((void *)hDbc, 2);
+  hb_storptr(static_cast<void *>(hDbc), 2);
   hb_retni(ret);
 }
 
@@ -287,7 +287,7 @@ HB_FUNC_STATIC(SR_ALLOCST)
    hb_retni(SQLAllocStmt(hdbc, &hStmt)))
 #endif
 
-  hb_storptr((void *)hStmt, 2);
+  hb_storptr(static_cast<void *>(hStmt), 2);
 }
 
 //----------------------------------------------------------------------------//
@@ -1121,7 +1121,7 @@ HB_FUNC_STATIC(SR_ODBCWRITEMEMO)
 
       cbSize = strlen(sMemo);
 
-      retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR, cbSize, 0, (void *)sMemo,
+      retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR, cbSize, 0, static_cast<void *>(const_cast<char *>(sMemo)),
                                  cbSize, &cbSize);
 
       if (!(retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)) {

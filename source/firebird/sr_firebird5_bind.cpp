@@ -247,7 +247,7 @@ HB_FUNC_STATIC(SR_FBCONNECT5)
     return;
   } else {
     hb_retni(SQL_SUCCESS);
-    hb_storptr((void *)session, 5);
+    hb_storptr(static_cast<void *>(session), 5);
   }
 }
 
@@ -1036,7 +1036,7 @@ HB_FUNC_STATIC(SR_FBVERSION5)
 
   *tmp = 0;
 
-  if (!isc_version(&(session->db), firebird_info_cb, (void *)tmp)) {
+  if (!isc_version(&(session->db), firebird_info_cb, static_cast<void *>(tmp))) {
     isc_vax_integer(tmp, 100);
     hb_retnl(num_version);
   }

@@ -932,8 +932,8 @@ char *DEFUN(strdup, (s), const char *s)
   SQLORA_ || upper(<param_name>)
 ---------------------------------------------------------------------------*/
 /* Parameters, sort them by name */
-static sqlora_param_t g_params[] = {{"PREFETCH_ROWS", INTEGER, (VOID *)&_num_prefetch_rows, nullptr},
-                                    {"LONGSIZE", INTEGER, (VOID *)&_max_long_size, nullptr},
+static sqlora_param_t g_params[] = {{"PREFETCH_ROWS", INTEGER, static_cast<VOID *>(&_num_prefetch_rows), nullptr},
+                                    {"LONGSIZE", INTEGER, static_cast<VOID *>(&_max_long_size), nullptr},
                                     {"TRACE_FILE", STRING, _trace_file, nullptr},
                                     {"TRACE_LEVEL", INTEGER, &_trace_level, nullptr},
                                     {nullptr, INTEGER, nullptr, nullptr}};
@@ -4758,7 +4758,7 @@ int DEFUN(sqlo_fetch, (sth, nrows), sqlo_stmt_handle_t sth AND unsigned int nrow
                 // stp->outv_size[col_idx], stp->outv[col_idx]);
 
                 localStatus = sqlo_lob_read_buffer(dbp->dbh, (OCILobLocator *)stp->ocolsv[col_idx].loblp,
-                                                   static_cast<unsigned int>(stp->outv_size[col_idx]), (void *)(stp->outv[col_idx]),
+                                                   static_cast<unsigned int>(stp->outv_size[col_idx]), static_cast<void *>(stp->outv[col_idx]),
                                                    static_cast<unsigned int>(stp->outv_size[col_idx]));
 
                 if (localStatus == OCI_ERROR) {
@@ -6576,7 +6576,7 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
         piece = SQLO_LAST_PIECE;
       }
 
-      if (fread((void *)buf, (size_t)nbytes, 1, fp) != 1) {
+      if (fread(static_cast<void *>(buf), (size_t)nbytes, 1, fp) != 1) {
         strcpy(dbp->errmsg, "sqlo_lob_write_stream: I/O error. Could not get data from stream");
         TRACE(2, fprintf(_get_trace_fp(dbp), "sqlo_lob_write_stream: "
                                              "Error during fread(). Setting piece to SQLO_LAST_PIECE\n"););
@@ -6700,7 +6700,7 @@ DEFUN(sqlo_lob_read_stream, (dbh, loblp, loblen, fp),
     if (SQLO_STILL_EXECUTING == dbp->status) {
       SQLO_USLEEP;
     }
-    sqlo_lob_read_buffer(dbh, loblp, loblen, (void *)buf, nbytes);
+    sqlo_lob_read_buffer(dbh, loblp, loblen, static_cast<void *>(buf), nbytes);
 
   } while (SQLO_STILL_EXECUTING == dbp->status);
 
@@ -6711,7 +6711,7 @@ DEFUN(sqlo_lob_read_stream, (dbh, loblp, loblen, fp),
                      "sqlo_lob_read_stream: "
                      "got all in one piece (%u bytes)\n",
                      loblen););
-    (void)fwrite((void *)buf, (size_t)loblen, 1, fp);
+    (void)fwrite(static_cast<void *>(buf), (size_t)loblen, 1, fp);
     break;
   }
   case SQLO_ERROR: {
@@ -6724,7 +6724,7 @@ DEFUN(sqlo_lob_read_stream, (dbh, loblp, loblen, fp),
 
     TRACE(3, fprintf(_get_trace_fp(dbp), "sqlo_lob_read_stream: got first piece (%u bytes)\n", nbytes););
     /* write this buffer */
-    (void)fwrite((void *)buf, (size_t)nbytes, 1, fp);
+    (void)fwrite(static_cast<void *>(buf), (size_t)nbytes, 1, fp);
 
     do {
       memset(buf, '\0', MAX_LONG_SIZE);
@@ -6738,7 +6738,7 @@ DEFUN(sqlo_lob_read_stream, (dbh, loblp, loblen, fp),
           SQLO_USLEEP;
         }
 
-        sqlo_lob_read_buffer(dbh, loblp, loblen, (void *)buf, nbytes);
+        sqlo_lob_read_buffer(dbh, loblp, loblen, static_cast<void *>(buf), nbytes);
 
       } while (SQLO_STILL_EXECUTING == dbp->status);
 
@@ -6749,13 +6749,13 @@ DEFUN(sqlo_lob_read_stream, (dbh, loblp, loblen, fp),
                          "got last piece (%u bytes)\n",
                          remainder););
 
-        (void)fwrite((void *)buf, (size_t)remainder, 1, fp);
+        (void)fwrite(static_cast<void *>(buf), (size_t)remainder, 1, fp);
       } else {
         TRACE(3, fprintf(_get_trace_fp(dbp),
                          "sqlo_lob_read_stream: "
                          "got next piece (%u bytes)\n",
                          nbytes););
-        (void)fwrite((void *)buf, (size_t)nbytes, 1, fp);
+        (void)fwrite(static_cast<void *>(buf), (size_t)nbytes, 1, fp);
       }
 
     } while (SQLO_NEED_DATA == dbp->status);

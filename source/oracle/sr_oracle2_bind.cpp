@@ -206,7 +206,7 @@ HB_FUNC_STATIC(SR_SQLO2_CONNECT)
     OCI_SetDefaultFormatDate(session->cn, "YYYYMMDD");
     OCI_SetDefaultLobPrefetchSize(session->cn, 4096);
     strcpy(session->server_version, OCI_GetVersionServer(session->cn));
-    hb_storptr((void *)session, 4);
+    hb_storptr(static_cast<void *>(session), 4);
     hb_retni(SQL_SUCCESS);
   }
 }
@@ -1134,7 +1134,7 @@ HB_FUNC_STATIC(SR_ORACLEWRITEMEMO2)
       lob1 = OCI_GetLob2(rs, ":b1");
 
       // status = SQLO2_lob_write_buffer(session->dbh, loblp, strlen(sMemo), sMemo, strlen(sMemo), SQLO2_ONE_PIECE);
-      status = OCI_LobWrite(lob1, (void *)sMemo, static_cast<unsigned int>(strlen(sMemo)));
+      status = OCI_LobWrite(lob1, static_cast<void *>(sMemo), static_cast<unsigned int>(strlen(sMemo)));
 
       if (status < 0) {
         // SQLO2_free_lob_desc(session->dbh, &loblp);

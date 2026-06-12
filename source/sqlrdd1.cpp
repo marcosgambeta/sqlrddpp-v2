@@ -3355,7 +3355,7 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
       HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Could not add field: %i", i));
     }
     hb_itemRelease(thisfield);
-    hb_xfree((void *)field.atomName);
+    hb_xfree(static_cast<void *>(const_cast<char *>(field.atomName)));
   }
   return true;
 }

@@ -122,7 +122,7 @@ HB_FUNC_STATIC(SR_MYSCONNECT)
     } else {
       mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr, CLIENT_ALL_FLAGS2);
     }
-    hb_retptr((void *)session);
+    hb_retptr(static_cast<void *>(session));
   } else {
     mysql_close(nullptr);
     if (s_iConnectionCount == 0) {
@@ -214,7 +214,7 @@ HB_FUNC_STATIC(SR_MYSEXEC)
   } else {
     session->numcols = 0;
   }
-  hb_retptr((void *)session->stmt);
+  hb_retptr(static_cast<void *>(session->stmt));
   session->ifetch = -1;
 }
 

@@ -105,7 +105,7 @@ HB_FUNC_STATIC(SR_PGSCONNECT)
   session->ifetch = -2;
   // Setup Postgres Notice Processor
   PQsetNoticeProcessor(session->dbh, myNoticeProcessor, nullptr);
-  hb_retptr((void *)session);
+  hb_retptr(static_cast<void *>(session));
 }
 
 //----------------------------------------------------------------------------//
@@ -227,7 +227,7 @@ HB_FUNC_STATIC(SR_PGSEXEC)
     return;
   }
 
-  hb_retptr((void *)session->stmt);
+  hb_retptr(static_cast<void *>(session->stmt));
 
   session->ifetch = -1;
   session->numcols = PQnfields(session->stmt);

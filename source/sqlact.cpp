@@ -115,7 +115,7 @@ int SqlParse(sql_stmt *stmt, const char *query, int queryLen)
   stmt->queryPtr = stmt->errPtr = query;
   stmt->errMsg = 0;
 
-  if (sql_yyparse((void *)stmt) || stmt->errMsg || stmt->command == -1) {
+  if (sql_yyparse(static_cast<void *>(stmt)) || stmt->errMsg || stmt->command == -1) {
     // printf("parse error in sql_yyparse\n");
     if (!stmt->errMsg) {
       stmt->errMsg = SQL_PARSER_ERROR_PARSE;

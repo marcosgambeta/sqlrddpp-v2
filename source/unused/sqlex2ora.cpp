@@ -554,7 +554,7 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
       // SR_TraceLog("ccc.log", "escrevendo lob  InsertRecord->asChar.value %s InsertRecord->asChar.size %lu \n ",
       // InsertRecord->asChar.value, InsertRecord->asChar.size);
       res = OCI_LobSeek(InsertRecord->lob1, 0, OCI_SEEK_SET);
-      res = OCI_LobWrite(InsertRecord->lob1, (void *)InsertRecord->asChar.value, InsertRecord->asChar.size);
+      res = OCI_LobWrite(InsertRecord->lob1, static_cast<void *>(InsertRecord->asChar.value), InsertRecord->asChar.size);
     }
     if (InsertRecord->lIndPtr == SQL_NULL_DATA) {
       OCI_BindSetNull(OCI_GetBind(thiswa->hStmtInsert, i));

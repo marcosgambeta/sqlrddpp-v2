@@ -2105,7 +2105,7 @@ HB_FUNC(SR_XML_DATAREAD)
   } else { // can only be an integer, that is, a file handle
     mxml_refil_setup(&refil, mxml_refill_from_handle_func, buffer, 0, 512);
 
-    refil.u.vPtr = (void *)(HB_PTRUINT)hb_itemGetNInt(pParam);
+    refil.u.vPtr = reinterpret_cast<void *>((HB_PTRUINT)hb_itemGetNInt(pParam));
   }
 
   // Now we can get the root node
@@ -2151,7 +2151,7 @@ HB_FUNC(SR_XML_NODE_TO_STRING)
 
   sgs = mxml_sgs_new();
   mxml_output_setup(&out, mxml_output_func_to_sgs, 0);
-  out.u.vPtr = (void *)sgs;
+  out.u.vPtr = static_cast<void *>(sgs);
 
   if (mxml_node_write(&out, pNode, iStyle) == MXML_STATUS_OK) {
     hb_retclen(mxml_sgs_extract(sgs), sgs->length);

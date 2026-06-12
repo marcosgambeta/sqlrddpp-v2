@@ -123,7 +123,7 @@ HB_FUNC_STATIC(SR_MARIADBCONNECT)
     } else {
       mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr, CLIENT_ALL_FLAGS2);
     }
-    hb_retptr((void *)session);
+    hb_retptr(static_cast<void *>(session));
   } else {
     mysql_close(nullptr);
     if (s_iConnectionCount == 0) {
@@ -216,7 +216,7 @@ HB_FUNC_STATIC(SR_MARIADBEXEC)
   session->stmt = mysql_store_result(session->dbh);
   session->ulAffected_rows = mysql_affected_rows(session->dbh);
   session->numcols = session->stmt != nullptr ? mysql_num_fields(session->stmt) : 0;
-  hb_retptr((void *)session->stmt);
+  hb_retptr(static_cast<void *>(session->stmt));
   session->ifetch = -1;
 }
 
