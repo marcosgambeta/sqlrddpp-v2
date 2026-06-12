@@ -1295,7 +1295,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED5)
         }
 
         if ((var->sqltype & 1) && (*var->sqlind < 0)) {
-          sr_FBFieldGet5(hb_arrayGetItemPtr(pFields, icol), &temp, static_cast<char *>(""), 0, /*bQueryOnly,*/ /*ulSystemID,*/ bTranslate);
+          sr_FBFieldGet5(hb_arrayGetItemPtr(pFields, icol), &temp, const_cast<char *>(""), 0, /*bQueryOnly,*/ /*ulSystemID,*/ bTranslate);
           hb_arraySetForward(pRet, icol, &temp);
         } else {
           dtype = (((XSQLVAR *)var)->sqltype & ~1);
