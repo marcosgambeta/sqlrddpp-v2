@@ -75,8 +75,8 @@
 #define HB_ULONG ULONG
 #endif
 
-static PHB_DYNS s_pSym_SR_DESERIALIZE = SR_NULLPTR;
-static PHB_DYNS s_pSym_SR_FROMJSON = SR_NULLPTR;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
+static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 static int s_iConnectionCount = 0;
 
 #define LOGFILE "mariadb.log"
@@ -109,27 +109,27 @@ HB_FUNC_STATIC(SR_MARIADBCONNECT)
   HB_UINT uiPort = HB_ISNUM(5) ? hb_parnl(5) : MYSQL_PORT;
   HB_UINT uiTimeout = HB_ISNUM(7) ? hb_parnl(7) : 3600;
   HB_BOOL lCompress = HB_ISLOG(8) ? hb_parl(8) : false;
-  mysql_library_init(0, SR_NULLPTR, SR_NULLPTR);
+  mysql_library_init(0, nullptr, nullptr);
   //    memset(session, 0, sizeof(MARIADB_SESSION));
 
   session->dbh = mysql_init((MYSQL *)0);
   session->ifetch = -2;
 
-  if (session->dbh != SR_NULLPTR) {
+  if (session->dbh != nullptr) {
     s_iConnectionCount++;
     mysql_options(session->dbh, MYSQL_OPT_CONNECT_TIMEOUT, reinterpret_cast<const char *>(&uiTimeout));
     if (lCompress) {
-      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, SR_NULLPTR, CLIENT_ALL_FLAGS);
+      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr, CLIENT_ALL_FLAGS);
     } else {
-      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, SR_NULLPTR, CLIENT_ALL_FLAGS2);
+      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr, CLIENT_ALL_FLAGS2);
     }
     hb_retptr((void *)session);
   } else {
-    mysql_close(SR_NULLPTR);
+    mysql_close(nullptr);
     if (s_iConnectionCount == 0) {
       mysql_library_end();
     }
-    hb_retptr(SR_NULLPTR);
+    hb_retptr(nullptr);
   }
 }
 
@@ -140,12 +140,12 @@ HB_FUNC_STATIC(SR_MARIADBFINISH)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR) {
+  if (session == nullptr) {
     hb_ret();
     return;
   }
 
-  if (session->dbh != SR_NULLPTR) {
+  if (session->dbh != nullptr) {
     mysql_close(session->dbh);
     if (s_iConnectionCount > 0) {
       s_iConnectionCount--;
@@ -170,7 +170,7 @@ HB_FUNC_STATIC(SR_MARIADBGETCONNID)
 
   HB_ULONG ulThreadID;
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retnl(0); // TODO: is 0 the correct value to return ?
     return;
   }
@@ -188,7 +188,7 @@ HB_FUNC_STATIC(SR_MARIADBKILLCONNID)
   GET_MARIADB_SESSION(session, 1);
   HB_ULONG ulThreadID = (HB_ULONG)hb_itemGetNL(hb_param(2, HB_IT_LONG));
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retni(-1);
     return;
   }
@@ -201,12 +201,12 @@ HB_FUNC_STATIC(SR_MARIADBKILLCONNID)
 // SR_MARIADBEXEC(pSession, cQuery) -> pointer
 HB_FUNC_STATIC(SR_MARIADBEXEC)
 {
-  // SR_TraceLog(SR_NULLPTR, "mysqlExec : %s\n", hb_parc(2));
+  // SR_TraceLog(nullptr, "mysqlExec : %s\n", hb_parc(2));
   GET_MARIADB_SESSION(session, 1);
   const char *szQuery = hb_parc(2);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
-    hb_retptr(SR_NULLPTR);
+  if (session == nullptr || session->dbh == nullptr) {
+    hb_retptr(nullptr);
     return;
   }
 
@@ -215,7 +215,7 @@ HB_FUNC_STATIC(SR_MARIADBEXEC)
   mysql_real_query(session->dbh, szQuery, (unsigned long)hb_parclen(2));
   session->stmt = mysql_store_result(session->dbh);
   session->ulAffected_rows = mysql_affected_rows(session->dbh);
-  session->numcols = session->stmt != SR_NULLPTR ? mysql_num_fields(session->stmt) : 0;
+  session->numcols = session->stmt != nullptr ? mysql_num_fields(session->stmt) : 0;
   hb_retptr((void *)session->stmt);
   session->ifetch = -1;
 }
@@ -228,7 +228,7 @@ HB_FUNC_STATIC(SR_MARIADBFETCH)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR || session->stmt == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr || session->stmt == nullptr) {
     hb_retni(SQL_INVALID_HANDLE);
     return;
   }
@@ -343,24 +343,24 @@ static void sr_MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
       PHB_ITEM pTemp;
       if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
           (sr_lSerializeArrayAsJson())) {
-        if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
+        if (s_pSym_SR_FROMJSON == nullptr) {
           s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-          if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
+          if (s_pSym_SR_FROMJSON == nullptr) {
             printf("Could not find Symbol HB_JSONDECODE\n");
           }
         }
         hb_vmPushDynSym(s_pSym_SR_FROMJSON);
         hb_vmPushNil();
         hb_vmPushString(bBuffer, lLenBuff);
-        pTemp = hb_itemNew(SR_NULLPTR);
+        pTemp = hb_itemNew(nullptr);
         hb_vmPush(pTemp);
         hb_vmDo(2);
         hb_itemMove(pItem, pTemp);
         hb_itemRelease(pTemp);
       } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
-        if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
+        if (s_pSym_SR_DESERIALIZE == nullptr) {
           s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-          if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
+          if (s_pSym_SR_DESERIALIZE == nullptr) {
             printf("Could not find Symbol SR_DESERIALIZE\n");
           }
         }
@@ -369,11 +369,11 @@ static void sr_MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
         hb_vmPushString(bBuffer, lLenBuff);
         hb_vmDo(1);
 
-        pTemp = hb_itemNew(SR_NULLPTR);
+        pTemp = hb_itemNew(nullptr);
         hb_itemMove(pTemp, hb_stackReturnItem());
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
-          //PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
+          //PHB_ITEM pLangItem = hb_itemNew(nullptr); (using stack instead of heap)
           HB_ITEM pLangItem{};
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
@@ -416,7 +416,7 @@ static void sr_MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
 #ifdef __XHARBOUR__
       lMilliSec = hb_timeEncStr(bBuffer);
 #else
-      lMilliSec = hb_timeUnformat(bBuffer, SR_NULLPTR); // TOCHECK:
+      lMilliSec = hb_timeUnformat(bBuffer, nullptr); // TOCHECK:
 #endif
       hb_itemPutTDT(pItem, 0, lMilliSec);
       break;
@@ -439,7 +439,7 @@ HB_FUNC_STATIC(SR_MARIADBLINEPROCESSED)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR || session->stmt == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr || session->stmt == nullptr) {
     hb_retni(SQL_INVALID_HANDLE);
     return;
   }
@@ -471,7 +471,7 @@ HB_FUNC_STATIC(SR_MARIADBLINEPROCESSED)
     lens = (HB_ULONG *)mysql_fetch_lengths(session->stmt);
 
     for (col = 0; col < cols; col++) {
-      //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
+      //temp = hb_itemNew(nullptr); (using stack instead of heap)
       HB_ITEM TempItem{};
       lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, col + 1), FIELD_ENUM);
 
@@ -500,7 +500,7 @@ HB_FUNC_STATIC(SR_MARIADBSTATUS)
   int ret;
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retni(SQL_ERROR);
     return;
   }
@@ -518,7 +518,7 @@ HB_FUNC_STATIC(SR_MARIADBRESULTSTATUS)
   HB_UINT ret;
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retnl(SQL_ERROR);
     return;
   }
@@ -549,7 +549,7 @@ HB_FUNC_STATIC(SR_MARIADBRESSTATUS)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retc("");
     return;
   }
@@ -564,12 +564,12 @@ HB_FUNC_STATIC(SR_MARIADBCLEAR)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR || session->stmt == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr || session->stmt == nullptr) {
     return;
   }
 
   mysql_free_result(session->stmt);
-  session->stmt = SR_NULLPTR;
+  session->stmt = nullptr;
   session->ifetch = -2;
 }
 
@@ -580,7 +580,7 @@ HB_FUNC_STATIC(SR_MARIADBCOLS)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retni(0); // TODO: is 0 the correct value to return ?
     return;
   }
@@ -596,7 +596,7 @@ HB_FUNC_STATIC(SR_MARIADBVERS)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retnl(0); // TODO: is 0 the correct value to return ?
     return;
   }
@@ -612,7 +612,7 @@ HB_FUNC_STATIC(SR_MARIADBERRMSG)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retc("");
     return;
   }
@@ -627,7 +627,7 @@ HB_FUNC_STATIC(SR_MARIADBCOMMIT)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retni(SQL_ERROR);
     return;
   }
@@ -642,7 +642,7 @@ HB_FUNC_STATIC(SR_MARIADBROLLBACK)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr) {
     hb_retni(SQL_ERROR);
     return;
   }
@@ -662,7 +662,7 @@ HB_FUNC_STATIC(SR_MARIADBQUERYATTR)
 
   GET_MARIADB_SESSION(session, 1);
 
-  if (session == SR_NULLPTR || session->dbh == SR_NULLPTR || session->stmt == SR_NULLPTR) {
+  if (session == nullptr || session->dbh == nullptr || session->stmt == nullptr) {
     hb_retnl(-2);
     return;
   }
@@ -672,9 +672,9 @@ HB_FUNC_STATIC(SR_MARIADBQUERYATTR)
   }
 
   rows = session->numcols;
-  ret = hb_itemNew(SR_NULLPTR);
-  //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
-  atemp = hb_itemNew(SR_NULLPTR);
+  ret = hb_itemNew(nullptr);
+  //temp = hb_itemNew(nullptr); (using stack instead of heap)
+  atemp = hb_itemNew(nullptr);
 
   hb_arrayNew(ret, rows);
 
@@ -823,7 +823,7 @@ HB_FUNC_STATIC(SR_MARIADBTABLEATTR)
   }
 
   session = (PMARIADB_SESSION)hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
-  assert(session->dbh != SR_NULLPTR);
+  assert(session->dbh != nullptr);
 
   sprintf(attcmm, "select * from %s where 0 = 1", hb_parc(2));
 
@@ -835,9 +835,9 @@ HB_FUNC_STATIC(SR_MARIADBTABLEATTR)
     SR_TraceLog(LOGFILE, "Query error : %i - %s\n", mysql_errno(session->dbh), mysql_error(session->dbh));
   }
 
-  ret = hb_itemNew(SR_NULLPTR);
-  temp = hb_itemNew(SR_NULLPTR);
-  atemp = hb_itemNew(SR_NULLPTR);
+  ret = hb_itemNew(nullptr);
+  temp = hb_itemNew(nullptr);
+  atemp = hb_itemNew(nullptr);
 
   rows = mysql_num_fields(session->stmt);
   hb_arrayNew(ret, rows);
@@ -973,7 +973,7 @@ HB_FUNC_STATIC(SR_MARIADBTABLEATTR)
   hb_itemReturnForward(ret);
   hb_itemRelease(ret);
   mysql_free_result(session->stmt);
-  session->stmt = SR_NULLPTR;
+  session->stmt = nullptr;
 }
 #endif
 */
@@ -985,7 +985,7 @@ HB_FUNC_STATIC(SR_MARIADBAFFECTEDROWS)
 {
   GET_MARIADB_SESSION(session, 1);
 
-  hb_retnll(session != SR_NULLPTR ? session->ulAffected_rows : 0);
+  hb_retnll(session != nullptr ? session->ulAffected_rows : 0);
 }
 
 //----------------------------------------------------------------------------//

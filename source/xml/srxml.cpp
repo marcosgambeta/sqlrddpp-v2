@@ -138,7 +138,7 @@ static const char *mxml_error_desc(MXML_ERROR_CODE code);
 // This is just a shortcut
 static void hbxml_set_doc_status(MXML_REFIL *ref, PHB_ITEM doc, PHB_ITEM pNode, int status, int error)
 {
-  PHB_ITEM pNumber = hb_itemPutNI(SR_NULLPTR, 1);
+  PHB_ITEM pNumber = hb_itemPutNI(nullptr, 1);
 
   hb_objSendMsg(doc, "_NSTATUS", 1, pNumber);
   hb_itemPutNI(pNumber, error);
@@ -156,7 +156,7 @@ static void hbxml_doc_new_line(PHB_ITEM pDoc)
   PHB_ITEM pNumber;
 
   hb_objSendMsg(pDoc, "NLINE", 0);
-  pNumber = hb_itemPutNI(SR_NULLPTR, hb_parni(-1) + 1);
+  pNumber = hb_itemPutNI(nullptr, hb_parni(-1) + 1);
   hb_objSendMsg(pDoc, "_NLINE", 1, pNumber);
   hb_itemRelease(pNumber);
 }
@@ -166,7 +166,7 @@ static void hbxml_doc_new_node(PHB_ITEM pDoc, int amount)
   PHB_ITEM pNumber;
 
   hb_objSendMsg(pDoc, "NNODECOUNT", 0);
-  pNumber = hb_itemPutNI(SR_NULLPTR, hb_parni(-1) + amount);
+  pNumber = hb_itemPutNI(nullptr, hb_parni(-1) + amount);
   hb_objSendMsg(pDoc, "_NNODECOUNT", 1, pNumber);
   hb_itemRelease(pNumber);
 
@@ -416,7 +416,7 @@ static PHB_ITEM mxml_node_new(PHB_ITEM pDoc)
   pNode = hb_itemNew(hb_param(-1, HB_IT_ANY));
 
   // Sets also current node line begin value, if the node is from a document
-  if (pDoc != SR_NULLPTR) {
+  if (pDoc != nullptr) {
     hb_objSendMsg(pDoc, "NLINE", 0);
     hb_objSendMsg(pNode, "_NBEGINLINE", 1, hb_param(-1, HB_IT_ANY));
   }
@@ -434,7 +434,7 @@ static void mxml_node_unlink(PHB_ITEM pNode)
 {
   PHB_ITEM pPrev, pNext, pParent, pNil;
 
-  pNil = hb_itemNew(SR_NULLPTR);
+  pNil = hb_itemNew(nullptr);
 
   hb_objSendMsg(pNode, "OPREV", 0);
   pPrev = hb_itemNew(hb_param(-1, HB_IT_ANY));
@@ -779,7 +779,7 @@ static void mxml_node_read_data(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, i
 
   buf[iPos] = 0;
 
-  pItem = hb_itemPutNI(SR_NULLPTR, MXML_TYPE_DATA);
+  pItem = hb_itemPutNI(nullptr, MXML_TYPE_DATA);
   hb_objSendMsg(pNode, "_NTYPE", 1, pItem);
 
   if (iAllocated > iPos + 1) {
@@ -859,7 +859,7 @@ static MXML_STATUS mxml_node_read_name(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM
     buf = static_cast<char *>(MXML_REALLOCATOR(buf, iPos + 1));
   }
 
-  pItem = hb_itemPutCL(SR_NULLPTR, buf, iPos);
+  pItem = hb_itemPutCL(nullptr, buf, iPos);
   hb_objSendMsg(pNode, "_CNAME", 1, pItem);
   hb_itemRelease(pItem);
   MXML_DELETOR(buf);
@@ -875,8 +875,8 @@ static MXML_STATUS mxml_node_read_attributes(MXML_REFIL *ref, PHB_ITEM pNode, PH
   PHB_ITEM hbValue;
   MXML_STATUS ret;
 
-  hbName = hb_itemNew(SR_NULLPTR);
-  hbValue = hb_itemNew(SR_NULLPTR);
+  hbName = hb_itemNew(nullptr);
+  hbValue = hb_itemNew(nullptr);
   attributes = hb_hashNew(NULL);
 
   hbAttr.pName = hbName;
@@ -930,7 +930,7 @@ static void mxml_node_read_directive(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM d
     }
 
     if (ref->status == MXML_STATUS_OK) {
-      PHB_ITEM pItem = hb_itemPutNI(SR_NULLPTR, MXML_TYPE_DIRECTIVE);
+      PHB_ITEM pItem = hb_itemPutNI(nullptr, MXML_TYPE_DIRECTIVE);
       buf[iPos] = 0;
       hb_objSendMsg(pNode, "_NTYPE", 1, pItem);
       if (iAllocated > iPos + 1) {
@@ -1003,7 +1003,7 @@ static void mxml_node_read_pi(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc)
   }
 
   if (ref->status == MXML_STATUS_OK) {
-    PHB_ITEM pItem = hb_itemPutNI(SR_NULLPTR, MXML_TYPE_PI);
+    PHB_ITEM pItem = hb_itemPutNI(nullptr, MXML_TYPE_PI);
     buf[iPos] = 0;
     hb_objSendMsg(pNode, "_NTYPE", 1, pItem);
     if (iAllocated > iPos + 1) {
@@ -1024,7 +1024,7 @@ static void mxml_node_read_tag(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, in
   char chr;
   PHB_ITEM pItem;
 
-  pItem = hb_itemPutNI(SR_NULLPTR, MXML_TYPE_TAG);
+  pItem = hb_itemPutNI(nullptr, MXML_TYPE_TAG);
   hb_objSendMsg(pNode, "_NTYPE", 1, pItem);
   hb_itemRelease(pItem);
 
@@ -1057,7 +1057,7 @@ static void mxml_node_read_comment(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc
   int iStatus = 0;
   PHB_ITEM pItem;
 
-  pItem = hb_itemPutNI(SR_NULLPTR, MXML_TYPE_COMMENT);
+  pItem = hb_itemPutNI(nullptr, MXML_TYPE_COMMENT);
   hb_objSendMsg(pNode, "_NTYPE", 1, pItem);
 
   // we'll put all the comment into the data member, up to ->
@@ -1133,7 +1133,7 @@ static void mxml_node_read_cdata(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM pDoc)
   int iStatus = 0;
   PHB_ITEM pItem;
 
-  pItem = hb_itemPutNI(SR_NULLPTR, MXML_TYPE_CDATA);
+  pItem = hb_itemPutNI(nullptr, MXML_TYPE_CDATA);
   hb_objSendMsg(pNode, "_NTYPE", 1, pItem);
 
   // we'll put all the cdata into the data member, up to ]]>
@@ -1330,7 +1330,7 @@ static MXML_STATUS mxml_node_read(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc,
       return MXML_STATUS_MALFORMED;
     }
     // resetting new node findings
-    node = SR_NULLPTR;
+    node = nullptr;
 
     switch (iStatus) {
     case 0: { // outside nodes
@@ -1407,7 +1407,7 @@ static MXML_STATUS mxml_node_read(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc,
     }
 
     // have I to add a node below our structure ?
-    if (node != SR_NULLPTR) {
+    if (node != nullptr) {
       if (ref->status == MXML_STATUS_OK) {
         mxml_node_add_below(pNode, node);
         hb_itemRelease(node);
@@ -1426,7 +1426,7 @@ static MXML_STATUS mxml_node_read(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc,
   // We cannot have errors here; we would have been already returned
 
   if (iStatus == -1) { // ARE WE DONE ?
-    PHB_ITEM child_node, data_node = SR_NULLPTR;
+    PHB_ITEM child_node, data_node = nullptr;
 
     // Time to close current node. We must verify:
     // 1) If the closing tag is coherent with the opened tag name.
@@ -1450,12 +1450,12 @@ static MXML_STATUS mxml_node_read(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc,
       hb_objSendMsg(child_node, "NTYPE", 0);
       if (hb_parni(-1) == MXML_TYPE_DATA) {
         // first data node ?
-        if (data_node == SR_NULLPTR) {
+        if (data_node == nullptr) {
           data_node = hb_itemNew(child_node);
           // ... or have we more than a data node?
         } else {
           hb_itemRelease(data_node);
-          data_node = SR_NULLPTR;
+          data_node = nullptr;
           break;
         }
       }
@@ -1513,8 +1513,8 @@ static MXML_STATUS mxml_node_write(MXML_OUTPUT *out, PHB_ITEM pNode, int style)
   PHB_ITEM pChild, pItem;
   int depth = 0;
 
-  pChild = hb_itemNew(SR_NULLPTR);
-  pItem = hb_itemNew(SR_NULLPTR);
+  pChild = hb_itemNew(nullptr);
+  pItem = hb_itemNew(nullptr);
 
   if (style & MXML_STYLE_NONEWLINE) {
     style &= ~MXML_STYLE_INDENT;
@@ -1697,8 +1697,8 @@ static MXML_OUTPUT * mxml_output_new(MXML_OUTPUT_FUNC func, int node_count)
 {
   MXML_OUTPUT *ret = (MXML_OUTPUT *)MXML_ALLOCATOR(sizeof(MXML_OUTPUT));
 
-  if (ret == SR_NULLPTR) {
-    return SR_NULLPTR;
+  if (ret == nullptr) {
+    return nullptr;
   }
 
   if (mxml_output_setup(ret, func, node_count) == MXML_STATUS_OK) {
@@ -1706,7 +1706,7 @@ static MXML_OUTPUT * mxml_output_new(MXML_OUTPUT_FUNC func, int node_count)
   }
 
   MXML_DELETOR(ret);
-  return SR_NULLPTR;
+  return nullptr;
 }
 #endif
 
@@ -1715,7 +1715,7 @@ static MXML_OUTPUT * mxml_output_new(MXML_OUTPUT_FUNC func, int node_count)
 // Node count is optional, but highly wanted for progress indicators.
 static MXML_STATUS mxml_output_setup(MXML_OUTPUT *out, MXML_OUTPUT_FUNC func, int node_count)
 {
-  if (func == SR_NULLPTR) {
+  if (func == nullptr) {
     return MXML_STATUS_ERROR;
   }
 
@@ -1849,8 +1849,8 @@ static MXML_REFIL * mxml_refil_new(MXML_REFIL_FUNC func, char *buf, HB_ISIZ bufl
 {
   MXML_REFIL *ret = (MXML_REFIL *)MXML_ALLOCATOR(sizeof(MXML_REFIL));
 
-  if (ret == SR_NULLPTR) {
-    return SR_NULLPTR;
+  if (ret == nullptr) {
+    return nullptr;
   }
 
   if (mxml_refil_setup(ret, func, buf, buflen, bufsize) == MXML_STATUS_OK) {
@@ -1858,7 +1858,7 @@ static MXML_REFIL * mxml_refil_new(MXML_REFIL_FUNC func, char *buf, HB_ISIZ bufl
   }
 
   MXML_DELETOR(ret);
-  return SR_NULLPTR;
+  return nullptr;
 }
 #endif
 
@@ -1874,7 +1874,7 @@ static MXML_REFIL * mxml_refil_new(MXML_REFIL_FUNC func, char *buf, HB_ISIZ bufl
 // calling program, if this is needed.
 static MXML_STATUS mxml_refil_setup(MXML_REFIL *ref, MXML_REFIL_FUNC func, char *buf, HB_ISIZ buflen, HB_ISIZ bufsize)
 {
-  if (buf == SR_NULLPTR && func == SR_NULLPTR) {
+  if (buf == nullptr && func == nullptr) {
     return MXML_STATUS_ERROR;
   }
 
@@ -1884,7 +1884,7 @@ static MXML_STATUS mxml_refil_setup(MXML_REFIL *ref, MXML_REFIL_FUNC func, char 
   ref->status = MXML_STATUS_OK;
   ref->error = MXML_ERROR_NONE;
 
-  if (buf == SR_NULLPTR) {
+  if (buf == nullptr) {
     ref->buflen = ref->bufsize = 0;
   } else {
     ref->buflen = buflen;
@@ -1921,7 +1921,7 @@ static int mxml_refil_getc(MXML_REFIL *ref)
   }
 
   if (ref->bufpos >= ref->buflen) {
-    if (ref->refil_func != SR_NULLPTR) {
+    if (ref->refil_func != nullptr) {
       ref->refil_func(ref);
       if (ref->status != MXML_STATUS_OK || ref->buflen == 0) {
         return MXML_EOF;
@@ -1966,14 +1966,14 @@ static MXML_SGS *mxml_sgs_new()
 {
   MXML_SGS *ret = (MXML_SGS *)MXML_ALLOCATOR(sizeof(MXML_SGS));
 
-  if (ret == SR_NULLPTR) {
-    return SR_NULLPTR;
+  if (ret == nullptr) {
+    return nullptr;
   }
 
   ret->buffer = static_cast<char *>(MXML_ALLOCATOR(MXML_ALLOC_BLOCK));
-  if (ret->buffer == SR_NULLPTR) {
+  if (ret->buffer == nullptr) {
     MXML_DELETOR(ret);
-    return SR_NULLPTR;
+    return nullptr;
   }
 
   ret->allocated = MXML_ALLOC_BLOCK;
@@ -1984,7 +1984,7 @@ static MXML_SGS *mxml_sgs_new()
 
 static void mxml_sgs_destroy(MXML_SGS *sgs)
 {
-  if (sgs->buffer != SR_NULLPTR) {
+  if (sgs->buffer != nullptr) {
     MXML_DELETOR(sgs->buffer);
   }
 
@@ -2000,7 +2000,7 @@ static MXML_STATUS mxml_sgs_append_char(MXML_SGS *sgs, char c)
   if (sgs->length >= sgs->allocated) {
     char *buf = static_cast<char *>(MXML_REALLOCATOR(sgs->buffer, sgs->allocated + MXML_ALLOC_BLOCK));
 
-    if (buf == SR_NULLPTR) {
+    if (buf == nullptr) {
       return MXML_STATUS_ERROR;
     }
 
@@ -2018,7 +2018,7 @@ static MXML_STATUS mxml_sgs_append_string_len(MXML_SGS *sgs, const char *s, HB_I
       HB_ISIZ blklen = ((sgs->length + slen) / MXML_ALLOC_BLOCK + 1) * MXML_ALLOC_BLOCK;
       char *buf = static_cast<char *>(MXML_REALLOCATOR(sgs->buffer, blklen));
 
-      if (buf == SR_NULLPTR) {
+      if (buf == nullptr) {
         return MXML_STATUS_ERROR;
       }
 
@@ -2073,7 +2073,7 @@ static const char *mxml_error_desc(MXML_ERROR_CODE code)
   int iCode = (static_cast<int>(code)) - 1;
 
   if (iCode < 0 || iCode > (signed)(sizeof(edesc) / sizeof(char *))) {
-    return SR_NULLPTR;
+    return nullptr;
   }
 
   return edesc[iCode];
@@ -2095,13 +2095,13 @@ HB_FUNC(SR_XML_DATAREAD)
   char buffer[512], *buf;
   HB_SIZE nLen;
 
-  if (pDoc == SR_NULLPTR || pParam == SR_NULLPTR || (!HB_IS_STRING(pParam) && !HB_IS_NUMERIC(pParam))) {
-    hb_errRT_BASE(EG_ARG, 3012, SR_NULLPTR, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS);
+  if (pDoc == nullptr || pParam == nullptr || (!HB_IS_STRING(pParam) && !HB_IS_NUMERIC(pParam))) {
+    hb_errRT_BASE(EG_ARG, 3012, nullptr, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS);
     return;
   }
 
   if (hb_itemGetWriteCL(pParam, &buf, &nLen)) {
-    mxml_refil_setup(&refil, SR_NULLPTR, buf, nLen, nLen);
+    mxml_refil_setup(&refil, nullptr, buf, nLen, nLen);
   } else { // can only be an integer, that is, a file handle
     mxml_refil_setup(&refil, mxml_refill_from_handle_func, buffer, 0, 512);
 
@@ -2124,7 +2124,7 @@ HB_FUNC(SR_XMLERRORDESC)
   if (pNum) {
     hb_retc(mxml_error_desc((MXML_ERROR_CODE)hb_itemGetNI(pNum)));
   } else {
-    hb_errRT_BASE(EG_ARG, 3012, SR_NULLPTR, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS);
+    hb_errRT_BASE(EG_ARG, 3012, nullptr, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS);
   }
 }
 
@@ -2138,12 +2138,12 @@ HB_FUNC(SR_XML_NODE_TO_STRING)
   MXML_OUTPUT out;
   int iStyle;
 
-  if (pNode == SR_NULLPTR) {
-    hb_errRT_BASE(EG_ARG, 3012, SR_NULLPTR, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS);
+  if (pNode == nullptr) {
+    hb_errRT_BASE(EG_ARG, 3012, nullptr, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS);
     return;
   }
 
-  if (pStyle == SR_NULLPTR) {
+  if (pStyle == nullptr) {
     iStyle = 0;
   } else {
     iStyle = hb_itemGetNI(pStyle);
@@ -2170,12 +2170,12 @@ HB_FUNC(SR_XML_NODE_WRITE)
   MXML_OUTPUT out;
   int iStyle, iRet;
 
-  if (pNode == SR_NULLPTR || pHandle == SR_NULLPTR) {
-    hb_errRT_BASE(EG_ARG, 3012, SR_NULLPTR, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS);
+  if (pNode == nullptr || pHandle == nullptr) {
+    hb_errRT_BASE(EG_ARG, 3012, nullptr, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS);
     return;
   }
 
-  if (pStyle == SR_NULLPTR) {
+  if (pStyle == nullptr) {
     iStyle = 0;
   } else {
     iStyle = hb_itemGetNI(pStyle);

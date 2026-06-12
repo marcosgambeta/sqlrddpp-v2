@@ -97,8 +97,8 @@ enum SQLO2_iStatus_codes
   SQLO2_NO_DATA = 100            //*< Maps to OCI_NO_DATA
 };
 
-static PHB_DYNS s_pSym_SR_DESERIALIZE = SR_NULLPTR;
-static PHB_DYNS s_pSym_SR_FROMJSON = SR_NULLPTR;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
+static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 
 // static OCI_ConnPool * pool = NULL;
 //-----------------------------------------------------------------------------//
@@ -165,7 +165,7 @@ HB_FUNC_STATIC(SR_SQLO2_CONNECT)
 
   // memset(session, 0, sizeof(OCI_ORASESSION));
   if (!OCI_initilized) {
-    if (!OCI_Initialize(SR_NULLPTR, SR_NULLPTR,
+    if (!OCI_Initialize(nullptr, nullptr,
                         OCI_ENV_DEFAULT | OCI_ENV_CONTEXT | OCI_ENV_THREADED)) { // OCI_ENV_CONTEXT))
       session->iStatus = SQLO2_ERROR;
     } else {
@@ -196,7 +196,7 @@ HB_FUNC_STATIC(SR_SQLO2_CONNECT)
   session->cn = OCI_ConnectionCreate(hb_parc(1), hb_parc(2), hb_parc(3), OCI_SESSION_DEFAULT);
   //}
 
-  if (session->cn != SR_NULLPTR) {
+  if (session->cn != nullptr) {
     session->iStatus = SQLO_SUCCESS;
   }
 
@@ -217,7 +217,7 @@ HB_FUNC_STATIC(SR_SQLO2_DBMSNAME)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     hb_retc(session->server_version);
   } else {
     hb_retc("Not connected to Oracle");
@@ -230,7 +230,7 @@ HB_FUNC_STATIC(SR_SQLO2_DISCONNECT)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
 
     OCI_ConnectionFree(session->cn);
 
@@ -251,7 +251,7 @@ HB_FUNC_STATIC(SR_SQLO2_GETERRORDESCR)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     hb_retc(const_cast<char *>(OCI_ErrorGetString(OCI_GetLastError())));
   } else {
     hb_retc("Not connected to Oracle");
@@ -262,7 +262,7 @@ HB_FUNC_STATIC(SR_SQLO2_GETERRORCODE)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     hb_retni(OCI_ErrorGetType(OCI_GetLastError()));
   } else {
     hb_retni(SQL_ERROR);
@@ -273,7 +273,7 @@ HB_FUNC_STATIC(SR_SQLO2_NUMCOLS)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     hb_retni(session->numcols);
   } else {
     hb_retni(SQL_ERROR);
@@ -284,7 +284,7 @@ HB_FUNC_STATIC(SR_SQLO2_COMMIT)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     session->iStatus = OCI_Commit(session->cn) ? 0 : -1;
 
     if (SQLO2_SUCCESS == session->iStatus) {
@@ -303,7 +303,7 @@ HB_FUNC_STATIC(SR_SQLO2_ROLLBACK)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     session->iStatus = OCI_Rollback(session->cn) ? 0 : -1;
     if (SQLO2_SUCCESS == session->iStatus) {
       hb_retni(SQL_SUCCESS);
@@ -320,7 +320,7 @@ HB_FUNC_STATIC(SR_SQLO2_EXECDIRECT)
   GET_OCI_SESSION(session, 1);
   const char *stm = hb_parcx(2);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     session->stmt = OCI_StatementCreate(session->cn);
 
     if (OCI_ExecuteStmt(session->stmt, stm)) {
@@ -339,7 +339,7 @@ HB_FUNC_STATIC(SR_SQLO2_EXECUTE)
 {
   GET_OCI_SESSION(session, 1);
   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     char *stm = const_cast<char *>(hb_parc(2));
     if (lStmt) {
       OCI_SetPrefetchSize(session->stmt, 100);
@@ -387,7 +387,7 @@ HB_FUNC_STATIC(SR_ORACLEINBINDPARAM2)
 
   HB_SYMBOL_UNUSED(lStmt);
 
-  if (Stmt != SR_NULLPTR) {
+  if (Stmt != nullptr) {
 
     Stmt->pLink[iPos].bindname = static_cast<char *>(hb_xgrabz(sizeof(char) * 10));
     //      memset(Stmt->pLink[iPos].bindname,'\0',10 * sizeof(char));
@@ -527,7 +527,7 @@ HB_FUNC_STATIC(SR_ORACLEGETBINDDATA2) // TODO: not used in SQLRDD source code
 
   PHB_ITEM p1 = hb_param(2, HB_IT_ANY);
 
-  if (HB_IS_NUMBER(p1) && p != SR_NULLPTR) {
+  if (HB_IS_NUMBER(p1) && p != nullptr) {
 
     iPos = hb_itemGetNI(p1);
     if (p->pLink[iPos - 1].iType == 2) {
@@ -576,11 +576,11 @@ HB_FUNC_STATIC(SR_ORACLEEXECDIR2) // TODO: not used in SQLRDD source code
   GET_OCI_SESSION(session, 1);
   int ret = SQL_ERROR;
   int ret1;
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     ret1 = OCI_Execute(session->stmt);
     if (ret1) {
       OCI_StatementFree(session->stmt);
-      session->stmt = SR_NULLPTR;
+      session->stmt = nullptr;
       //          session->rs = OCI_GetResultset(session->stmt);
       hb_retni(0);
       return;
@@ -599,7 +599,7 @@ HB_FUNC_STATIC(SR_ORACLEPREPARE2)
   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
   int ret = -1;
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     if (lStmt) {
       session->stmt = OCI_StatementCreate(session->cn);
       ret = OCI_Prepare(session->stmt, szSql);
@@ -622,7 +622,7 @@ HB_FUNC_STATIC(SR_ORACLEBINDALLOC2)
   GET_OCI_SESSION(session, 1);
   int iBind;
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     iBind = hb_parni(2);
     session->pLink = (ORA_BIND_COLS2 *)hb_xgrabz(sizeof(ORA_BIND_COLS2) * iBind);
     // memset(session->pLink, 0, sizeof(ORA_BIND_COLS) * iBind);
@@ -649,7 +649,7 @@ static void OracleFreeLink2(int num_recs, POCI_ORASESSION p)
     }
 
     hb_xfree(p->pLink);
-    p->pLink = SR_NULLPTR;
+    p->pLink = nullptr;
     p->ubBindNum = 0;
   }
 }
@@ -760,25 +760,25 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
       HB_SIZE lLenBuff = strlen(bBuffer);
       if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
           (sr_lSerializeArrayAsJson())) {
-        if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
+        if (s_pSym_SR_FROMJSON == nullptr) {
           s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-          if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
+          if (s_pSym_SR_FROMJSON == nullptr) {
             printf("Could not find Symbol HB_JSONDECODE\n");
           }
         }
         hb_vmPushDynSym(s_pSym_SR_FROMJSON);
         hb_vmPushNil();
         hb_vmPushString(bBuffer, lLenBuff);
-        pTemp = hb_itemNew(SR_NULLPTR);
+        pTemp = hb_itemNew(nullptr);
         hb_vmPush(pTemp);
         hb_vmDo(2);
         // TOFIX:
         hb_itemMove(pItem, pTemp);
         hb_itemRelease(pTemp);
       } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
-        if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
+        if (s_pSym_SR_DESERIALIZE == nullptr) {
           s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-          if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
+          if (s_pSym_SR_DESERIALIZE == nullptr) {
             printf("Could not find Symbol SR_DESERIALIZE\n");
           }
         }
@@ -787,11 +787,11 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
         hb_vmPushString(bBuffer, lLenBuff);
         hb_vmDo(1);
 
-        pTemp = hb_itemNew(SR_NULLPTR);
+        pTemp = hb_itemNew(nullptr);
         hb_itemMove(pTemp, hb_stackReturnItem());
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
-          //PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
+          //PHB_ITEM pLangItem = hb_itemNew(nullptr); (using stack instead of heap)
           HB_ITEM pLangItem{};
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
@@ -853,16 +853,16 @@ HB_FUNC(SQLO2_LINE) // TODO: not used in SQLRDD source code
   HB_USHORT i;
   SQLO2_stmt_handle_t stmtParamRes;
 
-  ret = hb_itemNew(SR_NULLPTR);
+  ret = hb_itemNew(nullptr);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
-    line = SQLO2_values(stmtParamRes, SR_NULLPTR, 0);
-    lens = SQLO2_value_lens(stmtParamRes, SR_NULLPTR);
+    line = SQLO2_values(stmtParamRes, nullptr, 0);
+    lens = SQLO2_value_lens(stmtParamRes, nullptr);
     hb_arrayNew(ret, session->numcols);
 
     for (i = 0; i < session->numcols; i++) {
-      temp = hb_itemNew(SR_NULLPTR);
+      temp = hb_itemNew(nullptr);
       hb_arraySetForward(ret, i + 1, hb_itemPutCL(temp, static_cast<char *>(line[i]), lens[i]));
       hb_itemRelease(temp);
     }
@@ -887,7 +887,7 @@ HB_FUNC_STATIC(SR_SQLO2_LINEPROCESSED)
   PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
   //   SQLO2_stmt_handle_t stmtParamRes;
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     // stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
     // line = SQLO2_values(stmtParamRes, NULL, 0);
     // lens = SQLO2_value_lens(stmtParamRes, NULL);
@@ -896,7 +896,7 @@ HB_FUNC_STATIC(SR_SQLO2_LINEPROCESSED)
 
     for (i = 0; i < cols; i++) {
       lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i + 1), FIELD_ENUM);
-      temp = hb_itemNew(SR_NULLPTR);
+      temp = hb_itemNew(nullptr);
 
       if (lIndex != 0) {
         SQLO2_FieldGet(hb_arrayGetItemPtr(pFields, i + 1), temp, lIndex, bQueryOnly, ulSystemID, bTranslate,
@@ -969,7 +969,7 @@ HB_FUNC_STATIC(SR_SQLO2_DESCRIBECOL) // ( hStmt, nCol, @cName, @nDataType, @nCol
   char *name;
   //     SQLO2_stmt_handle_t stmtParamRes;
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     OCI_Column *col;
     ncol = hb_parni(2);
     // stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
@@ -1048,7 +1048,7 @@ HB_FUNC_STATIC(SR_SQLO2_FETCH)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
 
     session->iStatus = OCI_FetchNext(session->rs) ? 1 : -1;
 
@@ -1068,17 +1068,17 @@ HB_FUNC_STATIC(SR_SQLO2_CLOSESTMT)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     if (session->stmtParamRes) {
       OCI_StatementFree(session->stmtParamRes);
-      session->stmtParamRes = SR_NULLPTR;
+      session->stmtParamRes = nullptr;
     }
     if (session->stmt) {
       session->iStatus = OCI_StatementFree(session->stmt) ? 1 : -1;
     } else {
       session->iStatus = 1;
     }
-    session->stmt = SR_NULLPTR;
+    session->stmt = nullptr;
     hb_retni(session->iStatus);
   }
   hb_retni(SQL_SUCCESS);
@@ -1165,7 +1165,7 @@ HB_FUNC_STATIC(SR_ORACLE_PROCCURSOR2)
   const char *stmt = hb_parc(2);
   const char *parc = hb_parc(3);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     // parse the statement
     // ret = SQLO2_prepare(session->dbh, stmt);
     session->stmt = OCI_StatementCreate(session->cn);
@@ -1207,7 +1207,7 @@ HB_FUNC_STATIC(SR_SQLO2_ORACLESETLOBPREFETCH) // TODO: not used in SQLRDD source
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     hb_retl(OCI_SetDefaultLobPrefetchSize(session->cn, (unsigned int)hb_parni(2)));
   } else {
     hb_retl(false);
@@ -1220,7 +1220,7 @@ HB_FUNC_STATIC(SR_SQLO2_SETSTATEMENTCACHESIZE)
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     hb_retl(OCI_SetStatementCacheSize(session->cn, (unsigned int)hb_parni(2)));
   } else {
     hb_retl(false);
@@ -1233,7 +1233,7 @@ HB_FUNC_STATIC(SR_SQLO2_GETSTATEMENTCACHESIZE) // TODO: not used in SQLRDD sourc
 {
   GET_OCI_SESSION(session, 1);
 
-  if (session != SR_NULLPTR) {
+  if (session != nullptr) {
     hb_retni((unsigned int)OCI_GetStatementCacheSize(session->cn));
   } else {
     hb_retni(0);
@@ -1248,7 +1248,7 @@ HB_FUNC_STATIC(SR_GETORAHANDLE2) // TODO: not used in SQLRDD source code
 {
   GET_OCI_SESSION(p, 1);
 
-  if (p != SR_NULLPTR) {
+  if (p != nullptr) {
     hb_retptr(p->stmt);
   }
 }
@@ -1261,7 +1261,7 @@ HB_FUNC_STATIC(SR_SETORAHANDLE2) // TODO: not used in SQLRDD source code
 {
   GET_OCI_SESSION(p, 1);
 
-  if (p != SR_NULLPTR) {
+  if (p != nullptr) {
     p->stmt = (OCI_Statement *)hb_parptr(2);
   }
 }

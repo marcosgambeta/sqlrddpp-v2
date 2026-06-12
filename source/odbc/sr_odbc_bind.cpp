@@ -113,8 +113,8 @@ typedef unsigned char SQLTCHAR;
 #define HB_ULONG ULONG
 #endif
 
-static PHB_DYNS s_pSym_SR_DESERIALIZE = SR_NULLPTR;
-static PHB_DYNS s_pSym_SR_FROMJSON = SR_NULLPTR;
+static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
+static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 void SR_odbcErrorDiagRTE(SQLHSTMT hStmt, const char *routine, const char *szSql, SQLRETURN res, int line,
                       const char *module);
 void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQueryOnly, HB_ULONG ulSystemID,
@@ -169,10 +169,10 @@ HB_FUNC(SR_INSTALLDSN)
     }
 
     // remove the DSN if it already existed
-    SQLConfigDataSource(SR_NULLPTR, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
+    SQLConfigDataSource(nullptr, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
 
     // create a new DSN
-    hb_retl(SQLConfigDataSource(SR_NULLPTR, ODBC_ADD_SYS_DSN, szDriver, szAttributes));
+    hb_retl(SQLConfigDataSource(nullptr, ODBC_ADD_SYS_DSN, szDriver, szAttributes));
 
     hb_xfree((void *)szAttributes);
   }
@@ -197,7 +197,7 @@ HB_FUNC(SR_UNINSTALLDSN)
     }
 
     // remove the DSN if it already existed
-    SQLConfigDataSource(SR_NULLPTR, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
+    SQLConfigDataSource(nullptr, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
 
     hb_xfree((void *)szAttributes);
   }
@@ -517,25 +517,25 @@ static void sr_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
       PHB_ITEM pTemp;
       if (lLenBuff > 0 && (strncmp(bBuffer, "[", 1) == 0 || strncmp(bBuffer, "[]", 2)) &&
           (sr_lSerializeArrayAsJson())) {
-        if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
+        if (s_pSym_SR_FROMJSON == nullptr) {
           s_pSym_SR_FROMJSON = hb_dynsymFindName("HB_JSONDECODE");
-          if (s_pSym_SR_FROMJSON == SR_NULLPTR) {
+          if (s_pSym_SR_FROMJSON == nullptr) {
             printf("Could not find Symbol HB_JSONDECODE\n");
           }
         }
         hb_vmPushDynSym(s_pSym_SR_FROMJSON);
         hb_vmPushNil();
         hb_vmPushString(bBuffer, lLenBuff);
-        pTemp = hb_itemNew(SR_NULLPTR);
+        pTemp = hb_itemNew(nullptr);
         hb_vmPush(pTemp);
         hb_vmDo(2);
         // TOFIX:
         hb_itemMove(pItem, pTemp);
         hb_itemRelease(pTemp);
       } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
-        if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
+        if (s_pSym_SR_DESERIALIZE == nullptr) {
           s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
-          if (s_pSym_SR_DESERIALIZE == SR_NULLPTR) {
+          if (s_pSym_SR_DESERIALIZE == nullptr) {
             printf("Could not find Symbol SR_DESERIALIZE\n");
           }
         }
@@ -544,11 +544,11 @@ static void sr_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
         hb_vmPushString(bBuffer, lLenBuff);
         hb_vmDo(1);
 
-        pTemp = hb_itemNew(SR_NULLPTR);
+        pTemp = hb_itemNew(nullptr);
         hb_itemMove(pTemp, hb_stackReturnItem());
 
         if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
-          //PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
+          //PHB_ITEM pLangItem = hb_itemNew(nullptr); (using stack instead of heap)
           HB_ITEM pLangItem{};
           HB_SIZE ulPos;
           if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
@@ -612,28 +612,28 @@ HB_FUNC_STATIC(SR_ODBCLINEPROCESSED)
   PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
 
   if (!pFields) {
-    hb_errRT_BASE_SubstR(EG_ARG, 1111, SR_NULLPTR, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
+    hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
                          hb_paramError(3));
   }
 
   cols = static_cast<int>(hb_arrayLen(pFields));
 
   if (cols <= 0) {
-    hb_errRT_BASE_SubstR(EG_ARG, 1111, SR_NULLPTR, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
+    hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
                          hb_paramError(3));
   }
 
   lLen = static_cast<HB_LONG>(hb_pcount() > 1 ? hb_parnl(2) : 4096);
 
   if (lLen <= 0) {
-    hb_errRT_BASE_SubstR(EG_ARG, 1111, SR_NULLPTR, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
+    hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
                          hb_paramError(3));
   }
 
   // bBuffer = hb_xgrab((HB_ULONG) lLen + 1);
 
   for (i = 1; i <= cols; i++) {
-    //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
+    //temp = hb_itemNew(nullptr); (using stack instead of heap)
     HB_ITEM temp{};
     lIndex = (HB_USHORT)hb_arrayGetNI(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM);
 
@@ -681,21 +681,21 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
   HB_ULONG ulPosCache = hb_arrayGetNL(pInfo, AINFO_NPOSCACHE);
 
   if (!pFields) {
-    hb_errRT_BASE_SubstR(EG_ARG, 1111, SR_NULLPTR, "SR_ODBCGETLINES", 3, hb_paramError(1), hb_paramError(2),
+    hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCGETLINES", 3, hb_paramError(1), hb_paramError(2),
                          hb_paramError(3));
   }
 
   cols = static_cast<int>(hb_arrayLen(pFields));
 
   if (cols <= 0) {
-    hb_errRT_BASE_SubstR(EG_ARG, 1111, SR_NULLPTR, "SR_ODBCGETLINES", 3, hb_paramError(1), hb_paramError(2),
+    hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCGETLINES", 3, hb_paramError(1), hb_paramError(2),
                          hb_paramError(3));
   }
 
   lLen = (hb_pcount() > 1 ? hb_parnl(2) : 4096);
 
   if (lLen <= 0) {
-    hb_errRT_BASE_SubstR(EG_ARG, 1111, SR_NULLPTR, "SR_ODBCGETLINES", 3, hb_paramError(1), hb_paramError(2),
+    hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCGETLINES", 3, hb_paramError(1), hb_paramError(2),
                          hb_paramError(3));
   }
 
@@ -738,11 +738,11 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
 
     for (i = 1; i <= cols; i++) {
       HB_ITEM temp{};
-      bOut = SR_NULLPTR;
+      bOut = nullptr;
       lInitBuff = static_cast<HB_LONG>(lLen);
       lLenOut = 0;
       iReallocs = 0;
-      //temp = hb_itemNew(SR_NULLPTR); (using stack instead of heap)
+      //temp = hb_itemNew(nullptr); (using stack instead of heap)
       lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM);
       lIndex = lIndex ? lIndex : i;
 
@@ -842,7 +842,7 @@ void SR_odbcErrorDiagRTE(SQLHSTMT hStmt, const char *routine, const char *szSql,
           Msg);
 
   if (szSql) {
-    pArg = hb_itemNew(SR_NULLPTR);
+    pArg = hb_itemNew(nullptr);
     hb_itemPutC(pArg, szSql);
     if (hb_itemGetCLen(pArg)) {
       hb_errPutArgs(pError, 1, pArg);
@@ -1022,7 +1022,7 @@ HB_FUNC_STATIC(SR_GETCONNECTOPTION)
 #if ODBCVER >= 0x0300
   SQLPOINTER buffer[512];
   SQLINTEGER lLen = 0;
-  buffer[0] = SR_NULLPTR;
+  buffer[0] = nullptr;
   hb_retni(SQLGetConnectAttr(SR_PAR_SQLHDBC(1), SR_PAR_SQLINTEGER(2), static_cast<SQLPOINTER>(buffer),
                              static_cast<SQLINTEGER>(sizeof(buffer)), static_cast<SQLINTEGER *>(&lLen)));
   hb_storclen(reinterpret_cast<char *>(buffer), lLen, 3);
@@ -1083,7 +1083,7 @@ void SR_odbcErrorDiag(SQLHSTMT hStmt, const char *routine, const char *szSql, in
 HB_FUNC_STATIC(SR_TABLES)
 {
   RETCODE ret;
-  ret = SQLTables(SR_PAR_SQLHSTMT(1), SR_NULLPTR, SQL_NTS, SR_NULLPTR, SQL_NTS, SR_NULLPTR, SQL_NTS,
+  ret = SQLTables(SR_PAR_SQLHSTMT(1), nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
                   reinterpret_cast<SQLCHAR *>(const_cast<char *>("TABLE")), 5);
   hb_retni(ret);
 }
@@ -1187,7 +1187,7 @@ void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQu
     res = SQLGetData((HSTMT)hStmt, ui, SQL_CHAR, buffer, 0, &lLenOut);
     if (SQL_SUCCEEDED(res)) {
       if (static_cast<int>(lLenOut) == SQL_NULL_DATA || lLenOut == 0) {
-        sr_odbcFieldGet(pField, pItem, SR_NULLPTR, -1, bQueryOnly, ulSystemID, bTranslate);
+        sr_odbcFieldGet(pField, pItem, nullptr, -1, bQueryOnly, ulSystemID, bTranslate);
       } else if (lLenOut > 0) {
         char *val = static_cast<char *>(hb_xgrab(lLenOut + 1));
         res = SQLGetData((HSTMT)hStmt, ui, SQL_CHAR, val, lLenOut + 1, &lLenOut);

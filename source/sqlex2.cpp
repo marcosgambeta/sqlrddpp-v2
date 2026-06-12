@@ -78,7 +78,7 @@
 
 //------------------------------------------------------------------------
 
-static PHB_DYNS s_pSym_Serial1 = SR_NULLPTR; // Pointer to serialization function
+static PHB_DYNS s_pSym_Serial1 = nullptr; // Pointer to serialization function
 
 //------------------------------------------------------------------------
 
@@ -136,7 +136,7 @@ static void ResolveSpecialCols(SQLEXAREAP thiswa)
 
   if (!thiswa->pIndexMgmnt) {
     hb_objSendMsg(thiswa->oWorkArea, "AINDEXMGMNT", 0);
-    thiswa->pIndexMgmnt = hb_itemNew(SR_NULLPTR);
+    thiswa->pIndexMgmnt = hb_itemNew(nullptr);
     hb_itemMove(thiswa->pIndexMgmnt, hb_stackReturnItem());
   }
   iOldArea = hb_rddGetCurrentWorkAreaNumber();
@@ -479,7 +479,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
         res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT,
                                static_cast<SQLSMALLINT>(InsertRecord->iCType), static_cast<SQLSMALLINT>(InsertRecord->iSQLType),
                                InsertRecord->ColumnSize, InsertRecord->DecimalDigits, &(InsertRecord->asLogical), 0,
-                               SR_NULLPTR);
+                               nullptr);
         break; // TODO: unnecessary break
       }
       }
@@ -534,7 +534,7 @@ HB_ERRCODE SR_FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate)
         } else {
           if (InsertRecord->isMultiLang && HB_IS_STRING(pFieldData)) {
             // Transform multilang field in HASH
-            PHB_ITEM pLangItem = hb_itemNew(SR_NULLPTR);
+            PHB_ITEM pLangItem = hb_itemNew(nullptr);
             pTemp = hb_hashNew(NULL);
 #ifdef __XHARBOUR__
             hb_hashAdd(pTemp, ULONG_MAX, sr_getBaseLang(pLangItem), pFieldData);
@@ -607,7 +607,7 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREAP thiswa)
       SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/Fetch", thiswa->sSql, res, __LINE__, __FILE__);
       return HB_FAILURE;
     }
-    res = SQLGetData(thiswa->hStmtInsert, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), SR_NULLPTR);
+    res = SQLGetData(thiswa->hStmtInsert, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), nullptr);
     if (CHECK_SQL_N_OK(res)) {
       SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/GetData", thiswa->sSql, res, __LINE__, __FILE__);
       return HB_FAILURE;
@@ -621,7 +621,7 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREAP thiswa)
     char ident[200] = {0};
     char tablename[100] = {0};
 
-    if (thiswa->hStmtNextval == SR_NULLPTR) {
+    if (thiswa->hStmtNextval == nullptr) {
       switch (thiswa->nSystemID) {
       case SQLRDD_RDBMS_ORACLE: {
         sprintf(tablename, "%s", thiswa->szDataFileName);
@@ -663,7 +663,7 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREAP thiswa)
       SR_odbcErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmt/Fetch", ident, _res, __LINE__, __FILE__);
       return HB_FAILURE;
     }
-    _res = SQLGetData(thiswa->hStmtNextval, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), SR_NULLPTR);
+    _res = SQLGetData(thiswa->hStmtNextval, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), nullptr);
     if (CHECK_SQL_N_OK(_res)) {
       SR_odbcErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmt/GetData", ident, _res, __LINE__, __FILE__);
       return HB_FAILURE;
@@ -779,7 +779,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
         res =
             SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
                              static_cast<SQLSMALLINT>(CurrRecord->iSQLType), CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
-                             &(CurrRecord->asLogical), 0, SR_NULLPTR);
+                             &(CurrRecord->asLogical), 0, nullptr);
         break; // TODO: unnecessary break
       }
       }
@@ -804,7 +804,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
           CLOSE_QUALIFIER(thiswa));
   hb_xfree(temp);
   res = SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(++iBind), SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0,
-                         &(thiswa->lUpdatedRecord), 0, SR_NULLPTR);
+                         &(thiswa->lUpdatedRecord), 0, nullptr);
   if (CHECK_SQL_N_OK(res)) {
     SR_odbcErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
     return HB_FAILURE;
@@ -854,7 +854,7 @@ HB_ERRCODE SR_ExecuteUpdateStmt(SQLEXAREAP thiswa)
   if (res == SQL_ERROR) {
     SR_odbcErrorDiagRTE(thiswa->hStmtUpdate, "ExecuteUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
     SQLCloseCursor(thiswa->hStmtUpdate);
-    thiswa->hStmtUpdate = SR_NULLPTR;
+    thiswa->hStmtUpdate = nullptr;
     return HB_FAILURE;
   }
 
@@ -868,12 +868,12 @@ HB_ERRCODE SR_ExecuteUpdateStmt(SQLEXAREAP thiswa)
 
   // Update Buffer Pool if needed
 
-  pKey = hb_itemNew(SR_NULLPTR);
+  pKey = hb_itemNew(nullptr);
   hb_itemPutNL(pKey, thiswa->recordList[thiswa->recordListPos]);
 
   if (hb_hashScan(thiswa->hBufferPool, pKey, &lPos)) {
     aRecord = hb_hashGetValueAt(thiswa->hBufferPool, lPos);
-    hb_arrayCopy(thiswa->aBuffer, aRecord, SR_NULLPTR, SR_NULLPTR, SR_NULLPTR);
+    hb_arrayCopy(thiswa->aBuffer, aRecord, nullptr, nullptr, nullptr);
   }
   hb_itemRelease(pKey);
 
