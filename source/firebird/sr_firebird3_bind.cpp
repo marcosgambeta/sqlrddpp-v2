@@ -311,9 +311,9 @@ HB_FUNC_STATIC(SR_FBBEGINTRANSACTION3)
         ERRORLOGANDEXIT(session, "FBBEGINTRANSACTION1_1");
       }
 
-      // if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short)
-      //                           sizeof(isc_tpb), isc_tpb))
-      isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short)sizeof(isc_tpb),
+      // if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), static_cast<unsigned short>(
+      //                           sizeof(isc_tpb)), isc_tpb))
+      isc_start_transaction(session->status, &(session->transac), 1, &(session->db), static_cast<unsigned short>(sizeof(isc_tpb)),
                             isc_tpb);
       if (CHECK_ERROR(session)) {
         ERRORLOGANDEXIT(session, "FBBEGINTRANSACTION1_2");
@@ -329,9 +329,9 @@ HB_FUNC_STATIC(SR_FBBEGINTRANSACTION3)
       }
     }
 
-    // if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short)
-    //                           sizeof(isc_tpb), isc_tpb))
-    isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short)sizeof(isc_tpb),
+    // if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), static_cast<unsigned short>(
+    //                           sizeof(isc_tpb)), isc_tpb))
+    isc_start_transaction(session->status, &(session->transac), 1, &(session->db), static_cast<unsigned short>(sizeof(isc_tpb)),
                           isc_tpb);
     if (CHECK_ERROR(session)) {
       ERRORLOGANDEXIT(session, "FBBEGINTRANSACTION3");
@@ -418,9 +418,9 @@ HB_FUNC_STATIC(SR_FBEXECUTE3)
   }
 
   if (!session->transac) {
-    // if( isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short)
-    // sizeof(isc_tpb), isc_tpb) )
-    isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short)sizeof(isc_tpb),
+    // if( isc_start_transaction(session->status, &(session->transac), 1, &(session->db), static_cast<unsigned short)(
+    // sizeof(isc_tpb)), isc_tpb) )
+    isc_start_transaction(session->status, &(session->transac), 1, &(session->db), static_cast<unsigned short>(sizeof(isc_tpb)),
                           isc_tpb);
     if (CHECK_ERROR(session)) {
       ERRORLOGANDEXIT(session, "FBBEGINTRANSACTION1_3");
@@ -431,7 +431,7 @@ HB_FUNC_STATIC(SR_FBEXECUTE3)
   // printf("isc_dsql_prepare %p %p %p %s %p\n", session->status, session->transac, session->stmt, command,
   // session->sqlda); if( isc_dsql_prepare(session->status, &(session->transac), &(session->stmt), 0, command,
   // hb_parni(3), session->sqlda) )
-  isc_dsql_prepare(session->status, &(session->transac), &(session->stmt), 0, command, (unsigned short)hb_parni(3),
+  isc_dsql_prepare(session->status, &(session->transac), &(session->stmt), 0, command, static_cast<unsigned short>(hb_parni(3)),
                    session->sqlda);
   if (CHECK_ERROR(session)) {
     ERRORLOGANDEXIT(session, command);
@@ -515,10 +515,10 @@ HB_FUNC_STATIC(SR_FBEXECUTE3)
     // ISC_STATUS r;
     // if( isc_dsql_execute(session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL) )
     if (session->queryType == isc_info_sql_stmt_exec_procedure) {
-      isc_dsql_execute2(session->status, &(session->transac), &(session->stmt), (unsigned short)hb_parni(3), nullptr,
+      isc_dsql_execute2(session->status, &(session->transac), &(session->stmt), static_cast<unsigned short>(hb_parni(3)), nullptr,
                         nullptr);
     } else {
-      isc_dsql_execute(session->status, &(session->transac), &(session->stmt), (unsigned short)hb_parni(3), nullptr);
+      isc_dsql_execute(session->status, &(session->transac), &(session->stmt), static_cast<unsigned short>(hb_parni(3)), nullptr);
     }
 
     if (CHECK_ERROR(session)) {
@@ -528,10 +528,10 @@ HB_FUNC_STATIC(SR_FBEXECUTE3)
     // if( isc_dsql_execute(session->status, &(session->transac), &(session->stmt), hb_parni(3), session->sqlda) )
     // ISC_STATUS r; ,
     if (session->queryType == isc_info_sql_stmt_exec_procedure) {
-      isc_dsql_execute2(session->status, &(session->transac), &(session->stmt), (unsigned short)hb_parni(3), nullptr,
+      isc_dsql_execute2(session->status, &(session->transac), &(session->stmt), static_cast<unsigned short>(hb_parni(3)), nullptr,
                         session->sqlda);
     } else {
-      isc_dsql_execute(session->status, &(session->transac), &(session->stmt), (unsigned short)hb_parni(3),
+      isc_dsql_execute(session->status, &(session->transac), &(session->stmt), static_cast<unsigned short>(hb_parni(3)),
                        session->sqlda);
     }
 
@@ -553,9 +553,9 @@ HB_FUNC_STATIC(SR_FBEXECUTEIMMEDIATE3)
   // ISC_STATUS r;
 
   if (!session->transac) {
-    // if( isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short)
-    // sizeof(isc_tpb), isc_tpb) )
-    isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short)sizeof(isc_tpb),
+    // if( isc_start_transaction(session->status, &(session->transac), 1, &(session->db), static_cast<unsigned short>(
+    // sizeof(isc_tpb)), isc_tpb) )
+    isc_start_transaction(session->status, &(session->transac), 1, &(session->db), static_cast<unsigned short>(sizeof(isc_tpb)),
                           isc_tpb);
     if (CHECK_ERROR(session)) {
       ERRORLOGANDEXIT(session, "FBBEGINTRANSACTION1_4");
@@ -569,7 +569,7 @@ HB_FUNC_STATIC(SR_FBEXECUTEIMMEDIATE3)
   //    ERRORLOGANDEXIT(session, command);
   // }
   isc_dsql_execute_immediate(session->status, &(session->db), &(session->transac), 0, command,
-                             (unsigned short)hb_parni(3), nullptr);
+                             static_cast<unsigned short>(hb_parni(3)), nullptr);
 
   if (CHECK_ERROR(session)) {
     ERRORLOGANDEXIT(session, command);
@@ -915,7 +915,7 @@ HB_FUNC_STATIC(SR_FBGETDATA3)
 
         for (count = 0; count <= num_segments; count++) {
           if (isc_get_segment(session->status, &blob_handle, (unsigned short ISC_FAR *)&blob_seg_len,
-                              (unsigned short)residual_size, p) != isc_segstr_eof) {
+                              static_cast<unsigned short>(residual_size), p) != isc_segstr_eof) {
             p += blob_seg_len;
             residual_size -= blob_seg_len;
           }
@@ -984,7 +984,7 @@ HB_FUNC(SR_FBCREATEDB3)
                 passwd /*, page, charset*/);
   }
 
-  if (isc_dsql_execute_immediate((ISC_STATUS *)status, &newdb, &trans, 0, create_db, (unsigned short)dialect,
+  if (isc_dsql_execute_immediate((ISC_STATUS *)status, &newdb, &trans, 0, create_db, static_cast<unsigned short>(dialect),
                                  nullptr)) {
     hb_retni(SQL_ERROR);
     SR_TraceLog(LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1]);
@@ -1452,7 +1452,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED3)
 
             for (count = 0; count <= num_segments; count++) {
               if (isc_get_segment(session->status, &blob_handle, (unsigned short ISC_FAR *)&blob_seg_len,
-                                  (unsigned short)residual_size, p) != isc_segstr_eof) {
+                                  static_cast<unsigned short>(residual_size), p) != isc_segstr_eof) {
                 p += blob_seg_len;
                 residual_size -= blob_seg_len;
               }

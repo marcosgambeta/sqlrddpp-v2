@@ -7091,7 +7091,7 @@ int DEFUN(sqlo_describecol, (sth, col, dType, name, namelen, prec, scale, dbsize
   colp = stp->ocolsv;
   colp += col;
 
-  *dType = (unsigned short)(colp->database_dtype);
+  *dType = static_cast<unsigned short>(colp->database_dtype);
   *name = (colp->col_name);
   *namelen = static_cast<int>(colp->col_name_size);
   *prec = static_cast<int>(colp->prec);

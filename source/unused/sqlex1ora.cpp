@@ -1159,7 +1159,7 @@ void SetCurrRecordStructureOra(SQLEXORAAREAP thiswa)
     BindStructure->lFieldPosDB = i;
     BindStructure->lFieldPosWA = hb_arrayGetNL(pFieldStruct, FIELD_WAOFFSET);
     BindStructure->ColumnSize = (unsigned int)hb_itemGetNI(pFieldLen);
-    BindStructure->DecimalDigits = (unsigned short)hb_itemGetNI(pFieldDec);
+    BindStructure->DecimalDigits = static_cast<unsigned short>(hb_itemGetNI(pFieldDec));
     BindStructure->colName = QualifyName2(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
     sprintf(BindStructure->szBindName, ":%s", hb_arrayGetCPtr(pFieldStruct, FIELD_NAME));
 

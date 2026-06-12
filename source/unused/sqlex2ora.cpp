@@ -262,7 +262,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
     InsertRecord->lFieldPosDB = i;
     InsertRecord->lFieldPosWA = lFieldPosWA;
     InsertRecord->ColumnSize = (unsigned int)hb_itemGetNI(pFieldLen);
-    InsertRecord->DecimalDigits = (unsigned short)hb_itemGetNI(pFieldDec);
+    InsertRecord->DecimalDigits = static_cast<unsigned short>(hb_itemGetNI(pFieldDec));
     InsertRecord->isArgumentNull = false;
     InsertRecord->isMemo = bIsMemo;
     InsertRecord->isMultiLang = bMultiLang;
