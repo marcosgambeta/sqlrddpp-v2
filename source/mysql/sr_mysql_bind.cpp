@@ -698,7 +698,7 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
 
       mysql_get_character_set_info(session->dbh, &cs);
       if (cs.mbmaxlen > 0) {
-        mbmax = (unsigned int)cs.mbmaxlen;
+        mbmax = static_cast<unsigned int>(cs.mbmaxlen);
       }
 
       char_len = static_cast<int>((mbmax > 1) ? (field->length / mbmax) : field->length);
@@ -864,7 +864,7 @@ HB_FUNC_STATIC(SR_MYSTABLEATTR)
 
       mysql_get_character_set_info(session->dbh, &cs);
       if (cs.mbmaxlen > 0) {
-        mbmax = (unsigned int)cs.mbmaxlen;
+        mbmax = static_cast<unsigned int>(cs.mbmaxlen);
       }
 
       char_len = static_cast<int>((mbmax > 1) ? (field->length / mbmax) : field->length);

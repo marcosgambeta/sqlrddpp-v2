@@ -261,7 +261,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
     InsertRecord->isBoundNULL = false;
     InsertRecord->lFieldPosDB = i;
     InsertRecord->lFieldPosWA = lFieldPosWA;
-    InsertRecord->ColumnSize = (unsigned int)hb_itemGetNI(pFieldLen);
+    InsertRecord->ColumnSize = static_cast<unsigned int>(hb_itemGetNI(pFieldLen));
     InsertRecord->DecimalDigits = static_cast<unsigned short>(hb_itemGetNI(pFieldDec));
     InsertRecord->isArgumentNull = false;
     InsertRecord->isMemo = bIsMemo;
@@ -464,7 +464,7 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
         break;
       }
       }
-      if (InsertRecord->lIndPtr == (unsigned int)SQL_NULL_DATA) {
+      if (InsertRecord->lIndPtr == static_cast<unsigned int>(SQL_NULL_DATA)) {
         OCI_BindSetNull(OCI_GetBind(thiswa->hStmtInsert, iCol));
       }
       InsertRecord->iParNum = iBind;

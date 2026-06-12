@@ -586,9 +586,9 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
     }
 
     hb_dateDecode(hb_itemGetDL(pFieldData), &iYear, &iMonth, &iDay);
-    BindStructure->asDate.year = (unsigned int)iYear;
-    BindStructure->asDate.month = (unsigned int)iMonth;
-    BindStructure->asDate.day = (unsigned int)iDay;
+    BindStructure->asDate.year = static_cast<unsigned int>(iYear);
+    BindStructure->asDate.month = static_cast<unsigned int>(iMonth);
+    BindStructure->asDate.day = static_cast<unsigned int>(iDay);
     OCI_DateSetDate(BindStructure->asDate1, BindStructure->asDate.year, BindStructure->asDate.month,
                     BindStructure->asDate.day);
     break;
@@ -615,12 +615,12 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
       hb_itemGetTDT(pFieldData, &lJulian, &lMilliSec);
       hb_dateDecode(lJulian, &iYear, &iMonth, &iDay);
       hb_timeDecode(lMilliSec, &iHour, &iMinute, &seconds, &millisec);
-      BindStructure->asTimestamp.year = (unsigned int)iYear;
-      BindStructure->asTimestamp.month = (unsigned int)iMonth;
-      BindStructure->asTimestamp.day = (unsigned int)iDay;
-      BindStructure->asTimestamp.hour = (unsigned int)iHour;
-      BindStructure->asTimestamp.minute = (unsigned int)iMinute;
-      BindStructure->asTimestamp.second = (unsigned int)seconds;
+      BindStructure->asTimestamp.year = static_cast<unsigned int>(iYear);
+      BindStructure->asTimestamp.month = static_cast<unsigned int>(iMonth);
+      BindStructure->asTimestamp.day = static_cast<unsigned int>(iDay);
+      BindStructure->asTimestamp.hour = static_cast<unsigned int>(iHour);
+      BindStructure->asTimestamp.minute = static_cast<unsigned int>(iMinute);
+      BindStructure->asTimestamp.second = static_cast<unsigned int>(seconds);
       BindStructure->asTimestamp.fraction = 0;
       OCI_DateSetDateTime(BindStructure->asDate2, BindStructure->asTimestamp.year, BindStructure->asTimestamp.month,
                           BindStructure->asTimestamp.day, BindStructure->asTimestamp.hour,
@@ -826,7 +826,7 @@ static void BindAllIndexStmts(SQLEXORAAREAP thiswa)
   INDEXBINDORAP IndexBind, IndexBindParam;
   COLUMNBINDORAP BindStructure;
   int iCol, iBind, iLoop;
-  unsigned int res = (unsigned int)SQL_ERROR;
+  unsigned int res = static_cast<unsigned int>(SQL_ERROR);
   char *sSql;
 
   if (thiswa->sqlarea.hOrdCurrent == 0) {
@@ -1158,7 +1158,7 @@ void SetCurrRecordStructureOra(SQLEXORAAREAP thiswa)
     BindStructure->isArgumentNull = false;
     BindStructure->lFieldPosDB = i;
     BindStructure->lFieldPosWA = hb_arrayGetNL(pFieldStruct, FIELD_WAOFFSET);
-    BindStructure->ColumnSize = (unsigned int)hb_itemGetNI(pFieldLen);
+    BindStructure->ColumnSize = static_cast<unsigned int>(hb_itemGetNI(pFieldLen));
     BindStructure->DecimalDigits = static_cast<unsigned short>(hb_itemGetNI(pFieldDec));
     BindStructure->colName = QualifyName2(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
     sprintf(BindStructure->szBindName, ":%s", hb_arrayGetCPtr(pFieldStruct, FIELD_NAME));

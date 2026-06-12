@@ -500,7 +500,7 @@ HB_FUNC_STATIC(SR_ORACLEINBINDPARAM2)
       if (HB_ISCHAR(6)) {
         hb_xmemcpy(Stmt->pLink[iPos].col_name, hb_parc(6), hb_parclen(6));
         Stmt->pLink[iPos].col_name[hb_parclen(6)] = '\0';
-        ret = OCI_BindString(Stmt->stmt, Stmt->pLink[iPos].bindname, Stmt->pLink[iPos].col_name, (unsigned int)hb_parclen(6));
+        ret = OCI_BindString(Stmt->stmt, Stmt->pLink[iPos].bindname, Stmt->pLink[iPos].col_name, static_cast<unsigned int>(hb_parclen(6)));
       } else {
         ret = OCI_BindString(Stmt->stmt, Stmt->pLink[iPos].bindname, Stmt->pLink[iPos].col_name, iFieldSize);
       }
@@ -1134,7 +1134,7 @@ HB_FUNC_STATIC(SR_ORACLEWRITEMEMO2)
       lob1 = OCI_GetLob2(rs, ":b1");
 
       // status = SQLO2_lob_write_buffer(session->dbh, loblp, strlen(sMemo), sMemo, strlen(sMemo), SQLO2_ONE_PIECE);
-      status = OCI_LobWrite(lob1, (void *)sMemo, (unsigned int)strlen(sMemo));
+      status = OCI_LobWrite(lob1, (void *)sMemo, static_cast<unsigned int>(strlen(sMemo)));
 
       if (status < 0) {
         // SQLO2_free_lob_desc(session->dbh, &loblp);
@@ -1208,7 +1208,7 @@ HB_FUNC_STATIC(SR_SQLO2_ORACLESETLOBPREFETCH) // TODO: not used in SQLRDD source
   GET_OCI_SESSION(session, 1);
 
   if (session != nullptr) {
-    hb_retl(OCI_SetDefaultLobPrefetchSize(session->cn, (unsigned int)hb_parni(2)));
+    hb_retl(OCI_SetDefaultLobPrefetchSize(session->cn, static_cast<unsigned int>(hb_parni(2))));
   } else {
     hb_retl(false);
   }
@@ -1221,7 +1221,7 @@ HB_FUNC_STATIC(SR_SQLO2_SETSTATEMENTCACHESIZE)
   GET_OCI_SESSION(session, 1);
 
   if (session != nullptr) {
-    hb_retl(OCI_SetStatementCacheSize(session->cn, (unsigned int)hb_parni(2)));
+    hb_retl(OCI_SetStatementCacheSize(session->cn, static_cast<unsigned int>(hb_parni(2))));
   } else {
     hb_retl(false);
   }
@@ -1234,7 +1234,7 @@ HB_FUNC_STATIC(SR_SQLO2_GETSTATEMENTCACHESIZE) // TODO: not used in SQLRDD sourc
   GET_OCI_SESSION(session, 1);
 
   if (session != nullptr) {
-    hb_retni((unsigned int)OCI_GetStatementCacheSize(session->cn));
+    hb_retni(static_cast<unsigned int>(OCI_GetStatementCacheSize(session->cn)));
   } else {
     hb_retni(0);
   }
