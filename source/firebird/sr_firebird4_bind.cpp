@@ -166,7 +166,7 @@ static void fb_log_status4(PFB_SESSION session, const char *from)
 
   while (fb_interpret((ISC_SCHAR *)s, sizeof(s), &pVect)) {
     // const char * nl = (s[0] ? s[strlen(s) - 1] != '\n' : true) ? "\n" : "";
-    strcat(session->msgerror, (const char *)s);
+    strcat(session->msgerror, reinterpret_cast<const char *>(s));
     strcat(session->msgerror, "\n");
     // util_output("%s%s", s, nl);
   }

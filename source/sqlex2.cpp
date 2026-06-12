@@ -253,7 +253,7 @@ void SR_CreateInsertStmt(SQLEXAREAP thiswa)
     bIsMemo = cType == 'M' || bMultiLang;
 
     if (i != static_cast<int>(thiswa->ulhRecno)) { // RECNO is never included in INSERT column list
-      temp = hb_strdup((const char *)sFields);
+      temp = hb_strdup(static_cast<const char *>(sFields));
       sprintf(sFields, "%s,%c%s%c", temp, OPEN_QUALIFIER(thiswa), SR_QualifyName(colName, thiswa),
               CLOSE_QUALIFIER(thiswa));
       sParams[uiPos] = ',';
@@ -446,7 +446,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
       case SQL_C_BINARY: {
         SQLINTEGER nInd;
         InsertRecord->lIndPtr = SQL_NTS;
-        nInd = static_cast<SQLINTEGER>(strlen((const char *)(InsertRecord->asChar.value)));
+        nInd = static_cast<SQLINTEGER>(strlen(reinterpret_cast<const char *>(InsertRecord->asChar.value)));
         res = SQLBindParameter(thiswa->hStmtInsert, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
                                InsertRecord->asChar.size_alloc, 0, InsertRecord->asChar.value, nInd,
                                &(InsertRecord->lIndPtr));
@@ -746,7 +746,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
       case SQL_C_BINARY: {
         SQLINTEGER nInd;
         CurrRecord->lIndPtr = SQL_NTS;
-        nInd = static_cast<SQLINTEGER>(strlen((const char *)(CurrRecord->asChar.value)));
+        nInd = static_cast<SQLINTEGER>(strlen(reinterpret_cast<const char *>(CurrRecord->asChar.value)));
         res =
             SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR,
                              CurrRecord->asChar.size_alloc, 0, CurrRecord->asChar.value, nInd, &(CurrRecord->lIndPtr));
@@ -787,7 +787,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
       CurrRecord->iParNum = iBind;
 
       // Create SQL
-      temp = hb_strdup((const char *)thiswa->sSql);
+      temp = hb_strdup(static_cast<const char *>(thiswa->sSql));
       sprintf(thiswa->sSql, "%s%c %c%s%c = ?", temp, iBind > 1 ? ',' : ' ', OPEN_QUALIFIER(thiswa), CurrRecord->colName,
               CLOSE_QUALIFIER(thiswa));
       hb_xfree(temp);
@@ -799,7 +799,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
     }
     CurrRecord++;
   }
-  temp = hb_strdup((const char *)thiswa->sSql);
+  temp = hb_strdup(static_cast<const char *>(thiswa->sSql));
   sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = ?", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
           CLOSE_QUALIFIER(thiswa));
   hb_xfree(temp);

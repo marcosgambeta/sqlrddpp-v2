@@ -121,7 +121,7 @@ static HB_ERRCODE getSeekWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType,
                                       // because Oracle does not store NULLs in indexes
 
       if (BindStructure->iCType == SQL_C_DOUBLE) {
-        temp = hb_strdup((const char *)thiswa->sWhere);
+        temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
         sprintf(thiswa->sWhere, "%s %s ( A.%c%s%c %s %s OR A.%c%s%c IS NULL )", bWhere ? temp : "\nWHERE",
                 bWhere ? "AND" : "", OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa),
                 iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "IS", iCol == queryLevel ? "0" : "NULL",
@@ -133,14 +133,14 @@ static HB_ERRCODE getSeekWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType,
           // Since this is not numeric, EVERYTHING is greater
           // or equal to NULL, so we do not add any restriction to WHERE clause.
         } else {
-          temp = hb_strdup((const char *)thiswa->sWhere);
+          temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
           sprintf(thiswa->sWhere, "%s %s A.%c%s%c IS NULL", bWhere ? temp : "\nWHERE", bWhere ? "AND" : "",
                   OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa));
           hb_xfree(temp);
         }
       }
     } else {
-      temp = hb_strdup((const char *)thiswa->sWhere);
+      temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
       sprintf(thiswa->sWhere, "%s %s A.%c%s%c %s :%s", bWhere ? temp : "\nWHERE", bWhere ? "AND" : "",
               OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa),
               iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "=", BindStructure->colName);

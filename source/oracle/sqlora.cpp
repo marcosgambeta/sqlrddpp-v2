@@ -3524,7 +3524,7 @@ static inline sqlo_stmt_struct_ptr_t DEFUN(_sth2stp, (sth, func_name), int sth A
   real_sth = DECODE_STH(sth);
   dbh = DECODE_DBH(sth);
 
-  CHECK_DBHANDLE(dbp, dbh, ((CONST char *)func_name), SR_NULLPTR);
+  CHECK_DBHANDLE(dbp, dbh, (static_cast<CONST char *>(func_name)), SR_NULLPTR);
 
   TRACE(3, fprintf(_get_trace_fp(dbp), "_sth2stp: sth %d -> sth=%u, dbh=%u\n", sth, real_sth, dbh););
 
@@ -4200,7 +4200,7 @@ CONST char *DEFUN(sqlo_geterror, (dbh), sqlo_db_handle_t dbh)
 #endif
     }
 
-    return (CONST char *)dbp->errmsg;
+    return static_cast<CONST char *>(dbp->errmsg);
   }
 }
 
@@ -4907,7 +4907,7 @@ CONST char *DEFUN(sqlo_command, (sth), sqlo_stmt_handle_t sth)
   sqlo_stmt_struct_ptr_t stp;
 
   CHECK_STHANDLE(stp, sth, "sqlo_command", SR_NULLPTR);
-  return (CONST char *)_get_stmt_string(stp);
+  return static_cast<CONST char *>(_get_stmt_string(stp));
 }
 
 /*---------------------------------------------------------------------------

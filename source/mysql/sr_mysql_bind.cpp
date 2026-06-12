@@ -116,7 +116,7 @@ HB_FUNC_STATIC(SR_MYSCONNECT)
 
   if (session->dbh != SR_NULLPTR) {
     s_iConnectionCount++;
-    mysql_options(session->dbh, MYSQL_OPT_CONNECT_TIMEOUT, (const char *)&uiTimeout);
+    mysql_options(session->dbh, MYSQL_OPT_CONNECT_TIMEOUT, reinterpret_cast<const char *>(&uiTimeout));
     if (lCompress) {
       mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, SR_NULLPTR, CLIENT_ALL_FLAGS);
     } else {
