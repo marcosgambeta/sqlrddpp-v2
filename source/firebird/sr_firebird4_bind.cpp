@@ -164,7 +164,7 @@ static void fb_log_status4(PFB_SESSION session, const char *from)
   hb_xmemset(session->msgerror, '\0', 8192);
   // isc_interprete(session->msgerror, &pVect);
 
-  while (fb_interpret((ISC_SCHAR *)s, sizeof(s), &pVect)) {
+  while (fb_interpret(reinterpret_cast<ISC_SCHAR *>(s), sizeof(s), &pVect)) {
     // const char * nl = (s[0] ? s[strlen(s) - 1] != '\n' : true) ? "\n" : "";
     strcat(session->msgerror, reinterpret_cast<const char *>(s));
     strcat(session->msgerror, "\n");
@@ -459,61 +459,61 @@ HB_FUNC_STATIC(SR_FBEXECUTE4)
 
     switch (dtype) {
     case IB_SQL_TEXT: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab((sizeof(char) * var->sqllen) + 1);
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab((sizeof(char) * var->sqllen) + 1));
       break;
     }
     case IB_SQL_BOOLEAN: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(ISC_UCHAR));
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_UCHAR)));
       break;
     }
     case IB_SQL_VARYING: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab((sizeof(char) * var->sqllen) + 3);
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab((sizeof(char) * var->sqllen) + 3));
       break;
     }
     case IB_SQL_LONG: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(long));
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(long)));
       break;
     }
     case IB_SQL_SHORT: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(short));
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(short)));
       break;
     }
     case IB_SQL_FLOAT: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(float));
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(float)));
       break;
     }
     case IB_SQL_DOUBLE: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(double));
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(double)));
       break;
     }
     case IB_SQL_D_FLOAT: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(float) * 2);
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(float) * 2));
       break;
     }
     case IB_SQL_TIMESTAMP: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(ISC_TIMESTAMP));
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_TIMESTAMP)));
       break;
     }
     case IB_SQL_ARRAY:
     case IB_SQL_QUAD:
     case IB_SQL_BLOB: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(ISC_QUAD));
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_QUAD)));
       break;
     }
     case IB_SQL_TYPE_TIME: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(ISC_TIME));
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_TIME)));
       break;
     }
     case IB_SQL_TYPE_DATE: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(ISC_DATE));
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_DATE)));
       break;
     }
     case IB_SQL_INT64: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(ISC_INT64) * var->sqllen);
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(ISC_INT64) * var->sqllen));
       break;
     }
     default: {
-      var->sqldata = (ISC_SCHAR *)hb_xgrab(sizeof(char) * var->sqllen);
+      var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(char) * var->sqllen));
       break; // TODO: unnecessary break
     }
     }
