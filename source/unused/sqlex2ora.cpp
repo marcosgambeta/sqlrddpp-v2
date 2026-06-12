@@ -100,7 +100,7 @@ char *QualifyName2(char *szName, SQLEXORAAREAP thiswa)
     case SQLRDD_RDBMS_FIREBR5:
     case SQLRDD_RDBMS_IBMDB2:
     case SQLRDD_RDBMS_ADABAS: {
-      szName[i] = (char)toupper(static_cast<int>(szName[i]));
+      szName[i] = static_cast<char>(toupper(static_cast<int>(szName[i])));
       break;
     }
     case SQLRDD_RDBMS_INGRES:
@@ -108,7 +108,7 @@ char *QualifyName2(char *szName, SQLEXORAAREAP thiswa)
     case SQLRDD_RDBMS_MYSQL:
     case SQLRDD_RDBMS_OTERRO:
     case SQLRDD_RDBMS_INFORM: {
-      szName[i] = (char)tolower(static_cast<int>(szName[i]));
+      szName[i] = static_cast<char>(tolower(static_cast<int>(szName[i])));
       break; // TODO: unnecessary break
     }
     }

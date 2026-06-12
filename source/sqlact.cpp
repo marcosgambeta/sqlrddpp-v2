@@ -271,17 +271,17 @@ HB_FUNC(SR_STRTOHEX)
     iCipher = static_cast<int>(iNum % 16);
 
     if (iCipher < 10) {
-      c[1] = '0' + (char)iCipher;
+      c[1] = '0' + static_cast<char>(iCipher);
     } else {
-      c[1] = 'A' + (char)(iCipher - 10);
+      c[1] = 'A' + static_cast<char>(iCipher - 10);
     }
     iNum >>= 4;
 
     iCipher = iNum % 16;
     if (iCipher < 10) {
-      c[0] = '0' + (char)iCipher;
+      c[0] = '0' + static_cast<char>(iCipher);
     } else {
-      c[0] = 'A' + (char)(iCipher - 10);
+      c[0] = 'A' + static_cast<char>(iCipher - 10);
     }
 
     c += 2;
@@ -337,7 +337,7 @@ char *sr_Hex2Str(const char *cStr, int len, int *lenOut)
 
     iNum += iCipher;
     cStr++;
-    outbuff[i] = (char)iNum;
+    outbuff[i] = static_cast<char>(iNum);
   }
 
   outbuff[nalloc] = '\0';
@@ -905,7 +905,7 @@ HB_FUNC(SR_DBQUALIFY)
     case SQLRDD_RDBMS_ADABAS: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
-        szOut[i + 1] = (char)toupper((HB_BYTE)pszBuffer[i]);
+        szOut[i + 1] = static_cast<char>(toupper((HB_BYTE)pszBuffer[i]));
       }
       szOut[i + 1] = '"';
       break;
@@ -914,7 +914,7 @@ HB_FUNC(SR_DBQUALIFY)
     case SQLRDD_RDBMS_POSTGR: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
-        szOut[i + 1] = (char)tolower((HB_BYTE)pszBuffer[i]);
+        szOut[i + 1] = static_cast<char>(tolower((HB_BYTE)pszBuffer[i]));
       }
       szOut[i + 1] = '"';
       break;
@@ -932,14 +932,14 @@ HB_FUNC(SR_DBQUALIFY)
     case SQLRDD_RDBMS_MARIADB: {
       szOut[0] = '`';
       for (i = 0; i < ulLen; i++) {
-        szOut[i + 1] = (char)tolower((HB_BYTE)pszBuffer[i]);
+        szOut[i + 1] = static_cast<char>(tolower((HB_BYTE)pszBuffer[i]));
       }
       szOut[i + 1] = '`';
       break;
     }
     case SQLRDD_RDBMS_INFORM: {
       for (i = 0; i < ulLen; i++) {
-        szOut[i] = (char)tolower((HB_BYTE)pszBuffer[i]);
+        szOut[i] = static_cast<char>(tolower((HB_BYTE)pszBuffer[i]));
       }
       ulLen -= 2;
       break;

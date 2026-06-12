@@ -192,20 +192,20 @@ HB_FUNC_STATIC(SR_FBCONNECT)
   dpb[i++] = isc_dpb_version1;
   dpb[i++] = isc_dpb_user_name;
   len = static_cast<int>(strlen(user));
-  dpb[i++] = (char)len;
+  dpb[i++] = static_cast<char>(len);
   memcpy(&(dpb[i]), user, len);
   i += len;
 
   dpb[i++] = isc_dpb_password;
   len = static_cast<int>(strlen(passwd));
-  dpb[i++] = (char)len;
+  dpb[i++] = static_cast<char>(len);
   memcpy(&(dpb[i]), passwd, len);
   i += len;
 
   if (charset != nullptr) {
     dpb[i++] = isc_dpb_lc_ctype;
     len = static_cast<int>(strlen(charset));
-    dpb[i++] = (char)len;
+    dpb[i++] = static_cast<char>(len);
     memcpy(&(dpb[i]), charset, len);
     i += len;
   }
