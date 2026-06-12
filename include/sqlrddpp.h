@@ -27,7 +27,7 @@
 #endif
 #endif
 #endif
-#define SR_NULLPTR nullptr
+//#define SR_NULLPTR nullptr
 
 // Supported Database Engines (RDBMS)
 
