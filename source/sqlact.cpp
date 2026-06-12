@@ -760,7 +760,7 @@ HB_FUNC(SR_ESCAPENUM)
     lValue = hb_strValInt(ToBuffer, &iOverflow);
 
     if (!iOverflow) {
-      double dValue = (double)lValue;
+      double dValue = static_cast<double>(lValue);
       hb_retnlen(dValue, static_cast<int>(len), static_cast<int>(dec));
     } else {
       double dValue = hb_strVal(ToBuffer, iSize);
@@ -863,7 +863,7 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
     lValue = hb_strValInt(ToBuffer, &iOverflow);
 
     if (!iOverflow) {
-      double dValue = (double)lValue;
+      double dValue = static_cast<double>(lValue);
       hb_itemPutNLen(pRet, dValue, static_cast<int>(len), static_cast<int>(dec));
     } else {
       double dValue = hb_strVal(ToBuffer, iSize);

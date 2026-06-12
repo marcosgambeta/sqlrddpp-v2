@@ -555,7 +555,7 @@ HB_FUNC_STATIC(SR_ORACLEGETBINDDATA2) // TODO: not used in SQLRDD source code
       // p->pLink[iPos - 1].date = OCI_GetDate( p->rs, iPos);
       OCI_DateGetDateTime(p->pLink[iPos - 1].date, &iYear, &iMonth, &iDay, &iHour, &iMin, &iSeconds);
       lDate = hb_dateEncode(iYear, iMonth, iDay);
-      lTime = hb_timeEncode(iHour, iMin, (double)iSeconds, 0); // TODO: parameter 4
+      lTime = hb_timeEncode(iHour, iMin, static_cast<double>(iSeconds), 0); // TODO: parameter 4
 
       // TODO: fix line below
       // hb_retdtl(lDate, lTime);
@@ -829,7 +829,7 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
 
       OCI_TimestampGetDateTime(pTime, &iYear, &iMonth, &iDay, &iHour, &iMin, &dSec, &fsec);
       // TODO: fix line below
-      // hb_itemPutDT(pItem, iYear, iMonth, iDay, iHour, iMin, (double)dSec, 0);
+      // hb_itemPutDT(pItem, iYear, iMonth, iDay, iHour, iMin, static_cast<double>(dSec), 0);
       OCI_TimestampFree(pTime);
       break;
     }

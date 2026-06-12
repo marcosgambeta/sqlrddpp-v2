@@ -568,7 +568,7 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
       break;
     }
 
-    BindStructure->asDouble = (double)hb_itemGetND(pFieldData);
+    BindStructure->asDouble = static_cast<double>(hb_itemGetND(pFieldData));
     break;
   }
   case SQL_C_TYPE_DATE: {

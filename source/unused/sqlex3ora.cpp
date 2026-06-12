@@ -372,7 +372,7 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
       }
       case SQL_C_DOUBLE: {
         size = BindStructure->ColumnSize;
-        BindStructure->asDouble = (double)hb_strVal(szKey, BindStructure->ColumnSize);
+        BindStructure->asDouble = static_cast<double>(hb_strVal(szKey, BindStructure->ColumnSize));
         break;
       }
       case SQL_C_TYPE_TIMESTAMP: {
@@ -480,7 +480,7 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
       if (BindStructure->iCType == SQL_C_NUMERIC) {
         BindStructure->asNumeric = static_cast<HB_LONG>(hb_itemGetNInt(pKey));
       } else {
-        BindStructure->asDouble = (double)hb_itemGetND(pKey);
+        BindStructure->asDouble = static_cast<double>(hb_itemGetND(pKey));
       }
     } else if (HB_IS_LOGICAL(pKey)) {
       if (BindStructure->iCType != SQL_C_BIT) { // Check column data type
