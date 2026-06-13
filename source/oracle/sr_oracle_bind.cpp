@@ -703,11 +703,11 @@ HB_FUNC_STATIC(SR_SQLO_LINEPROCESSED)
   HB_LONG lIndex;
   PHB_ITEM temp;
   HB_SIZE i, cols;
-  PHB_ITEM pFields = hb_param(3, HB_IT_ARRAY);
+  auto  pFields = hb_param(3, HB_IT_ARRAY);
   HB_BOOL bQueryOnly = hb_parl(4);
   HB_ULONG ulSystemID = hb_parnl(5);
   HB_BOOL bTranslate = hb_parl(6);
-  PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
+  auto  pRet = hb_param(7, HB_IT_ARRAY);
   sqlo_stmt_handle_t stmtParamRes;
 
   if (session != nullptr) {
@@ -743,7 +743,7 @@ HB_FUNC_STATIC(SR_ORACLEWRITEMEMO)
   sqlo_stmt_handle_t sth;
   int status;
 
-  PHB_ITEM pArray = hb_param(5, HB_IT_ARRAY);
+  auto pArray = hb_param(5, HB_IT_ARRAY);
 
   HB_SIZE uiLen, uiSize;
 
@@ -874,7 +874,7 @@ HB_FUNC(SR_ORACLEINBINDPARAM)
       if (HB_ISDATE(6)) {
 #endif
         int iYear, iMonth, iDay;
-        PHB_ITEM pFieldData = hb_param(6, HB_IT_DATE);
+        auto pFieldData = hb_param(6, HB_IT_DATE);
         hb_dateDecode(hb_itemGetDL(pFieldData), &iYear, &iMonth, &iDay);
         // hb_dateStrPut(Stmt->pLink[iPos].sDate, iYear, iMonth, iDay);
         Stmt->pLink[iPos].sDate[0] = static_cast<char>(iYear / 100) + 100; // century
@@ -904,7 +904,7 @@ HB_FUNC(SR_ORACLEINBINDPARAM)
         int mSec;
         int iSeconds;
 #endif
-        PHB_ITEM pFieldData = hb_param(6, HB_IT_DATETIME);
+        auto pFieldData = hb_param(6, HB_IT_DATETIME);
 #ifdef __XHARBOUR__
         hb_dateDecode(hb_itemGetDL(pFieldData), &iYear, &iMonth, &iDay);
         hb_timeDecode(hb_itemGetT(pFieldData), &iHour, &iMin, &dSec);
@@ -969,7 +969,7 @@ HB_FUNC(SR_ORACLEGETBINDDATA)
   GET_OCI_SESSION(p, 1);
   int iPos;
 
-  PHB_ITEM p1 = hb_param(2, HB_IT_ANY);
+  auto p1 = hb_param(2, HB_IT_ANY);
 
   if (HB_IS_NUMBER(p1) && p != nullptr) {
 

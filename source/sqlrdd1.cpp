@@ -3728,7 +3728,7 @@ HB_FUNC(SR_SETFOUND)
   SQLAREAP pArea = (SQLAREAP)hb_rddGetCurrentWorkAreaPointer();
 
   if (pArea) {
-    PHB_ITEM pFound = hb_param(1, HB_IT_LOGICAL);
+    auto pFound = hb_param(1, HB_IT_LOGICAL);
     if (pFound) {
       pArea->area.fFound = hb_itemGetL(pFound);
       hb_arraySetForward(pArea->aInfo, AINFO_FOUND, pFound);

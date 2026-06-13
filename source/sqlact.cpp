@@ -874,7 +874,7 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
 
 HB_FUNC(SR_DBQUALIFY)
 {
-  PHB_ITEM pText = hb_param(1, HB_IT_STRING);
+  auto pText = hb_param(1, HB_IT_STRING);
   int ulDb = hb_parni(2);
 
   if (pText) {

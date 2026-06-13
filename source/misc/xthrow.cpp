@@ -52,7 +52,7 @@
 
 HB_FUNC(_SR_THROW)
 {
-  PHB_ITEM pError = hb_param(1, HB_IT_ANY);
+  auto pError = hb_param(1, HB_IT_ANY);
 
   if (pError && HB_IS_OBJECT(pError)) {
     PHB_ITEM pResult = hb_errLaunchSubst(pError);

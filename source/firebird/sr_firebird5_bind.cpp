@@ -1256,11 +1256,11 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED5)
   VARY *vary;
 
   //PHB_ITEM temp;
-  PHB_ITEM pFields = hb_param(3, HB_IT_ARRAY);
+  auto pFields = hb_param(3, HB_IT_ARRAY);
   //HB_BOOL bQueryOnly = hb_parl(4); (not used)
   //HB_ULONG ulSystemID = hb_parnl(5);
   HB_BOOL bTranslate = hb_parl(6);
-  PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
+  auto pRet = hb_param(7, HB_IT_ARRAY);
   HB_LONG lIndex;
 
   HB_SIZE lLen, lDec;

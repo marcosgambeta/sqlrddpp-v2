@@ -605,11 +605,11 @@ HB_FUNC_STATIC(SR_ODBCLINEPROCESSED)
   // int iReallocs;
   //PHB_ITEM temp;
   int i, cols;
-  PHB_ITEM pFields = hb_param(3, HB_IT_ARRAY);
+  auto pFields = hb_param(3, HB_IT_ARRAY);
   HB_BOOL bQueryOnly = hb_parl(4);
   HB_ULONG ulSystemID = hb_parnl(5);
   HB_BOOL bTranslate = hb_parl(6);
-  PHB_ITEM pRet = hb_param(7, HB_IT_ARRAY);
+  auto pRet = hb_param(7, HB_IT_ARRAY);
 
   if (!pFields) {
     hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCLINEPROCESSED", 3, hb_paramError(1), hb_paramError(2),
@@ -665,17 +665,17 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
   //PHB_ITEM temp;
   int i, cols, line;
 
-  PHB_ITEM pFields = hb_param(3, HB_IT_ARRAY);
-  PHB_ITEM pCache = hb_param(4, HB_IT_ARRAY);
+  auto pFields = hb_param(3, HB_IT_ARRAY);
+  auto pCache = hb_param(4, HB_IT_ARRAY);
   HB_ULONG ulSystemID = hb_parnl(5);
   HB_BOOL bTranslate = hb_parl(6);
   int iCurrFetch = hb_parni(7);
-  PHB_ITEM pInfo = hb_param(8, HB_IT_ARRAY);
+  auto pInfo = hb_param(8, HB_IT_ARRAY);
   HB_ULONG ulDirect = hb_parnl(9);
   HB_ULONG ulnRecno = hb_parnl(10);
   HB_BOOL bFetchAll = hb_parl(11);
-  PHB_ITEM pFetch = hb_param(12, HB_IT_ARRAY);
-  PHB_ITEM pRec = hb_param(13, HB_IT_ANY);
+  auto pFetch = hb_param(12, HB_IT_ARRAY);
+  auto pRec = hb_param(13, HB_IT_ANY);
   HB_LONG lPos = hb_parnl(14);
 
   HB_ULONG ulPosCache = hb_arrayGetNL(pInfo, AINFO_NPOSCACHE);
@@ -1101,7 +1101,7 @@ HB_FUNC_STATIC(SR_ODBCWRITEMEMO)
   SQLRETURN retcode3, retcode2, retcode = 0;
   SQLLEN cbSize = 0;
 
-  PHB_ITEM pArray = hb_param(5, HB_IT_ARRAY);
+  auto pArray = hb_param(5, HB_IT_ARRAY);
   hDbc = SR_PAR_SQLHDBC(1);
 
   uiLen = static_cast<HB_ULONG>(hb_arrayLen(pArray));
