@@ -74,10 +74,10 @@
 static RDDFUNCS sqlrddSuper;
 
 static void startSQLRDDSymbols(void);
-static HB_BOOL ProcessFields(SQLAREAP ThisDb);
-static HB_BOOL SetFields(SQLAREAP ThisDb);
-static HB_BOOL iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2);
-static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact);
+static bool ProcessFields(SQLAREAP ThisDb);
+static bool SetFields(SQLAREAP ThisDb);
+static bool iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2);
+static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, bool fExact);
 
 // static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder);
 HB_EXTERN_BEGIN
@@ -520,7 +520,7 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
+static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, bool fExact)
 {
   HB_LONG lorder = 0;
   PHB_ITEM pTag, pKeyVal, itemTemp;
@@ -3252,7 +3252,7 @@ static HB_ERRCODE sqlRddInfo(LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConne
 
 //------------------------------------------------------------------------
 
-static HB_BOOL ProcessFields(SQLAREAP thiswa)
+static bool ProcessFields(SQLAREAP thiswa)
 {
   DBFIELDINFO field;
   HB_LONG numFields;
@@ -3359,7 +3359,7 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-static HB_BOOL SetFields(SQLAREAP thiswa)
+static bool SetFields(SQLAREAP thiswa)
 {
   HB_LONG numFields;
   HB_USHORT i;
@@ -3435,7 +3435,7 @@ HB_FUNC(SR_ITEMCMP)
 
 //------------------------------------------------------------------------
 
-static HB_BOOL iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2)
+static bool iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2)
 {
   if (HB_IS_NIL(pItem1) || HB_IS_NIL(pItem2)) {
     return false;
