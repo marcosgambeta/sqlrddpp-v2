@@ -209,7 +209,7 @@ HB_FUNC_STATIC(SR_FBCONNECT)
     memcpy(&(dpb[i]), charset, len);
     i += len;
   }
-  if (isc_attach_database(session->status, 0, db_connect, &(session->db), (short)i, dpb)) {
+  if (isc_attach_database(session->status, 0, db_connect, &(session->db), static_cast<short>(i), dpb)) {
     fb_log_status(session, "FBCONNECT");
     if (session->msgerror) {
       hb_xfree(session->msgerror);
@@ -840,7 +840,7 @@ HB_FUNC_STATIC(SR_FBGETDATA)
         }
         for (resp = res_buffer; *resp != isc_info_end;) {
           item = *resp++;
-          length = (short)isc_vax_integer(resp, 2);
+          length = static_cast<short>(isc_vax_integer(resp, 2));
           resp += 2;
           switch (item) {
           case isc_info_blob_total_length: {
@@ -1375,7 +1375,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED)
             }
             for (resp = res_buffer; *resp != isc_info_end;) {
               item = *resp++;
-              length = (short)isc_vax_integer(resp, 2);
+              length = static_cast<short>(isc_vax_integer(resp, 2));
               resp += 2;
               switch (item) {
               case isc_info_blob_total_length: {

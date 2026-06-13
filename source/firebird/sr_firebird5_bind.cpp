@@ -147,7 +147,7 @@ static void isSelect(PFB_SESSION session)
   // if( isError(QT_TRANSLATE_NOOP("QIBaseResult", "Could not get query info"), QSqlError::StatementError) )
   //    return false;
   iLength = isc_vax_integer(&acBuffer[1], 2);
-  session->queryType = isc_vax_integer(&acBuffer[3], (short)iLength);
+  session->queryType = isc_vax_integer(&acBuffer[3], static_cast<short>(iLength));
 }
 
 //----------------------------------------------------------------------------//
@@ -236,7 +236,7 @@ HB_FUNC_STATIC(SR_FBCONNECT5)
     i += len;
   }
 
-  if (isc_attach_database(session->status, 0, db_connect, &(session->db), (short)i, dpb)) {
+  if (isc_attach_database(session->status, 0, db_connect, &(session->db), static_cast<short>(i), dpb)) {
     fb_log_status5(session, "FBCONNECT");
     if (session->msgerror) {
       hb_xfree(session->msgerror);
@@ -899,7 +899,7 @@ HB_FUNC_STATIC(SR_FBGETDATA5)
         }
         for (resp = res_buffer; *resp != isc_info_end;) {
           item = *resp++;
-          length = (short)isc_vax_integer(resp, 2);
+          length = static_cast<short>(isc_vax_integer(resp, 2));
           resp += 2;
           switch (item) {
           case isc_info_blob_total_length: {
@@ -1437,7 +1437,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED5)
             }
             for (resp = res_buffer; *resp != isc_info_end;) {
               item = *resp++;
-              length = (short)isc_vax_integer(resp, 2);
+              length = static_cast<short>(isc_vax_integer(resp, 2));
               resp += 2;
               switch (item) {
               case isc_info_blob_total_length: {
