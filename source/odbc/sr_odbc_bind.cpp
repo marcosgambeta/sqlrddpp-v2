@@ -345,7 +345,7 @@ static void sr_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
     case SQL_NVARCHAR:
     case SQL_WCHAR:
     case SQL_GUID: {
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
       hb_itemPutCLPtr(pItem, szResult, lLen);
       break;
@@ -375,7 +375,7 @@ static void sr_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
     case SQL_TIMESTAMP:
     case SQL_TYPE_TIMESTAMP: {
       if (ulSystemID == SQLRDD_RDBMS_IBMDB2) {
-        // char * szResult = static_cast<char *>(hb_xgrab(26 + 1));
+        // auto szResult = static_cast<char *>(hb_xgrab(26 + 1));
         // hb_xmemset(szResult, ' ', lLen);
         // hb_itemPutCLPtr(pItem, szResult, lLen);
         hb_itemPutTDT(pItem, 0, 0);
@@ -431,7 +431,7 @@ static void sr_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
     case SQL_WCHAR:
     case SQL_GUID: {
       HB_SIZE lPos;
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemcpy(szResult, bBuffer, lLen < (HB_SIZE)lLenBuff ? lLen : (HB_SIZE)lLenBuff);
       for (lPos = lLenBuff; lPos < lLen; lPos++) {
         szResult[lPos] = ' ';
@@ -878,7 +878,7 @@ HB_FUNC_STATIC(SR_DESCRIB)
   SQLSMALLINT lLen = SR_PAR_SQLSMALLINT(4);
   SQLSMALLINT wBufLen = SR_PAR_SQLSMALLINT(5);
   SQLSMALLINT wDataType = SR_PAR_SQLSMALLINT(6);
-  SQLULEN wColSize = static_cast<SQLULEN>(hb_parnint(7));
+  auto wColSize = static_cast<SQLULEN>(hb_parnint(7));
   SQLSMALLINT wDecimals = SR_PAR_SQLSMALLINT(8);
   SQLSMALLINT wNullable = SR_PAR_SQLSMALLINT(9);
   // SQLTCHAR bBuffer[128] = {0};
@@ -923,9 +923,9 @@ HB_FUNC_STATIC(SR_DESCRIB)
 HB_FUNC_STATIC(SR_COLATTRIBUTE)
 {
   SQLSMALLINT lLen = SR_PAR_SQLSMALLINT(5);
-  char *bBuffer = static_cast<char *>(hb_xgrab(lLen));
+  auto bBuffer = static_cast<char *>(hb_xgrab(lLen));
   SQLSMALLINT wBufLen = SR_PAR_SQLSMALLINT(6);
-  SQLLEN wNumPtr = static_cast<SQLLEN>(hb_parnint(7));
+  auto wNumPtr = static_cast<SQLLEN>(hb_parnint(7));
   RETCODE wResult =
       SQLColAttribute(SR_PAR_SQLHSTMT(1), SR_PAR_SQLUSMALLINT(2), SR_PAR_SQLUSMALLINT(3), static_cast<SQLPOINTER>(bBuffer),
                       SR_PAR_SQLSMALLINT(5), static_cast<SQLSMALLINT *>(&wBufLen), static_cast<SQLLEN *>(&wNumPtr));
@@ -1189,7 +1189,7 @@ void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQu
       if (static_cast<int>(lLenOut) == SQL_NULL_DATA || lLenOut == 0) {
         sr_odbcFieldGet(pField, pItem, nullptr, -1, bQueryOnly, ulSystemID, bTranslate);
       } else if (lLenOut > 0) {
-        char *val = static_cast<char *>(hb_xgrab(lLenOut + 1));
+        auto val = static_cast<char *>(hb_xgrab(lLenOut + 1));
         res = SQLGetData((HSTMT)hStmt, ui, SQL_CHAR, val, lLenOut + 1, &lLenOut);
         if (SQL_SUCCEEDED(res)) {
           sr_odbcFieldGet(pField, pItem, static_cast<char *>(val), lLenOut, bQueryOnly, ulSystemID, bTranslate);

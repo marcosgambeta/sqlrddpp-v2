@@ -1037,7 +1037,7 @@ static void sr_FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
   if (lLenBuff <= 0) { // database content is NULL
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
       szResult[lLen] = '\0';
       hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -1087,7 +1087,7 @@ static void sr_FBFieldGet3(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, const
     switch (lType) {
     case SQL_CHAR: {
       HB_SIZE lPos;
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
       for (lPos = lLenBuff; lPos < lLen; lPos++) {
         szResult[lPos] = ' ';

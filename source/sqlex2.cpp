@@ -84,9 +84,9 @@ static PHB_DYNS s_pSym_Serial1 = nullptr; // Pointer to serialization function
 
 char *SR_QualifyName(char *szName, SQLEXAREAP thiswa)
 {
-  int i, len;
+  int i;
 
-  len = static_cast<int>(strlen(szName));
+  auto len = static_cast<int>(strlen(szName));
 
   for (i = 0; i < len; i++) {
     if (szName[i] == '\0') {

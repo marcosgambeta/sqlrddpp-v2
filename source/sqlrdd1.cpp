@@ -1168,7 +1168,7 @@ static HB_ERRCODE sqlGetValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     } else {
       PHB_ITEM pLangItem = hb_itemNew(nullptr);
       HB_SIZE nLen = pField->uiLen, nSrcLen;
-      char *empty = static_cast<char *>(hb_xgrab(nLen + 1));
+      auto empty = static_cast<char *>(hb_xgrab(nLen + 1));
 
       if (hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &nPos) ||
           hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &nPos) ||
@@ -2899,11 +2899,11 @@ static HB_ERRCODE sqlFilterText(SQLAREAP thiswa, PHB_ITEM pFilter)
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem)
 {
-  HB_LONG lIndexes, lorder;
+  HB_LONG lorder;
   PHB_ITEM pTag, pTemp;
 
   hb_itemClear(pItem);
-  lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
+  auto lIndexes = static_cast<HB_LONG>(hb_itemSize(thiswa->aOrders));
 
   if (lIndexes) {
     // Exists opened orders ?
@@ -3255,7 +3255,6 @@ static HB_ERRCODE sqlRddInfo(LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConne
 static bool ProcessFields(SQLAREAP thiswa)
 {
   DBFIELDINFO field;
-  HB_LONG numFields;
   HB_BYTE *fieldType;
   HB_USHORT i;
   PHB_ITEM thisfield;
@@ -3265,7 +3264,7 @@ static bool ProcessFields(SQLAREAP thiswa)
     return false;
   }
 
-  numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
+  auto numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));
@@ -3361,7 +3360,6 @@ static bool ProcessFields(SQLAREAP thiswa)
 
 static bool SetFields(SQLAREAP thiswa)
 {
-  HB_LONG numFields;
   HB_USHORT i;
   PHB_ITEM thisfield;
 
@@ -3370,7 +3368,7 @@ static bool SetFields(SQLAREAP thiswa)
     return false;
   }
 
-  numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
+  auto numFields = static_cast<HB_LONG>(hb_itemSize(thiswa->aStruct));
 
   if (!numFields) {
     HB_TRACE(HB_TR_ALWAYS, ("SQLRDD: Empty structure array"));

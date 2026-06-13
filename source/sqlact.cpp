@@ -595,9 +595,7 @@ HB_FUNC(SR_ESCAPESTRING)
 
 char *SR_QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase, HB_BOOL bRTrim, HB_SIZE *iSizeOut) // TODO: static ?
 {
-  char *ToBuffer;
-
-  ToBuffer = static_cast<char *>(hb_xgrab((iSize * 2) + 3));
+  auto ToBuffer = static_cast<char *>(hb_xgrab((iSize * 2) + 3));
 
   ToBuffer[0] = '\'';
   ToBuffer++;
@@ -755,7 +753,7 @@ HB_FUNC(SR_ESCAPENUM)
     lValue = hb_strValInt(ToBuffer, &iOverflow);
 
     if (!iOverflow) {
-      double dValue = static_cast<double>(lValue);
+      auto dValue = static_cast<double>(lValue);
       hb_retnlen(dValue, static_cast<int>(len), static_cast<int>(dec));
     } else {
       double dValue = hb_strVal(ToBuffer, iSize);
@@ -858,7 +856,7 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
     lValue = hb_strValInt(ToBuffer, &iOverflow);
 
     if (!iOverflow) {
-      double dValue = static_cast<double>(lValue);
+      auto dValue = static_cast<double>(lValue);
       hb_itemPutNLen(pRet, dValue, static_cast<int>(len), static_cast<int>(dec));
     } else {
       double dValue = hb_strVal(ToBuffer, iSize);

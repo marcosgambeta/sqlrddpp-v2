@@ -510,7 +510,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
     // database content is NULL
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
       szResult[lLen] = '\0';
       hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -553,7 +553,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenB
     switch (lType) {
     case SQL_CHAR: {
       HB_SIZE lPos;
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
 
       for (lPos = lLenBuff; lPos < lLen; lPos++) {

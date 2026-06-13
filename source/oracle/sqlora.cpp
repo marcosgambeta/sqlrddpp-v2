@@ -915,8 +915,7 @@ extern char *strdup __P((const char *s));
  */
 char *DEFUN(strdup, (s), const char *s)
 {
-  char *n;
-  n = static_cast<char *>(MALLOC(sizeof(char) * (strlen(s) + 1)));
+  auto n = static_cast<char *>(MALLOC(sizeof(char) * (strlen(s) + 1)));
   TRACE(4, fprintf(_trace_fp, "strdup: Allocated %d bytes\n", (strlen(s) + 1)););
   if (n) {
     strcpy(n, s);
@@ -4514,7 +4513,7 @@ int DEFUN(sqlo_open, (dbh, stmt, argc, argv),
   int status;
   int ret;
   bool_t bmf = FALSE; /* flag indicates change in blocking mode */
-  unsigned int blocking = static_cast<unsigned int>(SQLO_STH_INIT);
+  auto blocking = static_cast<unsigned int>(SQLO_STH_INIT);
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_open", SQLO_INVALID_DB_HANDLE);
 
@@ -4588,7 +4587,7 @@ int DEFUN(sqlo_open2, (sthp, dbh, stmt, argc, argv),
   sqlo_stmt_struct_ptr_t stp = nullptr;
   int status;
   int ret;
-  unsigned int blocking = static_cast<unsigned int>(SQLO_STH_INIT);
+  auto blocking = static_cast<unsigned int>(SQLO_STH_INIT);
   int real_sth;
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_open2", SQLO_INVALID_DB_HANDLE);
@@ -6251,7 +6250,7 @@ int DEFUN(sqlo_set_blocking, (dbh, on), sqlo_db_handle_t dbh AND unsigned int on
 {
   sqlo_db_struct_ptr_t dbp;
   unsigned int new_mode;
-  unsigned int blocking = static_cast<unsigned int>(SQLO_STH_INIT);
+  auto blocking = static_cast<unsigned int>(SQLO_STH_INIT);
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_set_blocking", SQLO_INVALID_DB_HANDLE);
 
@@ -6305,7 +6304,7 @@ int DEFUN(sqlo_break, (dbh), sqlo_db_handle_t dbh)
 {
   sqlo_db_struct_ptr_t dbp;
 
-  unsigned int blocking = static_cast<unsigned int>(SQLO_STH_INIT);
+  auto blocking = static_cast<unsigned int>(SQLO_STH_INIT);
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_break", SQLO_INVALID_DB_HANDLE);
 

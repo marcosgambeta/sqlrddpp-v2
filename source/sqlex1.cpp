@@ -467,7 +467,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
   switch (BindStructure->iCType) {
   case SQL_C_CHAR: {
     int nTrim, i;
-    int size = static_cast<int>(hb_itemGetCLen(pFieldData));
+    auto size = static_cast<int>(hb_itemGetCLen(pFieldData));
     auto pszText = hb_itemGetCPtr(pFieldData);
 
     nTrim = size;
@@ -504,7 +504,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
   }
   case SQL_C_BINARY: {
     int nTrim, i;
-    int size = static_cast<int>(hb_itemGetCLen(pFieldData));
+    auto size = static_cast<int>(hb_itemGetCLen(pFieldData));
     auto pszText = hb_itemGetCPtr(pFieldData);
 
     nTrim = size;
@@ -2930,7 +2930,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
   }
   if (HB_IS_STRING(itemTemp)) {
     char *bBuffer = const_cast<char *>(hb_itemGetCPtr(itemTemp)); // const char * to char *
-    HB_LONG lLenBuff = static_cast<HB_LONG>(hb_itemGetCLen(itemTemp));
+    auto lLenBuff = static_cast<HB_LONG>(hb_itemGetCLen(itemTemp));
     PHB_ITEM pTemp;
     if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
       if (s_pSym_SR_DESERIALIZE == nullptr) {
@@ -2993,7 +2993,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
     } else {
       PHB_ITEM pLangItem = hb_itemNew(nullptr);
       HB_SIZE nLen = pField->uiLen, nSrcLen;
-      char *empty = static_cast<char *>(hb_xgrab(nLen + 1));
+      auto empty = static_cast<char *>(hb_xgrab(nLen + 1));
 
       if (hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &ulPos) ||
           hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &ulPos) ||
@@ -3660,7 +3660,7 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
 static HB_ERRCODE sqlExOrderCreate(SQLEXAREAP thiswa, LPDBORDERCREATEINFO pOrderCreateInfo)
 {
   HB_ERRCODE err;
-  int iLen = static_cast<int>(hb_arrayLen(thiswa->aFields));
+  auto iLen = static_cast<int>(hb_arrayLen(thiswa->aFields));
   thiswa->lBofAt = 0;
   thiswa->lEofAt = 0;
   thiswa->indexLevel = -1;

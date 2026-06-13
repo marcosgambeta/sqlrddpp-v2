@@ -149,7 +149,7 @@ static HB_USHORT OCI_initilized = 0;
 static void err_handler(OCI_Error *err)
 {
   int err_type = OCI_ErrorGetType(err);
-  char *err_msg = static_cast<char *>(OCI_ErrorGetString(err));
+  auto err_msg = static_cast<char *>(OCI_ErrorGetString(err));
 
   printf("%s - %s\n", err_type == OCI_ERR_WARNING ? "warning" : "error", err_msg);
 }
@@ -681,7 +681,7 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
   if (OCI_IsNull(rs, iField)) {
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
       szResult[lLen] = '\0';
       hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -729,7 +729,7 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
   } else {
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       memset(szResult, ' ', lLen);
       uiLen = OCI_GetDataLength(rs, iField);
       hb_xmemcpy(szResult, const_cast<char *>(OCI_GetString(rs, iField)), uiLen);

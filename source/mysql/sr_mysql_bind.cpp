@@ -181,7 +181,7 @@ HB_FUNC_STATIC(SR_MYSGETCONNID)
 HB_FUNC_STATIC(SR_MYSKILLCONNID)
 {
   GET_MYSQL_SESSION(session, 1);
-  HB_ULONG ulThreadID = static_cast<HB_ULONG>(hb_itemGetNL(hb_param(2, HB_IT_LONG)));
+  auto ulThreadID = static_cast<HB_ULONG>(hb_itemGetNL(hb_param(2, HB_IT_LONG)));
 
   if (session == nullptr || session->dbh == nullptr) {
     hb_retni(0); // TODO: is 0 the correct value to return ?
@@ -270,7 +270,7 @@ static void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE
   if (lLenBuff <= 0) { // database content is NULL
     switch (lType) {
     case SQL_CHAR: {
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       hb_xmemset(szResult, ' ', lLen);
       szResult[lLen] = '\0';
       hb_itemPutCLPtr(pItem, szResult, lLen);
@@ -317,7 +317,7 @@ static void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE
     switch (lType) {
     case SQL_CHAR: {
       HB_SIZE lPos;
-      char *szResult = static_cast<char *>(hb_xgrab(lLen + 1));
+      auto szResult = static_cast<char *>(hb_xgrab(lLen + 1));
       memset(szResult, ' ', lLen);
       hb_xmemcpy(szResult, bBuffer, (lLen < lLenBuff ? lLen : lLenBuff));
       for (lPos = lLenBuff; lPos < lLen; lPos++) {
