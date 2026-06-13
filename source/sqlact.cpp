@@ -905,7 +905,7 @@ HB_FUNC(SR_DBQUALIFY)
     case SQLRDD_RDBMS_ADABAS: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
-        szOut[i + 1] = static_cast<char>(toupper((HB_BYTE)pszBuffer[i]));
+        szOut[i + 1] = static_cast<char>(toupper(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       szOut[i + 1] = '"';
       break;
@@ -914,7 +914,7 @@ HB_FUNC(SR_DBQUALIFY)
     case SQLRDD_RDBMS_POSTGR: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
-        szOut[i + 1] = static_cast<char>(tolower((HB_BYTE)pszBuffer[i]));
+        szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       szOut[i + 1] = '"';
       break;
@@ -922,7 +922,7 @@ HB_FUNC(SR_DBQUALIFY)
     case SQLRDD_RDBMS_MSSQL7: {
       szOut[0] = '[';
       for (i = 0; i < ulLen; i++) {
-        szOut[i + 1] = (HB_BYTE)pszBuffer[i];
+        szOut[i + 1] = static_cast<HB_BYTE>(pszBuffer[i]);
       }
       szOut[i + 1] = ']';
       break;
@@ -932,14 +932,14 @@ HB_FUNC(SR_DBQUALIFY)
     case SQLRDD_RDBMS_MARIADB: {
       szOut[0] = '`';
       for (i = 0; i < ulLen; i++) {
-        szOut[i + 1] = static_cast<char>(tolower((HB_BYTE)pszBuffer[i]));
+        szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       szOut[i + 1] = '`';
       break;
     }
     case SQLRDD_RDBMS_INFORM: {
       for (i = 0; i < ulLen; i++) {
-        szOut[i] = static_cast<char>(tolower((HB_BYTE)pszBuffer[i]));
+        szOut[i] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
       ulLen -= 2;
       break;
@@ -947,7 +947,7 @@ HB_FUNC(SR_DBQUALIFY)
     default: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
-        szOut[i + 1] = (HB_BYTE)pszBuffer[i];
+        szOut[i + 1] = static_cast<HB_BYTE>(pszBuffer[i]);
       }
       szOut[i + 1] = '"';
     }

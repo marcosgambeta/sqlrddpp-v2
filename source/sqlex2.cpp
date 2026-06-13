@@ -101,7 +101,7 @@ char *SR_QualifyName(char *szName, SQLEXAREAP thiswa)
     case SQLRDD_RDBMS_FIREBR5:
     case SQLRDD_RDBMS_IBMDB2:
     case SQLRDD_RDBMS_ADABAS: {
-      szName[i] = static_cast<char>(toupper((HB_BYTE)szName[i]));
+      szName[i] = static_cast<char>(toupper(static_cast<HB_BYTE>(szName[i])));
       break;
     }
     case SQLRDD_RDBMS_INGRES:
@@ -110,7 +110,7 @@ char *SR_QualifyName(char *szName, SQLEXAREAP thiswa)
     case SQLRDD_RDBMS_MARIADB:
     case SQLRDD_RDBMS_OTERRO:
     case SQLRDD_RDBMS_INFORM: {
-      szName[i] = static_cast<char>(tolower((HB_BYTE)szName[i]));
+      szName[i] = static_cast<char>(tolower(static_cast<HB_BYTE>(szName[i])));
       break; // TODO: unnecessary break
     }
     }
