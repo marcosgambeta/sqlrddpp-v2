@@ -289,13 +289,9 @@ HB_ERRCODE prepareSeekQuery(SQLEXAREAP thiswa, INDEXBINDP SeekBind)
 
 //------------------------------------------------------------------------
 
-HB_BOOL SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel)
+bool SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel)
 {
-  PHB_ITEM pColumns, pIndexRef;
-  INDEXBINDP SeekBind;
-  HB_BOOL bUseOptimizerHints;
-
-  bUseOptimizerHints = thiswa->nSystemID == SQLRDD_RDBMS_ORACLE;
+  HB_BOOL bUseOptimizerHints = thiswa->nSystemID == SQLRDD_RDBMS_ORACLE;
   thiswa->bConditionChanged1 = true; // SKIP statements are no longer valid
 
   // Alloc memory for binding structures, if first time
@@ -304,7 +300,7 @@ HB_BOOL SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel)
     SR_SetIndexBindStructure(thiswa);
   }
 
-  SeekBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
+  INDEXBINDP SeekBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
   // SeekBind += (queryLevel - 1); // place offset
 
   // Check if stmt must be created or recreated
@@ -313,8 +309,8 @@ HB_BOOL SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel)
       (thiswa->recordListDirection == LIST_FORWARD && (!SeekBind->SeekFwdStmt)) ||
       (thiswa->recordListDirection == LIST_BACKWARD && (!SeekBind->SeekBwdStmt))) {
 
-    pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
-    pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
+    PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
+    PHB_ITEM pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
     thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
     // Free the statements we are about to recreate

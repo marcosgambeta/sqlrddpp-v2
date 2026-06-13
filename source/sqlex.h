@@ -315,7 +315,7 @@ HB_ERRCODE SR_ExecuteUpdateStmt(SQLEXAREAP thiswa);
 // SEEK Prototypes
 
 HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *queryLevel);
-HB_BOOL SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel);
+bool SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel);
 void SR_BindSeekStmt(SQLEXAREAP thiswa, int queryLevel);
 HB_ERRCODE SR_getPreparedSeek(SQLEXAREAP thiswa, int queryLevel, HB_USHORT *iIndex, HSTMT *hStmt);
 
