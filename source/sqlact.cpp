@@ -879,10 +879,9 @@ HB_FUNC(SR_DBQUALIFY)
 
   if (pText) {
     char *szOut;
-    const char *pszBuffer;
     HB_SIZE ulLen, i;
 
-    pszBuffer = hb_itemGetCPtr(pText);
+    auto pszBuffer = hb_itemGetCPtr(pText);
     ulLen = hb_itemGetCLen(pText);
     szOut = static_cast<char *>(hb_xgrab(ulLen + 3));
 
