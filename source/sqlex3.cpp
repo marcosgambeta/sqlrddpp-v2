@@ -83,7 +83,7 @@
 
 //------------------------------------------------------------------------
 
-static void createSeekQuery(SQLEXAREAP thiswa, HB_BOOL bUseOptimizerHints)
+static void createSeekQuery(SQLEXAREAP thiswa, bool bUseOptimizerHints)
 {
   if (SR_getColumnList(thiswa)) {
     thiswa->bConditionChanged1 = true; // SEKIP statements are no longer valid - column list has changed!
