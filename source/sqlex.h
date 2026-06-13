@@ -292,7 +292,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
 char *SR_QualifyName(char *szName, SQLEXAREAP thiswa);
 COLUMNBINDP SR_GetBindStruct(SQLEXAREAP thiswa, INDEXBINDP IndexBind);
 HB_BOOL SR_getColumnList(SQLEXAREAP thiswa);
-void SR_SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere);
+void SR_SolveFilters(SQLEXAREAP thiswa, bool bWhere);
 void SR_getOrderByExpression(SQLEXAREAP thiswa, HB_BOOL bUseOptimizerHints);
 void SR_setResultSetLimit(SQLEXAREAP thiswa, int iRows);
 void SR_SetIndexBindStructure(SQLEXAREAP thiswa);

@@ -961,17 +961,15 @@ static void FeedCurrentRecordToBindings(SQLEXAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-void SR_SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
+void SR_SolveFilters(SQLEXAREAP thiswa, bool bWhere)
 {
   // Resolve SET FILTER TO
 
-  char *temp;
-
   char *szfor = getMessageC(thiswa->oWorkArea, "CFOR");
-  if (szfor) {
+  if (szfor != nullptr) {
     if (szfor[0]) {
       if (bWhere) {
-        temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
+        char *temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
         sprintf(thiswa->sWhere, "%s AND ( %s )", temp, szfor);
         hb_xfree(temp);
       } else {
@@ -986,10 +984,10 @@ void SR_SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
 
   if (thiswa->sqlfilter) {
     char *sFilter = getMessageC(thiswa->oWorkArea, "CFILTER");
-    if (sFilter) {
+    if (sFilter != nullptr) {
       if (sFilter[0]) {
         if (bWhere) {
-          temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
+          char *temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
           sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
           hb_xfree(temp);
         } else {
@@ -1001,10 +999,10 @@ void SR_SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
     }
   } else {
     char *sFilter = getMessageC(thiswa->oWorkArea, "CFILTER");
-    if (sFilter) {
+    if (sFilter != nullptr) {
       if (sFilter[0]) {
         if (bWhere) {
-          temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
+          char *temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
           sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
           hb_xfree(temp);
         } else {
@@ -1021,9 +1019,9 @@ void SR_SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
   if (thiswa->hOrdCurrent > 0) {
     PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
     const char *szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
-    if (szFilter && szFilter[0]) {
+    if (szFilter != nullptr && szFilter[0]) {
       if (bWhere) {
-        temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
+        char *temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
         sprintf(thiswa->sWhere, "%s AND ( %s )", temp, szFilter);
         hb_xfree(temp);
       } else {
@@ -1037,10 +1035,10 @@ void SR_SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
 
   {
     char *sFilter = getMessageC(thiswa->oWorkArea, "CSCOPE");
-    if (sFilter) {
+    if (sFilter != nullptr) {
       if (sFilter[0]) {
         if (bWhere) {
-          temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
+          char *temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
           sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
           hb_xfree(temp);
         } else {
@@ -1054,10 +1052,10 @@ void SR_SolveFilters(SQLEXAREAP thiswa, HB_BOOL bWhere)
 
   {
     char *sFilter = getMessageC(thiswa->oWorkArea, "CFLTUSR");
-    if (sFilter) {
+    if (sFilter != nullptr) {
       if (sFilter[0]) {
         if (bWhere) {
-          temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
+          char *temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
           sprintf(thiswa->sWhere, "%s AND ( %s )", temp, sFilter);
           hb_xfree(temp);
         } else {
