@@ -3424,13 +3424,7 @@ void SR_commonError(AREAP thiswa, HB_USHORT uiGenCode, HB_USHORT uiSubCode, cons
 // SR_ITEMCMP(cItem1, cItem2, nLenToCompare) ==> 0 == identical, < 0 if cItem1 < cIten2, > 0 == cItem1 > cIten2
 HB_FUNC(SR_ITEMCMP)
 {
-  int ret;
-
-  auto val1 = hb_itemGetCPtr(hb_param(1, HB_IT_ANY));
-  auto val2 = hb_itemGetCPtr(hb_param(2, HB_IT_ANY));
-  ret = strncmp(val1, val2, hb_parnl(3));
-
-  hb_retni(ret);
+  hb_retni(strncmp(hb_itemGetCPtr(hb_param(1, HB_IT_ANY)), hb_itemGetCPtr(hb_param(2, HB_IT_ANY)), hb_parnl(3)));
 }
 
 //------------------------------------------------------------------------
