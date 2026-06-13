@@ -112,7 +112,7 @@ HB_FUNC_EXTERN(SQLRDD);
 
 static int s_pageReadSize = PAGE_READ_SIZE;
 static int s_bufferPoolSize = BUFFER_POOL_SIZE;
-static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa);
+static bool CreateSkipStmt(SQLEXAREAP thiswa);
 static int s_bOldReverseIndex = 0;
 static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact);
 static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
@@ -2021,12 +2021,8 @@ HB_ERRCODE prepareRecordListQuery(SQLEXAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa)
+static bool CreateSkipStmt(SQLEXAREAP thiswa)
 {
-  PHB_ITEM pColumns, pIndexRef;
-  INDEXBINDP IndexBind;
-  int i;
-
   // Note about this IF: I assume that if query is prepared for level 1 (without changing IndexBind offset),
   // all queries are prepaered, since it loops to all levels when doing it, as code below. That's why it
   // checks for thiswa->IndexBindings[thiswa->hOrdCurrent]))->index???Stmt only.
@@ -2043,8 +2039,8 @@ static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa)
     thiswa->bOrderChanged = false;
 
     if (thiswa->hOrdCurrent > 0) {
-      pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
-      pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
+      PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
+      PHB_ITEM pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
       thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
     } else {
       thiswa->indexColumns = 1; // Natural order, RECNO
@@ -2058,11 +2054,11 @@ static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa)
 
     // Now we should bind all index columns to be used by SKIP
 
-    IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
+    INDEXBINDP IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
 
     // Free the statements we are about to recreate
 
-    for (i = 1; i <= thiswa->indexColumns; i++) {
+    for (int i = 1; i <= thiswa->indexColumns; i++) {
       if (IndexBind->SkipFwdStmt) {
         SQLFreeStmt(IndexBind->SkipFwdStmt, SQL_DROP);
         IndexBind->SkipFwdStmt = nullptr;
@@ -2082,7 +2078,7 @@ static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa)
 
     // Create and prepare queries to scroll to each index column level
 
-    for (i = 1; i <= thiswa->indexColumns; i++) {
+    for (int i = 1; i <= thiswa->indexColumns; i++) {
       getWhereExpression(thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD);
       createRecodListQuery(thiswa);
       prepareRecordListQuery(thiswa);
