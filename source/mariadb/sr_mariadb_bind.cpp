@@ -102,10 +102,10 @@ HB_FUNC_STATIC(SR_MARIADBCONNECT)
 {
   // PMARIADB_SESSION session = (PMARIADB_SESSION) hb_xgrab(sizeof(MARIADB_SESSION));
   PMARIADB_SESSION session = (PMARIADB_SESSION)hb_xgrabz(sizeof(MARIADB_SESSION));
-  const char *szHost = hb_parc(1);
-  const char *szUser = hb_parc(2);
-  const char *szPass = hb_parc(3);
-  const char *szDb = hb_parc(4);
+  auto szHost = hb_parc(1);
+  auto szUser = hb_parc(2);
+  auto szPass = hb_parc(3);
+  auto szDb = hb_parc(4);
   HB_UINT uiPort = HB_ISNUM(5) ? hb_parnl(5) : MYSQL_PORT;
   HB_UINT uiTimeout = HB_ISNUM(7) ? hb_parnl(7) : 3600;
   HB_BOOL lCompress = HB_ISLOG(8) ? hb_parl(8) : false;
@@ -203,7 +203,7 @@ HB_FUNC_STATIC(SR_MARIADBEXEC)
 {
   // SR_TraceLog(nullptr, "mysqlExec : %s\n", hb_parc(2));
   GET_MARIADB_SESSION(session, 1);
-  const char *szQuery = hb_parc(2);
+  auto szQuery = hb_parc(2);
 
   if (session == nullptr || session->dbh == nullptr) {
     hb_retptr(nullptr);

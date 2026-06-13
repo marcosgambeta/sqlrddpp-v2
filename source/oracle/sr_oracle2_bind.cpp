@@ -318,7 +318,7 @@ HB_FUNC_STATIC(SR_SQLO2_ROLLBACK)
 HB_FUNC_STATIC(SR_SQLO2_EXECDIRECT)
 {
   GET_OCI_SESSION(session, 1);
-  const char *stm = hb_parcx(2);
+  auto stm = hb_parcx(2);
 
   if (session != nullptr) {
     session->stmt = OCI_StatementCreate(session->cn);
@@ -595,7 +595,7 @@ HB_FUNC_STATIC(SR_ORACLEEXECDIR2) // TODO: not used in SQLRDD source code
 HB_FUNC_STATIC(SR_ORACLEPREPARE2)
 {
   GET_OCI_SESSION(session, 1);
-  const char *szSql = hb_parc(2);
+  auto szSql = hb_parc(2);
   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
   int ret = -1;
 
@@ -1087,9 +1087,9 @@ HB_FUNC_STATIC(SR_SQLO2_CLOSESTMT)
 HB_FUNC_STATIC(SR_ORACLEWRITEMEMO2)
 {
   GET_OCI_SESSION(session, 1);
-  const char *sTable = hb_parc(2);
+  auto sTable = hb_parc(2);
   HB_ULONG ulRecno = hb_parnl(3);
-  const char *sRecnoName = hb_parcx(4);
+  auto sRecnoName = hb_parcx(4);
   // SQLO2_lob_desc_t loblp;
   // SQLO2_stmt_handle_t sth;
   OCI_Lob *lob1;
@@ -1162,8 +1162,8 @@ HB_FUNC_STATIC(SR_ORACLE_PROCCURSOR2)
 
   int ret = SQL_ERROR;
 
-  const char *stmt = hb_parc(2);
-  const char *parc = hb_parc(3);
+  auto stmt = hb_parc(2);
+  auto parc = hb_parc(3);
 
   if (session != nullptr) {
     // parse the statement

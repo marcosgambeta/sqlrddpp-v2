@@ -246,7 +246,6 @@ PHB_ITEM SQLpCodeGenIntArray(int code, PHB_ITEM pArray)
 HB_FUNC(SR_STRTOHEX)
 {
   char *outbuff;
-  const char *cStr;
   char *c;
   HB_USHORT iNum;
   int i, len;
@@ -257,7 +256,7 @@ HB_FUNC(SR_STRTOHEX)
     return;
   }
 
-  cStr = hb_parc(1);
+  auto cStr = hb_parc(1);
   len = static_cast<int>(hb_parclen(1));
   outbuff = static_cast<char *>(hb_xgrab((len * 2) + 1));
   c = outbuff;
@@ -534,7 +533,6 @@ static HB_SIZE escape_oci(char *to, const char *from, HB_SIZE length)
 
 HB_FUNC(SR_ESCAPESTRING)
 {
-  const char *FromBuffer;
   HB_SIZE iSize;
   int idatabase;
   char *ToBuffer;
@@ -549,7 +547,7 @@ HB_FUNC(SR_ESCAPESTRING)
   }
 
   if (iSize) {
-    FromBuffer = hb_parc(1);
+    auto FromBuffer = hb_parc(1);
     ToBuffer = static_cast<char *>(hb_xgrab((iSize * 2) + 1));
     if (ToBuffer) {
       switch (idatabase) {
@@ -659,7 +657,6 @@ char *SR_QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatab
 
 HB_FUNC(SR_ESCAPENUM)
 {
-  const char *FromBuffer;
   char *ToBuffer;
   char SciNot[5] = {'\0', '\0', '\0', '\0', '\0'};
   HB_SIZE iSize, iPos;
@@ -669,7 +666,7 @@ HB_FUNC(SR_ESCAPENUM)
   double dMultpl;
 
   iSize = hb_parclen(1);
-  FromBuffer = hb_parc(1);
+  auto FromBuffer = hb_parc(1);
 
   if (!(HB_ISCHAR(1) && HB_ISNUM(2) && HB_ISNUM(3))) {
     hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPENUM", 3, hb_param(1, HB_IT_ANY), hb_param(2, HB_IT_ANY),

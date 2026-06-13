@@ -180,10 +180,10 @@ static void fb_log_status3(PFB_SESSION session, const char *from)
 HB_FUNC_STATIC(SR_FBCONNECT3)
 {
   XSQLVAR *var;
-  const char *db_connect = hb_parcx(1);
-  const char *user = hb_parcx(2);
-  const char *passwd = hb_parcx(3);
-  const char *charset = hb_parc(4);
+  auto db_connect = hb_parcx(1);
+  auto user = hb_parcx(2);
+  auto passwd = hb_parcx(3);
+  auto charset = hb_parc(4);
   char dpb[256];
   int i, len;
 
@@ -399,7 +399,7 @@ HB_FUNC_STATIC(SR_FBROLLBACKTRANSACTION3)
 HB_FUNC_STATIC(SR_FBEXECUTE3)
 {
   GET_FB_SESSION(session, 1);
-  const char *command = hb_parcx(2);
+  auto command = hb_parcx(2);
   int i, dtype;
   XSQLVAR *var;
 
@@ -548,7 +548,7 @@ HB_FUNC_STATIC(SR_FBEXECUTE3)
 HB_FUNC_STATIC(SR_FBEXECUTEIMMEDIATE3)
 {
   GET_FB_SESSION(session, 1);
-  const char *command = hb_parcx(2);
+  auto command = hb_parcx(2);
   // ISC_STATUS r;
 
   if (!session->transac) {
@@ -957,11 +957,11 @@ HB_FUNC(SR_FBCREATEDB3)
   long status[20];
   char create_db[1024];
 
-  const char *db_name = hb_parcx(1);
-  const char *username = hb_parcx(2);
-  const char *passwd = hb_parcx(3);
+  auto db_name = hb_parcx(1);
+  auto username = hb_parcx(2);
+  auto passwd = hb_parcx(3);
   int page = hb_parni(4);
-  const char *charset = hb_parc(5);
+  auto charset = hb_parc(5);
   int dialect = hb_parni(6);
 
   if (!dialect) {

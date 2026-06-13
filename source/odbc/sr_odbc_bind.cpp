@@ -159,7 +159,7 @@ HB_FUNC(SR_INSTALLDSN)
   if (hb_pcount() != 2) {
     hb_retl(false);
   } else {
-    const char *szDriver = hb_parc(1);
+    auto szDriver = hb_parc(1);
     char *szAttributes = hb_strdup(hb_parc(2));
 
     for (x = static_cast<int>(strlen(szAttributes)), y = 0; y < x; y++) {
@@ -187,7 +187,7 @@ HB_FUNC(SR_UNINSTALLDSN)
   if (hb_pcount() != 2) {
     hb_retl(false);
   } else {
-    const char *szDriver = hb_parc(1);
+    auto szDriver = hb_parc(1);
     char *szAttributes = hb_strdup(hb_parc(2));
 
     for (x = static_cast<int>(strlen(szAttributes)), y = 0; y < x; y++) {
@@ -1095,9 +1095,9 @@ HB_FUNC_STATIC(SR_ODBCWRITEMEMO)
   SQLHDBC hDbc;
   SQLHSTMT hStmt;
   HB_ULONG uiLen, uiSize;
-  const char *sTable = hb_parc(2);
+  auto sTable = hb_parc(2);
   HB_ULONG ulRecno = hb_parnl(3);
-  const char *sRecnoName = hb_parcx(4);
+  auto sRecnoName = hb_parcx(4);
   SQLRETURN retcode3, retcode2, retcode = 0;
   SQLLEN cbSize = 0;
 

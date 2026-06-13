@@ -225,7 +225,7 @@ HB_FUNC_STATIC(SR_SQLO_GETERRORCODE)
 HB_FUNC_STATIC(SR_SQLO_EXECDIRECT)
 {
   GET_OCI_SESSION(session, 1);
-  const char *stm = hb_parcx(2);
+  auto stm = hb_parcx(2);
 
   if (session != nullptr) {
     while (SQLO_STILL_EXECUTING == (session->status = sqlo_exec(session->dbh, static_cast<CONST char *>(stm), &session->uRows))) {
@@ -736,9 +736,9 @@ HB_FUNC_STATIC(SR_SQLO_LINEPROCESSED)
 HB_FUNC_STATIC(SR_ORACLEWRITEMEMO)
 {
   GET_OCI_SESSION(session, 1);
-  const char *sTable = hb_parc(2);
+  auto sTable = hb_parc(2);
   HB_ULONG ulRecno = hb_parnl(3);
-  const char *sRecnoName = hb_parcx(4);
+  auto sRecnoName = hb_parcx(4);
   sqlo_lob_desc_t loblp;
   sqlo_stmt_handle_t sth;
   int status;
@@ -1033,7 +1033,7 @@ HB_FUNC(SR_ORACLEFREEBIND)
 HB_FUNC(SR_ORACLEPREPARE)
 {
   GET_OCI_SESSION(session, 1);
-  const char *szSql = hb_parc(2);
+  auto szSql = hb_parc(2);
   HB_BOOL lStmt = HB_ISLOG(3) ? hb_parl(3) : false;
 
   if (session != nullptr) {
@@ -1072,8 +1072,8 @@ HB_FUNC_STATIC(SR_ORACLE_PROCCURSOR)
 
   int ret = SQL_ERROR;
 
-  const char *stmt = hb_parc(2);
-  const char *parc = hb_parc(3);
+  auto stmt = hb_parc(2);
+  auto parc = hb_parc(3);
 
   if (session != nullptr) {
     // parse the statement
@@ -1213,8 +1213,8 @@ HB_FUNC_STATIC(SR_ORACLE_BINDCURSOR)
 
   int ret = SQL_ERROR;
 
-  const char *stmt = hb_parc(2);
-  const char *parc = hb_parc(3);
+  auto stmt = hb_parc(2);
+  auto parc = hb_parc(3);
 
   if (session != nullptr) {
     // parse the statement
