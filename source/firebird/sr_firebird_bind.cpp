@@ -85,7 +85,7 @@
 #define ISC_INT64_FORMAT PFLL
 #endif
 
-#define GET_FB_SESSION(session, numpar) PFB_SESSION session = (PFB_SESSION)hb_itemGetPtr(hb_param(numpar, HB_IT_POINTER))
+#define GET_FB_SESSION(session, numpar) auto session = static_cast<PFB_SESSION>(hb_itemGetPtr(hb_param(numpar, HB_IT_POINTER)))
 
 #ifdef __XHARBOUR__
 #define HB_LONG LONG
