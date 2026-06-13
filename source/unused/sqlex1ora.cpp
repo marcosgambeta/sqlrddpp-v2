@@ -671,7 +671,6 @@ HB_ERRCODE SetBindEmptylValue2(COLUMNBINDORAP BindStructure)
   }
   case SQL_C_BIT: {
     BindStructure->asLogical = false;
-    break; // TODO: unnecessary break
   }
   }
   return HB_SUCCESS;
@@ -905,7 +904,6 @@ static void BindAllIndexStmts(SQLEXORAAREAP thiswa)
           }
           case SQL_C_BIT: {
             res = OCI_BindUnsignedBigInt(hStmt, BindStructure->szBindName, &BindStructure->asLogical);
-            break; // TODO: unnecessary break
           }
           }
           if (CHECK_SQL_N_OK(res)) {
@@ -1171,7 +1169,6 @@ void SetCurrRecordStructureOra(SQLEXORAAREAP thiswa)
     }
     case SQL_FAKE_DATE: {
       lType = SQL_CHAR;
-      break; // TODO: unnecessary break
     }
     }
 #endif
@@ -1213,7 +1210,6 @@ void SetCurrRecordStructureOra(SQLEXORAAREAP thiswa)
     }
     case 'L': {
       BindStructure->iCType = SQL_C_BIT;
-      break; // TODO: unnecessary break
     }
     }
     BindStructure++;

@@ -2333,7 +2333,6 @@ static int DEFUN(_save_oci_status, (dbp, action, object, lineno),
   }
   default: {
     sprintf(dbp->errmsg, "ERROR: - 00000: Unknown status %d\n(line: %d)\n", dbp->status, lineno);
-    break; // TODO: unnecessary break
   }
   }
 
@@ -6190,7 +6189,6 @@ int DEFUN(sqlo_get_oci_handle, (sqloh, ocihp, type), int sqloh AND void *ocihp A
   }
   default: {
     return SQLO_INVALID_OCI_HANDLE_TYPE;
-    break; /* to keep the compiler happy */ // TODO: unnecessary break
   }
   }
   return SQLO_SUCCESS;
@@ -6763,7 +6761,6 @@ DEFUN(sqlo_lob_read_stream, (dbh, loblp, loblen, fp),
   }
   default: {
     CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_lob_read_stream", "");
-    break; // TODO: unnecessary break
   }
   }
   return dbp->status;

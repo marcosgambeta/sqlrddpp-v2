@@ -1286,7 +1286,6 @@ void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQu
     if (static_cast<int>(iLen) == SQL_NULL_DATA) {
       hb_itemPutTDT(pItem, 0, 0);
     }
-    break; // TODO: unnecessary break
   }
   }
 }

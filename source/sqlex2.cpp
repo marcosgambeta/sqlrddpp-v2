@@ -111,7 +111,6 @@ char *SR_QualifyName(char *szName, SQLEXAREAP thiswa)
     case SQLRDD_RDBMS_OTERRO:
     case SQLRDD_RDBMS_INFORM: {
       szName[i] = static_cast<char>(tolower(static_cast<HB_BYTE>(szName[i])));
-      break; // TODO: unnecessary break
     }
     }
   }
@@ -283,7 +282,6 @@ void SR_CreateInsertStmt(SQLEXAREAP thiswa)
     }
     case SQL_FAKE_DATE: {
       lType = SQL_CHAR;
-      break; // TODO: unnecessary break
     }
     }
 #endif
@@ -328,7 +326,6 @@ void SR_CreateInsertStmt(SQLEXAREAP thiswa)
     }
     case 'L': {
       InsertRecord->iCType = SQL_C_BIT;
-      break; // TODO: unnecessary break
     }
     }
     // if (InsertRecord->isMultiLang) // culik, se e multiplang, binda como binario
@@ -480,7 +477,6 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
                                static_cast<SQLSMALLINT>(InsertRecord->iCType), static_cast<SQLSMALLINT>(InsertRecord->iSQLType),
                                InsertRecord->ColumnSize, InsertRecord->DecimalDigits, &(InsertRecord->asLogical), 0,
                                nullptr);
-        break; // TODO: unnecessary break
       }
       }
 
@@ -634,7 +630,6 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREAP thiswa)
       case SQLRDD_RDBMS_MYSQL:
       case SQLRDD_RDBMS_MARIADB: {
         sprintf(ident, "SELECT LAST_INSERT_ID()");
-        break; // TODO: unnecessary break
       }
       }
 
@@ -780,7 +775,6 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
             SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(CurrRecord->iCType),
                              static_cast<SQLSMALLINT>(CurrRecord->iSQLType), CurrRecord->ColumnSize, CurrRecord->DecimalDigits,
                              &(CurrRecord->asLogical), 0, nullptr);
-        break; // TODO: unnecessary break
       }
       }
 

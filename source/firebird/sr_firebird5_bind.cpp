@@ -513,7 +513,6 @@ HB_FUNC_STATIC(SR_FBEXECUTE5)
     }
     default: {
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(char) * var->sqllen));
-      break; // TODO: unnecessary break
     }
     }
     var->sqlind = (short *)hb_xgrab(sizeof(short));
@@ -677,7 +676,6 @@ HB_FUNC_STATIC(SR_FBDESCRIBECOL5)
       rettype = SQL_CHAR;
       hb_storni(var->sqllen, 5);
       hb_storni(var->sqlscale, 6);
-      break; // TODO: unnecessary break
     }
     }
     // hb_storclen(static_cast<char *>(var->sqlname), var->sqlname_length, 3);
@@ -841,7 +839,6 @@ HB_FUNC_STATIC(SR_FBGETDATA5)
         case IB_SQL_INT64: {
           value = (ISC_INT64) * (ISC_INT64 ISC_FAR *)var->sqldata;
           field_width = 21;
-          break; // TODO: unnecessary break
         }
         }
 
@@ -1355,7 +1352,6 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED5)
             case IB_SQL_INT64: {
               value = (ISC_INT64) * (ISC_INT64 ISC_FAR *)var->sqldata;
               field_width = 21;
-              break; // TODO: unnecessary break
             }
             }
 
@@ -1501,7 +1497,6 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED5)
           }
           default: {
             SR_TraceLog(LOGFILE, "Unsupported data type returned in query: %i\n", dtype);
-            break; // TODO: unnecessary break
           }
           }
         }

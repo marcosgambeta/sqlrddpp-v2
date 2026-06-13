@@ -503,8 +503,6 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
         mask += 2;
         hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
         BindStructure->asDate.day = static_cast<SQLUSMALLINT>(lVal);
-
-        break; // TODO: unnecessary break
       }
       }
 
@@ -639,7 +637,6 @@ void SR_BindSeekStmt(SQLEXAREAP thiswa, int queryLevel)
         res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
                                static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                BindStructure->DecimalDigits, &(BindStructure->asLogical), 0, nullptr);
-        break; // TODO: unnecessary break
       }
       }
       if (CHECK_SQL_N_OK(res)) {

@@ -629,7 +629,6 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
   }
   case SQL_C_BIT: {
     BindStructure->asLogical = static_cast<SQLCHAR>(hb_itemGetL(pFieldData));
-    break; // TODO: unnecessary break
   }
   }
   return HB_SUCCESS;
@@ -671,7 +670,6 @@ HB_ERRCODE SR_SetBindEmptylValue(COLUMNBINDP BindStructure)
   }
   case SQL_C_BIT: {
     BindStructure->asLogical = false;
-    break; // TODO: unnecessary break
   }
   }
 
@@ -875,7 +873,6 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
             res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, static_cast<SQLSMALLINT>(BindStructure->iCType),
                                    static_cast<SQLSMALLINT>(BindStructure->iSQLType), BindStructure->ColumnSize,
                                    BindStructure->DecimalDigits, &(BindStructure->asLogical), 0, nullptr);
-            break; // TODO: unnecessary break
           }
           }
           if (CHECK_SQL_N_OK(res)) {
@@ -1158,7 +1155,6 @@ void SR_SetCurrRecordStructure(SQLEXAREAP thiswa)
     }
     case SQL_FAKE_DATE: {
       lType = SQL_CHAR;
-      break; // TODO: unnecessary break
     }
     }
 #endif
@@ -1204,7 +1200,6 @@ void SR_SetCurrRecordStructure(SQLEXAREAP thiswa)
     }
     case 'L': {
       BindStructure->iCType = SQL_C_BIT;
-      break; // TODO: unnecessary break
     }
     }
     if (BindStructure->isMultiLang) { // culik, se e multiplang, binda como binario

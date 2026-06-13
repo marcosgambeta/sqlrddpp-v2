@@ -109,7 +109,6 @@ char *QualifyName2(char *szName, SQLEXORAAREAP thiswa)
     case SQLRDD_RDBMS_OTERRO:
     case SQLRDD_RDBMS_INFORM: {
       szName[i] = static_cast<char>(tolower(static_cast<int>(szName[i])));
-      break; // TODO: unnecessary break
     }
     }
   }
@@ -275,7 +274,6 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
     }
     case SQL_FAKE_DATE: {
       lType = SQL_CHAR;
-      break; // TODO: unnecessary break
     }
     }
 #endif
@@ -312,7 +310,6 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
     }
     case 'L': {
       InsertRecord->iCType = SQL_C_BIT;
-      break; // TODO: unnecessary break
     }
     }
     InsertRecord++;
@@ -589,7 +586,6 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
           tablename[MAX_TABLE_NAME_LENGHT - 4] = '\0';
         }
         sprintf(ident, "SELECT %s%s_SQ.CURRVAL FROM DUAL", thiswa->sOwner, tablename);
-        break; // TODO: unnecessary break
       }
       }
 
@@ -818,7 +814,6 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
         //                        CurrRecord->DecimalDigits,
         //                        &(CurrRecord->asLogical), 0, NULL);
         res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, CurrRecord->szBindName, &CurrRecord->asLogical);
-        break; // TODO: unnecessary break
       }
       }
 

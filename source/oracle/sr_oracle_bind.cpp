@@ -954,7 +954,6 @@ HB_FUNC(SR_ORACLEINBINDPARAM)
 
       ret = sqlo_bind_by_pos(lStmt ? Stmt->stmt : Stmt->stmtParam, iParamNum, SQLOT_STR, Stmt->pLink[iPos].col_name,
                              iFieldSize + 1, &Stmt->pLink[iPos].sVal, 0);
-      break; // TODO: unnecessary break
     }
     }
   }

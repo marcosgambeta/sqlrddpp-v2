@@ -667,7 +667,6 @@ int sqlyylex(YYSTYPE *lvalp, void *s)
         stmt->queryPtr = queryPtr + 5;
         return WHERE;
       }
-      break; // TODO: unnecessary break
     }
     }
 

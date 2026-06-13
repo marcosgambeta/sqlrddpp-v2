@@ -351,7 +351,6 @@ static MXML_STATUS mxml_attribute_read(MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM 
           return MXML_STATUS_MALFORMED;
         }
       }
-      break; // TODO: unnecessary break
     }
     }
   }
@@ -834,7 +833,6 @@ static MXML_STATUS mxml_node_read_name(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM
         hbxml_set_doc_status(ref, doc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_INVNODE);
         return MXML_STATUS_MALFORMED;
       }
-      break; // TODO: unnecessary break
     }
     }
 
@@ -992,7 +990,6 @@ static void mxml_node_read_pi(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc)
         buf[iPos++] = '?';
         mxml_refil_ungetc(ref, chr);
       }
-      break; // TODO: unnecessary break
     }
     }
 
@@ -1102,7 +1099,6 @@ static void mxml_node_read_comment(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc
         buf[iPos++] = '-';
         mxml_refil_ungetc(ref, chr);
       }
-      break; // TODO: unnecessary break
     }
     }
 
@@ -1200,7 +1196,6 @@ static void mxml_node_read_cdata(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM pDoc)
       } else {
         iStatus = 100;
       }
-      break; // TODO: unnecessary break
     }
     }
   }
@@ -1252,7 +1247,6 @@ static void mxml_node_read_cdata(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM pDoc)
           buf[iPos++] = ']';
           mxml_refil_ungetc(ref, chr);
         }
-        break; // TODO: unnecessary break
       }
       }
 
@@ -1402,7 +1396,6 @@ static MXML_STATUS mxml_node_read(MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc,
         hbxml_set_doc_status(ref, doc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_INVNODE);
         return MXML_STATUS_MALFORMED;
       }
-      break; // TODO: unnecessary break
     }
     }
 
@@ -1669,7 +1662,6 @@ static MXML_STATUS mxml_node_write(MXML_OUTPUT *out, PHB_ITEM pNode, int style)
     if (!(style & MXML_STYLE_NONEWLINE)) {
       mxml_output_string(out, hb_conNewLine());
     }
-    break; // TODO: unnecessary break
   }
   }
 

@@ -504,7 +504,6 @@ HB_FUNC_STATIC(SR_ORACLEINBINDPARAM2)
       } else {
         ret = OCI_BindString(Stmt->stmt, Stmt->pLink[iPos].bindname, Stmt->pLink[iPos].col_name, iFieldSize);
       }
-      break; // TODO: unnecessary break
     }
     }
   }

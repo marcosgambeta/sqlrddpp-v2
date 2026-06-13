@@ -584,7 +584,6 @@ HB_FUNC(SR_ESCAPESTRING)
       }
       case SQLRDD_RDBMS_IBMDB2: {
         iSize = escape_db2(ToBuffer, FromBuffer, iSize);
-        break; // TODO: unnecessary break
       }
       }
     }
@@ -637,7 +636,6 @@ char *SR_QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatab
   }
   case SQLRDD_RDBMS_IBMDB2: {
     iSize = escape_db2(ToBuffer, FromBuffer, iSize);
-    break; // TODO: unnecessary break
   }
   }
 

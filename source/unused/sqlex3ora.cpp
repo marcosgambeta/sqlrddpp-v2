@@ -427,8 +427,6 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
         mask += 2;
         hb_compStrToNum(mask, 2, &lVal, &dVal, nullptr, nullptr);
         BindStructure->asDate.day = static_cast<unsigned int>(lVal);
-
-        break; // TODO: unnecessary break
       }
       }
 
@@ -584,7 +582,6 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
         //                        BindStructure->ColumnSize,
         //                        BindStructure->DecimalDigits,
         //                        &(BindStructure->asLogical), 0, NULL);
-        break; // TODO: unnecessary break
       }
       }
       if (res == 0) {

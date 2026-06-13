@@ -1777,7 +1777,6 @@ static HB_ERRCODE sqlInfo(SQLAREAP thiswa, HB_USHORT uiIndex, PHB_ITEM pItem)
     } else {
       hb_itemPutC(pItem, "");
     }
-    break; // TODO: unnecessary break
   }
   }
   return HB_SUCCESS;
@@ -2802,7 +2801,6 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
     }
     case DBOI_ORDERCOUNT: {
       hb_itemPutNI(pInfo->itmResult, lIndexes);
-      break; // TODO: unnecessary break
     }
     }
   } else {
@@ -3340,7 +3338,6 @@ static HB_BOOL ProcessFields(SQLAREAP thiswa)
     }
     default: {
       field.uiType = HB_IT_NIL;
-      break; // TODO: unnecessary break
     }
     }
 
