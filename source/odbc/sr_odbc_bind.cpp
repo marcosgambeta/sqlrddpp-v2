@@ -630,7 +630,7 @@ HB_FUNC_STATIC(SR_ODBCLINEPROCESSED)
                          hb_paramError(3));
   }
 
-  // bBuffer = hb_xgrab((HB_ULONG) lLen + 1);
+  // bBuffer = hb_xgrab(static_cast<HB_ULONG>(lLen) + 1);
 
   for (i = 1; i <= cols; i++) {
     //temp = hb_itemNew(nullptr); (using stack instead of heap)
@@ -709,7 +709,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
       if (wReturn == SQL_ERROR) {
         break;
       }
-      if (ulDirect == (HB_ULONG)ORD_DIR_FWD) {
+      if (ulDirect == static_cast<HB_ULONG>(ORD_DIR_FWD)) {
         hb_arraySet(pInfo, AINFO_EOF_AT, pRec);
         hb_arraySetNL(pInfo, AINFO_NCACHEEND, lPos);
       } else {
@@ -719,7 +719,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
       break;
     }
 
-    if (ulDirect == (HB_ULONG)ORD_DIR_FWD) {
+    if (ulDirect == static_cast<HB_ULONG>(ORD_DIR_FWD)) {
       lPos++;
       if (lPos > (CAHCE_PAGE_SIZE * 3)) {
         lPos -= (CAHCE_PAGE_SIZE * 3);
@@ -976,7 +976,7 @@ HB_FUNC_STATIC(SR_GETINFO)
 HB_FUNC_STATIC(SR_SETCONNECTATTR)
 {
   // hb_retnl(static_cast<HB_LONG>(SQLSetConnectAttr((SQLHDBC) hb_parptr(1), (UWORD) hb_parnl(2),
-  //    (HB_ULONG) HB_ISCHAR(3) ? static_cast<SQLPOINTER>(hb_parcx(3)) : static_cast<SQLPOINTER>(hb_parnl(3)), hb_parni(4))));
+  //    static_cast<HB_ULONG>(HB_ISCHAR(3)) ? static_cast<SQLPOINTER>(hb_parcx(3)) : static_cast<SQLPOINTER>(hb_parnl(3)), hb_parni(4))));
 #if ODBCVER >= 0x0300
   hb_retni(SQLSetConnectAttr(SR_PAR_SQLHDBC(1), SR_PAR_SQLINTEGER(2),
                              HB_ISCHAR(3) ? static_cast<SQLPOINTER>(const_cast<char *>(hb_parc(3))) : reinterpret_cast<SQLPOINTER>((HB_PTRUINT)hb_parnint(3)),
@@ -1104,7 +1104,7 @@ HB_FUNC_STATIC(SR_ODBCWRITEMEMO)
   PHB_ITEM pArray = hb_param(5, HB_IT_ARRAY);
   hDbc = SR_PAR_SQLHDBC(1);
 
-  uiLen = (HB_ULONG)hb_arrayLen(pArray);
+  uiLen = static_cast<HB_ULONG>(hb_arrayLen(pArray));
 
   if (hDbc && uiLen > 0) {
 #if ODBCVER >= 0x0300

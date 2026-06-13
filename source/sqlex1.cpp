@@ -147,7 +147,7 @@ HB_ULONG SR_GetCurrentRecordNum(SQLEXAREAP thiswa)
   if (thiswa->bIsInsert || thiswa->area.fEof) {
     return thiswa->lLastRec;
   } else {
-    return (HB_ULONG)thiswa->recordList[thiswa->recordListPos];
+    return static_cast<HB_ULONG>(thiswa->recordList[thiswa->recordListPos]);
   }
 }
 
@@ -348,7 +348,7 @@ void SR_getOrderByExpression(SQLEXAREAP thiswa, HB_BOOL bUseOptimizerHints)
   if (bUseOptimizerHints) {
     // The the index phisical name
     if (thiswa->hOrdCurrent > 0) {
-      pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
+      pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
       sprintf(thiswa->sOrderBy, "%s", hb_arrayGetCPtr(pIndexRef, INDEX_PHISICAL_NAME));
     } else {
       thiswa->sOrderBy[0] = '\0';
@@ -361,7 +361,7 @@ void SR_getOrderByExpression(SQLEXAREAP thiswa, HB_BOOL bUseOptimizerHints)
     }
     // Get the index column list
     if (thiswa->hOrdCurrent > 0) {
-      pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
+      pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
       sprintf(thiswa->sOrderBy, "\n%s", hb_arrayGetCPtr(pIndexRef, bDirectionFWD ? ORDER_ASCEND : ORDER_DESEND));
     } else {
       // sprintf(thiswa->sOrderBy, "\nORDER BY %c%s%c %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
@@ -1017,7 +1017,7 @@ void SR_SolveFilters(SQLEXAREAP thiswa, bool bWhere)
   // Resolve SET SCOPE TO
 
   if (thiswa->hOrdCurrent > 0) {
-    PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
+    PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
     const char *szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
     if (szFilter != nullptr && szFilter[0]) {
       if (bWhere) {
@@ -1077,7 +1077,7 @@ void SR_SetIndexBindStructure(SQLEXAREAP thiswa)
   int i;
 
   if (thiswa->hOrdCurrent > 0) {
-    pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
+    pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
     pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
     thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
@@ -1481,7 +1481,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXAREAP thiswa, int iMax) // Returns 
   SQLFreeStmt(hStmt, SQL_CLOSE);
 
   if (recordListChanged) {
-    thiswa->recordListSize = (HB_ULONG)i;
+    thiswa->recordListSize = static_cast<HB_ULONG>(i);
     thiswa->recordListPos = 0;
     return RESULTSET_OK;
   }
@@ -1551,7 +1551,7 @@ static HB_ERRCODE getRecordList(SQLEXAREAP thiswa, int iMax) // Returns true if 
   SQLFreeStmt(thiswa->hStmt, SQL_CLOSE);
 
   if (recordListChanged) {
-    thiswa->recordListSize = (HB_ULONG)i;
+    thiswa->recordListSize = static_cast<HB_ULONG>(i);
     thiswa->recordListPos = 0;
     return RESULTSET_OK;
   }
@@ -1743,7 +1743,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
 
   if ((static_cast<HB_LONG>(hb_hashLen(thiswa->hBufferPool))) > s_bufferPoolSize) {
     hb_hashNew(thiswa->hBufferPool);
-    hb_hashPreallocate(thiswa->hBufferPool, (HB_ULONG)(s_bufferPoolSize * 1.2));
+    hb_hashPreallocate(thiswa->hBufferPool, static_cast<HB_ULONG>(s_bufferPoolSize * 1.2));
   }
 
   // Not found, so let's try the database...
@@ -2043,7 +2043,7 @@ static HB_BOOL CreateSkipStmt(SQLEXAREAP thiswa)
     thiswa->bOrderChanged = false;
 
     if (thiswa->hOrdCurrent > 0) {
-      pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent);
+      pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
       pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
       thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
     } else {
@@ -2248,7 +2248,7 @@ static HB_ERRCODE sqlExGoTo(SQLEXAREAP thiswa, HB_LONG recno)
   // 1 - Try to look for the record in current skip sequence
 
   for (i = 0; i < thiswa->recordListSize; i++) {
-    if (thiswa->recordList[i] == (HB_ULONG)recno) {
+    if (thiswa->recordList[i] == static_cast<HB_ULONG>(recno)) {
       thiswa->recordListPos = i;
       if (updateRecordBuffer(thiswa, false) == HB_SUCCESS) {
         thiswa->area.fEof = false;
@@ -2260,7 +2260,7 @@ static HB_ERRCODE sqlExGoTo(SQLEXAREAP thiswa, HB_LONG recno)
 
   // 2 - Get it from database
 
-  thiswa->recordList[0] = (HB_ULONG)recno;
+  thiswa->recordList[0] = static_cast<HB_ULONG>(recno);
   thiswa->recordListSize = 1;
   thiswa->recordListDirection = LIST_FORWARD;
   thiswa->recordListPos = 0;
@@ -2706,7 +2706,7 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREAP thiswa, HB_LONG lToSkip)
 
     if (thiswa->hOrdCurrent > 0) {
       thiswa->indexColumns = static_cast<int>(hb_arrayLen(
-          hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent), INDEX_FIELDS)));
+          hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent)), INDEX_FIELDS)));
     } else {
       thiswa->indexColumns = 1; // Natural order, RECNO
     }
@@ -3265,9 +3265,9 @@ static HB_ERRCODE sqlExRecCount(SQLEXAREAP thiswa, HB_ULONG *recCount)
   }
 
   if (thiswa->bIsInsert && thiswa->bufferHot) {
-    *recCount = (HB_ULONG)(hb_arrayGetNL(thiswa->aInfo, AINFO_RCOUNT) + 1);
+    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->aInfo, AINFO_RCOUNT) + 1);
   } else {
-    *recCount = (HB_ULONG)(hb_arrayGetNL(thiswa->aInfo, AINFO_RCOUNT));
+    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->aInfo, AINFO_RCOUNT));
   }
 
   thiswa->lLastRec = (*recCount) + 1;
@@ -3319,7 +3319,7 @@ static HB_ERRCODE sqlExRecId(SQLEXAREAP thiswa, PHB_ITEM recno)
     if (thiswa->bIsInsert || thiswa->area.fEof) {
       hb_itemPutNL(recno, thiswa->lLastRec);
     } else {
-      hb_itemPutNL(recno, (HB_ULONG)thiswa->recordList[thiswa->recordListPos]);
+      hb_itemPutNL(recno, static_cast<HB_ULONG>(thiswa->recordList[thiswa->recordListPos]));
     }
   } else {
     hb_itemPutNL(recno, 0);
@@ -3491,7 +3491,7 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREAP thiswa)
   thiswa->InsertRecord = nullptr;
   thiswa->CurrRecord = nullptr;
 
-  hb_hashPreallocate(thiswa->hBufferPool, (HB_ULONG)(s_bufferPoolSize * 1.2));
+  hb_hashPreallocate(thiswa->hBufferPool, static_cast<HB_ULONG>(s_bufferPoolSize * 1.2));
 
   memset(thiswa->updatedMask, 0, MAX_FIELDS);
   memset(thiswa->editMask, 0, MAX_FIELDS);
@@ -3642,7 +3642,7 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
 
   if (thiswa->hOrdCurrent > 0) {
     thiswa->indexColumns = static_cast<int>(hb_arrayLen(
-        hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, (HB_ULONG)thiswa->hOrdCurrent), INDEX_FIELDS)));
+        hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent)), INDEX_FIELDS)));
     s_bOldReverseIndex = thiswa->bReverseIndex;
     thiswa->bReverseIndex = hb_arrayGetL(thiswa->aInfo, AINFO_REVERSE_INDEX);
     if (thiswa->IndexBindings[thiswa->hOrdCurrent]) {

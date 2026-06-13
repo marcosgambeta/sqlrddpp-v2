@@ -328,7 +328,7 @@ void getOrderByExpressionOra(SQLEXORAAREAP thiswa, HB_BOOL bUseOptimizerHints)
   if (bUseOptimizerHints) {
     // The the index phisical name
     if (thiswa->sqlarea.hOrdCurrent > 0) {
-      pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG)thiswa->sqlarea.hOrdCurrent);
+      pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
       sprintf(thiswa->sOrderBy, "%s", hb_arrayGetCPtr(pIndexRef, INDEX_PHISICAL_NAME));
     } else {
       thiswa->sOrderBy[0] = '\0';
@@ -341,7 +341,7 @@ void getOrderByExpressionOra(SQLEXORAAREAP thiswa, HB_BOOL bUseOptimizerHints)
     }
     // Get the index column list
     if (thiswa->sqlarea.hOrdCurrent > 0) {
-      pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG)thiswa->sqlarea.hOrdCurrent);
+      pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
       sprintf(thiswa->sOrderBy, "\n%s", hb_arrayGetCPtr(pIndexRef, bDirectionFWD ? ORDER_ASCEND : ORDER_DESEND));
     } else {
       // sprintf(thiswa->sOrderBy, "\nORDER BY %c%s%c %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
@@ -553,7 +553,7 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
       break;
     }
 
-    BindStructure->asNumeric = (HB_ULONG)hb_itemGetNLL(pFieldData);
+    BindStructure->asNumeric = static_cast<HB_ULONG>(hb_itemGetNLL(pFieldData));
     break;
   }
   case SQL_C_DOUBLE: {
@@ -629,7 +629,7 @@ HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
     break;
   }
   case SQL_C_BIT: {
-    BindStructure->asLogical = (HB_ULONG)hb_itemGetL(pFieldData);
+    BindStructure->asLogical = static_cast<HB_ULONG>(hb_itemGetL(pFieldData));
     break;
   }
   }
@@ -1034,7 +1034,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
   // Resolve SET SCOPE TO
 
   if (thiswa->sqlarea.hOrdCurrent > 0) {
-    PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG)thiswa->sqlarea.hOrdCurrent);
+    PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
     const char *szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
     if (szFilter && szFilter[0]) {
       if (bWhere) {
@@ -1094,7 +1094,7 @@ void SetIndexBindStructureOra(SQLEXORAAREAP thiswa)
   int i;
 
   if (thiswa->sqlarea.hOrdCurrent > 0) {
-    pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG)thiswa->sqlarea.hOrdCurrent);
+    pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
     pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
     thiswa->indexColumns = hb_arrayLen(pColumns);
 
@@ -1505,7 +1505,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXORAAREAP thiswa, int iMax) // Retur
   // OCI_StatementFree(thiswa->hStmtSkip);
   // thiswa->hStmtSkip = NULL;
   if (recordListChanged) {
-    thiswa->recordListSize = (HB_ULONG)i;
+    thiswa->recordListSize = static_cast<HB_ULONG>(i);
     thiswa->recordListPos = 0;
     return RESULTSET_OK;
   }
@@ -1580,7 +1580,7 @@ static HB_ERRCODE getRecordList(SQLEXORAAREAP thiswa, int iMax) // Returns true 
   OCI_StatementFree(thiswa->hStmt);
 
   if (recordListChanged) {
-    thiswa->recordListSize = (HB_ULONG)i;
+    thiswa->recordListSize = static_cast<HB_ULONG>(i);
     thiswa->recordListPos = 0;
     return RESULTSET_OK;
   }
@@ -2121,7 +2121,7 @@ static HB_BOOL CreateSkipStmtOra(SQLEXORAAREAP thiswa)
     thiswa->bOrderChanged = false;
 
     if (thiswa->sqlarea.hOrdCurrent > 0) {
-      pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG)thiswa->sqlarea.hOrdCurrent);
+      pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
       pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
       thiswa->indexColumns = hb_arrayLen(pColumns);
     } else {
@@ -2327,7 +2327,7 @@ static HB_ERRCODE sqlExOraGoTo(SQLEXORAAREAP thiswa, HB_LONG recno)
 
   // 1 - Try to look for the record in current skip sequence
   for (i = 0; i < thiswa->recordListSize; i++) {
-    if (thiswa->recordList[i] == (HB_ULONG)recno) {
+    if (thiswa->recordList[i] == static_cast<HB_ULONG>(recno)) {
       thiswa->recordListPos = i;
       if (updateRecordBuffer(thiswa, false) == HB_SUCCESS) {
         thiswa->sqlarea.area.fEof = false;
@@ -2339,7 +2339,7 @@ static HB_ERRCODE sqlExOraGoTo(SQLEXORAAREAP thiswa, HB_LONG recno)
 
   // 2 - Get it from database
 
-  thiswa->recordList[0] = (HB_ULONG)recno;
+  thiswa->recordList[0] = static_cast<HB_ULONG>(recno);
   thiswa->recordListSize = 1;
   thiswa->recordListDirection = LIST_FORWARD;
   thiswa->recordListPos = 0;
@@ -2790,7 +2790,7 @@ static HB_ERRCODE sqlExOraSkipRaw(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
 
     if (thiswa->sqlarea.hOrdCurrent > 0) {
       thiswa->indexColumns = hb_arrayLen(hb_arrayGetItemPtr(
-          hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG)thiswa->sqlarea.hOrdCurrent), INDEX_FIELDS));
+          hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent)), INDEX_FIELDS));
     } else {
       thiswa->indexColumns = 1; // Natural order, RECNO
     }
@@ -3298,9 +3298,9 @@ static HB_ERRCODE sqlExOraRecCount(SQLEXORAAREAP thiswa, HB_ULONG *recCount)
   }
 
   if (thiswa->bIsInsert && thiswa->bufferHot) {
-    *recCount = (HB_ULONG)(hb_arrayGetNL(thiswa->sqlarea.aInfo, AINFO_RCOUNT) + 1);
+    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->sqlarea.aInfo, AINFO_RCOUNT) + 1);
   } else {
-    *recCount = (HB_ULONG)(hb_arrayGetNL(thiswa->sqlarea.aInfo, AINFO_RCOUNT));
+    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->sqlarea.aInfo, AINFO_RCOUNT));
   }
 
   thiswa->lLastRec = (*recCount) + 1;
@@ -3329,7 +3329,7 @@ static HB_ERRCODE sqlExOraRecNo(SQLEXORAAREAP thiswa, HB_ULONG *recno)
     thiswa->sqlarea.firstinteract = 0;
   }
 
-  *recno = (HB_ULONG)GetCurrentRecordNumOra(thiswa);
+  *recno = static_cast<HB_ULONG>(GetCurrentRecordNumOra(thiswa));
 
   return HB_SUCCESS;
 }
@@ -3655,7 +3655,7 @@ static HB_ERRCODE sqlExOraOrderListFocus(SQLEXORAAREAP thiswa, LPDBORDERINFO pOr
 
   if (thiswa->sqlarea.hOrdCurrent > 0) {
     thiswa->indexColumns = hb_arrayLen(hb_arrayGetItemPtr(
-        hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG)thiswa->sqlarea.hOrdCurrent), INDEX_FIELDS));
+        hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent)), INDEX_FIELDS));
     bOldReverseIndex = thiswa->bReverseIndex;
     thiswa->bReverseIndex = hb_arrayGetL(thiswa->sqlarea.aInfo, AINFO_REVERSE_INDEX);
     if (thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent]) {
@@ -4250,7 +4250,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOn
         memset(szResult, ' ', lLen);
         uiLen = OCI_GetDataLength(rs, iField);
         hb_xmemcpy(szResult, static_cast<char *>(OCI_GetString(rs, iField)), uiLen);
-        // hb_itemPutCLPtr(pItem, szResult, (HB_ULONG) uiLen);
+        // hb_itemPutCLPtr(pItem, szResult, static_cast<HB_ULONG>(uiLen));
         hb_itemPutCLPtr(pItem, szResult, (HB_SIZE) lLen);
         break;
       }
@@ -4334,7 +4334,7 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOn
           }
           hb_itemRelease(pTemp);
         } else {
-          hb_itemPutCL(pItem, bBuffer, (HB_ULONG) lLenBuff);
+          hb_itemPutCL(pItem, bBuffer, static_cast<HB_ULONG>(lLenBuff));
         }
         break;
       }

@@ -691,7 +691,7 @@ static void SQLO2_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL 
     case SQL_NUMERIC:
     case SQL_FAKE_NUM: {
       //             char szResult[2] = {' ', '\0'};
-      //             sr_escapeNumber(szResult, (HB_ULONG) lLen, (HB_ULONG) lDec, pItem);
+      //             sr_escapeNumber(szResult, static_cast<HB_ULONG>(lLen), static_cast<HB_ULONG>(lDec), pItem);
       //             hb_itemPutNL(pItem,0);
       if (lDec > 0) {
         hb_itemPutNDLen(pItem, 0, static_cast<int>(lLen), static_cast<int>(lDec));

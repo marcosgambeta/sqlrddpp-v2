@@ -1396,9 +1396,9 @@ static HB_ERRCODE sqlRecCount(SQLAREAP thiswa, HB_ULONG *recCount)
   }
 
   if (hb_arrayGetL(thiswa->aInfo, AINFO_ISINSERT) && hb_arrayGetL(thiswa->aInfo, AINFO_HOT)) {
-    *recCount = (HB_ULONG)(hb_arrayGetNL(thiswa->aInfo, AINFO_RCOUNT) + 1);
+    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->aInfo, AINFO_RCOUNT) + 1);
   } else {
-    *recCount = (HB_ULONG)(hb_arrayGetNL(thiswa->aInfo, AINFO_RCOUNT));
+    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->aInfo, AINFO_RCOUNT));
   }
 
   return HB_SUCCESS;
@@ -1427,7 +1427,7 @@ static HB_ERRCODE sqlRecNo(SQLAREAP thiswa, HB_ULONG *recno)
     thiswa->firstinteract = false;
   }
 
-  *recno = (HB_ULONG)hb_arrayGetNL(thiswa->aInfo, AINFO_RECNO);
+  *recno = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->aInfo, AINFO_RECNO));
 
   return HB_SUCCESS;
 }
@@ -1631,10 +1631,10 @@ static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo)
   thiswa->isam = hb_itemGetL(hb_stackReturnItem());
 
   hb_objSendMsg(thiswa->oWorkArea, "HNRECNO", 0);
-  thiswa->ulhRecno = (HB_ULONG)hb_itemGetNL(hb_stackReturnItem());
+  thiswa->ulhRecno = static_cast<HB_ULONG>(hb_itemGetNL(hb_stackReturnItem()));
 
   hb_objSendMsg(thiswa->oWorkArea, "HNDELETED", 0);
-  thiswa->ulhDeleted = (HB_ULONG)hb_itemGetNL(hb_stackReturnItem());
+  thiswa->ulhDeleted = static_cast<HB_ULONG>(hb_itemGetNL(hb_stackReturnItem()));
 
   if (errCode != HB_SUCCESS) {
     SELF_CLOSE(&thiswa->area);
@@ -2077,10 +2077,10 @@ static HB_ERRCODE sqlOpen(SQLAREAP thiswa, LPDBOPENINFO pOpenInfo)
   }
 
   hb_objSendMsg(thiswa->oWorkArea, "HNRECNO", 0);
-  thiswa->ulhRecno = (HB_ULONG)hb_itemGetNL(hb_stackReturnItem());
+  thiswa->ulhRecno = static_cast<HB_ULONG>(hb_itemGetNL(hb_stackReturnItem()));
 
   hb_objSendMsg(thiswa->oWorkArea, "HNDELETED", 0);
-  thiswa->ulhDeleted = (HB_ULONG)hb_itemGetNL(hb_stackReturnItem());
+  thiswa->ulhDeleted = static_cast<HB_ULONG>(hb_itemGetNL(hb_stackReturnItem()));
 
   if (hb_setGetAutOpen()) {
     if (HB_IS_OBJECT(thiswa->oWorkArea)) {
@@ -2493,7 +2493,7 @@ static PHB_ITEM loadTag(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG * lorder)
 
     if (hb_itemGetNL(hb_stackReturnItem())) {
       *lorder = hb_itemGetNL(hb_stackReturnItem());
-      pTag = hb_itemArrayGet(thiswa->aOrders, (HB_ULONG) * lorder);
+      pTag = hb_itemArrayGet(thiswa->aOrders, static_cast<HB_ULONG>(*lorder));
     }
   }
   return pTag;
@@ -2539,7 +2539,7 @@ PHB_ITEM sr_loadTagDefault(SQLAREAP thiswa, LPDBORDERINFO pInfo, HB_LONG *lorder
   *lorder = hb_itemGetNL(hb_stackReturnItem());
 
   if (*lorder) {
-    pTag = hb_itemArrayGet(thiswa->aOrders, (HB_ULONG)*lorder);
+    pTag = hb_itemArrayGet(thiswa->aOrders, static_cast<HB_ULONG>(*lorder));
   }
 
   hb_itemRelease(pOrder);
@@ -2919,7 +2919,7 @@ static HB_ERRCODE sqlScopeInfo(SQLAREAP thiswa, HB_USHORT nScope, PHB_ITEM pItem
     }
     lorder = hb_itemGetNL(hb_stackReturnItem());
     if (lorder) {
-      pTag = hb_itemArrayGet(thiswa->aOrders, (HB_ULONG)lorder);
+      pTag = hb_itemArrayGet(thiswa->aOrders, static_cast<HB_ULONG>(lorder));
       pTemp = hb_itemArrayGet(pTag, nScope ? BOTTOM_SCOPE : TOP_SCOPE);
       hb_itemCopy(pItem, pTemp);
       hb_itemRelease(pTag);

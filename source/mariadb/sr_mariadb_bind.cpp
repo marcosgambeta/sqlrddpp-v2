@@ -186,7 +186,7 @@ HB_FUNC_STATIC(SR_MARIADBGETCONNID)
 HB_FUNC_STATIC(SR_MARIADBKILLCONNID)
 {
   GET_MARIADB_SESSION(session, 1);
-  HB_ULONG ulThreadID = (HB_ULONG)hb_itemGetNL(hb_param(2, HB_IT_LONG));
+  HB_ULONG ulThreadID = static_cast<HB_ULONG>(hb_itemGetNL(hb_param(2, HB_IT_LONG)));
 
   if (session == nullptr || session->dbh == nullptr) {
     hb_retni(-1);

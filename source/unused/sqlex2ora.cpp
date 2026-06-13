@@ -852,7 +852,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
 
   if ((!thiswa->bIndexTouchedInUpdate) && thiswa->sqlarea.hOrdCurrent) {
     // Check if any updated column is included in current index column list
-    pColumns = hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, (HB_ULONG)thiswa->sqlarea.hOrdCurrent),
+    pColumns = hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent)),
                                   INDEX_FIELDS);
     thiswa->indexColumns = hb_arrayLen(pColumns);
 
