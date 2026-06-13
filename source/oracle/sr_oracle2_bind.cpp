@@ -848,11 +848,11 @@ HB_FUNC(SQLO2_LINE) // TODO: not used in SQLRDD source code
   GET_OCI_SESSION(session, 1);
   const char **line;
   CONST unsigned int *lens;
-  PHB_ITEM ret, temp;
+  PHB_ITEM temp;
   HB_USHORT i;
   SQLO2_stmt_handle_t stmtParamRes;
 
-  ret = hb_itemNew(nullptr);
+  auto ret = hb_itemNew(nullptr);
 
   if (session != nullptr) {
     stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;

@@ -425,7 +425,7 @@ HB_FUNC_STATIC(SR_PGSTRANSSTATUS)
 HB_FUNC_STATIC(SR_PGSQUERYATTR)
 {
   int row, rows, type;
-  PHB_ITEM ret, atemp /*, temp*/;
+  //PHB_ITEM temp;
   HB_ITEM temp{};
   HB_LONG typmod;
   GET_PGSQL_SESSION(session, 1);
@@ -441,9 +441,9 @@ HB_FUNC_STATIC(SR_PGSQUERYATTR)
   }
 
   rows = PQnfields(session->stmt);
-  ret = hb_itemNew(nullptr);
+  auto ret = hb_itemNew(nullptr);
   //temp = hb_itemNew(nullptr); (using stack instead of heap)
-  atemp = hb_itemNew(nullptr);
+  auto atemp = hb_itemNew(nullptr);
 
   hb_arrayNew(ret, rows);
 
@@ -625,7 +625,7 @@ HB_FUNC_STATIC(SR_PGSTABLEATTR)
 {
   char attcmm[512];
   int row, rows;
-  PHB_ITEM ret, atemp /*, temp*/;
+  //PHB_ITEM temp;
   HB_ITEM temp{};
   PGresult *stmtTemp;
   GET_PGSQL_SESSION(session, 1);
@@ -654,8 +654,8 @@ HB_FUNC_STATIC(SR_PGSTABLEATTR)
   }
 
   rows = PQntuples(stmtTemp);
-  ret = hb_itemNew(nullptr);
-  atemp = hb_itemNew(nullptr);
+  auto ret = hb_itemNew(nullptr);
+  auto atemp = hb_itemNew(nullptr);
   //temp = hb_itemNew(nullptr); (using stack instead of heap)
 
   hb_arrayNew(ret, rows);

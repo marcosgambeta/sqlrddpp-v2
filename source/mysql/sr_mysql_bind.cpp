@@ -658,7 +658,7 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
 {
   GET_MYSQL_SESSION(session, 1);
   int row, rows, type;
-  PHB_ITEM ret, /* temp, */ atemp;
+  //PHB_ITEM temp;
   HB_ITEM temp{};
   MYSQL_FIELD *field;
 
@@ -672,9 +672,9 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
   }
 
   rows = session->numcols;
-  ret = hb_itemNew(nullptr);
+  auto ret = hb_itemNew(nullptr);
   //temp = hb_itemNew(nullptr); (using heap instead of stack)
-  atemp = hb_itemNew(nullptr);
+  auto atemp = hb_itemNew(nullptr);
 
   hb_arrayNew(ret, rows);
 
@@ -813,7 +813,6 @@ HB_FUNC_STATIC(SR_MYSTABLEATTR)
 {
   char attcmm[256] = {0};
   int row, rows, type;
-  PHB_ITEM ret, atemp, temp;
   PMYSQL_SESSION session;
 
   MYSQL_FIELD *field;
@@ -835,9 +834,9 @@ HB_FUNC_STATIC(SR_MYSTABLEATTR)
     SR_TraceLog(LOGFILE, "Query error : %i - %s\n", mysql_errno(session->dbh), mysql_error(session->dbh));
   }
 
-  ret = hb_itemNew(nullptr);
-  temp = hb_itemNew(nullptr);
-  atemp = hb_itemNew(nullptr);
+  auto ret = hb_itemNew(nullptr);
+  auto temp = hb_itemNew(nullptr);
+  auto atemp = hb_itemNew(nullptr);
 
   rows = mysql_num_fields(session->stmt);
   hb_arrayNew(ret, rows);
