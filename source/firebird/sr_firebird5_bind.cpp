@@ -108,7 +108,7 @@ static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
 
 static char isc_tpb[] = {isc_tpb_version3, isc_tpb_write, isc_tpb_read_committed, isc_tpb_rec_version, isc_tpb_nowait};
 
-typedef struct _FB_SESSION
+struct _FB_SESSION
 {
   isc_db_handle db;
   ISC_STATUS status[20];
@@ -119,15 +119,18 @@ typedef struct _FB_SESSION
   long errorcode;
   int transactionPending;
   int queryType;
-} FB_SESSION;
+};
 
-typedef FB_SESSION *PFB_SESSION;
+using FB_SESSION = _FB_SESSION;
+using PFB_SESSION = FB_SESSION *;
 
-typedef struct vary1
+struct vary1
 {
   short vary_length;
   char vary_string[1];
-} VARY;
+};
+
+using VARY = vary1;
 
 /*
 #if 0 // TODO:  warning: unused variable 'divider' [-Wunused-const-variable] [clang++]
