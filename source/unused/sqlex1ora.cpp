@@ -3027,13 +3027,13 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
       }
       hb_itemRelease(pLangItem);
     } else {
-      auto pLangItem = hb_itemNew(nullptr);
+      HB_ITEM pLangItem{};
       HB_SIZE nLen = pField->uiLen, nSrcLen;
       auto empty = static_cast<char *>(hb_xgrab(nLen + 1));
 
-      if (hb_hashScan(itemTemp, sr_getBaseLang(pLangItem), &ulPos) ||
-          hb_hashScan(itemTemp, sr_getSecondLang(pLangItem), &ulPos) ||
-          hb_hashScan(itemTemp, sr_getRootLang(pLangItem), &ulPos)) {
+      if (hb_hashScan(itemTemp, sr_getBaseLang(&pLangItem), &ulPos) ||
+          hb_hashScan(itemTemp, sr_getSecondLang(&pLangItem), &ulPos) ||
+          hb_hashScan(itemTemp, sr_getRootLang(&pLangItem), &ulPos)) {
         itemTemp3 = hb_hashGetValueAt(itemTemp, ulPos);
         nSrcLen = hb_itemGetCLen(itemTemp3);
         hb_xmemcpy(empty, hb_itemGetCPtr(itemTemp3), HB_MIN(nLen, nSrcLen));
@@ -3055,7 +3055,6 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
       }
       empty[nLen] = '\0';
       hb_itemPutCLPtr(value, empty, nLen);
-      hb_itemRelease(pLangItem);
     }
   } else {
     // if (HB_IS_NIL(itemTemp)) {
@@ -3217,9 +3216,8 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
 
     hb_arraySet(thiswa->sqlarea.aBuffer, fieldindex, value);
   } else if (HB_IS_STRING(value) && HB_IS_HASH(pDest) && sr_isMultilang()) {
-    auto pLangItem = hb_itemNew(nullptr);
-    hb_hashAdd(pDest, sr_getBaseLang(pLangItem), value);
-    hb_itemRelease(pLangItem);
+    HB_ITEM pLangItem{};
+    hb_hashAdd(pDest, sr_getBaseLang(&pLangItem), value);
   } else if (pField->uiType == HB_FT_MEMO) { // Memo fields can hold ANY datatype
     hb_arraySet(thiswa->sqlarea.aBuffer, fieldindex, value);
   } else {
@@ -4318,12 +4316,11 @@ void SQLO_FieldGet(PHB_ITEM pField, PHB_ITEM pItem, int iField, HB_BOOL bQueryOn
           hb_itemMove(pTemp, hb_stackReturnItem());
 
           if (HB_IS_HASH(pTemp) && sr_isMultilang() && bTranslate) {
-            auto pLangItem = hb_itemNew(nullptr);
+            HB_ITEM pLangItem{};
             HB_ULONG ulPos;
-            if (hb_hashScan(pTemp, sr_getBaseLang(pLangItem), &ulPos) || hb_hashScan(pTemp, sr_getSecondLang(pLangItem), &ulPos) || hb_hashScan(pTemp, sr_getRootLang(pLangItem), &ulPos)) {
+            if (hb_hashScan(pTemp, sr_getBaseLang(&pLangItem), &ulPos) || hb_hashScan(pTemp, sr_getSecondLang(&pLangItem), &ulPos) || hb_hashScan(pTemp, sr_getRootLang(&pLangItem), &ulPos)) {
               hb_itemCopy(pItem, hb_hashGetValueAt(pTemp, ulPos));
             }
-            hb_itemRelease(pLangItem);
           } else {
             hb_itemMove(pItem, pTemp);
           }
