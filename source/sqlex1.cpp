@@ -2885,10 +2885,19 @@ static HB_ERRCODE sqlExDeleted(SQLEXAREAP thiswa, HB_BOOL *isDeleted)
 
 // (DBENTRYP_SP)
 #define sqlExFieldCount nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VF)
 #define sqlExFieldDisplay nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_SSI)
 #define sqlExFieldInfo nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_SCP)
 #define sqlExFieldName nullptr
 
@@ -3096,6 +3105,9 @@ static HB_ERRCODE sqlExGoCold(SQLEXAREAP thiswa)
 
 // (DBENTRYP_V)
 #define sqlExGoHot nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_P)
 #define sqlExPutRec nullptr
 
@@ -3320,6 +3332,9 @@ static HB_ERRCODE sqlExRecId(SQLEXAREAP thiswa, PHB_ITEM recno)
 
 // (DBENTRYP_S)
 #define sqlExSetFieldExtent nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_CP)
 #define sqlExAlias nullptr
 
@@ -3534,38 +3549,89 @@ static HB_ERRCODE sqlExStructSize(SQLEXAREAP thiswa, HB_USHORT *StructSize)
 
 // (DBENTRYP_CP)
 #define sqlExSysName nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VEI)
 #define sqlExEval nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_V)
 #define sqlExPack nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_LSP)
 #define sqlExPackRec nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VS)
 #define sqlExSort nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VT)
 #define sqlExTrans nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VT)
 #define sqlExTransRec nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_V)
 #define sqlExZap nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VR)
 #define sqlExChildEnd nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VR)
 #define sqlExChildStart nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VR)
 #define sqlExChildSync nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_V)
 #define sqlExSyncChildren nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_V)
 #define sqlExClearRel nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_V)
 #define sqlExForceRel nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_SSP)
 #define sqlExRelArea nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VR)
 #define sqlExRelEval nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_SI)
 #define sqlExRelText nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VR)
 #define sqlExSetRel nullptr
 
@@ -3648,6 +3714,9 @@ static HB_ERRCODE sqlExOrderListFocus(SQLEXAREAP thiswa, LPDBORDERINFO pOrderInf
 
 // (DBENTRYP_V)
 #define sqlExOrderListRebuild nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VOO)
 #define sqlExOrderCondition nullptr
 
@@ -3777,10 +3846,19 @@ static HB_ERRCODE sqlExClearFilter(SQLEXAREAP thiswa)
 
 // (DBENTRYP_V)
 #define sqlExClearLocate nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_V)
 #define sqlExClearScope nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VPLP)
 #define sqlExCountScope nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_I)
 #define sqlExFilterText nullptr
 
@@ -3816,6 +3894,8 @@ static HB_ERRCODE sqlExSetFilter(SQLEXAREAP thiswa, LPDBFILTERINFO pFilterInfo)
   return ret;
 }
 
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VLO)
 #define sqlExSetLocate nullptr
 
@@ -3836,14 +3916,29 @@ static HB_ERRCODE sqlExSetScope(SQLEXAREAP thiswa, LPDBORDSCOPEINFO sInfo)
 
 // (DBENTRYP_VPL)
 #define sqlExSkipScope nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_B)
 #define sqlExLocate nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_CC)
 #define sqlExCompile nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_I)
 #define sqlExError nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_I)
 #define sqlExEvalBlock nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VSP)
 #define sqlExRawLock nullptr
 
@@ -3893,30 +3988,69 @@ static HB_ERRCODE sqlExUnLock(SQLEXAREAP thiswa, PHB_ITEM pRecNo)
 
 // (DBENTRYP_V)
 #define sqlExCloseMemFile nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VO)
 #define sqlExCreateMemFile nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_SCCS)
 #define sqlExGetValueFile nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_VO)
 #define sqlExOpenMemFile nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_SCCS)
 #define sqlExPutValueFile nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_V)
 #define sqlExReadDBHeader nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_V)
 #define sqlExWriteDBHeader nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_R)
 #define sqlExInit nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_R)
 #define sqlExExit nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_RVVL)
 #define sqlExDrop nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_RVVL)
 #define sqlExExists nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_RVVVL)
 #define sqlExRename nullptr
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_RSLV)
 #define sqlExInfo nullptr // TODO: duplicated
+
+//------------------------------------------------------------------------
+
 // (DBENTRYP_SVP)
 #define sqlExWhoCares nullptr
 
