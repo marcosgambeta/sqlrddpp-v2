@@ -3277,13 +3277,13 @@ static bool ProcessFields(SQLAREAP thiswa)
     memset(&field, 0, sizeof(field));
 
     field.uiTypeExtended = 0;
-    field.atomName = hb_arrayGetC(thisfield, static_cast<HB_USHORT>(1));
-    field.uiDec = static_cast<HB_USHORT>(0);
-    field.uiLen = static_cast<HB_USHORT>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(3)));
+    field.atomName = hb_arrayGetC(thisfield, 1);
+    field.uiDec = 0;
+    field.uiLen = static_cast<HB_USHORT>(hb_arrayGetNI(thisfield, 3));
 
-    thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(5)));
+    thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, 5));
 
-    fieldType = (unsigned char *)hb_arrayGetCPtr(thisfield, static_cast<HB_USHORT>(2));
+    fieldType = (unsigned char *)hb_arrayGetCPtr(thisfield, 2);
 
     switch (*fieldType) {
     case 'c':
@@ -3299,7 +3299,7 @@ static bool ProcessFields(SQLAREAP thiswa)
     case 'n':
     case 'N': {
       field.uiType = HB_FT_LONG;
-      field.uiDec = static_cast<HB_USHORT>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(4)));
+      field.uiDec = static_cast<HB_USHORT>(hb_arrayGetNI(thisfield, 4));
       break;
     }
     case 'l':
@@ -3375,7 +3375,7 @@ static bool SetFields(SQLAREAP thiswa)
       return false;
     }
 
-    thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(5)));
+    thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, 5));
     hb_itemRelease(thisfield);
   }
   return true;
