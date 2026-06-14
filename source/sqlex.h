@@ -144,12 +144,12 @@ typedef struct _COLUMNBIND
                                     // of numeric variables in SQL
   SQLUINTEGER ColumnSize;           // To make an easy bind
   SQLSMALLINT DecimalDigits;        // To make an easy bind
-  HB_BOOL isNullable;               // Is this column NULLABLE ?
-  HB_BOOL isArgumentNull;           // Value to be bound is NULL ?
-  HB_BOOL isBoundNULL;              // Field was bound as NULL ?
+  bool isNullable;                  // Is this column NULLABLE ?
+  bool isArgumentNull;              // Value to be bound is NULL ?
+  bool isBoundNULL;                 // Field was bound as NULL ?
   SQLLEN lIndPtr;                   // Buffer lenght pointer to be used in SQLBindParam()
-  HB_BOOL isMemo;                   // Field is MEMO ?
-  HB_BOOL isMultiLang;              // Fiels is multi language ?
+  bool isMemo;                      // Field is MEMO ?
+  bool isMultiLang;                 // Fiels is multi language ?
 } COLUMNBIND;
 
 typedef COLUMNBIND *COLUMNBINDP;
