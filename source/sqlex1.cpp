@@ -1755,7 +1755,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
               OPEN_QUALIFIER(thiswa), thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa));
     }
 
-    iEnd = (HB_USHORT)strlen(thiswa->sSqlBuffer);
+    iEnd = static_cast<HB_USHORT>(strlen(thiswa->sSqlBuffer));
     for (i = 20; i < (MAX_SQL_QUERY_LEN / 5); i++) {
       if (thiswa->sSqlBuffer[i] == '?') {
         iEnd = i;
@@ -3131,7 +3131,7 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
     SELF_FORCEREL((AREAP)thiswa);
   }
 
-  fieldindex = (HB_USHORT)thiswa->uiBufferIndex[fieldNum - 1];
+  fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
   thiswa->editMask[fieldindex - 1] = '1';
   pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
 
@@ -4238,7 +4238,7 @@ static void hb_sqlExRddInit(void *cargo)
   HB_SYMBOL_UNUSED(cargo);
 
   if (hb_rddRegister("SQLRDD", RDT_FULL) <= 1) {
-    usResult = (HB_USHORT)hb_rddRegister("SQLEX", RDT_FULL);
+    usResult = static_cast<HB_USHORT>(hb_rddRegister("SQLEX", RDT_FULL));
     if (usResult <= 1) {
       if (usResult == 0) {
         PHB_DYNS pDynSym;

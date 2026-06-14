@@ -1267,7 +1267,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     SELF_FORCEREL(&thiswa->area);
   }
 
-  fieldindex = (HB_USHORT)thiswa->uiBufferIndex[fieldNum - 1];
+  fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
   pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
   //                if( s_pSym_SR_FROMXML == NULL ) {
   //                   s_pSym_SR_FROMXML = hb_dynsymFindName("ESCREVE");
@@ -3055,17 +3055,17 @@ static HB_ERRCODE sqlLock(SQLAREAP thiswa, LPDBLOCKINFO pLockInfo)
       hb_arrayGet(thiswa->aInfo, AINFO_RECNO, pRecord);
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 2, pMethod, pRecord);
       hb_itemRelease(pRecord);
-      pLockInfo->fResult = (HB_USHORT)hb_itemGetL(hb_stackReturnItem());
+      pLockInfo->fResult = static_cast<HB_USHORT>(hb_itemGetL(hb_stackReturnItem()));
       break;
     }
     case DBLM_MULTIPLE: {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 2, pMethod, pLockInfo->itmRecID);
-      pLockInfo->fResult = (HB_USHORT)hb_itemGetL(hb_stackReturnItem());
+      pLockInfo->fResult = static_cast<HB_USHORT>(hb_itemGetL(hb_stackReturnItem()));
       break;
     }
     case DBLM_FILE: {
       hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLLOCK, 1, pMethod);
-      pLockInfo->fResult = (HB_USHORT)hb_itemGetL(hb_stackReturnItem());
+      pLockInfo->fResult = static_cast<HB_USHORT>(hb_itemGetL(hb_stackReturnItem()));
       break;
     }
     default: {
@@ -3263,9 +3263,9 @@ static bool ProcessFields(SQLAREAP thiswa)
     return false;
   }
 
-  SELF_SETFIELDEXTENT(&thiswa->area, (HB_USHORT)numFields);
+  SELF_SETFIELDEXTENT(&thiswa->area, static_cast<HB_USHORT>(numFields));
 
-  for (i = 1; i <= (HB_USHORT)numFields; i++) {
+  for (i = 1; i <= static_cast<HB_USHORT>(numFields); i++) {
     thisfield = hb_itemArrayGet(thiswa->aStruct, i);
 
     if (hb_itemType(thisfield) != HB_IT_ARRAY) {
@@ -3277,13 +3277,13 @@ static bool ProcessFields(SQLAREAP thiswa)
     memset(&field, 0, sizeof(field));
 
     field.uiTypeExtended = 0;
-    field.atomName = hb_arrayGetC(thisfield, (HB_USHORT)1);
-    field.uiDec = (HB_USHORT)0;
-    field.uiLen = (HB_USHORT)hb_arrayGetNI(thisfield, (HB_USHORT)3);
+    field.atomName = hb_arrayGetC(thisfield, static_cast<HB_USHORT>(1));
+    field.uiDec = static_cast<HB_USHORT>(0);
+    field.uiLen = static_cast<HB_USHORT>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(3)));
 
-    thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, (HB_USHORT)5));
+    thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(5)));
 
-    fieldType = (unsigned char *)hb_arrayGetCPtr(thisfield, (HB_USHORT)2);
+    fieldType = (unsigned char *)hb_arrayGetCPtr(thisfield, static_cast<HB_USHORT>(2));
 
     switch (*fieldType) {
     case 'c':
@@ -3299,7 +3299,7 @@ static bool ProcessFields(SQLAREAP thiswa)
     case 'n':
     case 'N': {
       field.uiType = HB_FT_LONG;
-      field.uiDec = (HB_USHORT)hb_arrayGetNI(thisfield, (HB_USHORT)4);
+      field.uiDec = static_cast<HB_USHORT>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(4)));
       break;
     }
     case 'l':
@@ -3367,7 +3367,7 @@ static bool SetFields(SQLAREAP thiswa)
     return false;
   }
 
-  for (i = 1; i <= (HB_USHORT)numFields; i++) {
+  for (i = 1; i <= static_cast<HB_USHORT>(numFields); i++) {
     thisfield = hb_itemArrayGet(thiswa->aStruct, i);
 
     if (hb_itemType(thisfield) != HB_IT_ARRAY) {
@@ -3375,7 +3375,7 @@ static bool SetFields(SQLAREAP thiswa)
       return false;
     }
 
-    thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, (HB_USHORT)5));
+    thiswa->uiBufferIndex[i - 1] = static_cast<int>(hb_arrayGetNI(thisfield, static_cast<HB_USHORT>(5)));
     hb_itemRelease(thisfield);
   }
   return true;

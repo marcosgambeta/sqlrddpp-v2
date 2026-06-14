@@ -633,7 +633,7 @@ HB_FUNC_STATIC(SR_ODBCLINEPROCESSED)
   for (i = 1; i <= cols; i++) {
     //temp = hb_itemNew(nullptr); (using stack instead of heap)
     HB_ITEM temp{};
-    lIndex = (HB_USHORT)hb_arrayGetNI(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM);
+    lIndex = static_cast<HB_USHORT>(hb_arrayGetNI(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM));
 
     if (lIndex == 0) {
       hb_arraySetForward(pRet, i, &temp);
