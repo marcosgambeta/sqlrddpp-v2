@@ -3610,27 +3610,23 @@ HB_FUNC(SQLRDD)
 
 HB_FUNC(SQLRDD_GETFUNCTABLE)
 {
-  RDDFUNCS *pTable;
-  HB_USHORT *uiCount;
-
   startSQLRDDSymbols();
 
-  uiCount = (HB_USHORT *)hb_parptr(1);
-  pTable = (RDDFUNCS *)hb_parptr(2);
+  auto uiCount = static_cast<HB_USHORT *>(hb_parptr(1));
+  auto pTable = static_cast<RDDFUNCS *>(hb_parptr(2));
 
   HB_TRACE(HB_TR_DEBUG, ("SQLRDD_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
-  if (pTable) {
-    HB_ERRCODE errCode;
-
-    if (uiCount) {
-      *uiCount = RDDFUNCSCOUNT;
-    }
-    errCode = hb_rddInherit(pTable, &sqlTable, &sqlrddSuper, nullptr);
-    hb_retni(errCode);
-  } else {
+  if (pTable == nullptr) {
     hb_retni(HB_FAILURE);
+    return;
   }
+
+  if (uiCount) {
+    *uiCount = RDDFUNCSCOUNT;
+  }
+
+  hb_retni(hb_rddInherit(pTable, &sqlTable, &sqlrddSuper, nullptr));
 }
 
 //------------------------------------------------------------------------

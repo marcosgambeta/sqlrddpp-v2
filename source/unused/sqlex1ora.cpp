@@ -3984,27 +3984,23 @@ HB_FUNC(SQLEXORA)
 
 HB_FUNC(SQLEXORA_GETFUNCTABLE)
 {
-  RDDFUNCS *pTable;
-  HB_USHORT *uiCount;
-
   // startsqlExOraSymbols();
 
-  uiCount = (HB_USHORT *)hb_parptr(1);
-  pTable = (RDDFUNCS *)hb_parptr(2);
+  auto uiCount = static_cast<HB_USHORT *>(hb_parptr(1));
+  auto pTable = static_cast<RDDFUNCS *>(hb_parptr(2));
 
   HB_TRACE(HB_TR_DEBUG, ("sqlExOra_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
-  if (pTable) {
-    HB_ERRCODE errCode;
-
-    if (uiCount) {
-      *uiCount = RDDFUNCSCOUNT;
-    }
-    errCode = hb_rddInherit(pTable, &sqlTable, &sqlExOraSuper, static_cast<const char *>("SQLRDD"));
-    hb_retni(errCode);
-  } else {
+  if (pTable == nullptr) {
     hb_retni(HB_FAILURE);
+    return;
   }
+
+  if (uiCount) {
+    *uiCount = RDDFUNCSCOUNT;
+  }
+
+  hb_retni(hb_rddInherit(pTable, &sqlTable, &sqlExOraSuper, static_cast<const char *>("SQLRDD")));
 }
 
 #define __PRG_SOURCE__ __FILE__
