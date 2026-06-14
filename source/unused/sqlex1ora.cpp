@@ -2178,7 +2178,7 @@ static HB_ERRCODE sqlExOraBof(SQLEXORAAREAP thiswa, HB_BOOL *bof)
 {
   if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   if (thiswa->sqlarea.lpdbPendingRel) {
@@ -2196,7 +2196,7 @@ static HB_ERRCODE sqlExOraEof(SQLEXORAAREAP thiswa, HB_BOOL *eof)
 {
   if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   if (thiswa->sqlarea.lpdbPendingRel) {
@@ -2230,8 +2230,8 @@ static HB_ERRCODE sqlExOraFound(SQLEXORAAREAP thiswa, HB_BOOL *found)
 static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
 {
   thiswa->sqlarea.lpdbPendingRel = nullptr;
-  thiswa->sqlarea.firstinteract = 0;
-  thiswa->sqlarea.wasdel = 0;
+  thiswa->sqlarea.firstinteract = false;
+  thiswa->sqlarea.wasdel = false;
   thiswa->sqlarea.area.fFound = false;
 
   if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
@@ -2309,8 +2309,8 @@ static HB_ERRCODE sqlExOraGoTo(SQLEXORAAREAP thiswa, HB_LONG recno)
 
   // Reset parent rel struct
   thiswa->sqlarea.lpdbPendingRel = nullptr;
-  thiswa->sqlarea.firstinteract = 0;
-  thiswa->sqlarea.wasdel = 0;
+  thiswa->sqlarea.firstinteract = false;
+  thiswa->sqlarea.wasdel = false;
   thiswa->sqlarea.area.fFound = false;
 
   if (recno == 0) {
@@ -2356,8 +2356,8 @@ static HB_ERRCODE sqlExOraGoTo(SQLEXORAAREAP thiswa, HB_LONG recno)
 
 static HB_ERRCODE sqlExOraGoToId(SQLEXORAAREAP thiswa, PHB_ITEM pItem)
 {
-  thiswa->sqlarea.firstinteract = 0;
-  thiswa->sqlarea.wasdel = 0;
+  thiswa->sqlarea.firstinteract = false;
+  thiswa->sqlarea.wasdel = false;
 
   if (SELF_GOCOLD(&thiswa->sqlarea.area) == HB_FAILURE) {
     return HB_FAILURE;
@@ -2376,8 +2376,8 @@ static HB_ERRCODE sqlExOraGoToId(SQLEXORAAREAP thiswa, PHB_ITEM pItem)
 static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
 {
   thiswa->sqlarea.lpdbPendingRel = nullptr;
-  thiswa->sqlarea.firstinteract = 0;
-  thiswa->sqlarea.wasdel = 0;
+  thiswa->sqlarea.firstinteract = false;
+  thiswa->sqlarea.wasdel = false;
   thiswa->sqlarea.area.fFound = false;
 
   if (getWorkareaParamsOra(thiswa) == HB_FAILURE) { // If workarea was opened by dbCreate()
@@ -2458,8 +2458,8 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
   OCI_Resultset *rs;
 
   thiswa->sqlarea.lpdbPendingRel = nullptr;
-  thiswa->sqlarea.firstinteract = 0;
-  thiswa->sqlarea.wasdel = 0;
+  thiswa->sqlarea.firstinteract = false;
+  thiswa->sqlarea.wasdel = false;
   thiswa->sqlarea.area.fTop = thiswa->sqlarea.area.fBottom = false;
   thiswa->sqlarea.area.fEof = false;
   thiswa->sqlarea.area.fFound = false;
@@ -2631,7 +2631,7 @@ static HB_ERRCODE sqlExOraSkip(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
     }
   } else if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   // Flush record and exit
@@ -2643,7 +2643,7 @@ static HB_ERRCODE sqlExOraSkip(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
   thiswa->lCurrentRecord = GetCurrentRecordNumOra(thiswa);
 
   thiswa->sqlarea.area.fTop = thiswa->sqlarea.area.fBottom = false;
-  thiswa->sqlarea.wasdel = 0;
+  thiswa->sqlarea.wasdel = false;
   thiswa->sqlarea.area.fBof = thiswa->sqlarea.area.fEof = false;
 
   if (lToSkip > 0) {
@@ -2859,8 +2859,8 @@ static HB_ERRCODE sqlExOraAppend(SQLEXORAAREAP thiswa)
 {
   // Reset parent rel struct
   thiswa->sqlarea.lpdbPendingRel = nullptr;
-  thiswa->sqlarea.firstinteract = 0;
-  thiswa->sqlarea.wasdel = 0;
+  thiswa->sqlarea.firstinteract = false;
+  thiswa->sqlarea.wasdel = false;
 
   hb_arraySize(thiswa->sqlarea.aLocked, 0);
 
@@ -2893,7 +2893,7 @@ static HB_ERRCODE sqlExOraDeleteRec(SQLEXORAAREAP thiswa)
 
   if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   if (thiswa->sqlarea.lpdbPendingRel) {
@@ -2947,7 +2947,7 @@ static HB_ERRCODE sqlExOraDeleted(SQLEXORAAREAP thiswa, HB_BOOL *isDeleted)
 {
   if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   if (thiswa->sqlarea.lpdbPendingRel) {
@@ -2992,7 +2992,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
     SELF_FORCEREL(&thiswa->sqlarea.area);
   } else if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   itemTemp = hb_itemArrayGet(thiswa->sqlarea.aBuffer, thiswa->sqlarea.uiBufferIndex[fieldNum - 1]);
@@ -3156,7 +3156,7 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
 
   if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   if (thiswa->sqlarea.lpdbPendingRel) {
@@ -3255,7 +3255,7 @@ static HB_ERRCODE sqlExOraRecall(SQLEXORAAREAP thiswa)
     SELF_FORCEREL(&thiswa->sqlarea.area);
   } else if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   SELF_DELETED(&thiswa->sqlarea.area, &isDeleted);
@@ -3321,7 +3321,7 @@ static HB_ERRCODE sqlExOraRecNo(SQLEXORAAREAP thiswa, HB_ULONG *recno)
     SELF_FORCEREL(&thiswa->sqlarea.area);
   } else if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   *recno = static_cast<HB_ULONG>(GetCurrentRecordNumOra(thiswa));
@@ -3337,7 +3337,7 @@ static HB_ERRCODE sqlExOraRecId(SQLEXORAAREAP thiswa, PHB_ITEM recno)
     SELF_FORCEREL(&thiswa->sqlarea.area);
   } else if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   if (thiswa->sqlarea.initialized) {
@@ -3859,7 +3859,7 @@ static HB_ERRCODE sqlExOraLock(SQLEXORAAREAP thiswa, LPDBLOCKINFO pLockInfo)
 
   if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   hb_arraySetL(thiswa->sqlarea.aInfo, AINFO_BOF, thiswa->sqlarea.area.fBof);
@@ -3879,7 +3879,7 @@ static HB_ERRCODE sqlExOraUnLock(SQLEXORAAREAP thiswa, PHB_ITEM pRecNo)
 
   if (thiswa->sqlarea.firstinteract) {
     SELF_GOTOP(&thiswa->sqlarea.area);
-    thiswa->sqlarea.firstinteract = 0;
+    thiswa->sqlarea.firstinteract = false;
   }
 
   hb_arraySetL(thiswa->sqlarea.aInfo, AINFO_BOF, thiswa->sqlarea.area.fBof);
@@ -4098,7 +4098,7 @@ static int sqlKeyCompareEx(SQLEXORAAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
   if (pTag) {
     if (thiswa->sqlarea.firstinteract) {
       SELF_GOTOP(&thiswa->sqlarea.area);
-      thiswa->sqlarea.firstinteract = 0;
+      thiswa->sqlarea.firstinteract = false;
     }
 
     itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
