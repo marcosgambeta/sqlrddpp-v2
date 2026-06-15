@@ -355,14 +355,13 @@ void getOrderByExpressionOra(SQLEXORAAREAP thiswa, HB_BOOL bUseOptimizerHints)
 
 static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB_LONG lFieldPosDB)
 {
-  PHB_ITEM pFieldStruct;
   char *colName;
   char sSql[DEFAULT_INDEX_COLUMN_MAX_LEN];
   HB_BOOL res;
 
   OCI_Resultset *rs;
 
-  pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, (HB_SIZE)lFieldPosDB);
+  auto pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, (HB_SIZE)lFieldPosDB);
 
   if (thiswa->colStmt[lFieldPosDB - 1].pStmt == nullptr) {
     // res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->colStmt[lFieldPosDB - 1]));
@@ -1031,7 +1030,7 @@ void SolveFiltersOra(SQLEXORAAREAP thiswa, HB_BOOL bWhere)
   // Resolve SET SCOPE TO
 
   if (thiswa->sqlarea.hOrdCurrent > 0) {
-    PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
+    auto pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
     const char *szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
     if (szFilter && szFilter[0]) {
       if (bWhere) {

@@ -1388,7 +1388,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED4)
             } else {
               // sprintf(p, "%*" ISC_INT64_FORMAT "d%", field_width, (ISC_INT64) value);
               // hb_snprintf(data, sizeof(data), "%*" ISC_INT64_FORMAT "d", field_width, (ISC_INT64) value);
-              PHB_ITEM pField = hb_arrayGetItemPtr(pFields, icol);
+              auto pField = hb_arrayGetItemPtr(pFields, icol);
               HB_LONG lType = hb_arrayGetNL(pField, 6);
               if (lType == SQL_BIT || lType == SQL_SMALLINT) {
                 hb_itemPutL(&temp, (HB_BOOL)value);

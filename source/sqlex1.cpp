@@ -390,7 +390,6 @@ void SR_getOrderByExpression(SQLEXAREAP thiswa, HB_BOOL bUseOptimizerHints)
 
 static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LONG lFieldPosDB)
 {
-  PHB_ITEM pFieldStruct;
   char *colName;
   char sSql[DEFAULT_INDEX_COLUMN_MAX_LEN];
   SQLRETURN res; // HB_ERRCODE res;
@@ -402,7 +401,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
   // char buffer[2];
   // HB_LONG lType; not used
 
-  pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB);
+  auto pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB);
 
   if (thiswa->colStmt[lFieldPosDB - 1] == nullptr) {
     res = SQLAllocStmt((HDBC)thiswa->hDbc, &(thiswa->colStmt[lFieldPosDB - 1]));
@@ -1028,7 +1027,7 @@ void SR_SolveFilters(SQLEXAREAP thiswa, bool bWhere)
   // Resolve SET SCOPE TO
 
   if (thiswa->hOrdCurrent > 0) {
-    PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
+    auto pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
     const char *szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
     if (szFilter != nullptr && szFilter[0]) {
       if (bWhere) {
@@ -2048,8 +2047,8 @@ static bool CreateSkipStmt(SQLEXAREAP thiswa)
     thiswa->bOrderChanged = false;
 
     if (thiswa->hOrdCurrent > 0) {
-      PHB_ITEM pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
-      PHB_ITEM pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
+      auto pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
+      auto pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
       thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
     } else {
       thiswa->indexColumns = 1; // Natural order, RECNO

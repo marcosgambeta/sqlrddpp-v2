@@ -1111,7 +1111,7 @@ HB_FUNC_STATIC(SR_ODBCWRITEMEMO)
     SQLAllocStmt(hDbc, &hStmt);
 #endif
     for (uiSize = 0; uiSize < uiLen; uiSize++) {
-      PHB_ITEM pFieldDesc = hb_arrayGetItemPtr(pArray, uiSize + 1);
+      auto pFieldDesc = hb_arrayGetItemPtr(pArray, uiSize + 1);
       char szSql[512] = {0};
       const char *sMemo = hb_arrayGetCPtr(pFieldDesc, 2);
       const char *sField = hb_arrayGetCPtr(pFieldDesc, 1);
