@@ -4244,19 +4244,15 @@ HB_FUNC(SQLEX_GETFUNCTABLE)
 
 static void hb_sqlExRddInit(void *cargo)
 {
-  HB_USHORT usResult;
   HB_SYMBOL_UNUSED(cargo);
 
   if (hb_rddRegister("SQLRDD", RDT_FULL) <= 1) {
-    usResult = static_cast<HB_USHORT>(hb_rddRegister("SQLEX", RDT_FULL));
+    auto usResult = static_cast<HB_USHORT>(hb_rddRegister("SQLEX", RDT_FULL));
     if (usResult <= 1) {
       if (usResult == 0) {
-        PHB_DYNS pDynSym;
         HB_FUNC_EXEC(SR_INIT);
-
-        pDynSym = hb_dynsymFind("__SR_STARTSQL");
-
-        if (pDynSym && hb_dynsymIsFunction(pDynSym)) {
+        PHB_DYNS pDynSym = hb_dynsymFind("__SR_STARTSQL");
+        if (pDynSym != nullptr && hb_dynsymIsFunction(pDynSym)) {
           hb_vmPushDynSym(pDynSym);
           hb_vmPushNil();
           hb_vmDo(0);
