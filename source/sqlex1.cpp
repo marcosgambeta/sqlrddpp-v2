@@ -4311,21 +4311,19 @@ HB_FUNC(SR_SETBUFFERPOOLSIZE)
 
 static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
 {
-  HB_LONG lorder = 0;
-  PHB_ITEM pTag, pKeyVal, itemTemp;
-  int iLimit, iResult = 0;
-  HB_BYTE len1, len2;
-  const char *val1, *val2;
-  char *valbuf = nullptr;
+  PHB_ITEM pKeyVal;
+  HB_BYTE len1;
+  const char *val1;
 
-  pTag = sr_loadTagDefault(thiswa, nullptr, &lorder);
+  HB_LONG lorder = 0;
+  PHB_ITEM pTag = sr_loadTagDefault(thiswa, nullptr, &lorder);
   if (pTag) {
     if (thiswa->firstinteract) {
       SELF_GOTOP((AREAP)thiswa);
       thiswa->firstinteract = false;
     }
 
-    itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
+    PHB_ITEM itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
     // if (pTag) {
     //   HB_EVALINFO info;
     //   hb_evalNew(&info, hb_itemArrayGet(pTag, INDEXMAN_KEY_CODEBLOCK));
@@ -4350,6 +4348,10 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
   } else {
     return 0;
   }
+
+  HB_BYTE len2;
+  const char *val2;
+  char *valbuf = nullptr;
 
 #if 0 // TODO: old code for reference (to be deleted)
   if (HB_IS_DATE(pKey)) {
@@ -4380,10 +4382,10 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
   case HB_IT_INTEGER:
   case HB_IT_LONG:
   case HB_IT_DOUBLE: {
-    PHB_ITEM pLen = hb_itemPutNL(nullptr, static_cast<HB_LONG>(len1));
-    val2 = valbuf = hb_itemStr(pKey, pLen, nullptr);
+    HB_ITEM pLen{};
+    hb_itemPutNL(&pLen, static_cast<HB_LONG>(len1));
+    val2 = valbuf = hb_itemStr(pKey, &pLen, nullptr);
     len2 = static_cast<HB_BYTE>(strlen(val2));
-    hb_itemRelease(pLen);
     break;
   }
   case HB_IT_LOGICAL: {
@@ -4397,7 +4399,9 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
   }
   }
 
-  iLimit = (len1 > len2) ? len2 : len1;
+  int iLimit = (len1 > len2) ? len2 : len1;
+
+  int iResult = 0;
 
   if (HB_IS_STRING(pKeyVal)) {
     if (iLimit > 0) {
