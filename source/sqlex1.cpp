@@ -2382,17 +2382,11 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREAP thiswa)
 // (DBENTRYP_BIB)
 static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_BOOL bFindLast)
 {
-  int queryLevel;
-  HB_USHORT iIndex;
-  HB_SIZE i;
-  HB_ERRCODE retvalue = HB_SUCCESS;
-  PHB_ITEM pNewKey = nullptr;
-  HSTMT hStmt = nullptr;
-
   thiswa->lpdbPendingRel = nullptr;
   thiswa->firstinteract = false;
   thiswa->wasdel = false;
-  thiswa->area.fTop = thiswa->area.fBottom = false;
+  thiswa->area.fTop = false;
+  thiswa->area.fBottom = false;
   thiswa->area.fEof = false;
   thiswa->area.fFound = false;
 
@@ -2404,6 +2398,8 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
     SR_commonError((AREAP)thiswa, EG_NOORDER, EDBF_NOTINDEXED, thiswa->sTable);
     return HB_FAILURE;
   }
+
+  PHB_ITEM pNewKey = nullptr;
 
 #ifndef HB_CDP_SUPPORT_OFF
   if (HB_IS_STRING(pKey)) {
@@ -2429,6 +2425,8 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
     SR_SetIndexBindStructure(thiswa);
   }
 
+  int queryLevel;
+
   if (SR_FeedSeekKeyToBindings(thiswa, pKey, &queryLevel) != HB_SUCCESS) {
     if (pNewKey) {
       hb_itemRelease(pNewKey);
@@ -2443,24 +2441,26 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
 
   thiswa->bConditionChanged2 = false;
 
+  HB_USHORT iIndex;
+  HSTMT hStmt = nullptr;
+  HB_ERRCODE retvalue = HB_SUCCESS;
+
   if (SR_getPreparedSeek(thiswa, queryLevel, &iIndex, &hStmt) ==
       HB_SUCCESS) { // Fetch line from database, read RECNO and DELETED
     // Create a line array to hold the record
     // HB_LONG lLenOut, lLen, lInitBuff;
-    HB_BOOL bTranslate;
     // PTR bBuffer, bOut;
     // HB_USHORT iReallocs;
     //PHB_ITEM temp; (using stack instead of heap)
     // HB_ITEM temp;
-    int iComp;
     auto aRecord = hb_itemNew(nullptr);
 
     hb_arrayNew(aRecord, hb_arrayLen(thiswa->aBuffer));
 
     // bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1);
-    bTranslate = false;
+    //HB_BOOL bTranslate = false;
 
-    for (i = 1; i <= thiswa->area.uiFieldCount; i++) {
+    for (HB_SIZE i = 1; i <= thiswa->area.uiFieldCount; i++) {
       // bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1 );
       // // bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1);
       // lLen = COLUMN_BLOCK_SIZE;
@@ -2483,7 +2483,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
         // FIELD_DOMAIN);
         ++iIndex;
         SR_odbcGetData((HSTMT)hStmt, hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), &temp, 0,
-                    thiswa->nSystemID, bTranslate, iIndex);
+                    thiswa->nSystemID, /*bTranslate*/ false, iIndex);
         hb_arraySetForward(aRecord, i, &temp);
       }
       //hb_itemRelease(temp);
@@ -2496,7 +2496,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
 
     // End search code
 
-    iComp = sqlKeyCompareEx(thiswa, pKey, false);
+    int iComp = sqlKeyCompareEx(thiswa, pKey, false);
 
     if (iComp != 0) {
       thiswa->area.fFound = true;
