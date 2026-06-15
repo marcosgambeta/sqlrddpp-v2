@@ -728,7 +728,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
         lPos += (CAHCE_PAGE_SIZE * 3);
       }
     }
-    pLine = (PHB_ITEM)hb_arrayGetItemPtr(pCache, lPos);
+    pLine = hb_arrayGetItemPtr(pCache, lPos);
 
     if (HB_IS_NIL(pLine)) {
       hb_arrayNew(pLine, cols);
