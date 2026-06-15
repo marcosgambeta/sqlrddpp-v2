@@ -1,12 +1,10 @@
 # SQLRDD++ v2
 
-SQLRDD++ para Harbour e Harbour++
+SQLRDD++ para Harbour, xHarbour, Harbour 3.4 e Harbour++.
 
 ## Requisitos
 
-Harbour ou Harbour++  
-Compilador C++  
-Standard C++11 ou superior  
+Compilador C++ com suporte ao padrão C++11 ou superior  
 
 ## SGBD suportados
 
