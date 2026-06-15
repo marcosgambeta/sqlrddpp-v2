@@ -1249,12 +1249,6 @@ static HB_ERRCODE sqlGoCold(SQLAREAP thiswa)
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM value)
 {
-  PHB_ITEM pDest;
-  LPFIELD pField;
-  char *cfield;
-  double dNum;
-  HB_USHORT len, dec, fieldindex;
-  PHB_ITEM pFieldNum;
   // HB_BOOL bOk = true;
   // PHB_DYNS s_pSym_SR_FROMXML = NULL;
 
@@ -1267,8 +1261,8 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     SELF_FORCEREL(&thiswa->area);
   }
 
-  fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
-  pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
+  auto fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
+  PHB_ITEM pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
   //                if( s_pSym_SR_FROMXML == NULL ) {
   //                   s_pSym_SR_FROMXML = hb_dynsymFindName("ESCREVE");
   //                   if( s_pSym_SR_FROMXML  == NULL ) {
@@ -1283,10 +1277,9 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
   //
   if (HB_IS_NIL(pDest)) {
     hb_itemRelease(pDest);
-    pFieldNum = hb_itemNew(nullptr);
-    hb_itemPutNI(pFieldNum, thiswa->uiBufferIndex[fieldNum - 1]);
-    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGETVALUE, 1, pFieldNum);
-    hb_itemRelease(pFieldNum);
+    HB_ITEM pFieldNum{};
+    hb_itemPutNI(&pFieldNum, thiswa->uiBufferIndex[fieldNum - 1]);
+    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGETVALUE, 1, &pFieldNum);
     pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
   }
 
@@ -1295,7 +1288,7 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     thiswa->uiFieldList[fieldNum - 1] = 1;
   }
 
-  pField = thiswa->area.lpFields + fieldNum - 1;
+  LPFIELD pField = thiswa->area.lpFields + fieldNum - 1;
 
   // test compatible datatypes
   // if (HB_IS_TIMESTAMP(value)) { //|| HB_IS_DATE(pDest))
@@ -1305,11 +1298,10 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
   if ((HB_IS_NUMBER(pDest) && HB_IS_NUMBER(value)) || (HB_IS_STRING(pDest) && HB_IS_STRING(value)) ||
       (HB_IS_LOGICAL(pDest) && HB_IS_LOGICAL(value)) || (HB_IS_DATE(pDest) && HB_IS_DATE(value)) ||
       (HB_IS_TIMESTAMP(pDest) && HB_IS_DATETIME(value)) || (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value))) {
-
     if (pField->uiType == HB_FT_STRING) {
-      HB_SIZE nSize = hb_itemGetCLen(value), nLen = pField->uiLen;
-
-      cfield = static_cast<char *>(hb_xgrab(nLen + 1));
+      HB_SIZE nSize = hb_itemGetCLen(value);
+      HB_SIZE nLen = pField->uiLen;
+      auto cfield = static_cast<char *>(hb_xgrab(nLen + 1));
 #ifndef HB_CDP_SUPPORT_OFF
       hb_cdpnDup2(hb_itemGetCPtr(value), nSize, cfield, &nLen, thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP(),
                   thiswa->area.cdPage);
@@ -1324,12 +1316,12 @@ static HB_ERRCODE sqlPutValue(SQLAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM valu
       cfield[nLen] = '\0';
       hb_itemPutCLPtr(value, cfield, nLen);
     } else if (pField->uiType == HB_FT_LONG) {
-      len = pField->uiLen;
-      dec = pField->uiDec;
+      HB_USHORT len = pField->uiLen;
+      HB_USHORT dec = pField->uiDec;
       if (dec > 0) {
         len -= (dec + 1);
       }
-      dNum = hb_itemGetND(value);
+      double dNum = hb_itemGetND(value);
       hb_itemPutNLen(value, dNum, len, dec);
     }
 
