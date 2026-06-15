@@ -1554,10 +1554,10 @@ static HB_ERRCODE sqlCreate(SQLAREAP thiswa, LPDBOPENINFO pCreateInfo)
   }
   hb_itemPutNL(pArea, pCreateInfo->uiArea);
 
-  thiswa->area.fTop = 0;
-  thiswa->area.fBottom = 1;
-  thiswa->area.fBof = 0;
-  thiswa->area.fEof = 1;
+  thiswa->area.fTop = false;
+  thiswa->area.fBottom = true;
+  thiswa->area.fBof = false;
+  thiswa->area.fEof = true;
 
   //   thiswa->valResult = NULL;
 
