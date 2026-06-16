@@ -121,7 +121,7 @@ struct _SQL_CHAR_STRUCT
 
 using SQL_CHAR_STRUCT = _SQL_CHAR_STRUCT;
 
-struct _INDEXBIND
+struct INDEXBIND
 {
   // Relative field position in aFields
   HB_LONG lFieldPosDB;
@@ -149,7 +149,7 @@ struct _INDEXBIND
   char SeekBwdSql[PREPARED_SQL_LEN];
 };
 
-using INDEXBIND = _INDEXBIND;
+//using INDEXBIND = _INDEXBIND; (deprecated)
 //using INDEXBINDP = INDEXBIND *; (deprecated)
 
 struct COLUMNBIND
