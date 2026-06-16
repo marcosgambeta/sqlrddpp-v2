@@ -3129,12 +3129,6 @@ static HB_ERRCODE sqlExGoCold(SQLEXAREAP thiswa)
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM value)
 {
-  PHB_ITEM pDest;
-  LPFIELD pField;
-  char *cfield;
-  double dNum;
-  HB_USHORT len, dec, fieldindex;
-
   if (thiswa->firstinteract) {
     SELF_GOTOP(reinterpret_cast<AREAP>(thiswa));
     thiswa->firstinteract = false;
@@ -3144,9 +3138,9 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
     SELF_FORCEREL(reinterpret_cast<AREAP>(thiswa));
   }
 
-  fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
+  auto fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
   thiswa->editMask[fieldindex - 1] = '1';
-  pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
+  auto pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
 
   if (!thiswa->uiFieldList[fieldNum - 1]) {
     thiswa->uiFieldList[fieldNum - 1] = 1;
@@ -3162,7 +3156,7 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
     thiswa->uiFieldList[fieldNum - 1] = 1;
   }
 
-  pField = thiswa->area.lpFields + fieldNum - 1;
+  LPFIELD pField = thiswa->area.lpFields + fieldNum - 1;
 
   // test compatible datatypes
 
@@ -3171,9 +3165,10 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
       (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value))) {
 
     if (pField->uiType == HB_FT_STRING) {
-      HB_SIZE nSize = hb_itemGetCLen(value), nLen = pField->uiLen;
+      HB_SIZE nSize = hb_itemGetCLen(value);
+      HB_SIZE nLen = pField->uiLen;
 
-      cfield = static_cast<char *>(hb_xgrab(nLen + 1));
+      auto cfield = static_cast<char *>(hb_xgrab(nLen + 1));
 #ifndef HB_CDP_SUPPORT_OFF
       hb_cdpnDup2(hb_itemGetCPtr(value), nSize, cfield, &nLen, thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP(),
                   thiswa->area.cdPage);
@@ -3188,12 +3183,12 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
       cfield[nLen] = '\0';
       hb_itemPutCLPtr(value, cfield, nLen);
     } else if (pField->uiType == HB_FT_LONG) {
-      len = pField->uiLen;
-      dec = pField->uiDec;
+      HB_USHORT len = pField->uiLen;
+      HB_USHORT dec = pField->uiDec;
       if (dec > 0) {
         len -= (dec + 1);
       }
-      dNum = hb_itemGetND(value);
+      double dNum = hb_itemGetND(value);
       hb_itemPutNLen(value, dNum, len, dec);
     }
 
