@@ -66,7 +66,7 @@
 
 // SQL WORKAREA
 
-typedef struct _SQLAREA
+struct _SQLAREA
 {
   AREA area;
 
@@ -74,43 +74,73 @@ typedef struct _SQLAREA
   //
   //  Warning: The above section MUST match WORKAREA exactly!  Any
   //  additions to the structure MUST be added below
-  PHB_CODEPAGE cdPageCnv; // Area's codepage convert pointer
-  char *szDataFileName;   // file name
-  HB_LONG hOrdCurrent;    // current index order
-  bool shared;
-  bool readonly;         // only SELECT allowed
-  bool creating;         // true when creating table
-  bool firstinteract;    // true when workarea was not used yet
-  bool isam;             // ISAM Simulator ?
-  bool wasdel;
-  bool initialized;    // Workarea Initialization done
-  bool sqlfilter;      // SET FILTER converted to SQL
 
-  PHB_ITEM oWorkArea;  // SQL Workarea object
-  PHB_ITEM aInfo;      // Status array
-  PHB_ITEM aBuffer;    // Record buffer
-  PHB_ITEM aOrders;    // Indexes
-  PHB_ITEM aStruct;    // Table xBase structure
-  PHB_ITEM aLocked;    // Locked lines
-  PHB_ITEM aCreate;    // Structure received by dbCreate()
-  PHB_ITEM aCache;     // Workarea recordset cache
-  PHB_ITEM aOldBuffer; // Last workarea buffer
-  PHB_ITEM aEmptyBuff; // Empty buffer to be in eof()+1
+  // Area's codepage convert pointer
+  PHB_CODEPAGE cdPageCnv;
+  // file name
+  char *szDataFileName;
+  // current index order
+  HB_LONG hOrdCurrent;
+  //
+  bool shared;
+  // only SELECT allowed
+  bool readonly;
+  // true when creating table
+  bool creating;
+  // true when workarea was not used yet
+  bool firstinteract;
+  // ISAM Simulator ?
+  bool isam;
+  //
+  bool wasdel;
+  // Workarea Initialization done
+  bool initialized;
+  // SET FILTER converted to SQL
+  bool sqlfilter;
+
+  // SQL Workarea object
+  PHB_ITEM oWorkArea;
+  // Status array
+  PHB_ITEM aInfo;
+  // Record buffer
+  PHB_ITEM aBuffer;
+  // Indexes
+  PHB_ITEM aOrders;
+  // Table xBase structure
+  PHB_ITEM aStruct;
+  // Locked lines
+  PHB_ITEM aLocked;
+  // Structure received by dbCreate()
+  PHB_ITEM aCreate;
+  // Workarea recordset cache
+  PHB_ITEM aCache;
+  // Last workarea buffer
+  PHB_ITEM aOldBuffer;
+  // Empty buffer to be in eof()+1
+  PHB_ITEM aEmptyBuff;
+  //
   PHB_ITEM aSelectList;
 
-  HB_ULONG ulhRecno;   // Recno position in field list
-  HB_ULONG ulhDeleted; // Deleted position in field list
+  // Recno position in field list
+  HB_ULONG ulhRecno;
+  // Deleted position in field list
+  HB_ULONG ulhDeleted;
 
-  int *uiBufferIndex;   // Field offset in fields array
-  int *uiFieldList;     // Keeps a field list for SELECT statements
-  int iFieldListStatus; // field list status - see sqlprototypes.h
+  // Field offset in fields array
+  int *uiBufferIndex;
+  // Keeps a field list for SELECT statements
+  int *uiFieldList;
+  // field list status - see sqlprototypes.h
+  int iFieldListStatus;
 
-  LPDBRELINFO lpdbPendingRel; // Pointer to parent rel struct
-  char editMask[MAX_FIELDS];  // Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD
+  // Pointer to parent rel struct
+  LPDBRELINFO lpdbPendingRel;
+  // Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD
+  char editMask[MAX_FIELDS];
+};
 
-} SQLAREA;
-
-typedef SQLAREA *LPSQLAREA;
+using SQLAREA = _SQLAREA;
+using LPSQLAREA = SQLAREA *;
 
 #ifndef SQLAREAP
 #define SQLAREAP LPSQLAREA
