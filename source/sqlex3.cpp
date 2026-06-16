@@ -83,7 +83,7 @@
 
 //------------------------------------------------------------------------
 
-static void createSeekQuery(SQLEXAREAP thiswa, bool bUseOptimizerHints)
+static void createSeekQuery(SQLEXAREA *thiswa, bool bUseOptimizerHints)
 {
   if (SR_getColumnList(thiswa)) {
     thiswa->bConditionChanged1 = true; // SEKIP statements are no longer valid - column list has changed!
@@ -105,7 +105,7 @@ static void createSeekQuery(SQLEXAREAP thiswa, bool bUseOptimizerHints)
 
 //------------------------------------------------------------------------
 
-static HB_ERRCODE getSeekWhereExpression(SQLEXAREAP thiswa, int iListType, int queryLevel, HB_BOOL *bUseOptimizerHints)
+static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int queryLevel, HB_BOOL *bUseOptimizerHints)
 {
   HB_BOOL bWhere = false;
   int iCol;
@@ -172,7 +172,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREAP thiswa, int iListType, int q
 }
 
 #if 0
-static HB_ERRCODE getSeekWhereExpression(SQLEXAREAP thiswa, int iListType, int queryLevel, HB_BOOL * bUseOptimizerHints)
+static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int queryLevel, HB_BOOL * bUseOptimizerHints)
 {
    SqlExLog("getSeekWhereExpression()", 3);
 
@@ -257,7 +257,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREAP thiswa, int iListType, int q
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE prepareSeekQuery(SQLEXAREAP thiswa, INDEXBINDP SeekBind)
+HB_ERRCODE prepareSeekQuery(SQLEXAREA *thiswa, INDEXBINDP SeekBind)
 {
   SQLRETURN res;
   HSTMT hPrep;
@@ -289,7 +289,7 @@ HB_ERRCODE prepareSeekQuery(SQLEXAREAP thiswa, INDEXBINDP SeekBind)
 
 //------------------------------------------------------------------------
 
-bool SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel)
+bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel)
 {
   HB_BOOL bUseOptimizerHints = thiswa->nSystemID == SQLRDD::RDBMS::ORACLE;
   thiswa->bConditionChanged1 = true; // SKIP statements are no longer valid
@@ -341,7 +341,7 @@ bool SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel)
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *queryLevel)
+HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREA *thiswa, PHB_ITEM pKey, int *queryLevel)
 {
   INDEXBINDP SeekBind;
   COLUMNBINDP BindStructure;
@@ -571,7 +571,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *query
 
 //------------------------------------------------------------------------
 
-void SR_BindSeekStmt(SQLEXAREAP thiswa, int queryLevel)
+void SR_BindSeekStmt(SQLEXAREA *thiswa, int queryLevel)
 {
   HSTMT hStmt;
   INDEXBINDP SeekBind, SeekBindParam;
@@ -653,7 +653,7 @@ void SR_BindSeekStmt(SQLEXAREAP thiswa, int queryLevel)
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_getPreparedSeek(SQLEXAREAP thiswa, int queryLevel, HB_USHORT *iIndex,
+HB_ERRCODE SR_getPreparedSeek(SQLEXAREA *thiswa, int queryLevel, HB_USHORT *iIndex,
                            HSTMT *hStmt) // Returns true if any result found
 {
   SQLRETURN res;

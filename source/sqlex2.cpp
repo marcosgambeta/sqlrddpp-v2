@@ -82,7 +82,7 @@ static PHB_DYNS s_pSym_Serial1 = nullptr; // Pointer to serialization function
 
 //------------------------------------------------------------------------
 
-char *SR_QualifyName(char *szName, SQLEXAREAP thiswa)
+char *SR_QualifyName(char *szName, SQLEXAREA *thiswa)
 {
   int i;
 
@@ -119,7 +119,7 @@ char *SR_QualifyName(char *szName, SQLEXAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-static void ResolveSpecialCols(SQLEXAREAP thiswa)
+static void ResolveSpecialCols(SQLEXAREA *thiswa)
 {
   // Resolve all Synthetic Index and FOR clause expressions, storing
   // results in thiswa->aBuffer
@@ -202,7 +202,7 @@ static void SerializeMemo(PHB_ITEM pFieldData)
 
 //------------------------------------------------------------------------
 
-void SR_SetInsertRecordStructure(SQLEXAREAP thiswa)
+void SR_SetInsertRecordStructure(SQLEXAREA *thiswa)
 {
   thiswa->InsertRecord = (COLUMNBINDP)hb_xgrab(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND));
   memset(thiswa->InsertRecord, 0, hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND));
@@ -210,7 +210,7 @@ void SR_SetInsertRecordStructure(SQLEXAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-void SR_CreateInsertStmt(SQLEXAREAP thiswa)
+void SR_CreateInsertStmt(SQLEXAREA *thiswa)
 {
   int iCols, i;
   PHB_ITEM pFieldStruct, pFieldLen, pFieldDec;
@@ -395,7 +395,7 @@ void SR_CreateInsertStmt(SQLEXAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_PrepareInsertStmt(SQLEXAREAP thiswa)
+HB_ERRCODE SR_PrepareInsertStmt(SQLEXAREA *thiswa)
 {
   SQLRETURN res;
 
@@ -418,7 +418,7 @@ HB_ERRCODE SR_PrepareInsertStmt(SQLEXAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
+HB_ERRCODE SR_BindInsertColumns(SQLEXAREA *thiswa)
 {
   int iCol, iCols, iBind;
   COLUMNBINDP InsertRecord;
@@ -495,7 +495,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate)
+HB_ERRCODE SR_FeedRecordCols(SQLEXAREA *thiswa, HB_BOOL bUpdate)
 {
   int iCols, i;
   PHB_ITEM pFieldData, pTemp;
@@ -560,7 +560,7 @@ HB_ERRCODE SR_FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate)
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREAP thiswa)
+HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREA *thiswa)
 {
   SQLRETURN res;
 
@@ -685,7 +685,7 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
+HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREA *thiswa)
 {
   SQLRETURN res;
   int iCols, i, iBind;
@@ -826,7 +826,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa)
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_ExecuteUpdateStmt(SQLEXAREAP thiswa)
+HB_ERRCODE SR_ExecuteUpdateStmt(SQLEXAREA *thiswa)
 {
   PHB_ITEM aRecord;
   HB_SIZE lPos;

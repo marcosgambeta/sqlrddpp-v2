@@ -406,9 +406,10 @@ struct _SQLEXAREA
 using SQLEXAREA = _SQLEXAREA;
 using LPSQLEXAREA = SQLEXAREA *;
 
-#ifndef SQLEXAREAP
-#define SQLEXAREAP LPSQLEXAREA
-#endif
+// deprecated
+//#ifndef SQLEXAREAP
+//#define SQLEXAREAP LPSQLEXAREA
+//#endif
 
 // prototypes
 
@@ -424,34 +425,34 @@ HB_BOOL SR_itemEmpty(PHB_ITEM pItem);
 void SR_commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
 HB_ERRCODE SR_SetBindEmptylValue(COLUMNBINDP BindStructure);
 HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hStmt);
-char *SR_QualifyName(char *szName, SQLEXAREAP thiswa);
-COLUMNBINDP SR_GetBindStruct(SQLEXAREAP thiswa, INDEXBINDP IndexBind);
-HB_BOOL SR_getColumnList(SQLEXAREAP thiswa);
-void SR_SolveFilters(SQLEXAREAP thiswa, bool bWhere);
-void SR_getOrderByExpression(SQLEXAREAP thiswa, HB_BOOL bUseOptimizerHints);
-void SR_setResultSetLimit(SQLEXAREAP thiswa, int iRows);
-void SR_SetIndexBindStructure(SQLEXAREAP thiswa);
-void SR_SetInsertRecordStructure(SQLEXAREAP thiswa);
-HB_ULONG SR_GetCurrentRecordNum(SQLEXAREAP thiswa);
+char *SR_QualifyName(char *szName, SQLEXAREA *thiswa);
+COLUMNBINDP SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBINDP IndexBind);
+HB_BOOL SR_getColumnList(SQLEXAREA *thiswa);
+void SR_SolveFilters(SQLEXAREA *thiswa, bool bWhere);
+void SR_getOrderByExpression(SQLEXAREA *thiswa, HB_BOOL bUseOptimizerHints);
+void SR_setResultSetLimit(SQLEXAREA *thiswa, int iRows);
+void SR_SetIndexBindStructure(SQLEXAREA *thiswa);
+void SR_SetInsertRecordStructure(SQLEXAREA *thiswa);
+HB_ULONG SR_GetCurrentRecordNum(SQLEXAREA *thiswa);
 extern void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQueryOnly, HB_ULONG ulSystemID,
                         HB_BOOL bTranslate, HB_USHORT ui);
 
 // INSERT and UPDATE prototypes
 
-void SR_CreateInsertStmt(SQLEXAREAP thiswa);
-void SR_SetCurrRecordStructure(SQLEXAREAP thiswa);
-HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREAP thiswa);
-HB_ERRCODE SR_PrepareInsertStmt(SQLEXAREAP thiswa);
-HB_ERRCODE SR_BindInsertColumns(SQLEXAREAP thiswa);
-HB_ERRCODE SR_FeedRecordCols(SQLEXAREAP thiswa, HB_BOOL bUpdate);
-HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREAP thiswa);
-HB_ERRCODE SR_ExecuteUpdateStmt(SQLEXAREAP thiswa);
+void SR_CreateInsertStmt(SQLEXAREA *thiswa);
+void SR_SetCurrRecordStructure(SQLEXAREA *thiswa);
+HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREA *thiswa);
+HB_ERRCODE SR_PrepareInsertStmt(SQLEXAREA *thiswa);
+HB_ERRCODE SR_BindInsertColumns(SQLEXAREA *thiswa);
+HB_ERRCODE SR_FeedRecordCols(SQLEXAREA *thiswa, HB_BOOL bUpdate);
+HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREA *thiswa);
+HB_ERRCODE SR_ExecuteUpdateStmt(SQLEXAREA *thiswa);
 
 // SEEK Prototypes
 
-HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREAP thiswa, PHB_ITEM pKey, int *queryLevel);
-bool SR_CreateSeekStmt(SQLEXAREAP thiswa, int queryLevel);
-void SR_BindSeekStmt(SQLEXAREAP thiswa, int queryLevel);
-HB_ERRCODE SR_getPreparedSeek(SQLEXAREAP thiswa, int queryLevel, HB_USHORT *iIndex, HSTMT *hStmt);
+HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREA *thiswa, PHB_ITEM pKey, int *queryLevel);
+bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel);
+void SR_BindSeekStmt(SQLEXAREA *thiswa, int queryLevel);
+HB_ERRCODE SR_getPreparedSeek(SQLEXAREA *thiswa, int queryLevel, HB_USHORT *iIndex, HSTMT *hStmt);
 
 #endif // ODBCRDD_H
