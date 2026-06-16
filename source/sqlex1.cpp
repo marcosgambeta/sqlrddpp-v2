@@ -2404,7 +2404,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREA *thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
   if (HB_IS_STRING(pKey)) {
     PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
     if (thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc) {
-      HB_SIZE nLen = hb_itemGetCLen(pKey);
+      auto nLen = hb_itemGetCLen(pKey);
       char *pszVal = hb_cdpnDup(hb_itemGetCPtr(pKey), &nLen, cdpSrc, thiswa->area.cdPage);
       pKey = pNewKey = hb_itemPutCLPtr(nullptr, pszVal, nLen);
     }
@@ -3165,7 +3165,7 @@ static HB_ERRCODE sqlExPutValue(SQLEXAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM 
       (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value))) {
 
     if (pField->uiType == HB_FT_STRING) {
-      HB_SIZE nSize = hb_itemGetCLen(value);
+      auto nSize = hb_itemGetCLen(value);
       HB_SIZE nLen = pField->uiLen;
 
       auto cfield = static_cast<char *>(hb_xgrab(nLen + 1));

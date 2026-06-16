@@ -634,7 +634,7 @@ static HB_ERRCODE sqlSeek(SQLAREA *thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey, HB_
   if (HB_IS_STRING(pKey)) {
     PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
     if (thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc) {
-      HB_SIZE nLen = hb_itemGetCLen(pKey);
+      auto nLen = hb_itemGetCLen(pKey);
       char *pszVal = hb_cdpnDup(hb_itemGetCPtr(pKey), &nLen, cdpSrc, thiswa->area.cdPage);
       pKey = pNewKey = hb_itemPutCLPtr(nullptr, pszVal, nLen);
     }
@@ -1211,7 +1211,7 @@ static HB_ERRCODE sqlGetValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     if (pField_->uiType == HB_FT_STRING) {
       PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
       if (thiswa->area.cdPage && thiswa->area.cdPage != cdpDest) {
-        HB_SIZE nLen = hb_itemGetCLen(itemTemp);
+        auto nLen = hb_itemGetCLen(itemTemp);
         char *pszVal = hb_cdpnDup(hb_itemGetCPtr(itemTemp), &nLen, thiswa->area.cdPage, cdpDest);
         hb_itemPutCLPtr(itemTemp, pszVal, nLen);
       }
@@ -1304,7 +1304,7 @@ static HB_ERRCODE sqlPutValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
       (HB_IS_LOGICAL(pDest) && HB_IS_LOGICAL(value)) || (HB_IS_DATE(pDest) && HB_IS_DATE(value)) ||
       (HB_IS_TIMESTAMP(pDest) && HB_IS_DATETIME(value)) || (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value))) {
     if (pField->uiType == HB_FT_STRING) {
-      HB_SIZE nSize = hb_itemGetCLen(value);
+      auto nSize = hb_itemGetCLen(value);
       HB_SIZE nLen = pField->uiLen;
       auto cfield = static_cast<char *>(hb_xgrab(nLen + 1));
 #ifndef HB_CDP_SUPPORT_OFF
@@ -2969,7 +2969,7 @@ static HB_ERRCODE sqlSetScope(SQLAREA *thiswa, LPDBORDSCOPEINFO sInfo)
   if (HB_IS_STRING(scopeval)) {
     PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
     if (thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc) {
-      HB_SIZE nLen = hb_itemGetCLen(scopeval);
+      auto nLen = hb_itemGetCLen(scopeval);
       char *pszVal = hb_cdpnDup(hb_itemGetCPtr(scopeval), &nLen, cdpSrc, thiswa->area.cdPage);
       hb_itemPutCLPtr(scopeval, pszVal, nLen);
     }
