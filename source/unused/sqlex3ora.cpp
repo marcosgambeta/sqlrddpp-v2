@@ -211,7 +211,7 @@ HB_BOOL CreateSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
   INDEXBINDORAP SeekBind;
   HB_BOOL bUseOptimizerHints;
 
-  bUseOptimizerHints = thiswa->nSystemID == SQLRDD_RDBMS_ORACLE;
+  bUseOptimizerHints = thiswa->nSystemID == SQLRDD::RDBMS::ORACLE;
   thiswa->bConditionChanged1 = true; // SKIP statements are no longer valid
 
   // Alloc memory for binding structures, if first time
@@ -516,7 +516,7 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
     BindStructure = GetBindStructOra(thiswa, SeekBindParam);
     if (!BindStructure->isArgumentNull) {
 
-      // if (thiswa->nSystemID = SQLRDD_RDBMS_ORACLE)
+      // if (thiswa->nSystemID = SQLRDD::RDBMS::ORACLE)
       //    if (BindStructure->iCType == SQL_C_TYPE_DATE)
       //      BindStructure->iCType = SQL_C_TYPE_TIMESTAMP; // May be DATE or TIMESTAMP
 

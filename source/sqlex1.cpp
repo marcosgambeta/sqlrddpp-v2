@@ -157,8 +157,8 @@ HB_ULONG SR_GetCurrentRecordNum(SQLEXAREAP thiswa)
 static HB_BOOL IsItemNull(PHB_ITEM pFieldData, SQLEXAREAP thiswa)
 {
   if (SR_itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
-      (((thiswa->nSystemID == SQLRDD_RDBMS_POSTGR) && HB_IS_DATE(pFieldData)) ||
-       ((thiswa->nSystemID != SQLRDD_RDBMS_POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
+      (((thiswa->nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
+       ((thiswa->nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
     return true;
   }
   return false;
@@ -210,43 +210,43 @@ void SR_setResultSetLimit(SQLEXAREAP thiswa, int iRows)
   }
 
   switch (thiswa->nSystemID) {
-  case SQLRDD_RDBMS_MSSQL7:
-  case SQLRDD_RDBMS_CACHE:
-  case SQLRDD_RDBMS_SYBASE: {
+  case SQLRDD::RDBMS::MSSQL7:
+  case SQLRDD::RDBMS::CACHE:
+  case SQLRDD::RDBMS::SYBASE: {
     //fmt1 = "TOP %i";
     //fmt2 = "";
     sprintf(thiswa->sLimit1, "TOP %i", iRows);
     sprintf(thiswa->sLimit2, "", iRows);
     break;
   }
-  case SQLRDD_RDBMS_FIREBR:
-  case SQLRDD_RDBMS_FIREBR3:
-  case SQLRDD_RDBMS_FIREBR4:
-  case SQLRDD_RDBMS_FIREBR5:
-  case SQLRDD_RDBMS_INFORM: {
+  case SQLRDD::RDBMS::FIREBR:
+  case SQLRDD::RDBMS::FIREBR3:
+  case SQLRDD::RDBMS::FIREBR4:
+  case SQLRDD::RDBMS::FIREBR5:
+  case SQLRDD::RDBMS::INFORM: {
     //fmt1 = "FIRST %i";
     //fmt2 = "";
     sprintf(thiswa->sLimit1, "FIRST %i", iRows);
     sprintf(thiswa->sLimit2, "", iRows);
     break;
   }
-  case SQLRDD_RDBMS_ORACLE: {
+  case SQLRDD::RDBMS::ORACLE: {
     //fmt1 = "";
     //fmt2 = "";
     sprintf(thiswa->sLimit1, "", iRows);
     sprintf(thiswa->sLimit2, "", iRows);
     break;
   }
-  case SQLRDD_RDBMS_POSTGR:
-  case SQLRDD_RDBMS_MYSQL:
-  case SQLRDD_RDBMS_MARIADB: {
+  case SQLRDD::RDBMS::POSTGR:
+  case SQLRDD::RDBMS::MYSQL:
+  case SQLRDD::RDBMS::MARIADB: {
     //fmt1 = "";
     //fmt2 = "LIMIT %i";
     sprintf(thiswa->sLimit1, "", iRows);
     sprintf(thiswa->sLimit2, "LIMIT %i", iRows);
     break;
   }
-  case SQLRDD_RDBMS_IBMDB2: {
+  case SQLRDD::RDBMS::IBMDB2: {
     //fmt1 = "";
     //fmt2 = "fetch first %i rows only";
     sprintf(thiswa->sLimit1, "", iRows);
@@ -873,7 +873,7 @@ static void BindAllIndexStmts(SQLEXAREAP thiswa)
             //                        0);
             res = SQLBindParameter(hStmt, static_cast<SQLUSMALLINT>(iBind), SQL_PARAM_INPUT, SQL_C_TYPE_TIMESTAMP,
                                    SQL_TYPE_TIMESTAMP, SQL_TIMESTAMP_LEN,
-                                   thiswa->nSystemID == SQLRDD_RDBMS_MSSQL7 || thiswa->nSystemID == SQLRDD_RDBMS_AZURE ? 3 : 0,
+                                   thiswa->nSystemID == SQLRDD::RDBMS::MSSQL7 || thiswa->nSystemID == SQLRDD::RDBMS::AZURE ? 3 : 0,
                                    &(BindStructure->asTimestamp), 0, 0);
             break;
           }
@@ -939,8 +939,8 @@ static void FeedCurrentRecordToBindings(SQLEXAREAP thiswa)
 
       // Check if column is NULL
 
-      if (SR_itemEmpty(pFieldData) && (((thiswa->nSystemID == SQLRDD_RDBMS_POSTGR) && HB_IS_DATE(pFieldData)) ||
-                                       ((thiswa->nSystemID != SQLRDD_RDBMS_POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
+      if (SR_itemEmpty(pFieldData) && (((thiswa->nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
+                                       ((thiswa->nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
         if (BindStructure->isNullable && BindStructure->isArgumentNull) {
           // It is STILL NULL, so no problem
           HSTMT hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
@@ -1202,9 +1202,9 @@ void SR_SetCurrRecordStructure(SQLEXAREAP thiswa)
     case 'D': {
       // BindStructure->iCType = lType; // DATE or TIMESTAMP
       // Corrigido 27/12/2013 09:53 - lpereira
-      // Estava atribuindo o valor de SQLRDD_RDBMS_ORACLE para thiswa->nSystemID.
-      // if (thiswa->nSystemID = SQLRDD_RDBMS_ORACLE)
-      if (thiswa->nSystemID == SQLRDD_RDBMS_ORACLE) {
+      // Estava atribuindo o valor de SQLRDD::RDBMS::ORACLE para thiswa->nSystemID.
+      // if (thiswa->nSystemID = SQLRDD::RDBMS::ORACLE)
+      if (thiswa->nSystemID == SQLRDD::RDBMS::ORACLE) {
         BindStructure->iCType = SQL_C_TYPE_TIMESTAMP; // May be DATE or TIMESTAMP
       } else {
         BindStructure->iCType = lType; // May be DATE or TIMESTAMP

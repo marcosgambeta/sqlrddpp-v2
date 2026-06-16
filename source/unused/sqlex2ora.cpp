@@ -92,22 +92,22 @@ char *QualifyName2(char *szName, SQLEXORAAREAP thiswa)
       break;
     }
     switch (thiswa->nSystemID) {
-    case SQLRDD_RDBMS_MSSQL7:
-    case SQLRDD_RDBMS_ORACLE:
-    case SQLRDD_RDBMS_FIREBR:
-    case SQLRDD_RDBMS_FIREBR3:
-    case SQLRDD_RDBMS_FIREBR4:
-    case SQLRDD_RDBMS_FIREBR5:
-    case SQLRDD_RDBMS_IBMDB2:
-    case SQLRDD_RDBMS_ADABAS: {
+    case SQLRDD::RDBMS::MSSQL7:
+    case SQLRDD::RDBMS::ORACLE:
+    case SQLRDD::RDBMS::FIREBR:
+    case SQLRDD::RDBMS::FIREBR3:
+    case SQLRDD::RDBMS::FIREBR4:
+    case SQLRDD::RDBMS::FIREBR5:
+    case SQLRDD::RDBMS::IBMDB2:
+    case SQLRDD::RDBMS::ADABAS: {
       szName[i] = static_cast<char>(toupper(static_cast<int>(szName[i])));
       break;
     }
-    case SQLRDD_RDBMS_INGRES:
-    case SQLRDD_RDBMS_POSTGR:
-    case SQLRDD_RDBMS_MYSQL:
-    case SQLRDD_RDBMS_OTERRO:
-    case SQLRDD_RDBMS_INFORM: {
+    case SQLRDD::RDBMS::INGRES:
+    case SQLRDD::RDBMS::POSTGR:
+    case SQLRDD::RDBMS::MYSQL:
+    case SQLRDD::RDBMS::OTERRO:
+    case SQLRDD::RDBMS::INFORM: {
       szName[i] = static_cast<char>(tolower(static_cast<int>(szName[i])));
     }
     }
@@ -319,7 +319,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
   sFields[0] = ' ';
 
   switch (thiswa->nSystemID) {
-  case SQLRDD_RDBMS_ORACLE: {
+  case SQLRDD::RDBMS::ORACLE: {
     ident[0] = '\0';
     break;
   }
@@ -330,7 +330,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
   if (thiswa->sSql) {
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   }
-  if (thiswa->nSystemID == SQLRDD_RDBMS_MSSQL7) {
+  if (thiswa->nSystemID == SQLRDD::RDBMS::MSSQL7) {
     sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData VALUES (%s );%s", declare,
             thiswa->sTable, sFields, thiswa->sRecnoName, sParams, ident);
   } else {
@@ -572,14 +572,14 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
   // Retrieve RECNO
 
   switch (thiswa->nSystemID) {
-  case SQLRDD_RDBMS_ORACLE: {
+  case SQLRDD::RDBMS::ORACLE: {
     int res;
     char ident[200] = {0};
     char tablename[100] = {0};
 
     if (thiswa->hStmtNextval == nullptr) {
       switch (thiswa->nSystemID) {
-      case SQLRDD_RDBMS_ORACLE: {
+      case SQLRDD::RDBMS::ORACLE: {
         sprintf(tablename, "%s", thiswa->sqlarea.szDataFileName);
         if (strlen(tablename) > (MAX_TABLE_NAME_LENGHT - 3)) {
           tablename[MAX_TABLE_NAME_LENGHT - 4] = '\0';
@@ -631,8 +631,8 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
     }
     break;
   }
-  case SQLRDD_RDBMS_CACHE:
-  case SQLRDD_RDBMS_INFORM:
+  case SQLRDD::RDBMS::CACHE:
+  case SQLRDD::RDBMS::INFORM:
   default: {
     ;
   }

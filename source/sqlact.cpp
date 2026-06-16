@@ -549,38 +549,38 @@ HB_FUNC(SR_ESCAPESTRING)
     ToBuffer = static_cast<char *>(hb_xgrab((iSize * 2) + 1));
     if (ToBuffer) {
       switch (idatabase) {
-      case SQLRDD_RDBMS_MYSQL:
-      case SQLRDD_RDBMS_MARIADB: {
+      case SQLRDD::RDBMS::MYSQL:
+      case SQLRDD::RDBMS::MARIADB: {
         iSize = escape_mysql(ToBuffer, FromBuffer, iSize);
         break;
       }
-      case SQLRDD_RDBMS_FIREBR:
-      case SQLRDD_RDBMS_FIREBR3:
-      case SQLRDD_RDBMS_FIREBR4:
-      case SQLRDD_RDBMS_FIREBR5: {
+      case SQLRDD::RDBMS::FIREBR:
+      case SQLRDD::RDBMS::FIREBR3:
+      case SQLRDD::RDBMS::FIREBR4:
+      case SQLRDD::RDBMS::FIREBR5: {
         iSize = escape_firebird(ToBuffer, FromBuffer, iSize);
         break;
       }
-      case SQLRDD_RDBMS_ORACLE:
-      case SQLRDD_RDBMS_CACHE: {
+      case SQLRDD::RDBMS::ORACLE:
+      case SQLRDD::RDBMS::CACHE: {
         iSize = escape_oci(ToBuffer, FromBuffer, iSize);
         break;
       }
-      case SQLRDD_RDBMS_MSSQL7:
-      case SQLRDD_RDBMS_INGRES:
-      case SQLRDD_RDBMS_SYBASE:
-      case SQLRDD_RDBMS_ADABAS:
-      case SQLRDD_RDBMS_INFORM:
-      case SQLRDD_RDBMS_OTERRO:
-      case SQLRDD_RDBMS_PERVASIVE: {
+      case SQLRDD::RDBMS::MSSQL7:
+      case SQLRDD::RDBMS::INGRES:
+      case SQLRDD::RDBMS::SYBASE:
+      case SQLRDD::RDBMS::ADABAS:
+      case SQLRDD::RDBMS::INFORM:
+      case SQLRDD::RDBMS::OTERRO:
+      case SQLRDD::RDBMS::PERVASIVE: {
         iSize = escape_single(ToBuffer, FromBuffer, iSize);
         break;
       }
-      case SQLRDD_RDBMS_POSTGR: {
+      case SQLRDD::RDBMS::POSTGR: {
         iSize = escape_pgs(ToBuffer, FromBuffer, iSize);
         break;
       }
-      case SQLRDD_RDBMS_IBMDB2: {
+      case SQLRDD::RDBMS::IBMDB2: {
         iSize = escape_db2(ToBuffer, FromBuffer, iSize);
       }
       }
@@ -599,38 +599,38 @@ char *SR_QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatab
   ToBuffer++;
 
   switch (idatabase) {
-  case SQLRDD_RDBMS_MYSQL:
-  case SQLRDD_RDBMS_MARIADB: {
+  case SQLRDD::RDBMS::MYSQL:
+  case SQLRDD::RDBMS::MARIADB: {
     iSize = escape_mysql(ToBuffer, FromBuffer, iSize);
     break;
   }
-  case SQLRDD_RDBMS_FIREBR:
-  case SQLRDD_RDBMS_FIREBR3:
-  case SQLRDD_RDBMS_FIREBR4:
-  case SQLRDD_RDBMS_FIREBR5: {
+  case SQLRDD::RDBMS::FIREBR:
+  case SQLRDD::RDBMS::FIREBR3:
+  case SQLRDD::RDBMS::FIREBR4:
+  case SQLRDD::RDBMS::FIREBR5: {
     iSize = escape_firebird(ToBuffer, FromBuffer, iSize);
     break;
   }
-  case SQLRDD_RDBMS_ORACLE:
-  case SQLRDD_RDBMS_CACHE: {
+  case SQLRDD::RDBMS::ORACLE:
+  case SQLRDD::RDBMS::CACHE: {
     iSize = escape_oci(ToBuffer, FromBuffer, iSize);
     break;
   }
-  case SQLRDD_RDBMS_MSSQL7:
-  case SQLRDD_RDBMS_INGRES:
-  case SQLRDD_RDBMS_SYBASE:
-  case SQLRDD_RDBMS_ADABAS:
-  case SQLRDD_RDBMS_INFORM:
-  case SQLRDD_RDBMS_OTERRO:
-  case SQLRDD_RDBMS_PERVASIVE: {
+  case SQLRDD::RDBMS::MSSQL7:
+  case SQLRDD::RDBMS::INGRES:
+  case SQLRDD::RDBMS::SYBASE:
+  case SQLRDD::RDBMS::ADABAS:
+  case SQLRDD::RDBMS::INFORM:
+  case SQLRDD::RDBMS::OTERRO:
+  case SQLRDD::RDBMS::PERVASIVE: {
     iSize = escape_single(ToBuffer, FromBuffer, iSize);
     break;
   }
-  case SQLRDD_RDBMS_POSTGR: {
+  case SQLRDD::RDBMS::POSTGR: {
     iSize = escape_pgs(ToBuffer, FromBuffer, iSize);
     break;
   }
-  case SQLRDD_RDBMS_IBMDB2: {
+  case SQLRDD::RDBMS::IBMDB2: {
     iSize = escape_db2(ToBuffer, FromBuffer, iSize);
   }
   }
@@ -886,13 +886,13 @@ HB_FUNC(SR_DBQUALIFY)
     // Others, doesn't matter column case
 
     switch (ulDb) {
-    case SQLRDD_RDBMS_ORACLE:
-    case SQLRDD_RDBMS_FIREBR:
-    case SQLRDD_RDBMS_FIREBR3:
-    case SQLRDD_RDBMS_FIREBR4:
-    case SQLRDD_RDBMS_FIREBR5:
-    case SQLRDD_RDBMS_IBMDB2:
-    case SQLRDD_RDBMS_ADABAS: {
+    case SQLRDD::RDBMS::ORACLE:
+    case SQLRDD::RDBMS::FIREBR:
+    case SQLRDD::RDBMS::FIREBR3:
+    case SQLRDD::RDBMS::FIREBR4:
+    case SQLRDD::RDBMS::FIREBR5:
+    case SQLRDD::RDBMS::IBMDB2:
+    case SQLRDD::RDBMS::ADABAS: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<char>(toupper(static_cast<HB_BYTE>(pszBuffer[i])));
@@ -900,8 +900,8 @@ HB_FUNC(SR_DBQUALIFY)
       szOut[i + 1] = '"';
       break;
     }
-    case SQLRDD_RDBMS_INGRES:
-    case SQLRDD_RDBMS_POSTGR: {
+    case SQLRDD::RDBMS::INGRES:
+    case SQLRDD::RDBMS::POSTGR: {
       szOut[0] = '"';
       for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
@@ -909,7 +909,7 @@ HB_FUNC(SR_DBQUALIFY)
       szOut[i + 1] = '"';
       break;
     }
-    case SQLRDD_RDBMS_MSSQL7: {
+    case SQLRDD::RDBMS::MSSQL7: {
       szOut[0] = '[';
       for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<HB_BYTE>(pszBuffer[i]);
@@ -917,9 +917,9 @@ HB_FUNC(SR_DBQUALIFY)
       szOut[i + 1] = ']';
       break;
     }
-    case SQLRDD_RDBMS_MYSQL:
-    case SQLRDD_RDBMS_OTERRO:
-    case SQLRDD_RDBMS_MARIADB: {
+    case SQLRDD::RDBMS::MYSQL:
+    case SQLRDD::RDBMS::OTERRO:
+    case SQLRDD::RDBMS::MARIADB: {
       szOut[0] = '`';
       for (i = 0; i < ulLen; i++) {
         szOut[i + 1] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
@@ -927,7 +927,7 @@ HB_FUNC(SR_DBQUALIFY)
       szOut[i + 1] = '`';
       break;
     }
-    case SQLRDD_RDBMS_INFORM: {
+    case SQLRDD::RDBMS::INFORM: {
       for (i = 0; i < ulLen; i++) {
         szOut[i] = static_cast<char>(tolower(static_cast<HB_BYTE>(pszBuffer[i])));
       }
@@ -1059,8 +1059,8 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
   *bNullArgument = false;
 
   if (SR_itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
-      (((nSystemID == SQLRDD_RDBMS_POSTGR) && HB_IS_DATE(pFieldData)) ||
-       ((nSystemID != SQLRDD_RDBMS_POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
+      (((nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
+       ((nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
     if (bNullable || HB_IS_DATE(pFieldData)) {
       sValue = static_cast<char *>(hb_xgrab(5));
       sValue[0] = 'N';
@@ -1137,7 +1137,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
       hb_dateDecStr(sDate, hb_itemGetDL(pFieldData));
       sValue = static_cast<char *>(hb_xgrab(30));
       switch( nSystemID ) {
-         case SQLRDD_RDBMS_ORACLE: {
+         case SQLRDD::RDBMS::ORACLE: {
             if( !bMemo ) {
                sprintf(sValue, "TO_DATE(\'%s\',\'YYYYMMDD\')", sDate);
                return sValue;
@@ -1153,13 +1153,13 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
    } else if( HB_IS_LOGICAL(pFieldData) ) {
       sValue = static_cast<char *>(hb_xgrab(6));
       if( hb_itemGetL(pFieldData) ) {
-         if( nSystemID == SQLRDD_RDBMS_POSTGR ) {
+         if( nSystemID == SQLRDD::RDBMS::POSTGR ) {
             sValue[0] = 't';
             sValue[1] = 'r';
             sValue[2] = 'u';
             sValue[3] = 'e';
             sValue[4] = '\0';
-         } else if( nSystemID == SQLRDD_RDBMS_INFORM ) {
+         } else if( nSystemID == SQLRDD::RDBMS::INFORM ) {
             sValue[0] = '\'';
             sValue[1] = 't';
             sValue[2] = '\'';
@@ -1169,14 +1169,14 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
             sValue[1] = '\0';
          }
       } else {
-         if( nSystemID == SQLRDD_RDBMS_POSTGR ) {
+         if( nSystemID == SQLRDD::RDBMS::POSTGR ) {
             sValue[0] = 'f';
             sValue[1] = 'a';
             sValue[2] = 'l';
             sValue[3] = 's';
             sValue[4] = 'e';
             sValue[5] = '\0';
-         } else if( nSystemID == SQLRDD_RDBMS_INFORM ) {
+         } else if( nSystemID == SQLRDD::RDBMS::INFORM ) {
             sValue[0] = '\'';
             sValue[1] = 'f';
             sValue[2] = '\'';
@@ -1216,7 +1216,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
     hb_dateDecStr(sDate, hb_itemGetDL(pFieldData));
     sValue = static_cast<char *>(hb_xgrab(31));
     switch (nSystemID) {
-    case SQLRDD_RDBMS_ORACLE: {
+    case SQLRDD::RDBMS::ORACLE: {
       if (!bMemo) {
         sprintf(sValue, "TO_DATE(\'%s\',\'YYYYMMDD\')", sDate);
         return sValue;
@@ -1236,7 +1236,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
     sValue = static_cast<char *>(hb_xgrab(6));
     if (hb_itemGetL(pFieldData)) {
       switch (nSystemID) {
-      case SQLRDD_RDBMS_POSTGR: {
+      case SQLRDD::RDBMS::POSTGR: {
         sValue[0] = 't';
         sValue[1] = 'r';
         sValue[2] = 'u';
@@ -1244,7 +1244,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
         sValue[4] = '\0';
         break;
       }
-      case SQLRDD_RDBMS_INFORM: {
+      case SQLRDD::RDBMS::INFORM: {
         sValue[0] = '\'';
         sValue[1] = 't';
         sValue[2] = '\'';
@@ -1258,7 +1258,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
       }
     } else {
       switch (nSystemID) {
-      case SQLRDD_RDBMS_POSTGR: {
+      case SQLRDD::RDBMS::POSTGR: {
         sValue[0] = 'f';
         sValue[1] = 'a';
         sValue[2] = 'l';
@@ -1267,7 +1267,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
         sValue[5] = '\0';
         break;
       }
-      case SQLRDD_RDBMS_INFORM: {
+      case SQLRDD::RDBMS::INFORM: {
         sValue[0] = '\'';
         sValue[1] = 'f';
         sValue[2] = '\'';
