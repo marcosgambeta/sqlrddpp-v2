@@ -204,7 +204,7 @@ static void SerializeMemo(PHB_ITEM pFieldData)
 
 void SR_SetInsertRecordStructure(SQLEXAREA *thiswa)
 {
-  thiswa->InsertRecord = (COLUMNBINDP)hb_xgrab(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND));
+  thiswa->InsertRecord = (COLUMNBIND *)hb_xgrab(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND));
   memset(thiswa->InsertRecord, 0, hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND));
 }
 
@@ -221,7 +221,7 @@ void SR_CreateInsertStmt(SQLEXAREA *thiswa)
   char declare[200] = {0};
   char cType;
   HB_BOOL bNullable, bMultiLang, bIsMemo;
-  COLUMNBINDP InsertRecord;
+  COLUMNBIND *InsertRecord;
   HB_USHORT uiPos;
 
   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
@@ -421,7 +421,7 @@ HB_ERRCODE SR_PrepareInsertStmt(SQLEXAREA *thiswa)
 HB_ERRCODE SR_BindInsertColumns(SQLEXAREA *thiswa)
 {
   int iCol, iCols, iBind;
-  COLUMNBINDP InsertRecord;
+  COLUMNBIND *InsertRecord;
   SQLRETURN res = SQL_ERROR;
 
   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
@@ -499,7 +499,7 @@ HB_ERRCODE SR_FeedRecordCols(SQLEXAREA *thiswa, HB_BOOL bUpdate)
 {
   int iCols, i;
   PHB_ITEM pFieldData, pTemp;
-  COLUMNBINDP InsertRecord;
+  COLUMNBIND *InsertRecord;
 
   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
@@ -689,7 +689,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREA *thiswa)
 {
   SQLRETURN res;
   int iCols, i, iBind;
-  COLUMNBINDP CurrRecord;
+  COLUMNBIND *CurrRecord;
   PHB_ITEM pColumns;
   char *temp;
 

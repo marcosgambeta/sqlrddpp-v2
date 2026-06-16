@@ -110,7 +110,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
   HB_BOOL bWhere = false;
   int iCol;
   INDEXBINDP SeekBind;
-  COLUMNBINDP BindStructure;
+  COLUMNBIND *BindStructure;
   HB_BOOL bDirectionFWD;
   char *temp;
 
@@ -179,7 +179,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
    HB_BOOL bWhere = false;
    int iCol;
    INDEXBINDP SeekBind;
-   COLUMNBINDP BindStructure;
+   COLUMNBIND *BindStructure;
    HB_BOOL bDirectionFWD;
    char * temp;
 
@@ -344,7 +344,7 @@ bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel)
 HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREA *thiswa, PHB_ITEM pKey, int *queryLevel)
 {
   INDEXBINDP SeekBind;
-  COLUMNBINDP BindStructure;
+  COLUMNBIND *BindStructure;
   int i, lenKey, size, iCol;
   const char *szKey;
 
@@ -575,7 +575,7 @@ void SR_BindSeekStmt(SQLEXAREA *thiswa, int queryLevel)
 {
   HSTMT hStmt;
   INDEXBINDP SeekBind, SeekBindParam;
-  COLUMNBINDP BindStructure;
+  COLUMNBIND *BindStructure;
   int iBind, iLoop;
   SQLRETURN res = SQL_ERROR;
   char *sSql;

@@ -472,7 +472,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREA *thiswa, PHB_ITEM pFieldData, HB_LO
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hStmt)
+HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBIND *BindStructure, HSTMT hStmt)
 {
   HB_BOOL bEmpty = SR_itemEmpty(pFieldData);
   SQLRETURN res;
@@ -649,7 +649,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE SR_SetBindEmptylValue(COLUMNBINDP BindStructure)
+HB_ERRCODE SR_SetBindEmptylValue(COLUMNBIND *BindStructure)
 {
   switch (BindStructure->iCType) {
   case SQL_C_CHAR: {
@@ -693,7 +693,7 @@ HB_ERRCODE SR_SetBindEmptylValue(COLUMNBINDP BindStructure)
 
 void ReleaseInsertRecordStructure(SQLEXAREA *thiswa, int iCols)
 {
-  COLUMNBINDP InsertRecord;
+  COLUMNBIND *InsertRecord;
   if (thiswa->InsertRecord) {
     int n;
     if (iCols == 0) {
@@ -718,7 +718,7 @@ void ReleaseInsertRecordStructure(SQLEXAREA *thiswa, int iCols)
 
 void ReleaseCurrRecordStructure(SQLEXAREA *thiswa, int iCols)
 {
-  COLUMNBINDP CurrRecord;
+  COLUMNBIND *CurrRecord;
 
   if (thiswa->CurrRecord) {
     int n;
@@ -800,9 +800,9 @@ void ReleaseIndexBindStructure(SQLEXAREA *thiswa)
 
 //------------------------------------------------------------------------
 
-COLUMNBINDP SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBINDP IndexBind)
+COLUMNBIND *SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBINDP IndexBind)
 {
-  COLUMNBINDP pBind = thiswa->CurrRecord;
+  COLUMNBIND *pBind = thiswa->CurrRecord;
   pBind += (IndexBind->lFieldPosDB - 1); // Place offset
   return pBind;
 }
@@ -813,7 +813,7 @@ static void BindAllIndexStmts(SQLEXAREA *thiswa)
 {
   HSTMT hStmt;
   INDEXBINDP IndexBind, IndexBindParam;
-  COLUMNBINDP BindStructure;
+  COLUMNBIND *BindStructure;
   int iCol, iBind, iLoop;
   SQLRETURN res = SQL_ERROR;
   char *sSql;
@@ -907,7 +907,7 @@ static void FeedCurrentRecordToBindings(SQLEXAREA *thiswa)
   PHB_ITEM pFieldData;
   int iCol;
   INDEXBINDP IndexBind;
-  COLUMNBINDP BindStructure;
+  COLUMNBIND *BindStructure;
   HB_BOOL newFieldData;
 
   if (thiswa->hOrdCurrent == 0) {
@@ -1127,13 +1127,13 @@ void SR_SetCurrRecordStructure(SQLEXAREA *thiswa)
   int i, iCols;
   HB_LONG lType;
   char cType;
-  COLUMNBINDP BindStructure;
+  COLUMNBIND *BindStructure;
   // HB_BOOL bNullable, bMultiLang, bIsMemo;
   HB_BOOL bMultiLang;
 
   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
-  thiswa->CurrRecord = (COLUMNBINDP)hb_xgrab(iCols * sizeof(COLUMNBIND));
+  thiswa->CurrRecord = (COLUMNBIND *)hb_xgrab(iCols * sizeof(COLUMNBIND));
   memset(thiswa->CurrRecord, 0, iCols * sizeof(COLUMNBIND));
 
   BindStructure = thiswa->CurrRecord;
@@ -1234,7 +1234,7 @@ static HB_ERRCODE getWhereExpression(SQLEXAREA *thiswa, int iListType)
   PHB_ITEM pFieldData, pTemp;
   HB_BOOL bArgumentIsNull;
   HB_BOOL bDirectionFWD;
-  COLUMNBINDP BindStructure;
+  COLUMNBIND *BindStructure;
   char *temp;
   // Culik Let Clear all memorym this is more eficient and safe the adding an \0 to position 0
   memset(thiswa->sWhere, 0, MAX_SQL_QUERY_LEN / 10 * sizeof(char));

@@ -202,7 +202,7 @@ struct _COLUMNBIND
 };
 
 using COLUMNBIND = _COLUMNBIND;
-using COLUMNBINDP = COLUMNBIND *;
+//using COLUMNBINDP = COLUMNBIND *; (deprecated)
 
 // SQL WORKAREA
 
@@ -388,9 +388,9 @@ struct SQLEXAREA
   // TRUE if workarea has historic
   bool bHistoric;
   // Column bindings to INSERT
-  COLUMNBINDP InsertRecord;
+  COLUMNBIND *InsertRecord;
   // Current record bindings for SKIP / UPDATE
-  COLUMNBINDP CurrRecord;
+  COLUMNBIND *CurrRecord;
   // Flags if a column was updated - must be cleared on every GO_COLD
   char editMask[MAX_FIELDS];
   // Copy of updateMask in currently prepared UPDATE stmt
@@ -423,10 +423,10 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
                  HB_BOOL bTCCompat, HB_BOOL bMemo, HB_BOOL *bNullArgument);
 HB_BOOL SR_itemEmpty(PHB_ITEM pItem);
 void SR_commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
-HB_ERRCODE SR_SetBindEmptylValue(COLUMNBINDP BindStructure);
-HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT hStmt);
+HB_ERRCODE SR_SetBindEmptylValue(COLUMNBIND *BindStructure);
+HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBIND *BindStructure, HSTMT hStmt);
 char *SR_QualifyName(char *szName, SQLEXAREA *thiswa);
-COLUMNBINDP SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBINDP IndexBind);
+COLUMNBIND *SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBINDP IndexBind);
 HB_BOOL SR_getColumnList(SQLEXAREA *thiswa);
 void SR_SolveFilters(SQLEXAREA *thiswa, bool bWhere);
 void SR_getOrderByExpression(SQLEXAREA *thiswa, HB_BOOL bUseOptimizerHints);
