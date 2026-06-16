@@ -522,20 +522,19 @@ static HB_ERRCODE sqlGoTop(SQLAREAP thiswa)
 
 static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, bool fExact)
 {
-  HB_LONG lorder = 0;
-  PHB_ITEM pTag, pKeyVal, itemTemp;
-  int iLimit, iResult = 0;
-  HB_BYTE len1, len2;
-  char *valbuf = nullptr;
-  const char *val1, *val2;
+  PHB_ITEM pKeyVal;
+  HB_BYTE len1;
+  const char *val1;
 
-  pTag = sr_loadTagDefault((SQLAREAP)thiswa, nullptr, &lorder);
+  HB_LONG lorder = 0;
+
+  PHB_ITEM pTag = sr_loadTagDefault((SQLAREAP)thiswa, nullptr, &lorder);
   if (pTag) {
     if (((SQLAREAP)thiswa)->firstinteract) {
       SELF_GOTOP((AREAP)thiswa);
       ((SQLAREAP)thiswa)->firstinteract = false;
     }
-    itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
+    PHB_ITEM itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
     if (HB_IS_NUMBER(itemTemp)) {
       pKeyVal = hb_itemArrayGet(((SQLAREAP)thiswa)->aBuffer, hb_arrayGetNL(pTag, INDEX_KEY_CODEBLOCK));
       len1 = static_cast<HB_BYTE>(hb_strRTrimLen(hb_itemGetCPtr(pKeyVal), hb_itemGetCLen(pKeyVal), false)) - 15;
@@ -554,15 +553,19 @@ static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, bool fExact)
     return 0;
   }
 
+  HB_BYTE len2;
+  char *valbuf = nullptr;
+  const char *val2;
+
   if (HB_IS_DATE(pKey)) {
     len2 = 8;
     valbuf = static_cast<char *>(hb_xgrab(9));
     val2 = hb_itemGetDS(pKey, valbuf);
   } else if (HB_IS_NUMBER(pKey)) {
-    PHB_ITEM pLen = hb_itemPutNL(nullptr, static_cast<HB_LONG>(len1));
-    val2 = valbuf = hb_itemStr(pKey, pLen, nullptr);
+    HB_ITEM pLen{};
+    hb_itemPutNL(&pLen, static_cast<HB_LONG>(len1));
+    val2 = valbuf = hb_itemStr(pKey, &pLen, nullptr);
     len2 = static_cast<HB_BYTE>(strlen(val2));
-    hb_itemRelease(pLen);
   } else if (HB_IS_LOGICAL(pKey)) {
     len2 = 1;
     val2 = hb_itemGetL(pKey) ? "T" : "F";
@@ -571,7 +574,9 @@ static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, bool fExact)
     val2 = hb_itemGetCPtr(pKey);
   }
 
-  iLimit = (len1 > len2) ? len2 : len1;
+  int iLimit = (len1 > len2) ? len2 : len1;
+
+  int iResult = 0;
 
   if (HB_IS_STRING(pKeyVal)) {
     if (iLimit > 0) {
