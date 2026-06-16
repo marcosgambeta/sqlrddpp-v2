@@ -2984,7 +2984,7 @@ static HB_ERRCODE sqlExOraFlush(SQLEXORAAREAP thiswa)
 
 static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM value)
 {
-  PHB_ITEM itemTemp, itemTemp3;
+  PHB_ITEM itemTemp3;
   HB_SIZE ulPos;
 
   if (thiswa->sqlarea.lpdbPendingRel) {
@@ -2994,7 +2994,7 @@ static HB_ERRCODE sqlExOraGetValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
     thiswa->sqlarea.firstinteract = false;
   }
 
-  itemTemp = hb_itemArrayGet(thiswa->sqlarea.aBuffer, thiswa->sqlarea.uiBufferIndex[fieldNum - 1]);
+  auto itemTemp = hb_itemArrayGet(thiswa->sqlarea.aBuffer, thiswa->sqlarea.uiBufferIndex[fieldNum - 1]);
 
   if (HB_IS_NIL(itemTemp)) {
     getMissingColumn(thiswa, hb_arrayGetItemPtr(thiswa->sqlarea.aBuffer, thiswa->sqlarea.uiBufferIndex[fieldNum - 1]),
@@ -3144,11 +3144,10 @@ static HB_ERRCODE sqlExOraGoCold(SQLEXORAAREAP thiswa)
 
 static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM value)
 {
-  PHB_ITEM pDest;
   LPFIELD pField;
   char *cfield;
   double dNum;
-  HB_USHORT len, dec, fieldindex;
+  HB_USHORT len, dec;
 
   // SR_TraceLog(nullptr, "sqlPutValue, writing column %i\n", fieldNum);
 
@@ -3161,9 +3160,9 @@ static HB_ERRCODE sqlExOraPutValue(SQLEXORAAREAP thiswa, HB_USHORT fieldNum, PHB
     SELF_FORCEREL(&thiswa->sqlarea.area);
   }
 
-  fieldindex = static_cast<HB_USHORT>(thiswa->sqlarea.uiBufferIndex[fieldNum - 1]);
+  auto fieldindex = static_cast<HB_USHORT>(thiswa->sqlarea.uiBufferIndex[fieldNum - 1]);
   thiswa->editMask[fieldindex - 1] = '1';
-  pDest = hb_itemArrayGet(thiswa->sqlarea.aBuffer, fieldindex);
+  auto pDest = hb_itemArrayGet(thiswa->sqlarea.aBuffer, fieldindex);
 
   if (!thiswa->sqlarea.uiFieldList[fieldNum - 1]) {
     thiswa->sqlarea.uiFieldList[fieldNum - 1] = 1;
