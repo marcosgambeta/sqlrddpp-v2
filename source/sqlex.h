@@ -119,8 +119,6 @@ struct SQL_CHAR_STRUCT
   int size_alloc;
 };
 
-//using SQL_CHAR_STRUCT = _SQL_CHAR_STRUCT; (deprecated)
-
 struct INDEXBIND
 {
   // Relative field position in aFields
@@ -148,9 +146,6 @@ struct INDEXBIND
   // Partial prepared query for debugging pourposes
   char SeekBwdSql[PREPARED_SQL_LEN];
 };
-
-//using INDEXBIND = _INDEXBIND; (deprecated)
-//using INDEXBINDP = INDEXBIND *; (deprecated)
 
 struct COLUMNBIND
 {
@@ -200,9 +195,6 @@ struct COLUMNBIND
   // Fiels is multi language ?
   bool isMultiLang;
 };
-
-//using COLUMNBIND = _COLUMNBIND; (deprecated)
-//using COLUMNBINDP = COLUMNBIND *; (deprecated)
 
 // SQL WORKAREA
 
@@ -402,14 +394,6 @@ struct SQLEXAREA
   // Table open is an select statement
   bool bIsSelect;
 };
-
-//using SQLEXAREA = _SQLEXAREA; (deprecated)
-//using LPSQLEXAREA = SQLEXAREA *; (deprecated)
-
-// deprecated
-//#ifndef SQLEXAREAP
-//#define SQLEXAREAP LPSQLEXAREA
-//#endif
 
 // prototypes
 
