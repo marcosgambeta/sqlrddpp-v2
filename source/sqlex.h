@@ -58,18 +58,30 @@
 
 #define SUPERTABLE (&sqlExSuper)
 
-#define MAX_INDEXES 51    // 50 + Natural Order
-#define MAX_INDEX_COLS 10 // Seek will work on indexes with up to MAX_INDEX_COLS columns
-#define PREPARED_SQL_LEN 400
-#define RECORD_LIST_SIZE 250
-#define COLUMN_BLOCK_SIZE 64
-#define FIELD_LIST_SIZE 6000
-#define FIELD_LIST_SIZE_PARAM 600
-#define MAX_SQL_QUERY_LEN 32000
-#define PAGE_READ_SIZE 50
-#define BUFFER_POOL_SIZE 250
-#define DEFAULT_INDEX_COLUMN_MAX_LEN 200
-#define INITIAL_MEMO_ALLOC 256
+//#define MAX_INDEXES 51    // 50 + Natural Order
+constexpr int MAX_INDEXES = 51;
+//#define MAX_INDEX_COLS 10 // Seek will work on indexes with up to MAX_INDEX_COLS columns
+constexpr int MAX_INDEX_COLS = 10;
+//#define PREPARED_SQL_LEN 400
+constexpr int PREPARED_SQL_LEN = 400;
+//#define RECORD_LIST_SIZE 250
+constexpr int RECORD_LIST_SIZE = 250;
+//#define COLUMN_BLOCK_SIZE 64
+constexpr int COLUMN_BLOCK_SIZE = 64;
+//#define FIELD_LIST_SIZE 6000
+constexpr int FIELD_LIST_SIZE = 6000;
+//#define FIELD_LIST_SIZE_PARAM 600
+constexpr int FIELD_LIST_SIZE_PARAM = 600;
+//#define MAX_SQL_QUERY_LEN 32000
+constexpr int MAX_SQL_QUERY_LEN = 32000;
+//#define PAGE_READ_SIZE 50
+constexpr int PAGE_READ_SIZE = 50;
+//#define BUFFER_POOL_SIZE 250
+constexpr int BUFFER_POOL_SIZE = 250;
+//#define DEFAULT_INDEX_COLUMN_MAX_LEN 200
+constexpr int DEFAULT_INDEX_COLUMN_MAX_LEN = 200;
+//#define INITIAL_MEMO_ALLOC 256
+constexpr int INITIAL_MEMO_ALLOC = 256;
 
 //                                                    1 1 11 1 1 11 1 12 2 2
 //                                 0 1 2 34 5 6 7 8 9 0 1 23 4 5 67 8 90 1 2
