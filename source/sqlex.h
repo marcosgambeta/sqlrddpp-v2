@@ -111,18 +111,30 @@ using SQL_CHAR_STRUCT = _SQL_CHAR_STRUCT;
 
 struct _INDEXBIND
 {
-  HB_LONG lFieldPosDB;               // Relative field position in aFields
-  HB_LONG hIndexOrder;               // Index order
-  int iLevel;                        // The current column in index
-  int iIndexColumns;                 // How many index columns in index
-  HSTMT SkipFwdStmt;                 // Index stmt handle for SQL phrase in this level for FWD movment
-  HSTMT SkipBwdStmt;                 // Index stmt handle for SQL phrase in this level for BWD movment
-  HSTMT SeekFwdStmt;                 // Index stmt handle for SQL phrase in this level for FWD movment
-  HSTMT SeekBwdStmt;                 // Index stmt handle for SQL phrase in this level for BWD movment
-  char SkipFwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
-  char SkipBwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
-  char SeekFwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
-  char SeekBwdSql[PREPARED_SQL_LEN]; // Partial prepared query for debugging pourposes
+  // Relative field position in aFields
+  HB_LONG lFieldPosDB;
+  // Index order
+  HB_LONG hIndexOrder;
+  // The current column in index
+  int iLevel;
+  // How many index columns in index
+  int iIndexColumns;
+  // Index stmt handle for SQL phrase in this level for FWD movment
+  HSTMT SkipFwdStmt;
+  // Index stmt handle for SQL phrase in this level for BWD movment
+  HSTMT SkipBwdStmt;
+  // Index stmt handle for SQL phrase in this level for FWD movment
+  HSTMT SeekFwdStmt;
+  // Index stmt handle for SQL phrase in this level for BWD movment
+  HSTMT SeekBwdStmt;
+  // Partial prepared query for debugging pourposes
+  char SkipFwdSql[PREPARED_SQL_LEN];
+  // Partial prepared query for debugging pourposes
+  char SkipBwdSql[PREPARED_SQL_LEN];
+  // Partial prepared query for debugging pourposes
+  char SeekFwdSql[PREPARED_SQL_LEN];
+  // Partial prepared query for debugging pourposes
+  char SeekBwdSql[PREPARED_SQL_LEN];
 };
 
 using INDEXBIND = _INDEXBIND;
@@ -130,29 +142,51 @@ using INDEXBINDP = INDEXBIND *;
 
 struct _COLUMNBIND
 {
-  int iParNum;                      // Parameter number in binded parameters
-  int iSQLType;                     // SQL data type of column
-  int iCType;                       // C data type of the argument. It determines
-                                    // the as* member to be used, like xHB iTem API 'type'
-  HB_LONG lFieldPosDB;              // Relative field position in aFields
-  HB_LONG lFieldPosWA;              // Relative field position in aBuffer. NULL if RECNO or DELETED column
-  char *colName;                    // Fully qualified column name to be used in queries
-  SQL_CHAR_STRUCT asChar;           // Support for char data types
-  SQLCHAR asLogical;                // Support for logical data type
-  SQL_DATE_STRUCT asDate;           // I suppose ODBC driver will suport default
-                                    // convertion to TIMESTAMP when needed
-  SQL_TIMESTAMP_STRUCT asTimestamp; // Timestamp support, always converted to DATE
-  SQLDOUBLE asNumeric;              // I suppose all ODBC drivers has build in
-                                    // convertion from this type to all types
-                                    // of numeric variables in SQL
-  SQLUINTEGER ColumnSize;           // To make an easy bind
-  SQLSMALLINT DecimalDigits;        // To make an easy bind
-  bool isNullable;                  // Is this column NULLABLE ?
-  bool isArgumentNull;              // Value to be bound is NULL ?
-  bool isBoundNULL;                 // Field was bound as NULL ?
-  SQLLEN lIndPtr;                   // Buffer lenght pointer to be used in SQLBindParam()
-  bool isMemo;                      // Field is MEMO ?
-  bool isMultiLang;                 // Fiels is multi language ?
+  // Parameter number in binded parameters
+  int iParNum;
+  // SQL data type of column
+  int iSQLType;
+  // C data type of the argument. It determines
+  // the as* member to be used, like xHB iTem API 'type'
+  int iCType;
+
+  // Relative field position in aFields
+  HB_LONG lFieldPosDB;
+  // Relative field position in aBuffer. NULL if RECNO or DELETED column
+  HB_LONG lFieldPosWA;
+  // Fully qualified column name to be used in queries
+  char *colName;
+  // Support for char data types
+  SQL_CHAR_STRUCT asChar;
+  // Support for logical data type
+  SQLCHAR asLogical;
+  // I suppose ODBC driver will suport default
+  // convertion to TIMESTAMP when needed
+  SQL_DATE_STRUCT asDate;
+
+  // Timestamp support, always converted to DATE
+  SQL_TIMESTAMP_STRUCT asTimestamp;
+  // I suppose all ODBC drivers has build in
+  // convertion from this type to all types
+  // of numeric variables in SQL
+  SQLDOUBLE asNumeric;
+
+  // To make an easy bind
+  SQLUINTEGER ColumnSize;
+  // To make an easy bind
+  SQLSMALLINT DecimalDigits;
+  // Is this column NULLABLE ?
+  bool isNullable;
+  // Value to be bound is NULL ?
+  bool isArgumentNull;
+  // Field was bound as NULL ?
+  bool isBoundNULL;
+  // Buffer lenght pointer to be used in SQLBindParam()
+  SQLLEN lIndPtr;
+  // Field is MEMO ?
+  bool isMemo;
+  // Fiels is multi language ?
+  bool isMultiLang;
 };
 
 using COLUMNBIND = _COLUMNBIND;
@@ -168,109 +202,193 @@ struct _SQLEXAREA
   // Warning: The above section MUST match WORKAREA exactly! Any
   // additions to the structure MUST be added below
 
-  PHB_CODEPAGE cdPageCnv; // Area's codepage convert pointer
-  char *szDataFileName;   // file name
-  HB_LONG hOrdCurrent;    // current index order
+  // Area's codepage convert pointer
+  PHB_CODEPAGE cdPageCnv;
+  // file name
+  char *szDataFileName;
+  // current index order
+  HB_LONG hOrdCurrent;
 
   bool shared;
-  bool readonly;         // only SELECT allowed
-  bool creating;         // TRUE when creating table
-  bool firstinteract;    // TRUE when workarea was not used yet
-  bool isam;             // ISAM Simulator ?
+  // only SELECT allowed
+  bool readonly;
+  // TRUE when creating table
+  bool creating;
+  // TRUE when workarea was not used yet
+  bool firstinteract;
+  // ISAM Simulator ?
+  bool isam;
   bool wasdel;
-  bool initialized;    // Workarea Initialization done
-  bool sqlfilter;      // SET FILTER converted to SQL
+  // Workarea Initialization done
+  bool initialized;
+  // SET FILTER converted to SQL
+  bool sqlfilter;
 
-  PHB_ITEM oWorkArea;  // SQL Workarea object
-  PHB_ITEM aInfo;      // Status array
-  PHB_ITEM aBuffer;    // Record buffer
-  PHB_ITEM aOrders;    // Indexes
-  PHB_ITEM aStruct;    // Table xBase structure
-  PHB_ITEM aLocked;    // Locked lines
-  PHB_ITEM aCreate;    // Structure received by dbCreate()
-  PHB_ITEM aCache;     // Workarea recordset cache
-  PHB_ITEM aOldBuffer; // Last workarea buffer
-  PHB_ITEM aEmptyBuff; // Empty buffer to be in eof()+1
+  // SQL Workarea object
+  PHB_ITEM oWorkArea;
+  // Status array
+  PHB_ITEM aInfo;
+  // Record buffer
+  PHB_ITEM aBuffer;
+  // Indexes
+  PHB_ITEM aOrders;
+  // Table xBase structure
+  PHB_ITEM aStruct;
+  // Locked lines
+  PHB_ITEM aLocked;
+  // Structure received by dbCreate()
+  PHB_ITEM aCreate;
+  // Workarea recordset cache
+  PHB_ITEM aCache;
+  // Last workarea buffer
+  PHB_ITEM aOldBuffer;
+  // Empty buffer to be in eof()+1
+  PHB_ITEM aEmptyBuff;
   PHB_ITEM aSelectList;
 
-  HB_ULONG ulhRecno;   // Recno position in field list
-  HB_ULONG ulhDeleted; // Deleted position in field list
+  // Recno position in field list
+  HB_ULONG ulhRecno;
+  // Deleted position in field list
+  HB_ULONG ulhDeleted;
 
-  int *uiBufferIndex;    // Field offset in fields array
-  int *uiFieldList;      // Keeps a field list for SELECT statements
-  int iColumnListStatus; // field list status - see sqlprototypes.h
+  // Field offset in fields array
+  int *uiBufferIndex;
+  // Keeps a field list for SELECT statements
+  int *uiFieldList;
+  // field list status - see sqlprototypes.h
+  int iColumnListStatus;
 
-  LPDBRELINFO lpdbPendingRel; // Pointer to parent rel struct
+  // Pointer to parent rel struct
+  LPDBRELINFO lpdbPendingRel;
 
   // SQLEX's additions to the SQLRDD workarea structure
 
-  PHB_ITEM oSql;        // SQL connection object
-  PHB_ITEM aFields;     // Table structure in DB
-  PHB_ITEM hBufferPool; // Hash containing the Buffer Pool
-  PHB_ITEM pIndexMgmnt; // Existing Indexes in database catalog (SR_MGMNTINDEXES) array
+  // SQL connection object
+  PHB_ITEM oSql;
+  // Table structure in DB
+  PHB_ITEM aFields;
+  // Hash containing the Buffer Pool
+  PHB_ITEM hBufferPool;
+  // Existing Indexes in database catalog (SR_MGMNTINDEXES) array
+  PHB_ITEM pIndexMgmnt;
 
-  HSTMT hStmt;                 // Statement handle
-  HSTMT hStmtBuffer;           // Statement handle with prepared statement to retrieve line
-  HSTMT hStmtInsert;           // Statement handle with prepared phrase to insert a new record
-  HSTMT hStmtNextval;          // Statement handle with prepared phrase to get inserted record
-  HSTMT hStmtUpdate;           // Statement handle with prepared phrase to insert a new record
-  HDBC hDbc;                   // Database connection handle
-  int nSystemID;               // Connected database ID
-  HB_ULONG lCurrentRecord;     // Should be filled by SR_GetCurrentRecordNum() to be used in SKIP bindings
-  HB_ULONG lUpdatedRecord;     // Should be filled by SR_GetCurrentRecordNum() to be used in UPDATE bindings
-  HB_ULONG lBofAt;             // BOF Record optimizer
-  HB_ULONG lEofAt;             // EOF Record optimizer
-  HB_ULONG lLastRec;           // LastRec() + 1
-  HB_ULONG *lRecordToRetrieve; // To be used with Binded Parameter
-  HB_ULONG *recordList;        // record list to skip on
-  char *deletedList;           // deleted list relative to record list
-  int recordListPos;           // record list position
-  int recordListSize;          // record list size
-  int recordListDirection;     // LIST_FORWARD or LIST_BACKWARD
-  int iTCCompat;               // Top Connect compatible
+  // Statement handle
+  HSTMT hStmt;
+  // Statement handle with prepared statement to retrieve line
+  HSTMT hStmtBuffer;
+  // Statement handle with prepared phrase to insert a new record
+  HSTMT hStmtInsert;
+  // Statement handle with prepared phrase to get inserted record
+  HSTMT hStmtNextval;
+  // Statement handle with prepared phrase to insert a new record
+  HSTMT hStmtUpdate;
+  // Database connection handle
+  HDBC hDbc;
+  // Connected database ID
+  int nSystemID;
+  // Should be filled by SR_GetCurrentRecordNum() to be used in SKIP bindings
+  HB_ULONG lCurrentRecord;
+  // Should be filled by SR_GetCurrentRecordNum() to be used in UPDATE bindings
+  HB_ULONG lUpdatedRecord;
+  // BOF Record optimizer
+  HB_ULONG lBofAt;
+  // EOF Record optimizer
+  HB_ULONG lEofAt;
+  // LastRec() + 1
+  HB_ULONG lLastRec;
+  // To be used with Binded Parameter
+  HB_ULONG *lRecordToRetrieve;
+  // record list to skip on
+  HB_ULONG *recordList;
+  // deleted list relative to record list
+  char *deletedList;
+  // record list position
+  int recordListPos;
+  // record list size
+  int recordListSize;
+  // LIST_FORWARD or LIST_BACKWARD
+  int recordListDirection;
+  // Top Connect compatible
+  int iTCCompat;
 
-  int indexColumns; // current index column list lenght
-  int indexLevel;   // index column list level in current skip sequence
+  // current index column list lenght
+  int indexColumns;
+  // index column list level in current skip sequence
+  int indexLevel;
 
-  int skipDirection; // 1 - FWD, (-1) - BWD, 0 - none
+  // 1 - FWD, (-1) - BWD, 0 - none
+  int skipDirection;
 
-  char *sFields;      // field list string
-  char *sSql;         // Last SQL phrase
-  char *sSqlBuffer;   // SQL Statement to get WA buffer
-  char *sTable;       // Qualified table name
-  char *sOwner;       // Database schema included in sTable
-  char *sWhere;       // Where clause
-  char *sOrderBy;     // Order By clause
-  char *sRecnoName;   // Recno column name
-  char *sDeletedName; // Deleted column name
-  char sLimit1[50];   // String for recordset limit
-  char sLimit2[50];   // String for recordset limit
+  // field list string
+  char *sFields;
+  // Last SQL phrase
+  char *sSql;
+  // SQL Statement to get WA buffer
+  char *sSqlBuffer;
+  // Qualified table name
+  char *sTable;
+  // Database schema included in sTable
+  char *sOwner;
+  // Where clause
+  char *sWhere;
+  // Order By clause
+  char *sOrderBy;
+  // Recno column name
+  char *sRecnoName;
+  // Deleted column name
+  char *sDeletedName;
+  // String for recordset limit
+  char sLimit1[50];
+  // String for recordset limit
+  char sLimit2[50];
 
-  bool bufferHot;        // Does it have to write buffer down to database ?
-  bool bIsInsert;        // true if appending a new record
-  bool bConnVerified;    // Already checked for ODBC connection ?
-  bool bReverseIndex;    // If current index is in DESCENDING order
-  // INDEXBINDP IndexBindings[MAX_INDEXES]; // Index column and prepared SQL expression handles for SKIP
-  INDEXBINDP *IndexBindings; // Index column and prepared SQL expression handles for SKIP
+  // Does it have to write buffer down to database ?
+  bool bufferHot;
+  // true if appending a new record
+  bool bIsInsert;
+  // Already checked for ODBC connection ?
+  bool bConnVerified;
+  // If current index is in DESCENDING order
+  bool bReverseIndex;
+  // Index column and prepared SQL expression handles for SKIP
+  // INDEXBINDP IndexBindings[MAX_INDEXES];
+  // Index column and prepared SQL expression handles for SKIP
+  INDEXBINDP *IndexBindings;
 
-  HSTMT *colStmt;                // Single column retrieving statements
-  bool bConditionChanged1;       // If any of conditions like filters, scope, historic, has
-                                 // changed, prepared statements handles for Record List
-                                 // are no longer valid - USED FOR SKIP / GO TOP / BO BOTTOM
-  bool bConditionChanged2;       // If any of conditions like filters, scope, historic, has
-                                 // changed, prepared statements handles for Record List
-                                 // are no longer valid - USED FOR SEEK
-  bool bOrderChanged;            // If order has changed, we should fix column bindings
-                                 // before use then
-  bool bRebuildSeekQuery;        // If query for Seek must be recreated due to NULL interference
-  bool bHistoric;                // TRUE if workarea has historic
-  COLUMNBINDP InsertRecord;      // Column bindings to INSERT
-  COLUMNBINDP CurrRecord;        // Current record bindings for SKIP / UPDATE
-  char editMask[MAX_FIELDS];     // Flags if a column was updated - must be cleared on every GO_COLD
-  char updatedMask[MAX_FIELDS];  // Copy of updateMask in currently prepared UPDATE stmt
-  char specialMask[MAX_FIELDS];  // Same of updateMask but for special cols (INDKEY_xx and FORKEY_xx)
-  bool bIndexTouchedInUpdate;    // If any index column is affected by UPDATE
-  bool bIsSelect;                // Table open is an select statement
+  // Single column retrieving statements
+  HSTMT *colStmt;
+  // If any of conditions like filters, scope, historic, has
+  // changed, prepared statements handles for Record List
+  // are no longer valid - USED FOR SKIP / GO TOP / BO BOTTOM
+  bool bConditionChanged1;
+
+  // If any of conditions like filters, scope, historic, has
+  // changed, prepared statements handles for Record List
+  // are no longer valid - USED FOR SEEK
+  bool bConditionChanged2;
+
+  // If order has changed, we should fix column bindings
+  // before use then
+  bool bOrderChanged;
+
+  // If query for Seek must be recreated due to NULL interference
+  bool bRebuildSeekQuery;
+  // TRUE if workarea has historic
+  bool bHistoric;
+  // Column bindings to INSERT
+  COLUMNBINDP InsertRecord;
+  // Current record bindings for SKIP / UPDATE
+  COLUMNBINDP CurrRecord;
+  // Flags if a column was updated - must be cleared on every GO_COLD
+  char editMask[MAX_FIELDS];
+  // Copy of updateMask in currently prepared UPDATE stmt
+  char updatedMask[MAX_FIELDS];
+  // Same of updateMask but for special cols (INDKEY_xx and FORKEY_xx)
+  char specialMask[MAX_FIELDS];
+  // If any index column is affected by UPDATE
+  bool bIndexTouchedInUpdate;
+  // Table open is an select statement
+  bool bIsSelect;
 };
 
 using SQLEXAREA = _SQLEXAREA;
