@@ -404,7 +404,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREAP thiswa, PHB_ITEM pFieldData, HB_LO
   auto pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB);
 
   if (thiswa->colStmt[lFieldPosDB - 1] == nullptr) {
-    res = SQLAllocStmt((HDBC)thiswa->hDbc, &(thiswa->colStmt[lFieldPosDB - 1]));
+    res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->colStmt[lFieldPosDB - 1]));
 
     if (CHECK_SQL_N_OK(res)) {
       return HB_FAILURE;
@@ -1357,7 +1357,7 @@ HB_ERRCODE getWorkareaParams(SQLEXAREAP thiswa)
   if (!thiswa->oSql) {
     thiswa->oSql = getMessageItem(thiswa->oWorkArea, "OSQL");
     thiswa->aFields = getMessageItem(thiswa->oWorkArea, "AFIELDS");
-    thiswa->hDbc = (HDBC)getMessagePtr(thiswa->oSql, "HDBC");
+    thiswa->hDbc = static_cast<HDBC>(getMessagePtr(thiswa->oSql, "HDBC"));
     thiswa->nSystemID = getMessageNL(thiswa->oSql, "NSYSTEMID");
     thiswa->sTable = getMessageC(thiswa->oWorkArea, "CQUALIFIEDTABLENAME");
     thiswa->sOwner = getMessageC(thiswa->oWorkArea, "COWNER");
@@ -1381,7 +1381,7 @@ HB_ERRCODE getWorkareaParams(SQLEXAREAP thiswa)
   }
   thiswa->bIsSelect = getMessageL(thiswa->oWorkArea, "LTABLEISSELECT");
   // if (!thiswa->hStmtInsert) {
-  //   SQLAllocHandle(SQL_HANDLE_STMT, (HDBC)thiswa->hDbc, &(thiswa->hStmtInsert));
+  //   SQLAllocHandle(SQL_HANDLE_STMT, static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmtInsert));
   // }
 
   return HB_SUCCESS;
@@ -1504,7 +1504,7 @@ static HB_ERRCODE getRecordList(SQLEXAREAP thiswa, int iMax) // Returns true if 
   SQLRETURN res;
   int i, recordListChanged;
 
-  res = SQLAllocStmt((HDBC)thiswa->hDbc, &(thiswa->hStmt));
+  res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmt));
 
   if (CHECK_SQL_N_OK(res)) {
     return HB_FAILURE;
@@ -1573,7 +1573,7 @@ static HB_ERRCODE getFirstColumnAsLong(SQLEXAREAP thiswa, long *szValue) // Retu
 {
   SQLRETURN res;
 
-  res = SQLAllocStmt((HDBC)thiswa->hDbc, &(thiswa->hStmt));
+  res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmt));
 
   if (CHECK_SQL_N_OK(res)) {
     return HB_FAILURE;
@@ -1794,7 +1794,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREAP thiswa, HB_BOOL bUpdateDeleted)
       // thiswa->hStmtBuffer = NULL;
     }
 
-    res = SQLAllocStmt((HDBC)thiswa->hDbc, &(thiswa->hStmtBuffer));
+    res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmtBuffer));
     if (CHECK_SQL_N_OK(res)) {
       return HB_FAILURE;
     }
@@ -2002,7 +2002,7 @@ HB_ERRCODE prepareRecordListQuery(SQLEXAREAP thiswa)
   // culik not needed, we we are in the offset
   IndexBind += (thiswa->indexLevel - 1); // Place Offset
 
-  res = SQLAllocStmt((HDBC)thiswa->hDbc, &hPrep);
+  res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &hPrep);
 
   if (CHECK_SQL_N_OK(res)) {
     return HB_FAILURE;
@@ -2846,7 +2846,7 @@ static HB_ERRCODE sqlExDeleteRec(SQLEXAREAP thiswa)
               static_cast<int>(SR_GetCurrentRecordNum(thiswa)));
     }
 
-    res = SQLAllocStmt((HDBC)thiswa->hDbc, &(thiswa->hStmt));
+    res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmt));
     if (CHECK_SQL_N_OK(res)) {
       return HB_FAILURE;
     }
@@ -3251,7 +3251,7 @@ static HB_ERRCODE sqlExRecall(SQLEXAREAP thiswa)
             thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ", thiswa->sRecnoName,
             static_cast<int>(SR_GetCurrentRecordNum(thiswa)));
 
-    res = SQLAllocStmt((HDBC)thiswa->hDbc, &(thiswa->hStmt));
+    res = SQLAllocStmt(static_cast<HDBC>(thiswa->hDbc), &(thiswa->hStmt));
     if (CHECK_SQL_N_OK(res)) {
       return HB_FAILURE;
     }
