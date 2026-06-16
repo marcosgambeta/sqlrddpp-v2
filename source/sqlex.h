@@ -404,7 +404,7 @@ struct _SQLEXAREA
 };
 
 using SQLEXAREA = _SQLEXAREA;
-using LPSQLEXAREA = SQLEXAREA *;
+//using LPSQLEXAREA = SQLEXAREA *; (deprecated)
 
 // deprecated
 //#ifndef SQLEXAREAP
