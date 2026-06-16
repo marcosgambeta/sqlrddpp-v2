@@ -868,22 +868,22 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
   return pRet;
 }
 
+// SR_DBQUALIFY(cPar1, nPar2) -> string
 HB_FUNC(SR_DBQUALIFY)
 {
   auto pText = hb_param(1, HB_IT_STRING);
-  int ulDb = hb_parni(2);
+  auto ulDb = hb_parni(2);
 
-  if (pText) {
-    char *szOut;
-    HB_SIZE ulLen, i;
-
+  if (pText != nullptr) {
     auto pszBuffer = hb_itemGetCPtr(pText);
-    ulLen = hb_itemGetCLen(pText);
-    szOut = static_cast<char *>(hb_xgrab(ulLen + 3));
+    auto ulLen = hb_itemGetCLen(pText);
+    auto szOut = static_cast<char *>(hb_xgrab(ulLen + 3));
 
     // Firebird, DB2, ADABAS and Oracle must be uppercase
     // Postgres, MySQL and Ingres must be lowercase
     // Others, doesn't matter column case
+
+    HB_SIZE i;
 
     switch (ulDb) {
     case SQLRDD::RDBMS::ORACLE:
