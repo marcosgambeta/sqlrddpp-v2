@@ -152,7 +152,7 @@ struct _INDEXBIND
 using INDEXBIND = _INDEXBIND;
 using INDEXBINDP = INDEXBIND *;
 
-struct _COLUMNBIND
+struct COLUMNBIND
 {
   // Parameter number in binded parameters
   int iParNum;
@@ -201,7 +201,7 @@ struct _COLUMNBIND
   bool isMultiLang;
 };
 
-using COLUMNBIND = _COLUMNBIND;
+//using COLUMNBIND = _COLUMNBIND; (deprecated)
 //using COLUMNBINDP = COLUMNBIND *; (deprecated)
 
 // SQL WORKAREA
