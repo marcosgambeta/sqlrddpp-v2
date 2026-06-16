@@ -48,23 +48,23 @@ PHB_ITEM sr_escapeNumber(char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pR
 PHB_ITEM sr_getBaseLang(PHB_ITEM);
 PHB_ITEM sr_getSecondLang(PHB_ITEM);
 PHB_ITEM sr_getRootLang(PHB_ITEM);
-HB_BOOL HB_EXPORT sr_lSerializedAsString(void);
-HB_BOOL HB_EXPORT sr_lHideRecno(void);
-HB_BOOL HB_EXPORT sr_lHideHistoric(void);
-HB_BOOL HB_EXPORT sr_isMultilang(void);
-HB_BOOL HB_EXPORT sr_isShutdownProcess(void);
-HB_BOOL HB_EXPORT sr_UseDeleteds(void);
-HB_BOOL HB_EXPORT sr_lSerializeArrayAsJson(void);
-HB_BOOL HB_EXPORT sr_lsql2008newTypes(void);
-HB_BOOL HB_EXPORT sr_iOldPgsBehavior(void);
-HB_BOOL HB_EXPORT sr_fShortasNum(void);
+bool HB_EXPORT sr_lSerializedAsString();
+bool HB_EXPORT sr_lHideRecno();
+bool HB_EXPORT sr_lHideHistoric();
+bool HB_EXPORT sr_isMultilang();
+bool HB_EXPORT sr_isShutdownProcess();
+bool HB_EXPORT sr_UseDeleteds();
+bool HB_EXPORT sr_lSerializeArrayAsJson();
+bool HB_EXPORT sr_lsql2008newTypes();
+bool HB_EXPORT sr_iOldPgsBehavior();
+bool HB_EXPORT sr_fShortasNum();
 #ifdef SQLRDD_COMPAT_PRE_1_1
 HB_BOOL hb_arraySetNL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_LONG ulVal);
 HB_BOOL hb_arraySetL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_BOOL lVal);
 #endif
 //HB_BOOL iTemCompEqual(PHB_ITEM pItem1, PHB_ITEM pItem2); NOTE: changed to static
 HB_BOOL hb_itemEmpty(PHB_ITEM pItem);
-HB_BOOL sr_GoTopOnScope(void);
+bool sr_GoTopOnScope();
 
 // SOme commom defines to ALL SQL RDDs
 

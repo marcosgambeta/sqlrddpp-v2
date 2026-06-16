@@ -2417,22 +2417,22 @@ RETURN SQLRDD_RDBMS_UNKNOW
 
 #include "compat.h"
 
-static HB_BOOL s_fMultiLang = false;
-static HB_BOOL s_fShutDown = false;
-static HB_BOOL s_fGoTopOnScope = true;
-static HB_BOOL s_fSerializedAsString = false;
-static HB_BOOL s_fHideRecno = true;
-static HB_BOOL s_fHideHistoric = false;
-static HB_BOOL s_fUseDeleteds = true;
+static bool s_fMultiLang = false;
+static bool s_fShutDown = false;
+static bool s_fGoTopOnScope = true;
+static bool s_fSerializedAsString = false;
+static bool s_fHideRecno = true;
+static bool s_fHideHistoric = false;
+static bool s_fUseDeleteds = true;
 // Culik added new global to tell if we will serialize arrays as json or xml
-static HB_BOOL s_fSerializeArrayAsJson = false;
+static bool s_fSerializeArrayAsJson = false;
 // Culik added new global to tell if we are using sqlverser 2008 or newer
-static HB_BOOL s_fSql2008newTypes = false;
+static bool s_fSql2008newTypes = false;
 
-static HB_BOOL s_iOldPgsBehavior = false;
-static HB_BOOL s_fShortasNum = false;
+static bool s_iOldPgsBehavior = false;
+static bool s_fShortasNum = false;
 
-HB_BOOL HB_EXPORT sr_isMultilang(void)
+bool HB_EXPORT sr_isMultilang()
 {
   return s_fMultiLang;
 }
@@ -2445,7 +2445,7 @@ HB_FUNC(SR_SETMULTILANG)
   }
 }
 
-HB_BOOL HB_EXPORT sr_isShutdownProcess(void)
+bool HB_EXPORT sr_isShutdownProcess()
 {
   return s_fShutDown;
 }
@@ -2458,7 +2458,7 @@ HB_FUNC(SR_SETSHUTDOWN)
   }
 }
 
-HB_BOOL HB_EXPORT sr_GoTopOnScope(void)
+bool HB_EXPORT sr_GoTopOnScope()
 {
   return s_fGoTopOnScope;
 }
@@ -2471,7 +2471,7 @@ HB_FUNC(SR_SETGOTOPONSCOPE)
   }
 }
 
-HB_BOOL HB_EXPORT sr_lSerializedAsString(void)
+bool HB_EXPORT sr_lSerializedAsString()
 {
   return s_fSerializedAsString;
 }
@@ -2484,7 +2484,7 @@ HB_FUNC(SR_SETSERIALIZEDSTRING)
   }
 }
 
-HB_BOOL HB_EXPORT sr_lHideRecno(void)
+bool HB_EXPORT sr_lHideRecno()
 {
   return s_fHideRecno;
 }
@@ -2497,7 +2497,7 @@ HB_FUNC(SR_SETHIDERECNO)
   }
 }
 
-HB_BOOL HB_EXPORT sr_lHideHistoric(void)
+bool HB_EXPORT sr_lHideHistoric()
 {
   return s_fHideHistoric;
 }
@@ -2510,7 +2510,7 @@ HB_FUNC(SR_SETHIDEHISTORIC)
   }
 }
 
-HB_BOOL HB_EXPORT sr_UseDeleteds(void)
+bool HB_EXPORT sr_UseDeleteds()
 {
   return s_fUseDeleteds;
 }
@@ -2523,7 +2523,7 @@ HB_FUNC(SR_USEDELETEDS)
   }
 }
 
-HB_BOOL HB_EXPORT sr_lSerializeArrayAsJson(void)
+bool HB_EXPORT sr_lSerializeArrayAsJson()
 {
   return s_fSerializeArrayAsJson;
 }
@@ -2536,12 +2536,12 @@ HB_FUNC(SR_SETSERIALIZEARRAYASJSON)
   }
 }
 
-HB_BOOL HB_EXPORT sr_lsql2008newTypes(void)
+bool HB_EXPORT sr_lsql2008newTypes()
 {
   return s_fSql2008newTypes;
 }
 
-HB_BOOL HB_EXPORT sr_iOldPgsBehavior(void)
+bool HB_EXPORT sr_iOldPgsBehavior()
 {
   return s_iOldPgsBehavior;
 }
@@ -2561,7 +2561,7 @@ HB_FUNC(SR_SETSQL2008NEWTYPES)
 
 HB_FUNC(SR_SETPGSOLDBEHAVIOR)
 {
-  int iOld = s_iOldPgsBehavior;
+  bool iOld = s_iOldPgsBehavior;
   if (HB_ISLOG(1)) {
     s_iOldPgsBehavior = hb_parl(1);
   }
@@ -2569,7 +2569,7 @@ HB_FUNC(SR_SETPGSOLDBEHAVIOR)
 }
 
 
-HB_BOOL HB_EXPORT sr_fShortasNum(void)
+bool HB_EXPORT sr_fShortasNum()
 {
   return s_fShortasNum;
 }
