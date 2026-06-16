@@ -280,7 +280,7 @@ typedef struct _SQLAREA
   char editMask[MAX_FIELDS];  // Flags if a column was updated - must be cleared on every GO_COLD - USED BY ODBCRDD
 } SQLAREA;
 
-typedef SQLAREA *LPSQLAREA;
+//typedef SQLAREA *LPSQLAREA; (deprecated)
 
 // deprecated
 //#ifndef SQLAREAP
