@@ -1028,7 +1028,7 @@ void SR_SolveFilters(SQLEXAREAP thiswa, bool bWhere)
 
   if (thiswa->hOrdCurrent > 0) {
     auto pIndexRef = hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
-    const char *szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
+    auto szFilter = hb_arrayGetCPtr(pIndexRef, SCOPE_SQLEXPR);
     if (szFilter != nullptr && szFilter[0]) {
       if (bWhere) {
         char *temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));

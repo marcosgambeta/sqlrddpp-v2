@@ -754,8 +754,8 @@ HB_FUNC_STATIC(SR_ORACLEWRITEMEMO)
     for (uiSize = 0; uiSize < uiLen; uiSize++) {
       auto pFieldDesc = hb_arrayGetItemPtr(pArray, uiSize + 1);
       char szSql[256] = {0};
-      const char *sMemo = hb_arrayGetCPtr(pFieldDesc, 2);
-      const char *sField = hb_arrayGetCPtr(pFieldDesc, 1);
+      auto sMemo = hb_arrayGetCPtr(pFieldDesc, 2);
+      auto sField = hb_arrayGetCPtr(pFieldDesc, 1);
       sprintf(szSql, "UPDATE %s SET %s = EMPTY_CLOB() WHERE %s = %lu RETURNING %s INTO :b1", sTable, sField, sRecnoName,
               ulRecno, sField);
 

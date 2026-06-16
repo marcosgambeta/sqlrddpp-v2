@@ -335,7 +335,7 @@ static void sr_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, cons
   const HB_LONG lType = hb_arrayGetNL(pField, FIELD_DOMAIN);
   const HB_SIZE lLen = hb_arrayGetNL(pField, FIELD_LEN);
   const HB_SIZE lDec = hb_arrayGetNL(pField, FIELD_DEC);
-  const char *cType = hb_arrayGetCPtr(pField, FIELD_TYPE);
+  auto cType = hb_arrayGetCPtr(pField, FIELD_TYPE);
 
   if (lLenBuff <= 0) {
     // database content is NULL
@@ -1113,8 +1113,8 @@ HB_FUNC_STATIC(SR_ODBCWRITEMEMO)
     for (uiSize = 0; uiSize < uiLen; uiSize++) {
       auto pFieldDesc = hb_arrayGetItemPtr(pArray, uiSize + 1);
       char szSql[512] = {0};
-      const char *sMemo = hb_arrayGetCPtr(pFieldDesc, 2);
-      const char *sField = hb_arrayGetCPtr(pFieldDesc, 1);
+      auto sMemo = hb_arrayGetCPtr(pFieldDesc, 2);
+      auto sField = hb_arrayGetCPtr(pFieldDesc, 1);
       sprintf(szSql, "UPDATE %s SET %s = ? WHERE %s = %lu", sTable, sField, sRecnoName, ulRecno);
 
       cbSize = strlen(sMemo);
