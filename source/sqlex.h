@@ -112,14 +112,14 @@ static const char *closeQuotes = "\"\"\"]\"\"\"\"\"\"\"\"`\"\"\"`\"\"`\"\"\"";
 // other parts... I mean, it's duplicated, but I prefer to waste a few bytes more and have
 // things at hand, making this RDD faster
 
-struct _SQL_CHAR_STRUCT
+struct SQL_CHAR_STRUCT
 {
   SQLCHAR *value;
   int size;
   int size_alloc;
 };
 
-using SQL_CHAR_STRUCT = _SQL_CHAR_STRUCT;
+//using SQL_CHAR_STRUCT = _SQL_CHAR_STRUCT; (deprecated)
 
 struct INDEXBIND
 {
