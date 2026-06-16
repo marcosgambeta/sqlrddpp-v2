@@ -2932,7 +2932,7 @@ static HB_ERRCODE sqlExFlush(SQLEXAREAP thiswa)
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM value)
 {
-  PHB_ITEM itemTemp, itemTemp3;
+  PHB_ITEM itemTemp3;
   HB_SIZE ulPos;
 
   if (thiswa->lpdbPendingRel) {
@@ -2942,7 +2942,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREAP thiswa, HB_USHORT fieldNum, PHB_ITEM 
     thiswa->firstinteract = false;
   }
 
-  itemTemp = hb_itemArrayGet(thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1]);
+  auto itemTemp = hb_itemArrayGet(thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1]);
 
   if (HB_IS_NIL(itemTemp)) {
     getMissingColumn(thiswa, hb_arrayGetItemPtr(thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1]),
@@ -4313,7 +4313,7 @@ static int sqlKeyCompareEx(SQLEXAREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact)
       thiswa->firstinteract = false;
     }
 
-    PHB_ITEM itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
+    auto itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
     // if (pTag) {
     //   HB_EVALINFO info;
     //   hb_evalNew(&info, hb_itemArrayGet(pTag, INDEXMAN_KEY_CODEBLOCK));
