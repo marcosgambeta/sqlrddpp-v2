@@ -66,7 +66,7 @@
 
 // SQL WORKAREA
 
-struct _SQLAREA
+struct SQLAREA
 {
   AREA area;
 
@@ -139,7 +139,7 @@ struct _SQLAREA
   char editMask[MAX_FIELDS];
 };
 
-using SQLAREA = _SQLAREA;
+//using SQLAREA = _SQLAREA; (deprecated)
 //using LPSQLAREA = SQLAREA *; (deprecated)
 
 // deprecated
