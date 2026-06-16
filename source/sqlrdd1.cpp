@@ -528,15 +528,15 @@ static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, bool fExact)
 
   HB_LONG lorder = 0;
 
-  PHB_ITEM pTag = sr_loadTagDefault((SQLAREAP)thiswa, nullptr, &lorder);
+  PHB_ITEM pTag = sr_loadTagDefault(reinterpret_cast<SQLAREAP>(thiswa), nullptr, &lorder);
   if (pTag) {
-    if (((SQLAREAP)thiswa)->firstinteract) {
+    if (reinterpret_cast<SQLAREAP>(thiswa)->firstinteract) {
       SELF_GOTOP((AREAP)thiswa);
-      ((SQLAREAP)thiswa)->firstinteract = false;
+      reinterpret_cast<SQLAREAP>(thiswa)->firstinteract = false;
     }
     PHB_ITEM itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
     if (HB_IS_NUMBER(itemTemp)) {
-      pKeyVal = hb_itemArrayGet(((SQLAREAP)thiswa)->aBuffer, hb_arrayGetNL(pTag, INDEX_KEY_CODEBLOCK));
+      pKeyVal = hb_itemArrayGet(reinterpret_cast<SQLAREAP>(thiswa)->aBuffer, hb_arrayGetNL(pTag, INDEX_KEY_CODEBLOCK));
       len1 = static_cast<HB_BYTE>(hb_strRTrimLen(hb_itemGetCPtr(pKeyVal), hb_itemGetCLen(pKeyVal), false)) - 15;
       val1 = hb_itemGetCPtr(pKeyVal);
     } else {
@@ -2706,7 +2706,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
           hb_itemRelease(pTemp);
         }
         if (pInfo->itmNewVal) {
-          sqlSetServerSideIndexScope((SQLAREAP)thiswa, 0, pInfo->itmNewVal);
+          sqlSetServerSideIndexScope(reinterpret_cast<SQLAREAP>(thiswa), 0, pInfo->itmNewVal);
         }
         hb_itemRelease(pTag);
       } else {
@@ -2723,7 +2723,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
           hb_itemRelease(pTemp);
         }
         if (pInfo->itmNewVal) {
-          sqlSetServerSideIndexScope((SQLAREAP)thiswa, 1, pInfo->itmNewVal);
+          sqlSetServerSideIndexScope(reinterpret_cast<SQLAREAP>(thiswa), 1, pInfo->itmNewVal);
         }
         hb_itemRelease(pTag);
       } else {
@@ -2734,14 +2734,14 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
     case DBOI_SCOPETOPCLEAR: {
       pTag = sr_loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
-        sqlSetServerSideIndexScope((SQLAREAP)thiswa, 0, nullptr);
+        sqlSetServerSideIndexScope(reinterpret_cast<SQLAREAP>(thiswa), 0, nullptr);
       }
       break;
     }
     case DBOI_SCOPEBOTTOMCLEAR: {
       pTag = sr_loadTagDefault(thiswa, pInfo, &lorder);
       if (pTag) {
-        sqlSetServerSideIndexScope((SQLAREAP)thiswa, 1, nullptr);
+        sqlSetServerSideIndexScope(reinterpret_cast<SQLAREAP>(thiswa), 1, nullptr);
       }
       break;
     }
@@ -2754,7 +2754,7 @@ static HB_ERRCODE sqlOrderInfo(SQLAREAP thiswa, HB_USHORT uiIndex, LPDBORDERINFO
           hb_itemRelease(pTemp);
         }
         if (pInfo->itmNewVal) {
-          sqlSetServerSideIndexScope((SQLAREAP)thiswa, TOP_BOTTOM_SCOPE, pInfo->itmNewVal);
+          sqlSetServerSideIndexScope(reinterpret_cast<SQLAREAP>(thiswa), TOP_BOTTOM_SCOPE, pInfo->itmNewVal);
         }
         hb_itemRelease(pTag);
       } else {
@@ -3700,7 +3700,7 @@ HB_CALL_ON_STARTUP_END(_hb_sqlrdd_rdd_init_)
 
 HB_FUNC(SR_SETFOUND)
 {
-  SQLAREAP pArea = (SQLAREAP)hb_rddGetCurrentWorkAreaPointer();
+  SQLAREAP pArea = reinterpret_cast<SQLAREAP>(hb_rddGetCurrentWorkAreaPointer());
 
   if (pArea) {
     auto pFound = hb_param(1, HB_IT_LOGICAL);
