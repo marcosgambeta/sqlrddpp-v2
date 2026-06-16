@@ -34,7 +34,8 @@
 // NOTES:
 // Needs to be kept in sync with the sqlrddpp.ch file.
 // These constants are deprecated. If necessary, change
-// your C/C++ code to use SQLRDD_RDBMS_*.
+// your C code to use SQLRDD_RDBMS_* and/or your C++ code
+// to use SQLRDD::RDBMS::*.
 #define SYSTEMID_UNKNOW                0
 #define SYSTEMID_ORACLE                1
 #define SYSTEMID_MSSQL6                2
@@ -83,5 +84,36 @@
 #define SQLRDD_RDBMS_FIREBR3              20
 #define SQLRDD_RDBMS_FIREBR4              21
 #define SQLRDD_RDBMS_FIREBR5              22
+
+namespace SQLRDD {
+  namespace RDBMS {
+    // NOTE: needs to be kept in sync with the sqlrddpp.ch file
+    enum ID : int {
+      UNKNOW = 0,
+      ORACLE = 1,
+      MSSQL6 = 2,
+      MSSQL7 = 3,
+      SQLANY = 4,
+      SYBASE = 5,
+      ACCESS = 6,
+      INGRES = 7,
+      SQLBAS = 8,
+      ADABAS = 9,
+      INFORM = 10,
+      IBMDB2 = 11,
+      MYSQL = 12,
+      POSTGR = 13,
+      FIREBR = 14,
+      CACHE = 15,
+      OTERRO = 16,
+      PERVASIVE = 17,
+      AZURE = 18,
+      MARIADB = 19,
+      FIREBR3 = 20,
+      FIREBR4 = 21,
+      FIREBR5 = 22
+    };
+  }
+}
 
 #endif // SQLRDDPP_H
