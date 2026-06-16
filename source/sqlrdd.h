@@ -148,6 +148,6 @@ using LPSQLAREA = SQLAREA *;
 
 // prototypes
 
-void SR_commonError(AREAP ThisDb, HB_USHORT uiGenCode, HB_USHORT uiSubCode, const char *filename);
+void SR_commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
 
 #endif // SQLRDD_H
