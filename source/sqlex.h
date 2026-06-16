@@ -150,7 +150,7 @@ struct _INDEXBIND
 };
 
 using INDEXBIND = _INDEXBIND;
-using INDEXBINDP = INDEXBIND *;
+//using INDEXBINDP = INDEXBIND *; (deprecated)
 
 struct COLUMNBIND
 {
@@ -363,9 +363,9 @@ struct SQLEXAREA
   // If current index is in DESCENDING order
   bool bReverseIndex;
   // Index column and prepared SQL expression handles for SKIP
-  // INDEXBINDP IndexBindings[MAX_INDEXES];
+  // INDEXBIND *IndexBindings[MAX_INDEXES];
   // Index column and prepared SQL expression handles for SKIP
-  INDEXBINDP *IndexBindings;
+  INDEXBIND **IndexBindings;
 
   // Single column retrieving statements
   HSTMT *colStmt;
@@ -426,7 +426,7 @@ void SR_commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiS
 HB_ERRCODE SR_SetBindEmptylValue(COLUMNBIND *BindStructure);
 HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBIND *BindStructure, HSTMT hStmt);
 char *SR_QualifyName(char *szName, SQLEXAREA *thiswa);
-COLUMNBIND *SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBINDP IndexBind);
+COLUMNBIND *SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBIND *IndexBind);
 HB_BOOL SR_getColumnList(SQLEXAREA *thiswa);
 void SR_SolveFilters(SQLEXAREA *thiswa, bool bWhere);
 void SR_getOrderByExpression(SQLEXAREA *thiswa, HB_BOOL bUseOptimizerHints);

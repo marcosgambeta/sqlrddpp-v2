@@ -109,7 +109,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
 {
   HB_BOOL bWhere = false;
   int iCol;
-  INDEXBINDP SeekBind;
+  INDEXBIND *SeekBind;
   COLUMNBIND *BindStructure;
   HB_BOOL bDirectionFWD;
   char *temp;
@@ -178,7 +178,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
 
    HB_BOOL bWhere = false;
    int iCol;
-   INDEXBINDP SeekBind;
+   INDEXBIND *SeekBind;
    COLUMNBIND *BindStructure;
    HB_BOOL bDirectionFWD;
    char * temp;
@@ -257,7 +257,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE prepareSeekQuery(SQLEXAREA *thiswa, INDEXBINDP SeekBind)
+HB_ERRCODE prepareSeekQuery(SQLEXAREA *thiswa, INDEXBIND *SeekBind)
 {
   SQLRETURN res;
   HSTMT hPrep;
@@ -300,7 +300,7 @@ bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel)
     SR_SetIndexBindStructure(thiswa);
   }
 
-  INDEXBINDP SeekBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
+  INDEXBIND *SeekBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
   // SeekBind += (queryLevel - 1); // place offset
 
   // Check if stmt must be created or recreated
@@ -343,7 +343,7 @@ bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel)
 
 HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREA *thiswa, PHB_ITEM pKey, int *queryLevel)
 {
-  INDEXBINDP SeekBind;
+  INDEXBIND *SeekBind;
   COLUMNBIND *BindStructure;
   int i, lenKey, size, iCol;
   const char *szKey;
@@ -574,7 +574,7 @@ HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREA *thiswa, PHB_ITEM pKey, int *query
 void SR_BindSeekStmt(SQLEXAREA *thiswa, int queryLevel)
 {
   HSTMT hStmt;
-  INDEXBINDP SeekBind, SeekBindParam;
+  INDEXBIND *SeekBind, *SeekBindParam;
   COLUMNBIND *BindStructure;
   int iBind, iLoop;
   SQLRETURN res = SQL_ERROR;
@@ -657,7 +657,7 @@ HB_ERRCODE SR_getPreparedSeek(SQLEXAREA *thiswa, int queryLevel, HB_USHORT *iInd
                            HSTMT *hStmt) // Returns true if any result found
 {
   SQLRETURN res;
-  INDEXBINDP SeekBind;
+  INDEXBIND *SeekBind;
 
   SeekBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
   // this line bellow make the last field current

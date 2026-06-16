@@ -3523,7 +3523,7 @@ static HB_ERRCODE sqlExOraNewArea(SQLEXORAAREAP thiswa)
   memset(thiswa->editMask, 0, MAX_FIELDS);
   memset(thiswa->specialMask, 0, MAX_FIELDS);
   thiswa->IndexBindings = (INDEXBINDORAP *)hb_xgrabz(sizeof(INDEXBINDORAP) * MAX_INDEXES);
-  // memset(thiswa->IndexBindings, 0, sizeof(INDEXBINDP) * MAX_INDEXES);
+  // memset(thiswa->IndexBindings, 0, sizeof(INDEXBIND *) * MAX_INDEXES);
   // for (i = 0; i < MAX_INDEXES; i++) {
   //   thiswa->IndexBindings[i] = NULL;
   // }

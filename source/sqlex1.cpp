@@ -772,7 +772,7 @@ void SetColStatements(SQLEXAREA *thiswa)
 void ReleaseIndexBindStructure(SQLEXAREA *thiswa)
 {
   int i, n, iCols;
-  INDEXBINDP IndexBind;
+  INDEXBIND *IndexBind;
   for (i = 0; i < MAX_INDEXES; i++) {
     IndexBind = thiswa->IndexBindings[i];
     if (IndexBind) {
@@ -800,7 +800,7 @@ void ReleaseIndexBindStructure(SQLEXAREA *thiswa)
 
 //------------------------------------------------------------------------
 
-COLUMNBIND *SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBINDP IndexBind)
+COLUMNBIND *SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBIND *IndexBind)
 {
   COLUMNBIND *pBind = thiswa->CurrRecord;
   pBind += (IndexBind->lFieldPosDB - 1); // Place offset
@@ -812,7 +812,7 @@ COLUMNBIND *SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBINDP IndexBind)
 static void BindAllIndexStmts(SQLEXAREA *thiswa)
 {
   HSTMT hStmt;
-  INDEXBINDP IndexBind, IndexBindParam;
+  INDEXBIND *IndexBind, *IndexBindParam;
   COLUMNBIND *BindStructure;
   int iCol, iBind, iLoop;
   SQLRETURN res = SQL_ERROR;
@@ -906,7 +906,7 @@ static void FeedCurrentRecordToBindings(SQLEXAREA *thiswa)
 {
   PHB_ITEM pFieldData;
   int iCol;
-  INDEXBINDP IndexBind;
+  INDEXBIND *IndexBind;
   COLUMNBIND *BindStructure;
   HB_BOOL newFieldData;
 
@@ -1083,7 +1083,7 @@ void SR_SolveFilters(SQLEXAREA *thiswa, bool bWhere)
 void SR_SetIndexBindStructure(SQLEXAREA *thiswa)
 {
   PHB_ITEM pColumns, pIndexRef;
-  INDEXBINDP IndexBind;
+  INDEXBIND *IndexBind;
   int i;
 
   if (thiswa->hOrdCurrent > 0) {
@@ -1092,7 +1092,7 @@ void SR_SetIndexBindStructure(SQLEXAREA *thiswa)
     thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
     // Alloc memory for binding structures
-    thiswa->IndexBindings[thiswa->hOrdCurrent] = (INDEXBINDP)hb_xgrab(thiswa->indexColumns * sizeof(INDEXBIND));
+    thiswa->IndexBindings[thiswa->hOrdCurrent] = (INDEXBIND *)hb_xgrab(thiswa->indexColumns * sizeof(INDEXBIND));
     memset(thiswa->IndexBindings[thiswa->hOrdCurrent], 0, thiswa->indexColumns * sizeof(INDEXBIND));
 
     // Now we should bind all index columns to be used by SKIP
@@ -1109,7 +1109,7 @@ void SR_SetIndexBindStructure(SQLEXAREA *thiswa)
   } else {
     thiswa->indexColumns = 1; // Natural order, RECNO
     // Alloc memory for binding structures
-    thiswa->IndexBindings[thiswa->hOrdCurrent] = (INDEXBINDP)hb_xgrab(thiswa->indexColumns * sizeof(INDEXBIND));
+    thiswa->IndexBindings[thiswa->hOrdCurrent] = (INDEXBIND *)hb_xgrab(thiswa->indexColumns * sizeof(INDEXBIND));
     memset(thiswa->IndexBindings[thiswa->hOrdCurrent], 0, thiswa->indexColumns * sizeof(INDEXBIND));
     IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
     IndexBind->lFieldPosDB = thiswa->ulhRecno;
@@ -1244,7 +1244,7 @@ static HB_ERRCODE getWhereExpression(SQLEXAREA *thiswa, int iListType)
   // Resolve record or index navigation
 
   if (iListType == LIST_SKIP_FWD || iListType == LIST_SKIP_BWD) {
-    INDEXBINDP IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
+    INDEXBIND *IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
 
     thiswa->recordListDirection = (iListType == LIST_SKIP_FWD ? LIST_FORWARD : LIST_BACKWARD);
     bDirectionFWD = iListType == LIST_SKIP_FWD;
@@ -1393,7 +1393,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXAREA *thiswa, int iMax) // Returns 
 {
   SQLRETURN res;
   int i, recordListChanged;
-  INDEXBINDP IndexBind;
+  INDEXBIND *IndexBind;
   HSTMT hStmt;
   HB_ULONG lRecord;
   char *sSql;
@@ -1994,7 +1994,7 @@ static HB_ERRCODE trySkippingOnCache(SQLEXAREA *thiswa, HB_LONG lToSkip)
 
 HB_ERRCODE prepareRecordListQuery(SQLEXAREA *thiswa)
 {
-  INDEXBINDP IndexBind;
+  INDEXBIND *IndexBind;
   HSTMT hPrep;
   SQLRETURN res;
 
@@ -2038,9 +2038,9 @@ static bool CreateSkipStmt(SQLEXAREA *thiswa)
   if (thiswa->bOrderChanged || thiswa->bConditionChanged1 || (!(thiswa->IndexBindings[thiswa->hOrdCurrent])) ||
       (thiswa->IndexBindings[thiswa->hOrdCurrent] &&
        ((thiswa->recordListDirection == LIST_FORWARD &&
-         (!((INDEXBINDP)(thiswa->IndexBindings[thiswa->hOrdCurrent]))->SkipFwdStmt)) ||
+         (!((INDEXBIND *)(thiswa->IndexBindings[thiswa->hOrdCurrent]))->SkipFwdStmt)) ||
         (thiswa->recordListDirection == LIST_BACKWARD &&
-         (!((INDEXBINDP)(thiswa->IndexBindings[thiswa->hOrdCurrent]))
+         (!((INDEXBIND *)(thiswa->IndexBindings[thiswa->hOrdCurrent]))
                ->SkipBwdStmt))))) { // Filter or controlling order has changed, or stmt is not prepared
     thiswa->lBofAt = 0;
     thiswa->lEofAt = 0;
@@ -2062,7 +2062,7 @@ static bool CreateSkipStmt(SQLEXAREA *thiswa)
 
     // Now we should bind all index columns to be used by SKIP
 
-    INDEXBINDP IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
+    INDEXBIND *IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
 
     // Free the statements we are about to recreate
 
@@ -3507,8 +3507,8 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREA *thiswa)
   memset(thiswa->updatedMask, 0, MAX_FIELDS);
   memset(thiswa->editMask, 0, MAX_FIELDS);
   memset(thiswa->specialMask, 0, MAX_FIELDS);
-  thiswa->IndexBindings = (INDEXBINDP *)hb_xgrab(sizeof(INDEXBINDP) * MAX_INDEXES);
-  memset(thiswa->IndexBindings, 0, sizeof(INDEXBINDP) * MAX_INDEXES);
+  thiswa->IndexBindings = (INDEXBIND **)hb_xgrab(sizeof(INDEXBIND *) * MAX_INDEXES);
+  memset(thiswa->IndexBindings, 0, sizeof(INDEXBIND *) * MAX_INDEXES);
 
   return errCode;
 }

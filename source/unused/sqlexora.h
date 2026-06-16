@@ -377,7 +377,7 @@ typedef struct _SQLEXORAAREA
   bool bIsInsert;        // TRUE if appending a new record
   bool bConnVerified;    // Already checked for ODBC connection ?
   bool bReverseIndex;    // If current index is in DESCENDING order
-  // INDEXBINDP IndexBindings[MAX_INDEXES]; // Index column and prepared SQL expression handles for SKIP
+  // INDEXBIND *IndexBindings[MAX_INDEXES]; // Index column and prepared SQL expression handles for SKIP
   INDEXBINDORAP *IndexBindings; // Index column and prepared SQL expression handles for SKIP
 
   // OCI_Statement * colStmt;       // Single column retrieving statements
