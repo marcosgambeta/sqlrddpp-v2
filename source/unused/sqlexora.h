@@ -282,9 +282,10 @@ typedef struct _SQLAREA
 
 typedef SQLAREA *LPSQLAREA;
 
-#ifndef SQLAREAP
-#define SQLAREAP LPSQLAREA
-#endif
+// deprecated
+//#ifndef SQLAREAP
+//#define SQLAREAP LPSQLAREA
+//#endif
 
 typedef struct _SQLEXORAAREA
 {

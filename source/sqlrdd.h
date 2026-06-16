@@ -142,9 +142,10 @@ struct _SQLAREA
 using SQLAREA = _SQLAREA;
 using LPSQLAREA = SQLAREA *;
 
-#ifndef SQLAREAP
-#define SQLAREAP LPSQLAREA
-#endif
+// deprecated
+//#ifndef SQLAREAP
+//#define SQLAREAP LPSQLAREA
+//#endif
 
 // prototypes
 
