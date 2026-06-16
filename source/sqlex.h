@@ -206,7 +206,7 @@ using COLUMNBINDP = COLUMNBIND *;
 
 // SQL WORKAREA
 
-struct _SQLEXAREA
+struct SQLEXAREA
 {
   AREA area;
 
@@ -403,7 +403,7 @@ struct _SQLEXAREA
   bool bIsSelect;
 };
 
-using SQLEXAREA = _SQLEXAREA;
+//using SQLEXAREA = _SQLEXAREA; (deprecated)
 //using LPSQLEXAREA = SQLEXAREA *; (deprecated)
 
 // deprecated
