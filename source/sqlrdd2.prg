@@ -5487,11 +5487,11 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
       ::oSql:Commit()
       ::oSql:Exec("DROP SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ", .F.)
       ::oSql:Commit()
-      ::oSql:Exec("CREATE SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ START 1")
+      ::oSql:Exec("CREATE SEQUENCE " + chr(34) + ::cOwner + LimitLen(::cFileName, 3) + "_SQ" + chr(34) + " START 1")
       ::oSql:Commit()
    ENDIF
 
-   // Create the new table 
+   // Create the new table
 
    aPK := {}
    aCreate := {}
