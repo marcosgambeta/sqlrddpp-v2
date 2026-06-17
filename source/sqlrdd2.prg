@@ -5485,7 +5485,7 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
 
    IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
       ::oSql:Commit()
-      ::oSql:Exec("DROP SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ", .F.)
+      ::oSql:Exec("DROP SEQUENCE " + chr(34) + ::cOwner + LimitLen(::cFileName, 3) + "_SQ" + chr(34), .F.)
       ::oSql:Commit()
       ::oSql:Exec("CREATE SEQUENCE " + chr(34) + ::cOwner + LimitLen(::cFileName, 3) + "_SQ" + chr(34) + " START 1")
       ::oSql:Commit()
