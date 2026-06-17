@@ -341,7 +341,7 @@ struct SQLEXAREA
   // Recno column name
   char *sRecnoName;
   // Deleted column name
-  char *sDeletedName;
+  std::string sDeletedName; //char *sDeletedName;
   // String for recordset limit
   char sLimit1[50];
   // String for recordset limit
