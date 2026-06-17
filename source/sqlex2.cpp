@@ -82,7 +82,8 @@ static PHB_DYNS s_pSym_Serial1 = nullptr; // Pointer to serialization function
 
 //------------------------------------------------------------------------
 
-char *SR_QualifyName(char *szName, SQLEXAREA *thiswa)
+namespace SQLRDD {
+char *QualifyName(char *szName, SQLEXAREA *thiswa)
 {
   int i;
 
@@ -115,6 +116,7 @@ char *SR_QualifyName(char *szName, SQLEXAREA *thiswa)
     }
   }
   return szName;
+}
 }
 
 //------------------------------------------------------------------------
@@ -253,7 +255,7 @@ void SR_CreateInsertStmt(SQLEXAREA *thiswa)
 
     if (i != static_cast<int>(thiswa->ulhRecno)) { // RECNO is never included in INSERT column list
       temp = hb_strdup(static_cast<const char *>(sFields));
-      sprintf(sFields, "%s,%c%s%c", temp, OPEN_QUALIFIER(thiswa), SR_QualifyName(colName, thiswa),
+      sprintf(sFields, "%s,%c%s%c", temp, OPEN_QUALIFIER(thiswa), SQLRDD::QualifyName(colName, thiswa),
               CLOSE_QUALIFIER(thiswa));
       sParams[uiPos] = ',';
       sParams[++uiPos] = '?';

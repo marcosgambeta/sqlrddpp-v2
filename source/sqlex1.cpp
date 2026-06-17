@@ -418,7 +418,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREA *thiswa, PHB_ITEM pFieldData, HB_LO
       return HB_FAILURE;
     }
 
-    colName = SR_QualifyName(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
+    colName = SQLRDD::QualifyName(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
 
     if (thiswa->bIsSelect) {
       sprintf(sSql, "SELECT %c%s%c FROM (%s) WHERE %c%s%c = ?", OPEN_QUALIFIER(thiswa), colName,
@@ -1165,7 +1165,7 @@ void SR_SetCurrRecordStructure(SQLEXAREA *thiswa)
     BindStructure->lFieldPosWA = hb_arrayGetNL(pFieldStruct, FIELD_WAOFFSET);
     BindStructure->ColumnSize = (SQLUINTEGER)hb_itemGetNI(pFieldLen);
     BindStructure->DecimalDigits = static_cast<SQLSMALLINT>(hb_itemGetNI(pFieldDec));
-    BindStructure->colName = SR_QualifyName(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
+    BindStructure->colName = SQLRDD::QualifyName(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
     BindStructure->isMemo = cType == 'M';
 
 #ifdef SQLRDD_TOPCONN
@@ -1373,8 +1373,8 @@ HB_ERRCODE getWorkareaParams(SQLEXAREA *thiswa)
     thiswa->sDeletedName = getMessageCPtr(thiswa->oWorkArea, "CDELETEDNAME");
     thiswa->iTCCompat = getMessageNI(thiswa->oWorkArea, "NTCCOMPAT");
     thiswa->bHistoric = getMessageL(thiswa->oWorkArea, "LHISTORIC");
-    thiswa->sRecnoName = SR_QualifyName(thiswa->sRecnoName, thiswa);
-    thiswa->sDeletedName = SR_QualifyName(const_cast<char *>(thiswa->sDeletedName.c_str()), thiswa);
+    thiswa->sRecnoName = SQLRDD::QualifyName(thiswa->sRecnoName, thiswa);
+    thiswa->sDeletedName = SQLRDD::QualifyName(const_cast<char *>(thiswa->sDeletedName.c_str()), thiswa);
     SetColStatements(thiswa);
   }
 
@@ -1654,7 +1654,7 @@ HB_BOOL SR_getColumnList(SQLEXAREA *thiswa)
         len = static_cast<int>(strlen(fName));
         memset(colName, 0, HB_SYMBOL_NAME_LEN);
         hb_xmemcpy(colName, fName, len);
-        colName = SR_QualifyName(colName, thiswa);
+        colName = SQLRDD::QualifyName(colName, thiswa);
         colName[len] = '\0';
 
         if (uiFlds == 0) {
@@ -1691,7 +1691,7 @@ HB_BOOL SR_getColumnList(SQLEXAREA *thiswa)
         len = static_cast<int>(strlen(fName));
         memset(colName, 0, HB_SYMBOL_NAME_LEN);
         hb_xmemcpy(colName, fName, len);
-        colName = SR_QualifyName(colName, thiswa);
+        colName = SQLRDD::QualifyName(colName, thiswa);
         colName[len] = '\0';
 
         if (uiFlds == 0) {

@@ -410,11 +410,11 @@ HB_BOOL SR_itemEmpty(PHB_ITEM pItem);
 
 namespace SQLRDD {
 void commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
+char *QualifyName(char *szName, SQLEXAREA *thiswa);
 }
 
 HB_ERRCODE SR_SetBindEmptylValue(COLUMNBIND *BindStructure);
 HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBIND *BindStructure, HSTMT hStmt);
-char *SR_QualifyName(char *szName, SQLEXAREA *thiswa);
 COLUMNBIND *SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBIND *IndexBind);
 HB_BOOL SR_getColumnList(SQLEXAREA *thiswa);
 void SR_SolveFilters(SQLEXAREA *thiswa, bool bWhere);
