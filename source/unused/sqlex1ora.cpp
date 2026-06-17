@@ -290,19 +290,19 @@ static void createRecodListQueryOra(SQLEXORAAREAP thiswa)
               thiswa->sOrderBy, thiswa->sLimit2);
     } else {
       sprintf(thiswa->sSql, "SELECT %s A.%c%s%c FROM %s A %s %s %s", thiswa->sLimit1, OPEN_QUALIFIER(thiswa),
-              thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa), thiswa->sTable, thiswa->sWhere, thiswa->sOrderBy,
+              thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), thiswa->sWhere, thiswa->sOrderBy,
               thiswa->sLimit2);
     }
   } else {
     if (thiswa->bIsSelect) {
       sprintf(thiswa->sSql, "SELECT %s A.%c%s%c, A.%c%s%c FROM (%s) A %s %s %s", thiswa->sLimit1,
               OPEN_QUALIFIER(thiswa), thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa),
-              thiswa->sDeletedName, CLOSE_QUALIFIER(thiswa), thiswa->sTable, thiswa->sWhere, thiswa->sOrderBy,
+              thiswa->sDeletedName, CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), thiswa->sWhere, thiswa->sOrderBy,
               thiswa->sLimit2);
     } else {
       sprintf(thiswa->sSql, "SELECT %s A.%c%s%c, A.%c%s%c FROM %s A %s %s %s", thiswa->sLimit1, OPEN_QUALIFIER(thiswa),
               thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa), thiswa->sDeletedName,
-              CLOSE_QUALIFIER(thiswa), thiswa->sTable, thiswa->sWhere, thiswa->sOrderBy, thiswa->sLimit2);
+              CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), thiswa->sWhere, thiswa->sOrderBy, thiswa->sLimit2);
     }
   }
 }
@@ -315,7 +315,7 @@ static void createCountQuery(SQLEXORAAREAP thiswa)
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   }
   sprintf(thiswa->sSql, "SELECT COUNT( A.%c%s%c ) \nFROM %s A %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
-          CLOSE_QUALIFIER(thiswa), thiswa->sTable, thiswa->sWhere);
+          CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), thiswa->sWhere);
 }
 
 //------------------------------------------------------------------------
@@ -380,7 +380,7 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
               CLOSE_QUALIFIER(thiswa));
     } else {
       sprintf(sSql, "SELECT %c%s%c FROM %s WHERE %c%s%c = :sz001", OPEN_QUALIFIER(thiswa), colName,
-              CLOSE_QUALIFIER(thiswa), thiswa->sTable, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+              CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
               CLOSE_QUALIFIER(thiswa));
     }
     hb_xfree(colName);
@@ -1353,7 +1353,7 @@ HB_ERRCODE getWorkareaParamsOra(SQLEXORAAREAP thiswa)
     thiswa->aFields = getMessageItem(thiswa->sqlarea.oWorkArea, "AFIELDS");
     thiswa->hDbc = (OCI_ORASESSION *)getMessagePtr(thiswa->oSql, "HDBC");
     thiswa->nSystemID = getMessageNL(thiswa->oSql, "NSYSTEMID");
-    thiswa->sTable = getMessageC(thiswa->sqlarea.oWorkArea, "CQUALIFIEDTABLENAME");
+    thiswa->sTable = getMessageCPtr(thiswa->sqlarea.oWorkArea, "CQUALIFIEDTABLENAME");
     thiswa->sOwner = getMessageC(thiswa->sqlarea.oWorkArea, "COWNER");
     thiswa->sRecnoName = getMessageC(thiswa->sqlarea.oWorkArea, "CRECNONAME");
     thiswa->sDeletedName = getMessageC(thiswa->sqlarea.oWorkArea, "CDELETEDNAME");
@@ -1787,7 +1787,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
       sprintf(thiswa->sSqlBuffer, "SELECT %s FROM (%s) A WHERE A.%c%s%c IN ( :1", thiswa->sFields,
               thiswa->sqlarea.szDataFileName, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa));
     } else {
-      sprintf(thiswa->sSqlBuffer, "SELECT %s \nFROM %s A \nWHERE A.%c%s%c IN ( :1", thiswa->sFields, thiswa->sTable,
+      sprintf(thiswa->sSqlBuffer, "SELECT %s \nFROM %s A \nWHERE A.%c%s%c IN ( :1", thiswa->sFields, thiswa->sTable.c_str(),
               OPEN_QUALIFIER(thiswa), thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa));
     }
     // // SR_TraceLog("aaa.log", "thiswa->sSqlBuffer %s\n", thiswa->sSqlBuffer);
@@ -1990,7 +1990,7 @@ static HB_ERRCODE trySkippingOnCache(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
       if (lSupposedPos >= 0 && lSupposedPos < thiswa->recordListSize) {
         thiswa->recordListPos = lSupposedPos;
         if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
-          SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+          SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
           return HB_FAILURE;
         }
         return HB_SUCCESS;
@@ -2014,7 +2014,7 @@ static HB_ERRCODE trySkippingOnCache(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
       if (lSupposedPos >= 0 && lSupposedPos < thiswa->recordListSize) {
         thiswa->recordListPos = lSupposedPos;
         if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
-          SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+          SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
           return HB_FAILURE;
         }
         return HB_SUCCESS;
@@ -2248,7 +2248,7 @@ static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
       // // // SR_TraceLog("aaa.log", "chamando getRecord list de  sqlExOraGoBottom\n");
       if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
         OraErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
-        SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+        SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
         return HB_FAILURE;
       }
       // // // SR_TraceLog("aaa.log", "chamei getRecord list de  sqlExOraGoBottom\n");
@@ -2263,7 +2263,7 @@ static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
     // // // SR_TraceLog("aaa.log", "chamando getRecord list de  sqlExOraGoBottom\n");
     if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
       OraErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
-      SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+      SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
       return HB_FAILURE;
     }
     // // // SR_TraceLog("aaa.log", "chamei getRecord list de  sqlExOraGoBottom\n");
@@ -2282,7 +2282,7 @@ static HB_ERRCODE sqlExOraGoBottom(SQLEXORAAREAP thiswa)
     thiswa->sqlarea.area.fBof = false;
     thiswa->lEofAt = thiswa->recordList[thiswa->recordListPos];
     if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
-      SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+      SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
       return HB_FAILURE;
     }
   }
@@ -2365,7 +2365,7 @@ static HB_ERRCODE sqlExOraGoToId(SQLEXORAAREAP thiswa, PHB_ITEM pItem)
   if (HB_IS_NUMERIC(pItem)) {
     return SELF_GOTO(&thiswa->sqlarea.area, hb_itemGetNL(pItem));
   } else {
-    SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+    SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
     return HB_FAILURE;
   }
 }
@@ -2398,7 +2398,7 @@ static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
       // // // SR_TraceLog("aaa.log", "chamando getRecord list de  sqlExOraGoTop\n");
       if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
         OraErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
-        SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+        SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
         return HB_FAILURE;
       }
       // // // SR_TraceLog("aaa.log", "chamei getRecord list de  sqlExOraGoTop\n");
@@ -2412,7 +2412,7 @@ static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
     // // // SR_TraceLog("aaa.log", "chamando getRecord list de  sqlExOraGoTop\n");
     if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
       OraErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
-      SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+      SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
       return HB_FAILURE;
     }
     // // // SR_TraceLog("aaa.log", "chamei getRecord list de  sqlExOraGoTop\n");
@@ -2431,7 +2431,7 @@ static HB_ERRCODE sqlExOraGoTop(SQLEXORAAREAP thiswa)
     thiswa->sqlarea.area.fBof = false;
     thiswa->lBofAt = thiswa->recordList[thiswa->recordListPos];
     if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
-      SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+      SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
       return HB_FAILURE;
     }
   }
@@ -2468,7 +2468,7 @@ static HB_ERRCODE sqlExOraSeek(SQLEXORAAREAP thiswa, HB_BOOL bSoftSeek, PHB_ITEM
   }
 
   if (thiswa->sqlarea.hOrdCurrent == 0) {
-    SR_commonError(&thiswa->sqlarea.area, EG_NOORDER, EDBF_NOTINDEXED, thiswa->sTable);
+    SR_commonError(&thiswa->sqlarea.area, EG_NOORDER, EDBF_NOTINDEXED, thiswa->sTable.c_str());
     return HB_FAILURE;
   }
 
@@ -2813,7 +2813,7 @@ static HB_ERRCODE sqlExOraSkipRaw(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
       if (res == RESULTSET_OK) {
         break;
       } else if (res == HB_FAILURE) {
-        SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+        SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
         return HB_FAILURE;
       } else if (res == HB_RETRY) {
         if (lToSkip > 0) {
@@ -2830,7 +2830,7 @@ static HB_ERRCODE sqlExOraSkipRaw(SQLEXORAAREAP thiswa, HB_LONG lToSkip)
 
     if (res == RESULTSET_OK) {
       if (updateRecordBuffer(thiswa, false) == HB_FAILURE) {
-        SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable);
+        SR_commonError(&thiswa->sqlarea.area, EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
         return HB_FAILURE;
       }
       return ConcludeSkipraw(thiswa);
@@ -2906,11 +2906,11 @@ static HB_ERRCODE sqlExOraDeleteRec(SQLEXORAAREAP thiswa)
       memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
     }
     if (thiswa->sqlarea.ulhDeleted > 0 && sr_UseDeleteds()) {
-      sprintf(thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i", thiswa->sTable, thiswa->sDeletedName,
+      sprintf(thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i", thiswa->sTable.c_str(), thiswa->sDeletedName,
               thiswa->iTCCompat >= 2 ? '*' : 'T', thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ",
               thiswa->sRecnoName, static_cast<int>(GetCurrentRecordNumOra(thiswa)));
     } else {
-      sprintf(thiswa->sSql, "DELETE FROM %s WHERE %s = %i", thiswa->sTable, thiswa->sRecnoName,
+      sprintf(thiswa->sSql, "DELETE FROM %s WHERE %s = %i", thiswa->sTable.c_str(), thiswa->sRecnoName,
               static_cast<int>(GetCurrentRecordNumOra(thiswa)));
     }
 
@@ -3259,7 +3259,7 @@ static HB_ERRCODE sqlExOraRecall(SQLEXORAAREAP thiswa)
 
   if (isDeleted && thiswa->sqlarea.ulhDeleted > 0 && sr_UseDeleteds()) {
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
-    sprintf(thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i", thiswa->sTable, thiswa->sDeletedName, ' ',
+    sprintf(thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i", thiswa->sTable.c_str(), thiswa->sDeletedName, ' ',
             thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ", thiswa->sRecnoName,
             static_cast<int>(GetCurrentRecordNumOra(thiswa)));
 
@@ -3370,9 +3370,11 @@ static HB_ERRCODE sqlExOraClose(SQLEXORAAREAP thiswa)
   if ((thiswa->oSql) && HB_IS_OBJECT(thiswa->oSql)) {
     hb_itemRelease(thiswa->oSql);
   }
-  if (thiswa->sTable) {
-    hb_xfree(thiswa->sTable);
-  }
+  //if (thiswa->sTable) {
+  //  hb_xfree(thiswa->sTable);
+  //}
+  thiswa->sTable.clear();
+  thiswa->sTable.shrink_to_fit();
   if (thiswa->sOwner) {
     hb_xfree(thiswa->sOwner);
   }
@@ -3472,7 +3474,7 @@ static HB_ERRCODE sqlExOraNewArea(SQLEXORAAREAP thiswa)
   thiswa->oSql = nullptr;
   thiswa->hBufferPool = hb_hashNew(NULL);
   thiswa->aFields = nullptr;
-  thiswa->sTable = nullptr;
+  //thiswa->sTable = nullptr;
   thiswa->sOwner = nullptr;
   thiswa->sRecnoName = nullptr;
   thiswa->sDeletedName = nullptr;

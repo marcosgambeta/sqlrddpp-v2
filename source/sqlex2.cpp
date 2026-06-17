@@ -382,11 +382,11 @@ void SR_CreateInsertStmt(SQLEXAREA *thiswa)
   memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   if (thiswa->nSystemID == SQLRDD::RDBMS::MSSQL7) {
     sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData(%s) VALUES (%s );%s", declare,
-            thiswa->sTable, sFields, thiswa->sRecnoName, thiswa->sRecnoName, sParams, ident);
-    // sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) VALUES (%s );%s", declare, thiswa->sTable, sFields, sParams,
+            thiswa->sTable.c_str(), sFields, thiswa->sRecnoName, thiswa->sRecnoName, sParams, ident);
+    // sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) VALUES (%s );%s", declare, thiswa->sTable.c_str(), sFields, sParams,
     // ident);
   } else {
-    sprintf(thiswa->sSql, "INSERT INTO %s (%s ) VALUES (%s )%s", thiswa->sTable, sFields, sParams, ident);
+    sprintf(thiswa->sSql, "INSERT INTO %s (%s ) VALUES (%s )%s", thiswa->sTable.c_str(), sFields, sParams, ident);
   }
 
   hb_xfree(sFields);
@@ -712,7 +712,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREA *thiswa)
   if (thiswa->sSql) {
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   }
-  sprintf(thiswa->sSql, "UPDATE %s SET", thiswa->sTable);
+  sprintf(thiswa->sSql, "UPDATE %s SET", thiswa->sTable.c_str());
 
   for (i = 0; i < iCols; i++) {
     if (thiswa->editMask[i] || thiswa->specialMask[i]) {

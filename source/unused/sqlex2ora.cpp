@@ -332,9 +332,9 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
   }
   if (thiswa->nSystemID == SQLRDD::RDBMS::MSSQL7) {
     sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData VALUES (%s );%s", declare,
-            thiswa->sTable, sFields, thiswa->sRecnoName, sParams, ident);
+            thiswa->sTable.c_str(), sFields, thiswa->sRecnoName, sParams, ident);
   } else {
-    sprintf(thiswa->sSql, "INSERT INTO %s (%s ) VALUES (%s )%s", thiswa->sTable, sFields, sParams, ident);
+    sprintf(thiswa->sSql, "INSERT INTO %s (%s ) VALUES (%s )%s", thiswa->sTable.c_str(), sFields, sParams, ident);
   }
 
   hb_xfree(sFields);
@@ -678,7 +678,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
   if (thiswa->sSql) {
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   }
-  sprintf(thiswa->sSql, "UPDATE %s SET", thiswa->sTable);
+  sprintf(thiswa->sSql, "UPDATE %s SET", thiswa->sTable.c_str());
 
   // Cria o Sql
   for (i = 0; i < iCols; i++) {

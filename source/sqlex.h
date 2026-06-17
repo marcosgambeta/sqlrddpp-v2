@@ -55,6 +55,7 @@
 #include <hbapirdd.h>
 #include <hbapiitm.h>
 #include "sqlrdd.ch"
+#include <string>
 
 #define SUPERTABLE (&sqlExSuper)
 
@@ -330,7 +331,7 @@ struct SQLEXAREA
   // SQL Statement to get WA buffer
   char *sSqlBuffer;
   // Qualified table name
-  char *sTable;
+  std::string sTable; //char *sTable;
   // Database schema included in sTable
   char *sOwner;
   // Where clause

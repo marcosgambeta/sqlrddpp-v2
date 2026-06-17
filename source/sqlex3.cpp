@@ -94,9 +94,9 @@ static void createSeekQuery(SQLEXAREA *thiswa, bool bUseOptimizerHints)
   if (bUseOptimizerHints) {
     sprintf(thiswa->sSql, "SELECT /*+ INDEX_ASC( A %s ) */ %s %s \nFROM %s A %s AND ROWNUM <= 1",
             thiswa->sOrderBy, // thiswa->sOrderBy has the index name, not the index column list
-            thiswa->sLimit1, thiswa->sFields, thiswa->sTable, thiswa->sWhere);
+            thiswa->sLimit1, thiswa->sFields, thiswa->sTable.c_str(), thiswa->sWhere);
   } else {
-    sprintf(thiswa->sSql, "SELECT %s %s \nFROM %s A %s %s %s", thiswa->sLimit1, thiswa->sFields, thiswa->sTable,
+    sprintf(thiswa->sSql, "SELECT %s %s \nFROM %s A %s %s %s", thiswa->sLimit1, thiswa->sFields, thiswa->sTable.c_str(),
             thiswa->sWhere,
             thiswa->sOrderBy, // thiswa->sOrderBy has the index column list
             thiswa->sLimit2);

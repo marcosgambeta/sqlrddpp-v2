@@ -365,7 +365,7 @@ typedef struct _SQLEXORAAREA
   char *sFields;      // field list string
   char *sSql;         // Last SQL phrase
   char *sSqlBuffer;   // SQL Statement to get WA buffer
-  char *sTable;       // Qualified table name
+  std::string sTable; //char *sTable;       // Qualified table name
   char *sOwner;       // Database schema included in sTable
   char *sWhere;       // Where clause
   char *sOrderBy;     // Order By clause
