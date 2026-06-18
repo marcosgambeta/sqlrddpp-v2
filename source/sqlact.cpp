@@ -981,7 +981,7 @@ HB_BOOL hb_arraySetL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_BOOL lVal)
 //-----------------------------------------------------------------------------//
 
 namespace SQLRDD {
-HB_BOOL itemEmpty(PHB_ITEM pItem)
+bool itemEmpty(PHB_ITEM pItem)
 {
   switch (hb_itemType(pItem)) {
   case HB_IT_ARRAY: {
