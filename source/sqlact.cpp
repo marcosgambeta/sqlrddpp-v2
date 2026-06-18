@@ -980,7 +980,8 @@ HB_BOOL hb_arraySetL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_BOOL lVal)
 
 //-----------------------------------------------------------------------------//
 
-HB_BOOL SR_itemEmpty(PHB_ITEM pItem)
+namespace SQLRDD {
+HB_BOOL itemEmpty(PHB_ITEM pItem)
 {
   switch (hb_itemType(pItem)) {
   case HB_IT_ARRAY: {
@@ -1047,6 +1048,7 @@ HB_BOOL SR_itemEmpty(PHB_ITEM pItem)
   }
   }
 }
+}
 
 //-----------------------------------------------------------------------------//
 
@@ -1061,7 +1063,7 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
 
   *bNullArgument = false;
 
-  if (SR_itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
+  if (SQLRDD::itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
       (((nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
        ((nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
     if (bNullable || HB_IS_DATE(pFieldData)) {

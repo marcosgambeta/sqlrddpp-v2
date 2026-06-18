@@ -401,7 +401,6 @@ struct SQLEXAREA
 //int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact); NOTE: changed to static
 //void SR_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBuff, HB_BOOL bQueryOnly,
 //                  HB_ULONG ulSystemID, HB_BOOL bTranslate); NOTE: changed to static
-HB_BOOL SR_itemEmpty(PHB_ITEM pItem);
 
 namespace SQLRDD {
 void commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
@@ -411,6 +410,7 @@ void odbcErrorDiagRTE(HSTMT hStmt, const char *routine, const char *szSql, SQLRE
 char *QuoteTrimEscapeString(char *FromBuffer, HB_ULONG iSize, int idatabase, HB_BOOL bRTrim, HB_ULONG *iSizeOut);
 char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable, int nSystemID,
                  HB_BOOL bTCCompat, HB_BOOL bMemo, HB_BOOL *bNullArgument);
+HB_BOOL itemEmpty(PHB_ITEM pItem);
 }
 
 HB_ERRCODE SR_SetBindEmptylValue(COLUMNBIND *BindStructure);

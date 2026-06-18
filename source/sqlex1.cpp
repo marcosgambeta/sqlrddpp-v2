@@ -156,7 +156,7 @@ HB_ULONG SR_GetCurrentRecordNum(SQLEXAREA *thiswa)
 
 static HB_BOOL IsItemNull(PHB_ITEM pFieldData, SQLEXAREA *thiswa)
 {
-  if (SR_itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
+  if (SQLRDD::itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
       (((thiswa->nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
        ((thiswa->nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
     return true;
@@ -471,7 +471,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREA *thiswa, PHB_ITEM pFieldData, HB_LO
 
 HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBIND *BindStructure, HSTMT hStmt)
 {
-  HB_BOOL bEmpty = SR_itemEmpty(pFieldData);
+  HB_BOOL bEmpty = SQLRDD::itemEmpty(pFieldData);
   SQLRETURN res;
 
   switch (BindStructure->iCType) {
@@ -601,7 +601,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBIND *BindStructure, HSTMT
   case SQL_C_TYPE_TIMESTAMP: {
     int iYear, iMonth, iDay;
     int iHour, iMinute;
-    // HB_BOOL bEmpty = SR_itemEmpty(pFieldData); declared at beginning
+    // HB_BOOL bEmpty = SQLRDD::itemEmpty(pFieldData); declared at beginning
     // DebugBreak();
     if ((!bEmpty) && BindStructure->isBoundNULL && hStmt) { // Param was NULL, should be re-bound
       BindStructure->isBoundNULL = false;
@@ -936,7 +936,7 @@ static void FeedCurrentRecordToBindings(SQLEXAREA *thiswa)
 
       // Check if column is NULL
 
-      if (SR_itemEmpty(pFieldData) && (((thiswa->nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
+      if (SQLRDD::itemEmpty(pFieldData) && (((thiswa->nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
                                        ((thiswa->nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
         if (BindStructure->isNullable && BindStructure->isArgumentNull) {
           // It is STILL NULL, so no problem

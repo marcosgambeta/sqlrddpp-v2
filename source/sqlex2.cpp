@@ -151,7 +151,7 @@ static void ResolveSpecialCols(SQLEXAREA *thiswa)
     pIndIt = hb_itemArrayGet(pIndex, INDEXMAN_COLUMNS);
     // pIndIt = hb_arrayGetItemPtr(pIndex, INDEXMAN_COLUMNS);
 
-    if (!SR_itemEmpty(pIndIt)) {
+    if (!SQLRDD::itemEmpty(pIndIt)) {
       HB_EVALINFO info;
       hb_evalNew(&info, hb_itemArrayGet(pIndex, INDEXMAN_KEY_CODEBLOCK));
       pKeyVal = hb_evalLaunch(&info);
@@ -169,7 +169,7 @@ static void ResolveSpecialCols(SQLEXAREA *thiswa)
     // pIndIt = hb_arrayGetItemPtr(pIndex, INDEXMAN_FOR_CODEBLOCK);
     pIndIt = hb_itemArrayGet(pIndex, INDEXMAN_FOR_CODEBLOCK);
 
-    if (!SR_itemEmpty(pIndIt)) {
+    if (!SQLRDD::itemEmpty(pIndIt)) {
       HB_EVALINFO info;
       hb_evalNew(&info, hb_itemArrayGet(pIndex, INDEXMAN_FOR_CODEBLOCK));
       pKeyVal = hb_evalLaunch(&info);
@@ -525,7 +525,7 @@ HB_ERRCODE SR_FeedRecordCols(SQLEXAREA *thiswa, HB_BOOL bUpdate)
         // Get item value from Workarea
         pFieldData = hb_arrayGetItemPtr(thiswa->aBuffer, i);
 
-        if (SR_itemEmpty(pFieldData) && (!InsertRecord->isNullable)) {
+        if (SQLRDD::itemEmpty(pFieldData) && (!InsertRecord->isNullable)) {
           if (SR_SetBindEmptylValue(InsertRecord) == HB_FAILURE) {
             return HB_FAILURE;
           }
