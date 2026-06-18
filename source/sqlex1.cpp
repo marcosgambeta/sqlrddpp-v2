@@ -203,7 +203,8 @@ static void sqlGetCleanBuffer(SQLEXAREA *thiswa)
 
 void SR_setResultSetLimit(SQLEXAREA *thiswa, int iRows)
 {
-  //char *fmt1, *fmt2;
+  std::string fmt1;
+  std::string fmt2;
 
   if (iRows > 1) {
     iRows++; // Add one more to multiple line queries
@@ -213,10 +214,8 @@ void SR_setResultSetLimit(SQLEXAREA *thiswa, int iRows)
   case SQLRDD::RDBMS::MSSQL7:
   case SQLRDD::RDBMS::CACHE:
   case SQLRDD::RDBMS::SYBASE: {
-    //fmt1 = "TOP %i";
-    //fmt2 = "";
-    sprintf(thiswa->sLimit1, "TOP %i", iRows);
-    sprintf(thiswa->sLimit2, "", iRows);
+    fmt1 = "TOP %i";
+    fmt2 = "";
     break;
   }
   case SQLRDD::RDBMS::FIREBR:
@@ -224,45 +223,35 @@ void SR_setResultSetLimit(SQLEXAREA *thiswa, int iRows)
   case SQLRDD::RDBMS::FIREBR4:
   case SQLRDD::RDBMS::FIREBR5:
   case SQLRDD::RDBMS::INFORM: {
-    //fmt1 = "FIRST %i";
-    //fmt2 = "";
-    sprintf(thiswa->sLimit1, "FIRST %i", iRows);
-    sprintf(thiswa->sLimit2, "", iRows);
+    fmt1 = "FIRST %i";
+    fmt2 = "";
     break;
   }
   case SQLRDD::RDBMS::ORACLE: {
-    //fmt1 = "";
-    //fmt2 = "";
-    sprintf(thiswa->sLimit1, "", iRows);
-    sprintf(thiswa->sLimit2, "", iRows);
+    fmt1 = "";
+    fmt2 = "";
     break;
   }
   case SQLRDD::RDBMS::POSTGR:
   case SQLRDD::RDBMS::MYSQL:
   case SQLRDD::RDBMS::MARIADB: {
-    //fmt1 = "";
-    //fmt2 = "LIMIT %i";
-    sprintf(thiswa->sLimit1, "", iRows);
-    sprintf(thiswa->sLimit2, "LIMIT %i", iRows);
+    fmt1 = "";
+    fmt2 = "LIMIT %i";
     break;
   }
   case SQLRDD::RDBMS::IBMDB2: {
-    //fmt1 = "";
-    //fmt2 = "fetch first %i rows only";
-    sprintf(thiswa->sLimit1, "", iRows);
-    sprintf(thiswa->sLimit2, "fetch first %i rows only", iRows);
+    fmt1 = "";
+    fmt2 = "fetch first %i rows only";
     break;
   }
   default: {
-    //fmt1 = "";
-    //fmt2 = "";
-    sprintf(thiswa->sLimit1, "", iRows);
-    sprintf(thiswa->sLimit2, "", iRows);
+    fmt1 = "";
+    fmt2 = "";
   }
   }
 
-  //sprintf(thiswa->sLimit1, static_cast<const char *>(fmt1), iRows);
-  //sprintf(thiswa->sLimit2, static_cast<const char *>(fmt2), iRows);
+  sprintf(thiswa->sLimit1, fmt1.c_str(), iRows);
+  sprintf(thiswa->sLimit2, fmt2.c_str(), iRows);
 }
 
 //------------------------------------------------------------------------
