@@ -667,7 +667,7 @@ RETURN SQL_SUCCESS
 METHOD SR_CONNECTION:Execute(cCommand, lErrMsg, nLogMode, cType, lNeverLog)
 
    LOCAL nRet := 0
-   
+
    HB_SYMBOL_UNUSED(nRet)
 
    DEFAULT lErrMsg TO .T.
@@ -690,44 +690,44 @@ METHOD SR_CONNECTION:Execute(cCommand, lErrMsg, nLogMode, cType, lNeverLog)
    ENDIF
 
    IF cCommand == NIL
-      nRet := SQL_ERROR
+      RETURN SQL_ERROR
+   ENDIF
+
+   IF Len(cCommand) < 1
+      ::nRetCode := nRet := 2
    ELSE
-      IF Len(cCommand) < 1
-         ::nRetCode := nRet := 2
-      ELSE
-         ::cLastComm := cCommand
+      ::cLastComm := cCommand
 
-         IF nLogMode > 0 .AND. StrZero(nLogMode, SQLLOGCHANGES_SIZE)[6] == "1" .AND. ((!Upper(SubStr(LTrim(cCommand), 1, 6)) $ "SELECT,") .OR. cType == SQLLOGCHANGES_TYPE_LOCK) .AND. (!lNeverLog)
-            ::LogQuery(cCommand, cType, nLogMode)
-         ENDIF
-
-         ::AllocStatement()
-         ::nMiliseconds := Seconds() * 100
-
-         nRet := ::ExecuteRaw(cCommand)
-         ::nRetCode := nRet
-         ::nMiliseconds := (Seconds() * 100) - ::nMiliseconds
-
-         IF nLogMode > 0 .AND. StrZero(nLogMode, SQLLOGCHANGES_SIZE)[5] == "1" .AND. ((!Upper(SubStr(LTrim(cCommand), 1, 6)) $ "SELECT,") .OR. cType == SQLLOGCHANGES_TYPE_LOCK) .AND. (!lNeverLog)
-            ::LogQuery(cCommand, cType, nLogMode, ::nMiliseconds)
-         ENDIF
-
-         IF ::nMiliseconds > ::nTimeTraceMin
-            SR_WriteTimeLog(cCommand, SELF, ::nMiliseconds)
-         ENDIF
-
-         IF lErrMsg .AND. nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO .AND. (!(("DELETE FROM " $ Upper(cCommand) .OR. "UPDATE " $ Upper(Left(cCommand, 7))) .AND. nRet == SQL_NO_DATA_FOUND))
-            ::RunTimeErr("", "SQLExecDirect Error" + SR_CRLF + ::LastError() + SR_CRLF + ;
-               "Command : " + cCommand + SR_CRLF + "hStmt   : " + SR_Val2Char(::hStmt))
-         ENDIF
-
-         IF ::nAutoCommit > 0 .AND. Upper(SubStr(LTrim(cCommand), 1, 6)) $ "UPDATE,INSERT,DELETE"
-            IF (++::nIteractions) >= ::nAutoCommit .AND. ::nTransacCount == 0
-               ::Commit()
-            ENDIF
-         ENDIF
-
+      IF nLogMode > 0 .AND. StrZero(nLogMode, SQLLOGCHANGES_SIZE)[6] == "1" .AND. ((!Upper(SubStr(LTrim(cCommand), 1, 6)) $ "SELECT,") .OR. cType == SQLLOGCHANGES_TYPE_LOCK) .AND. (!lNeverLog)
+         ::LogQuery(cCommand, cType, nLogMode)
       ENDIF
+
+      ::AllocStatement()
+      ::nMiliseconds := Seconds() * 100
+
+      nRet := ::ExecuteRaw(cCommand)
+      ::nRetCode := nRet
+      ::nMiliseconds := (Seconds() * 100) - ::nMiliseconds
+
+      IF nLogMode > 0 .AND. StrZero(nLogMode, SQLLOGCHANGES_SIZE)[5] == "1" .AND. ((!Upper(SubStr(LTrim(cCommand), 1, 6)) $ "SELECT,") .OR. cType == SQLLOGCHANGES_TYPE_LOCK) .AND. (!lNeverLog)
+         ::LogQuery(cCommand, cType, nLogMode, ::nMiliseconds)
+      ENDIF
+
+      IF ::nMiliseconds > ::nTimeTraceMin
+         SR_WriteTimeLog(cCommand, SELF, ::nMiliseconds)
+      ENDIF
+
+      IF lErrMsg .AND. nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO .AND. (!(("DELETE FROM " $ Upper(cCommand) .OR. "UPDATE " $ Upper(Left(cCommand, 7))) .AND. nRet == SQL_NO_DATA_FOUND))
+         ::RunTimeErr("", "SQLExecDirect Error" + SR_CRLF + ::LastError() + SR_CRLF + ;
+            "Command : " + cCommand + SR_CRLF + "hStmt   : " + SR_Val2Char(::hStmt))
+      ENDIF
+
+      IF ::nAutoCommit > 0 .AND. Upper(SubStr(LTrim(cCommand), 1, 6)) $ "UPDATE,INSERT,DELETE"
+         IF (++::nIteractions) >= ::nAutoCommit .AND. ::nTransacCount == 0
+            ::Commit()
+         ENDIF
+      ENDIF
+
    ENDIF
 
 RETURN nRet
