@@ -1050,7 +1050,8 @@ HB_BOOL SR_itemEmpty(PHB_ITEM pItem)
 
 //-----------------------------------------------------------------------------//
 
-char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable, int nSystemID,
+namespace SQLRDD {
+char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable, int nSystemID,
                  HB_BOOL bTCCompat, HB_BOOL bMemo, HB_BOOL *bNullArgument) // TODO: not used
 {
   char *sValue, sDate[9];
@@ -1286,4 +1287,5 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
   }
 
   return sValue;
+}
 }
