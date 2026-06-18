@@ -245,7 +245,7 @@ HB_FUNC_STATIC(SR_DRIVERC)
                        static_cast<SQLUSMALLINT>(SQL_DRIVER_NOPROMPT)); // SQL_DRIVER_COMPLETE);
 #elif defined(HB_OS_UNIX)
   RETCODE ret =
-      SQLDriverConnect(SR_PAR_SQLHDBC(1), 0, static_cast<SQLCHAR *>(hb_parcx(2)), static_cast<SQLSMALLINT>(strlen(hb_parcx(2))),
+      SQLDriverConnect(SR_PAR_SQLHDBC(1), 0, reinterpret_cast<SQLCHAR *>(const_cast<char *>(hb_parcx(2))), static_cast<SQLSMALLINT>(strlen(hb_parcx(2))),
                        static_cast<SQLCHAR *>(bBuffer1), static_cast<SQLSMALLINT>(1024), static_cast<SQLSMALLINT *>(&wLen), static_cast<SQLUSMALLINT>(SQL_DRIVER_COMPLETE));
 #endif
   hb_storc(reinterpret_cast<char *>(bBuffer1), 3);
