@@ -214,31 +214,31 @@ void SR_SetInsertRecordStructure(SQLEXAREA *thiswa)
 
 void SR_CreateInsertStmt(SQLEXAREA *thiswa)
 {
-  int iCols, i;
-  PHB_ITEM pFieldStruct, pFieldLen, pFieldDec;
-  HB_LONG lFieldPosWA, lType;
-  char *colName, *sFields, *sParams, *temp;
-  char ident[200] = {0};
-  char tablename[100] = {0};
-  char declare[200] = {0};
-  char cType;
-  HB_BOOL bNullable, bMultiLang, bIsMemo;
-  COLUMNBIND *InsertRecord;
-  HB_USHORT uiPos;
-
-  iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
+  auto iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
   if (!thiswa->InsertRecord) {
     SR_SetInsertRecordStructure(thiswa);
   }
 
-  InsertRecord = thiswa->InsertRecord;
-  sFields = static_cast<char *>(hb_xgrab(FIELD_LIST_SIZE * sizeof(char)));
-  sParams = static_cast<char *>(hb_xgrab((FIELD_LIST_SIZE_PARAM) * sizeof(char)));
-  uiPos = 0;
+  COLUMNBIND *InsertRecord = thiswa->InsertRecord;
+  auto sFields = static_cast<char *>(hb_xgrab(FIELD_LIST_SIZE * sizeof(char)));
+  auto sParams = static_cast<char *>(hb_xgrab((FIELD_LIST_SIZE_PARAM) * sizeof(char)));
+  HB_USHORT uiPos = 0;
   sFields[0] = '\0';
 
-  for (i = 1; i <= iCols; i++) {
+  PHB_ITEM pFieldStruct;
+  bool bNullable;
+  PHB_ITEM pFieldLen;
+  PHB_ITEM pFieldDec;
+  HB_LONG lFieldPosWA;
+  HB_LONG lType;
+  char cType;
+  char *colName;
+  bool bMultiLang;
+  bool bIsMemo;
+  char *temp;
+
+  for (int i = 1; i <= iCols; i++) {
     pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, i);
     bNullable = hb_arrayGetL(pFieldStruct, FIELD_NULLABLE);
     pFieldLen = hb_arrayGetItemPtr(pFieldStruct, FIELD_LEN);
@@ -270,7 +270,7 @@ void SR_CreateInsertStmt(SQLEXAREA *thiswa)
     InsertRecord->isBoundNULL = false;
     InsertRecord->lFieldPosDB = i;
     InsertRecord->lFieldPosWA = lFieldPosWA;
-    InsertRecord->ColumnSize = (SQLUINTEGER)hb_itemGetNI(pFieldLen);
+    InsertRecord->ColumnSize = static_cast<SQLUINTEGER>(hb_itemGetNI(pFieldLen));
     InsertRecord->DecimalDigits = static_cast<SQLSMALLINT>(hb_itemGetNI(pFieldDec));
     InsertRecord->isArgumentNull = false;
     InsertRecord->isMemo = bIsMemo;
@@ -314,11 +314,7 @@ void SR_CreateInsertStmt(SQLEXAREA *thiswa)
       // Corrigido 27/12/2013 09:53 - lpereira
       // Estava atribuindo o valor de SQLRDD::RDBMS::ORACLE para thiswa->nSystemID.
       // if (thiswa->nSystemID = SQLRDD::RDBMS::ORACLE)
-      if (thiswa->nSystemID == SQLRDD::RDBMS::ORACLE) {
-        InsertRecord->iCType = SQL_C_TYPE_TIMESTAMP; // May be DATE or TIMESTAMP
-      } else {
-        InsertRecord->iCType = lType; // May be DATE or TIMESTAMP
-      }
+      InsertRecord->iCType = (thiswa->nSystemID == SQLRDD::RDBMS::ORACLE) ? SQL_C_TYPE_TIMESTAMP : lType; // May be DATE or TIMESTAMP
       break;
     }
     case 'T': {
@@ -337,6 +333,10 @@ void SR_CreateInsertStmt(SQLEXAREA *thiswa)
 
   sParams[0] = ' ';
   sFields[0] = ' ';
+
+  char ident[200] = {0};
+  char tablename[100] = {0};
+  char declare[200] = {0};
 
   switch (thiswa->nSystemID) {
   case SQLRDD::RDBMS::MSSQL7:
