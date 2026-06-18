@@ -139,14 +139,6 @@ struct SQLAREA
   char editMask[MAX_FIELDS];
 };
 
-//using SQLAREA = _SQLAREA; (deprecated)
-//using LPSQLAREA = SQLAREA *; (deprecated)
-
-// deprecated
-//#ifndef SQLAREAP
-//#define SQLAREAP LPSQLAREA
-//#endif
-
 // prototypes
 
 namespace SQLRDD {
