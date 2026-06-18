@@ -412,7 +412,6 @@ typedef SQLEXORAAREA *LPSQLEXORAAREA;
 // prototypes
 
 //int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact); NOTE: changed to static
-void SR_odbcErrorDiag(OCI_Statement *hStmt, const char *routine, const char *szSql, int line);
 // void SR_odbcErrorDiagRTE(OCI_Statement * hStmt, char * routine, char * szSql, int res, int line, char * module);
 void OraErrorDiagRTE(OCI_Statement *hStmt, char *routine, char *szSql, int res, int line, char *module);
 //void SR_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_LONG lLenBuff, HB_BOOL bQueryOnly,
@@ -421,7 +420,10 @@ char *SR_QuoteTrimEscapeString(char *FromBuffer, HB_ULONG iSize, int idatabase, 
 char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable, int nSystemID,
                  HB_BOOL bTCCompat, HB_BOOL bMemo, HB_BOOL *bNullArgument);
 HB_BOOL SR_itemEmpty2(PHB_ITEM pItem);
-void SQLRDD::commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
+namespace SQLRDD {
+void commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
+void odbcErrorDiag(OCI_Statement *hStmt, const char *routine, const char *szSql, int line);
+}
 HB_ERRCODE SetBindEmptylValue2(COLUMNBINDORAP BindStructure);
 HB_ERRCODE SetBindValue2(PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_Statement *hStmt);
 char *QualifyName2(char *szName, SQLEXORAAREAP thiswa);

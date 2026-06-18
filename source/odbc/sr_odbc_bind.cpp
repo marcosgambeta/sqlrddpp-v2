@@ -1059,7 +1059,8 @@ HB_FUNC_STATIC(SR_MORERESULTS) // hEnv, hDbc
 
 //----------------------------------------------------------------------------//
 
-void SR_odbcErrorDiag(SQLHSTMT hStmt, const char *routine, const char *szSql, int line) // TODO: static ?
+namespace SQLRDD {
+void odbcErrorDiag(SQLHSTMT hStmt, const char *routine, const char *szSql, int line) // TODO: static ?
 {
   SQLTCHAR SqlState[6] = {0}, Msg[2048] = {0};
   SQLINTEGER NativeError = 0;
@@ -1076,6 +1077,7 @@ void SR_odbcErrorDiag(SQLHSTMT hStmt, const char *routine, const char *szSql, in
 
   SR_TraceLog(LOGFILE, "Error at %s, local %i: State: %s - Message: %s\r\nOriginal SQL code:\n%s\n", routine, line,
               SqlState, Msg, szSql);
+}
 }
 
 //----------------------------------------------------------------------------//
@@ -1125,18 +1127,18 @@ HB_FUNC_STATIC(SR_ODBCWRITEMEMO)
                                  cbSize, &cbSize);
 
       if (!(retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)) {
-        SR_odbcErrorDiag(hStmt, "SQLBindParameter", szSql, __LINE__);
+        SQLRDD::odbcErrorDiag(hStmt, "SQLBindParameter", szSql, __LINE__);
         break;
       }
 
       retcode = SQLExecDirect(hStmt, reinterpret_cast<SQLCHAR *>(szSql), SQL_NTS);
       if (!(retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)) {
-        SR_odbcErrorDiag(hStmt, "SQLExecDirect", szSql, __LINE__);
+        SQLRDD::odbcErrorDiag(hStmt, "SQLExecDirect", szSql, __LINE__);
         break;
       } else {
         retcode3 = SQLFreeStmt((SQLHSTMT)hStmt, SQL_UNBIND);
         if (!(retcode3 == SQL_SUCCESS || retcode3 == SQL_SUCCESS_WITH_INFO)) {
-          SR_odbcErrorDiag(hStmt, "SQLFreeStmt, SQL_CLOSE", szSql, __LINE__);
+          SQLRDD::odbcErrorDiag(hStmt, "SQLFreeStmt, SQL_CLOSE", szSql, __LINE__);
           break;
         }
       }
@@ -1144,7 +1146,7 @@ HB_FUNC_STATIC(SR_ODBCWRITEMEMO)
     retcode2 = SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
 
     if (!(retcode2 == SQL_SUCCESS || retcode2 == SQL_SUCCESS_WITH_INFO)) {
-      SR_odbcErrorDiag(hStmt, "SQLFreeStmt, SQL_CLOSE", "-", __LINE__);
+      SQLRDD::odbcErrorDiag(hStmt, "SQLFreeStmt, SQL_CLOSE", "-", __LINE__);
     }
   }
 
