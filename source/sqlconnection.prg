@@ -62,7 +62,11 @@
 
 #define DEBUGSESSION     .F.
 
+//----------------------------------------------------------------------------//
+
 STATIC s_lNwgOldCompat := .F.
+
+//----------------------------------------------------------------------------//
 
 CLASS SR_CONNECTION
 
@@ -227,6 +231,8 @@ CLASS SR_CONNECTION
 
 ENDCLASS
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:LogQuery(cCommand, cType, nLogMode, nCost)
 
    LOCAL cSql
@@ -279,6 +285,8 @@ METHOD SR_CONNECTION:LogQuery(cCommand, cType, nLogMode, nCost)
    ENDIF
 
 RETURN NIL
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_CONNECTION:ListCatTables(cOwner)
 
@@ -346,6 +354,8 @@ METHOD SR_CONNECTION:ListCatTables(cOwner)
 
 RETURN aRet2
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:Fetch(aLine, lTranslate, aFields)
 
    LOCAL lResults := HB_IsArray(aLine)
@@ -361,8 +371,12 @@ METHOD SR_CONNECTION:Fetch(aLine, lTranslate, aFields)
 
 RETURN nRet
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:GetStruct(cTable)
 RETURN ::oSql:IniFields(.T., cTable, , .F.)
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_CONNECTION:Getline(aFields, lTranslate, aArray)
 
@@ -380,6 +394,8 @@ METHOD SR_CONNECTION:Getline(aFields, lTranslate, aArray)
 
 RETURN aArray
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:SetNextOpt(nSet, nOpt)
 
    ::lSetNext := .T.
@@ -387,6 +403,8 @@ METHOD SR_CONNECTION:SetNextOpt(nSet, nOpt)
    ::nSetValue := nOpt
 
 RETURN NIL
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_CONNECTION:Exec(cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType)
 
@@ -661,8 +679,12 @@ METHOD SR_CONNECTION:Exec(cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRec
 
 RETURN nRet
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:AllocStatement()
 RETURN SQL_SUCCESS
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_CONNECTION:Execute(cCommand, lErrMsg, nLogMode, cType, lNeverLog)
 
@@ -732,14 +754,20 @@ METHOD SR_CONNECTION:Execute(cCommand, lErrMsg, nLogMode, cType, lNeverLog)
 
 RETURN nRet
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:LastError()
 RETURN ""
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_CONNECTION:RPCTalk(cSend)
 
    HB_SYMBOL_UNUSED(cSend)
 
 RETURN ""
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_CONNECTION:DetectTargetDb()
 
@@ -830,6 +858,8 @@ METHOD SR_CONNECTION:DetectTargetDb()
 
 RETURN NIL
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:End()
 
    ::hEnv := NIL
@@ -837,17 +867,23 @@ METHOD SR_CONNECTION:End()
 
 RETURN NIL
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:GetInfo(nType)
 
    HB_SYMBOL_UNUSED(nType)
 
 RETURN ""
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:GetOptions(nType)
 
    HB_SYMBOL_UNUSED(nType)
 
 RETURN ""
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_CONNECTION:SetOptions(nType, uBuffer)
 
@@ -856,12 +892,16 @@ METHOD SR_CONNECTION:SetOptions(nType, uBuffer)
 
 RETURN SQL_SUCCESS
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:SetStmtOptions(nType, uBuffer)
 
    HB_SYMBOL_UNUSED(nType)
    HB_SYMBOL_UNUSED(uBuffer)
 
 RETURN SQL_SUCCESS
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_CONNECTION:Commit(lNoLog)
 
@@ -905,6 +945,8 @@ METHOD SR_CONNECTION:Commit(lNoLog)
 
 RETURN SQL_SUCCESS
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:RollBack()
 
    IF ::lTraceToDBF
@@ -945,6 +987,8 @@ METHOD SR_CONNECTION:RollBack()
 
 RETURN SQL_SUCCESS
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:RuntimeErr(cOperation, cErr)
 
    LOCAL oErr := ErrorNew()
@@ -976,6 +1020,8 @@ METHOD SR_CONNECTION:RuntimeErr(cOperation, cErr)
 
 RETURN NIL
 
+//----------------------------------------------------------------------------//
+
 FUNCTION SR_AdjustNum(a)
 
    LOCAL b := AClone(a)
@@ -1006,6 +1052,8 @@ FUNCTION SR_AdjustNum(a)
    NEXT i
 
 RETURN b
+
+//----------------------------------------------------------------------------//
 
 METHOD SR_CONNECTION:Connect(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout)
 
@@ -1273,6 +1321,8 @@ METHOD SR_CONNECTION:Connect(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxB
 
 RETURN SELF
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:SQLType(nType, cName, nLen)
 
    LOCAL cType := "U"
@@ -1357,10 +1407,12 @@ METHOD SR_CONNECTION:SQLType(nType, cName, nLen)
 
 RETURN cType
 
+//----------------------------------------------------------------------------//
+
 METHOD SR_CONNECTION:SQLLen(nType, nLen, nDec)
 
    LOCAL cType := "U"
-   
+
    HB_SYMBOL_UNUSED(cType)
 
    DEFAULT nDec TO -1
@@ -1420,6 +1472,8 @@ METHOD SR_CONNECTION:SQLLen(nType, nLen, nDec)
 
 RETURN nLen
 
+//----------------------------------------------------------------------------//
+
 FUNCTION SR_SetNwgCompat(l)
 
    LOCAL lOld := s_lNwgOldCompat
@@ -1429,6 +1483,8 @@ FUNCTION SR_SetNwgCompat(l)
    ENDIF
 
 RETURN lOld
+
+//----------------------------------------------------------------------------//
 
 FUNCTION SR_AutoCommit(nSet)
 
@@ -1445,6 +1501,8 @@ FUNCTION SR_AutoCommit(nSet)
 
 RETURN nOld
 
+//----------------------------------------------------------------------------//
+
 FUNCTION SR_AllInCache(lSet)
 
    LOCAL lOld
@@ -1460,6 +1518,8 @@ FUNCTION SR_AllInCache(lSet)
 
 RETURN lOld
 
+//----------------------------------------------------------------------------//
+
 FUNCTION SR_SetTraceLog(cLog)
 
    LOCAL cOld
@@ -1474,3 +1534,5 @@ FUNCTION SR_SetTraceLog(cLog)
    ENDIF
 
 RETURN cOld
+
+//----------------------------------------------------------------------------//
