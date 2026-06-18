@@ -438,7 +438,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREA *thiswa, PHB_ITEM pFieldData, HB_LO
   res = SQLExecute(thiswa->colStmt[lFieldPosDB - 1]);
 
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLExecute", sSql, (SQLRETURN)res, __LINE__,
+    SQLRDD::odbcErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLExecute", sSql, (SQLRETURN)res, __LINE__,
                      __FILE__);
     SQLFreeStmt(thiswa->colStmt[lFieldPosDB - 1], SQL_CLOSE);
     return HB_FAILURE;
@@ -449,7 +449,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREA *thiswa, PHB_ITEM pFieldData, HB_LO
   res = SQLFetch(thiswa->colStmt[lFieldPosDB - 1]);
   if (res != SQL_SUCCESS) {
     if (res == SQL_ERROR) {
-      SR_odbcErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLFetch", sSql, (SQLRETURN)res, __LINE__,
+      SQLRDD::odbcErrorDiagRTE(thiswa->colStmt[lFieldPosDB - 1], "getMissingColumn/SQLFetch", sSql, (SQLRETURN)res, __LINE__,
                        __FILE__);
       SQLFreeStmt(thiswa->colStmt[lFieldPosDB - 1], SQL_CLOSE);
       return HB_FAILURE;
@@ -548,7 +548,7 @@ HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBIND *BindStructure, HSTMT
                              &(BindStructure->lIndPtr));
 
       if (CHECK_SQL_N_OK(res)) {
-        SR_odbcErrorDiagRTE(hStmt, "SetBindValue", "", res, __LINE__, __FILE__);
+        SQLRDD::odbcErrorDiagRTE(hStmt, "SetBindValue", "", res, __LINE__, __FILE__);
         return HB_FAILURE;
       }
       break;
@@ -829,7 +829,7 @@ static void BindAllIndexStmts(SQLEXAREA *thiswa)
                            BindStructure->DecimalDigits, &(BindStructure->asNumeric), 0, nullptr);
 
     if (CHECK_SQL_N_OK(res)) {
-      SR_odbcErrorDiagRTE(hStmt, "BindAllIndexStmts", sSql, res, __LINE__, __FILE__);
+      SQLRDD::odbcErrorDiagRTE(hStmt, "BindAllIndexStmts", sSql, res, __LINE__, __FILE__);
     }
   } else {
     IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
@@ -886,7 +886,7 @@ static void BindAllIndexStmts(SQLEXAREA *thiswa)
           }
           }
           if (CHECK_SQL_N_OK(res)) {
-            SR_odbcErrorDiagRTE(hStmt, "BindAllIndexStmts()", sSql, res, __LINE__, __FILE__);
+            SQLRDD::odbcErrorDiagRTE(hStmt, "BindAllIndexStmts()", sSql, res, __LINE__, __FILE__);
           }
           iBind++;
         }
@@ -1405,7 +1405,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXAREA *thiswa, int iMax) // Returns 
   res = SQLExecute(hStmt);
 
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(hStmt, "getPreparedRecordList", sSql, res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(hStmt, "getPreparedRecordList", sSql, res, __LINE__, __FILE__);
     SQLCloseCursor(hStmt);
     return HB_FAILURE;
   }
@@ -1823,7 +1823,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREA *thiswa, HB_BOOL bUpdateDeleted)
   res = SQLExecute(thiswa->hStmtBuffer);
 
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(thiswa->hStmtBuffer, "updateRecordBuffer", thiswa->sSqlBuffer, res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(thiswa->hStmtBuffer, "updateRecordBuffer", thiswa->sSqlBuffer, res, __LINE__, __FILE__);
     SQLCloseCursor(thiswa->hStmtBuffer);
     // culik null the handle
     // thiswa->hStmtBuffer = NULL;
@@ -2175,7 +2175,7 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREA *thiswa)
       createRecodListQuery(thiswa);
 
       if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
-        SR_odbcErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
+        SQLRDD::odbcErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
         SQLRDD::commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
         return HB_FAILURE;
       }
@@ -2189,7 +2189,7 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREA *thiswa)
     createRecodListQuery(thiswa);
 
     if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
-      SR_odbcErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
+      SQLRDD::odbcErrorDiagRTE(thiswa->hStmt, "dbGoBottom", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
       SQLRDD::commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
       return HB_FAILURE;
     }
@@ -2327,7 +2327,7 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREA *thiswa)
       createRecodListQuery(thiswa);
 
       if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
-        SR_odbcErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
+        SQLRDD::odbcErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
         SQLRDD::commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
         return HB_FAILURE;
       }
@@ -2340,7 +2340,7 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREA *thiswa)
     createRecodListQuery(thiswa);
 
     if (getRecordList(thiswa, RECORD_LIST_SIZE / 10) == HB_FAILURE) {
-      SR_odbcErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
+      SQLRDD::odbcErrorDiagRTE(thiswa->hStmt, "dbGoTop", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
       SQLRDD::commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ, thiswa->sTable.c_str());
       return HB_FAILURE;
     }
@@ -3801,7 +3801,7 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREA *thiswa, HB_USHORT uiIndex, LPDBORDER
       createCountQuery(thiswa);
 
       if (getFirstColumnAsLong(thiswa, &lValue) == HB_FAILURE) {
-        SR_odbcErrorDiagRTE(thiswa->hStmt, "OrdKeyCount", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
+        SQLRDD::odbcErrorDiagRTE(thiswa->hStmt, "OrdKeyCount", thiswa->sSql, SQL_ERROR, __LINE__, __FILE__);
         uiError = HB_FAILURE;
       } else {
         pInfo->itmResult = hb_itemPutNI(pInfo->itmResult, static_cast<int>(lValue));

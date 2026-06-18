@@ -404,14 +404,14 @@ HB_ERRCODE SR_PrepareInsertStmt(SQLEXAREA *thiswa)
   res = SQLAllocHandle(SQL_HANDLE_STMT, (HDBC)thiswa->hDbc, &(thiswa->hStmtInsert));
 
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmt/SQLAllocStmt", thiswa->sSql, res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmt/SQLAllocStmt", thiswa->sSql, res, __LINE__, __FILE__);
     return HB_FAILURE;
   }
 
   res = SQLPrepare(thiswa->hStmtInsert, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS);
 
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmt", thiswa->sSql, res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmt", thiswa->sSql, res, __LINE__, __FILE__);
     return HB_FAILURE;
   }
 
@@ -485,7 +485,7 @@ HB_ERRCODE SR_BindInsertColumns(SQLEXAREA *thiswa)
       InsertRecord->iParNum = iBind;
 
       if (CHECK_SQL_N_OK(res)) {
-        SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "BindInsertColumns", thiswa->sSql, res, __LINE__, __FILE__);
+        SQLRDD::odbcErrorDiagRTE(thiswa->hStmtInsert, "BindInsertColumns", thiswa->sSql, res, __LINE__, __FILE__);
         return HB_FAILURE;
       }
     }
@@ -569,7 +569,7 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREA *thiswa)
   res = SQLExecute(thiswa->hStmtInsert);
 
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/SQLExecute", thiswa->sSql, res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/SQLExecute", thiswa->sSql, res, __LINE__, __FILE__);
     SQLCloseCursor(thiswa->hStmtInsert);
     return HB_FAILURE;
   }
@@ -592,7 +592,7 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREA *thiswa)
       if (res != SQL_SUCCESS) {
         res = SQLMoreResults(thiswa->hStmtInsert);
         if (CHECK_SQL_N_OK(res)) {
-          SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "SQLMoreResults", thiswa->sSql, res, __LINE__, __FILE__);
+          SQLRDD::odbcErrorDiagRTE(thiswa->hStmtInsert, "SQLMoreResults", thiswa->sSql, res, __LINE__, __FILE__);
           SQLCloseCursor(thiswa->hStmtInsert);
           return HB_FAILURE;
         }
@@ -601,12 +601,12 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREA *thiswa)
     }
     res = SQLFetch(thiswa->hStmtInsert);
     if (CHECK_SQL_N_OK(res)) {
-      SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/Fetch", thiswa->sSql, res, __LINE__, __FILE__);
+      SQLRDD::odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/Fetch", thiswa->sSql, res, __LINE__, __FILE__);
       return HB_FAILURE;
     }
     res = SQLGetData(thiswa->hStmtInsert, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), nullptr);
     if (CHECK_SQL_N_OK(res)) {
-      SR_odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/GetData", thiswa->sSql, res, __LINE__, __FILE__);
+      SQLRDD::odbcErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmt/GetData", thiswa->sSql, res, __LINE__, __FILE__);
       return HB_FAILURE;
     }
     break;
@@ -636,13 +636,13 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREA *thiswa)
 
       _res = SQLAllocHandle(SQL_HANDLE_STMT, (HDBC)thiswa->hDbc, &(thiswa->hStmtNextval));
       if (CHECK_SQL_N_OK(_res)) {
-        SR_odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLAllocStmt", ident, _res, __LINE__, __FILE__);
+        SQLRDD::odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLAllocStmt", ident, _res, __LINE__, __FILE__);
         return HB_FAILURE;
       }
 
       _res = SQLPrepare(thiswa->hStmtNextval, reinterpret_cast<SQLCHAR *>(ident), SQL_NTS);
       if (CHECK_SQL_N_OK(_res)) {
-        SR_odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLPrepare", ident, _res, __LINE__, __FILE__);
+        SQLRDD::odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLPrepare", ident, _res, __LINE__, __FILE__);
         return HB_FAILURE;
       }
     } else {
@@ -651,17 +651,17 @@ HB_ERRCODE SR_ExecuteInsertStmt(SQLEXAREA *thiswa)
 
     _res = SQLExecute(thiswa->hStmtNextval);
     if (CHECK_SQL_N_OK(_res)) {
-      SR_odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLExecute", ident, _res, __LINE__, __FILE__);
+      SQLRDD::odbcErrorDiagRTE(thiswa->hStmtNextval, "SQLExecute", ident, _res, __LINE__, __FILE__);
       return HB_FAILURE;
     }
     _res = SQLFetch(thiswa->hStmtNextval);
     if (CHECK_SQL_N_OK(_res)) {
-      SR_odbcErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmt/Fetch", ident, _res, __LINE__, __FILE__);
+      SQLRDD::odbcErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmt/Fetch", ident, _res, __LINE__, __FILE__);
       return HB_FAILURE;
     }
     _res = SQLGetData(thiswa->hStmtNextval, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof(SQL_C_ULONG), nullptr);
     if (CHECK_SQL_N_OK(_res)) {
-      SR_odbcErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmt/GetData", ident, _res, __LINE__, __FILE__);
+      SQLRDD::odbcErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmt/GetData", ident, _res, __LINE__, __FILE__);
       return HB_FAILURE;
     }
     SQLFreeStmt(thiswa->hStmtNextval, SQL_CLOSE);
@@ -704,7 +704,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREA *thiswa)
 
   res = SQLAllocHandle(SQL_HANDLE_STMT, (HDBC)thiswa->hDbc, &(thiswa->hStmtUpdate));
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
   }
 
   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
@@ -788,7 +788,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREA *thiswa)
       hb_xfree(temp);
 
       if (CHECK_SQL_N_OK(res)) {
-        SR_odbcErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
+        SQLRDD::odbcErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
         return HB_FAILURE;
       }
     }
@@ -801,13 +801,13 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREA *thiswa)
   res = SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(++iBind), SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0,
                          &(thiswa->lUpdatedRecord), 0, nullptr);
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
     return HB_FAILURE;
   }
 
   res = SQLPrepare(thiswa->hStmtUpdate, reinterpret_cast<SQLCHAR *>(thiswa->sSql), SQL_NTS);
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
     return HB_FAILURE;
   }
 
@@ -847,7 +847,7 @@ HB_ERRCODE SR_ExecuteUpdateStmt(SQLEXAREA *thiswa)
   res = SQLExecute(thiswa->hStmtUpdate);
 
   if (res == SQL_ERROR) {
-    SR_odbcErrorDiagRTE(thiswa->hStmtUpdate, "ExecuteUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(thiswa->hStmtUpdate, "ExecuteUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__);
     SQLCloseCursor(thiswa->hStmtUpdate);
     thiswa->hStmtUpdate = nullptr;
     return HB_FAILURE;

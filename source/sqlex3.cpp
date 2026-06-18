@@ -640,7 +640,7 @@ void SR_BindSeekStmt(SQLEXAREA *thiswa, int queryLevel)
       }
       }
       if (CHECK_SQL_N_OK(res)) {
-        SR_odbcErrorDiagRTE(hStmt, "BindSeekStmt", sSql, res, __LINE__, __FILE__);
+        SQLRDD::odbcErrorDiagRTE(hStmt, "BindSeekStmt", sSql, res, __LINE__, __FILE__);
       }
       iBind++;
       BindStructure->iParNum = iBind;
@@ -669,7 +669,7 @@ HB_ERRCODE SR_getPreparedSeek(SQLEXAREA *thiswa, int queryLevel, HB_USHORT *iInd
   res = SQLExecute(*hStmt);
 
   if (CHECK_SQL_N_OK(res)) {
-    SR_odbcErrorDiagRTE(*hStmt, "getPreparedSeek", "", res, __LINE__, __FILE__);
+    SQLRDD::odbcErrorDiagRTE(*hStmt, "getPreparedSeek", "", res, __LINE__, __FILE__);
     // SQLCloseCursor(*hStmt);
     SQLFreeStmt(*hStmt, SQL_CLOSE);
     return HB_FAILURE;

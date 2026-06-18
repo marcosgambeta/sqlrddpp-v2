@@ -115,8 +115,8 @@ typedef unsigned char SQLTCHAR;
 
 static PHB_DYNS s_pSym_SR_DESERIALIZE = nullptr;
 static PHB_DYNS s_pSym_SR_FROMJSON = nullptr;
-void SR_odbcErrorDiagRTE(SQLHSTMT hStmt, const char *routine, const char *szSql, SQLRETURN res, int line,
-                      const char *module);
+//void SR_odbcErrorDiagRTE(SQLHSTMT hStmt, const char *routine, const char *szSql, SQLRETURN res, int line,
+//                      const char *module);
 void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQueryOnly, HB_ULONG ulSystemID,
                  HB_BOOL bTranslate, HB_USHORT ui);
 
@@ -810,7 +810,8 @@ HB_FUNC_STATIC(SR_NUMRES)
 
 //----------------------------------------------------------------------------//
 
-void SR_odbcErrorDiagRTE(SQLHSTMT hStmt, const char *routine, const char *szSql, SQLRETURN res, int line,
+namespace SQLRDD {
+void odbcErrorDiagRTE(SQLHSTMT hStmt, const char *routine, const char *szSql, SQLRETURN res, int line,
                       const char *module)
 {
   PHB_ITEM pArg;
@@ -867,6 +868,7 @@ void SR_odbcErrorDiagRTE(SQLHSTMT hStmt, const char *routine, const char *szSql,
 
   return;
 }
+}
 
 //----------------------------------------------------------------------------//
 
@@ -897,7 +899,7 @@ HB_FUNC_STATIC(SR_DESCRIB)
                            &wDecimals, &wNullable);
   if (wDataType == -8 && ulSystemID == SQLRDD::RDBMS::MYSQL) {
     // MySQL ODBC Bug
-    SR_odbcErrorDiagRTE(SR_PAR_SQLHSTMT(1), "SQLCONNECT", "MySQL Driver version 5 is not compatible with SQLRDD", 0,
+    SQLRDD::odbcErrorDiagRTE(SR_PAR_SQLHSTMT(1), "SQLCONNECT", "MySQL Driver version 5 is not compatible with SQLRDD", 0,
                      __LINE__, __FILE__);
   }
 
