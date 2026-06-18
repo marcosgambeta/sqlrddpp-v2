@@ -4058,7 +4058,7 @@ static HB_ERRCODE sqlExUnLock(SQLEXAREA *thiswa, PHB_ITEM pRecNo)
 //------------------------------------------------------------------------
 
 // (DBENTRYP_RSLV)
-#define sqlExInfo nullptr // TODO: duplicated
+#define sqlExRDDInfo nullptr
 
 //------------------------------------------------------------------------
 
@@ -4199,7 +4199,7 @@ static const RDDFUNCS sqlTable = {
   (DBENTRYP_RVVL)sqlExDrop,
   (DBENTRYP_RVVL)sqlExExists,
   (DBENTRYP_RVVVL)sqlExRename,
-  (DBENTRYP_RSLV)sqlExInfo,
+  (DBENTRYP_RSLV)sqlExRDDInfo,
 
   // Special and reserved methods
 
