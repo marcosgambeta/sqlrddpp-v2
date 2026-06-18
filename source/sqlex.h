@@ -416,7 +416,7 @@ bool itemEmpty(PHB_ITEM pItem);
 HB_ERRCODE SR_SetBindEmptylValue(COLUMNBIND *BindStructure);
 HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBIND *BindStructure, HSTMT hStmt);
 COLUMNBIND *SR_GetBindStruct(SQLEXAREA *thiswa, INDEXBIND *IndexBind);
-HB_BOOL SR_getColumnList(SQLEXAREA *thiswa);
+bool SR_getColumnList(SQLEXAREA *thiswa);
 void SR_SolveFilters(SQLEXAREA *thiswa, bool bWhere);
 void SR_getOrderByExpression(SQLEXAREA *thiswa, HB_BOOL bUseOptimizerHints);
 void SR_setResultSetLimit(SQLEXAREA *thiswa, int iRows);

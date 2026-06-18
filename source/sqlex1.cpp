@@ -1601,7 +1601,7 @@ static HB_ERRCODE getFirstColumnAsLong(SQLEXAREA *thiswa, long *szValue) // Retu
 
 //------------------------------------------------------------------------
 
-HB_BOOL SR_getColumnList(SQLEXAREA *thiswa)
+bool SR_getColumnList(SQLEXAREA *thiswa)
 {
   HB_USHORT n, uiFlds;
   LPFIELD pField;
