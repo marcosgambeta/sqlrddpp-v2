@@ -592,7 +592,7 @@ HB_FUNC(SR_ESCAPESTRING)
 }
 
 namespace SQLRDD {
-char *QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase, HB_BOOL bRTrim, HB_SIZE *iSizeOut) // TODO: static ?
+char *QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase, bool bRTrim, HB_SIZE *iSizeOut) // TODO: static ?
 {
   auto ToBuffer = static_cast<char *>(hb_xgrab((iSize * 2) + 3));
 

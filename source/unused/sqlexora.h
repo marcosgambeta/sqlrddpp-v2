@@ -420,7 +420,7 @@ HB_BOOL SR_itemEmpty2(PHB_ITEM pItem);
 namespace SQLRDD {
 void commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
 void odbcErrorDiag(OCI_Statement *hStmt, const char *routine, const char *szSql, int line);
-char *QuoteTrimEscapeString(char *FromBuffer, HB_ULONG iSize, int idatabase, HB_BOOL bRTrim, HB_ULONG *iSizeOut);
+char *QuoteTrimEscapeString(char *FromBuffer, HB_ULONG iSize, int idatabase, bool bRTrim, HB_ULONG *iSizeOut);
 char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable, int nSystemID,
                  HB_BOOL bTCCompat, HB_BOOL bMemo, HB_BOOL *bNullArgument);
 }

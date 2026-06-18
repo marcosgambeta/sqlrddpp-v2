@@ -407,7 +407,7 @@ void commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubC
 char *QualifyName(char *szName, SQLEXAREA *thiswa);
 void odbcErrorDiag(HSTMT hStmt, const char *routine, const char *szSql, int line);
 void odbcErrorDiagRTE(HSTMT hStmt, const char *routine, const char *szSql, SQLRETURN res, int line, const char *module);
-char *QuoteTrimEscapeString(char *FromBuffer, HB_ULONG iSize, int idatabase, HB_BOOL bRTrim, HB_ULONG *iSizeOut);
+char *QuoteTrimEscapeString(char *FromBuffer, HB_ULONG iSize, int idatabase, bool bRTrim, HB_ULONG *iSizeOut);
 char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable, int nSystemID,
                  HB_BOOL bTCCompat, HB_BOOL bMemo, HB_BOOL *bNullArgument);
 bool itemEmpty(PHB_ITEM pItem);
