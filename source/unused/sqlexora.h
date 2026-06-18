@@ -369,7 +369,7 @@ typedef struct _SQLEXORAAREA
   char *sOwner;       // Database schema included in sTable
   char *sWhere;       // Where clause
   char *sOrderBy;     // Order By clause
-  char *sRecnoName;   // Recno column name
+  std::string sRecnoName; //char *sRecnoName;   // Recno column name
   std::string sDeletedName; //char *sDeletedName; // Deleted column name
   char sLimit1[50];   // String for recordset limit
   char sLimit2[50];   // String for recordset limit

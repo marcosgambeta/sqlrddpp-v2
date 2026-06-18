@@ -332,7 +332,7 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
   }
   if (thiswa->nSystemID == SQLRDD::RDBMS::MSSQL7) {
     sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData VALUES (%s );%s", declare,
-            thiswa->sTable.c_str(), sFields, thiswa->sRecnoName, sParams, ident);
+            thiswa->sTable.c_str(), sFields, thiswa->sRecnoName.c_str(), sParams, ident);
   } else {
     sprintf(thiswa->sSql, "INSERT INTO %s (%s ) VALUES (%s )%s", thiswa->sTable.c_str(), sFields, sParams, ident);
   }
@@ -701,8 +701,8 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
     CurrRecord++;
   }
   temp = hb_strdup(static_cast<const char *>(thiswa->sSql));
-  sprintf(szBindName, ":%s", thiswa->sRecnoName);
-  sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = %s", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+  sprintf(szBindName, ":%s", thiswa->sRecnoName.c_str());
+  sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = %s", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
           CLOSE_QUALIFIER(thiswa), szBindName);
   hb_xfree(temp);
   // SR_TraceLog("aaa.log", "query update %s\n", thiswa->sSql);
@@ -827,11 +827,11 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
   }
 
   // temp = hb_strdup(static_cast<const char *>(thiswa->sSql));
-  // sprintf(szBindName, ":%s", thiswa->sRecnoName);
-  // sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = %s", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+  // sprintf(szBindName, ":%s", thiswa->sRecnoName.c_str());
+  // sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = %s", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
   // CLOSE_QUALIFIER(thiswa), szBindName); hb_xfree(temp); res = SQLBindParameter(thiswa->hStmtUpdate, ++iBind,
   // SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0, &(thiswa->lUpdatedRecord), 0, NULL);
-  res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, thiswa->sRecnoName, &thiswa->lUpdatedRecord);
+  res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, thiswa->sRecnoName.c_str(), &thiswa->lUpdatedRecord);
   if (!res) {
     OraErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
     return HB_FAILURE;

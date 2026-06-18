@@ -339,7 +339,7 @@ struct SQLEXAREA
   // Order By clause
   char *sOrderBy;
   // Recno column name
-  char *sRecnoName;
+  std::string sRecnoName; //char *sRecnoName;
   // Deleted column name
   std::string sDeletedName; //char *sDeletedName;
   // String for recordset limit

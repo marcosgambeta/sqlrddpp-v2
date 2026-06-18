@@ -342,8 +342,8 @@ void SR_CreateInsertStmt(SQLEXAREA *thiswa)
   case SQLRDD::RDBMS::MSSQL7:
   case SQLRDD::RDBMS::SYBASE: {
     // sprintf(ident, " SELECT @@IDENTITY ;");
-    sprintf(ident, "SELECT %s FROM @InsertedData;", thiswa->sRecnoName);
-    sprintf(declare, "Declare @InsertedData table ( %s numeric(15,0) );", thiswa->sRecnoName);
+    sprintf(ident, "SELECT %s FROM @InsertedData;", thiswa->sRecnoName.c_str());
+    sprintf(declare, "Declare @InsertedData table ( %s numeric(15,0) );", thiswa->sRecnoName.c_str());
     // sprintf(ident, ";SELECT SCOPE_IDENTITY() AS NewID ;");
     break;
   }
@@ -351,7 +351,7 @@ void SR_CreateInsertStmt(SQLEXAREA *thiswa)
   case SQLRDD::RDBMS::FIREBR3:
   case SQLRDD::RDBMS::FIREBR4:
   case SQLRDD::RDBMS::FIREBR5: {
-    sprintf(ident, " RETURNING %s", thiswa->sRecnoName);
+    sprintf(ident, " RETURNING %s", thiswa->sRecnoName.c_str());
     break;
   }
   case SQLRDD::RDBMS::POSTGR: {
@@ -384,7 +384,7 @@ void SR_CreateInsertStmt(SQLEXAREA *thiswa)
   memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   if (thiswa->nSystemID == SQLRDD::RDBMS::MSSQL7) {
     sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData(%s) VALUES (%s );%s", declare,
-            thiswa->sTable.c_str(), sFields, thiswa->sRecnoName, thiswa->sRecnoName, sParams, ident);
+            thiswa->sTable.c_str(), sFields, thiswa->sRecnoName.c_str(), thiswa->sRecnoName.c_str(), sParams, ident);
     // sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) VALUES (%s );%s", declare, thiswa->sTable.c_str(), sFields, sParams,
     // ident);
   } else {
@@ -725,7 +725,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREA *thiswa)
                                                  // current order is not affected by UPDATE, so it takes
                                                  // worst scenario
       }
-      if (strcmp(CurrRecord->colName, thiswa->sRecnoName) == 0) {
+      if (strcmp(CurrRecord->colName, thiswa->sRecnoName.c_str()) == 0) {
         break;
       }
       // Bind the query column
@@ -795,7 +795,7 @@ HB_ERRCODE SR_CreateUpdateStmt(SQLEXAREA *thiswa)
     CurrRecord++;
   }
   temp = hb_strdup(static_cast<const char *>(thiswa->sSql));
-  sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = ?", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+  sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = ?", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
           CLOSE_QUALIFIER(thiswa));
   hb_xfree(temp);
   res = SQLBindParameter(thiswa->hStmtUpdate, static_cast<SQLUSMALLINT>(++iBind), SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0,

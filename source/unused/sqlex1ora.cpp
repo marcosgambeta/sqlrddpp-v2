@@ -286,22 +286,22 @@ static void createRecodListQueryOra(SQLEXORAAREAP thiswa)
   if (thiswa->sqlarea.ulhDeleted == 0) {
     if (thiswa->bIsSelect) {
       sprintf(thiswa->sSql, "SELECT %s A.%c%s%c FROM (%s) A %s %s %s", thiswa->sLimit1, OPEN_QUALIFIER(thiswa),
-              thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa), thiswa->sqlarea.szDataFileName, thiswa->sWhere,
+              thiswa->sRecnoName.c_str(), CLOSE_QUALIFIER(thiswa), thiswa->sqlarea.szDataFileName, thiswa->sWhere,
               thiswa->sOrderBy, thiswa->sLimit2);
     } else {
       sprintf(thiswa->sSql, "SELECT %s A.%c%s%c FROM %s A %s %s %s", thiswa->sLimit1, OPEN_QUALIFIER(thiswa),
-              thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), thiswa->sWhere, thiswa->sOrderBy,
+              thiswa->sRecnoName.c_str(), CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), thiswa->sWhere, thiswa->sOrderBy,
               thiswa->sLimit2);
     }
   } else {
     if (thiswa->bIsSelect) {
       sprintf(thiswa->sSql, "SELECT %s A.%c%s%c, A.%c%s%c FROM (%s) A %s %s %s", thiswa->sLimit1,
-              OPEN_QUALIFIER(thiswa), thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa),
+              OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(), CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa),
               thiswa->sDeletedName.c_str(), CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), thiswa->sWhere, thiswa->sOrderBy,
               thiswa->sLimit2);
     } else {
       sprintf(thiswa->sSql, "SELECT %s A.%c%s%c, A.%c%s%c FROM %s A %s %s %s", thiswa->sLimit1, OPEN_QUALIFIER(thiswa),
-              thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa), thiswa->sDeletedName.c_str(),
+              thiswa->sRecnoName.c_str(), CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa), thiswa->sDeletedName.c_str(),
               CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), thiswa->sWhere, thiswa->sOrderBy, thiswa->sLimit2);
     }
   }
@@ -314,7 +314,7 @@ static void createCountQuery(SQLEXORAAREAP thiswa)
   if (thiswa->sSql) {
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   }
-  sprintf(thiswa->sSql, "SELECT COUNT( A.%c%s%c ) \nFROM %s A %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+  sprintf(thiswa->sSql, "SELECT COUNT( A.%c%s%c ) \nFROM %s A %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
           CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), thiswa->sWhere);
 }
 
@@ -343,9 +343,9 @@ void getOrderByExpressionOra(SQLEXORAAREAP thiswa, HB_BOOL bUseOptimizerHints)
       pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
       sprintf(thiswa->sOrderBy, "\n%s", hb_arrayGetCPtr(pIndexRef, bDirectionFWD ? ORDER_ASCEND : ORDER_DESEND));
     } else {
-      // sprintf(thiswa->sOrderBy, "\nORDER BY %c%s%c %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+      // sprintf(thiswa->sOrderBy, "\nORDER BY %c%s%c %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
       // CLOSE_QUALIFIER(thiswa), bDirectionFWD ? "ASC" : "DESC");
-      sprintf(thiswa->sOrderBy, "\nORDER BY A.%c%s%c %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+      sprintf(thiswa->sOrderBy, "\nORDER BY A.%c%s%c %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
               CLOSE_QUALIFIER(thiswa), bDirectionFWD ? "ASC" : "DESC");
     }
   }
@@ -376,11 +376,11 @@ static HB_ERRCODE getMissingColumn(SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, HB
 
     if (thiswa->bIsSelect) {
       sprintf(sSql, "SELECT %c%s%c FROM (%s) WHERE %c%s%c = :sz001", OPEN_QUALIFIER(thiswa), colName,
-              CLOSE_QUALIFIER(thiswa), thiswa->sqlarea.szDataFileName, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+              CLOSE_QUALIFIER(thiswa), thiswa->sqlarea.szDataFileName, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
               CLOSE_QUALIFIER(thiswa));
     } else {
       sprintf(sSql, "SELECT %c%s%c FROM %s WHERE %c%s%c = :sz001", OPEN_QUALIFIER(thiswa), colName,
-              CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+              CLOSE_QUALIFIER(thiswa), thiswa->sTable.c_str(), OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
               CLOSE_QUALIFIER(thiswa));
     }
     hb_xfree(colName);
@@ -1248,7 +1248,7 @@ static HB_ERRCODE getWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType)
     if (thiswa->sqlarea.hOrdCurrent == 0) { // Natural order
       BindStructure = GetBindStructOra(thiswa, IndexBind);
       BindStructure->asNumeric = GetCurrentRecordNumOra(thiswa);
-      sprintf(thiswa->sWhere, "\nWHERE A.%c%s%c %s %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+      sprintf(thiswa->sWhere, "\nWHERE A.%c%s%c %s %s", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
               CLOSE_QUALIFIER(thiswa), bDirectionFWD ? ">=" : "<=", BindStructure->szBindName);
       bWhere = true;
     } else {
@@ -1355,12 +1355,12 @@ HB_ERRCODE getWorkareaParamsOra(SQLEXORAAREAP thiswa)
     thiswa->nSystemID = getMessageNL(thiswa->oSql, "NSYSTEMID");
     thiswa->sTable = getMessageCPtr(thiswa->sqlarea.oWorkArea, "CQUALIFIEDTABLENAME");
     thiswa->sOwner = getMessageC(thiswa->sqlarea.oWorkArea, "COWNER");
-    thiswa->sRecnoName = getMessageC(thiswa->sqlarea.oWorkArea, "CRECNONAME");
+    thiswa->sRecnoName = getMessageCPtr(thiswa->sqlarea.oWorkArea, "CRECNONAME");
     thiswa->sDeletedName = getMessageCPtr(thiswa->sqlarea.oWorkArea, "CDELETEDNAME");
     thiswa->iTCCompat = getMessageNI(thiswa->sqlarea.oWorkArea, "NTCCOMPAT");
     thiswa->bHistoric = getMessageL(thiswa->sqlarea.oWorkArea, "LHISTORIC");
     thiswa->bOracle12 = getMessageL(thiswa->oSql, "LORACLE12");
-    thiswa->sRecnoName = QualifyName2(thiswa->sRecnoName, thiswa);
+    thiswa->sRecnoName = QualifyName2(thiswa->sRecnoName.c_str(), thiswa);
     thiswa->sDeletedName = QualifyName2(thiswa->sDeletedName.c_str(), thiswa);
     SetColStatementsOra(thiswa);
   }
@@ -1674,10 +1674,10 @@ HB_BOOL getColumnListOra(SQLEXORAAREAP thiswa)
           // Should ALWAYS ask for RECNO in first column to
           // be used in the BufferPool
           if (thiswa->sqlarea.ulhDeleted == 0) {
-            sprintf(thiswa->sFields, "A.%c%s%c, A.%c%s%c", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+            sprintf(thiswa->sFields, "A.%c%s%c, A.%c%s%c", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
                     CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa), colName, CLOSE_QUALIFIER(thiswa));
           } else { // If deleted records control exists in current WA, we should add it first, also
-            sprintf(thiswa->sFields, "A.%c%s%c, A.%c%s%c, A.%c%s%c", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+            sprintf(thiswa->sFields, "A.%c%s%c, A.%c%s%c, A.%c%s%c", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
                     CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa), thiswa->sDeletedName.c_str(), CLOSE_QUALIFIER(thiswa),
                     OPEN_QUALIFIER(thiswa), colName, CLOSE_QUALIFIER(thiswa));
           }
@@ -1711,10 +1711,10 @@ HB_BOOL getColumnListOra(SQLEXORAAREAP thiswa)
           // Should ALWAYS ask for RECNO in first column to
           // be used in the BufferPool
           if (thiswa->sqlarea.ulhDeleted == 0) {
-            sprintf(thiswa->sFields, "A.%c%s%c, A.%c%s%c", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+            sprintf(thiswa->sFields, "A.%c%s%c, A.%c%s%c", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
                     CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa), colName, CLOSE_QUALIFIER(thiswa));
           } else {
-            sprintf(thiswa->sFields, "A.%c%s%c, A.%c%s%c, A.%c%s%c", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName,
+            sprintf(thiswa->sFields, "A.%c%s%c, A.%c%s%c, A.%c%s%c", OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
                     CLOSE_QUALIFIER(thiswa), OPEN_QUALIFIER(thiswa), thiswa->sDeletedName.c_str(), CLOSE_QUALIFIER(thiswa),
                     OPEN_QUALIFIER(thiswa), colName, CLOSE_QUALIFIER(thiswa));
           }
@@ -1785,10 +1785,10 @@ static HB_ERRCODE updateRecordBuffer(SQLEXORAAREAP thiswa, HB_BOOL bUpdateDelete
 
     if (thiswa->bIsSelect) {
       sprintf(thiswa->sSqlBuffer, "SELECT %s FROM (%s) A WHERE A.%c%s%c IN ( :1", thiswa->sFields,
-              thiswa->sqlarea.szDataFileName, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa));
+              thiswa->sqlarea.szDataFileName, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(), CLOSE_QUALIFIER(thiswa));
     } else {
       sprintf(thiswa->sSqlBuffer, "SELECT %s \nFROM %s A \nWHERE A.%c%s%c IN ( :1", thiswa->sFields, thiswa->sTable.c_str(),
-              OPEN_QUALIFIER(thiswa), thiswa->sRecnoName, CLOSE_QUALIFIER(thiswa));
+              OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(), CLOSE_QUALIFIER(thiswa));
     }
     // // SR_TraceLog("aaa.log", "thiswa->sSqlBuffer %s\n", thiswa->sSqlBuffer);
     // iEnd = static_cast<HB_USHORT>(strlen(thiswa->sSqlBuffer));
@@ -2908,9 +2908,9 @@ static HB_ERRCODE sqlExOraDeleteRec(SQLEXORAAREAP thiswa)
     if (thiswa->sqlarea.ulhDeleted > 0 && sr_UseDeleteds()) {
       sprintf(thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i", thiswa->sTable.c_str(), thiswa->sDeletedName.c_str(),
               thiswa->iTCCompat >= 2 ? '*' : 'T', thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ",
-              thiswa->sRecnoName, static_cast<int>(GetCurrentRecordNumOra(thiswa)));
+              thiswa->sRecnoName.c_str(), static_cast<int>(GetCurrentRecordNumOra(thiswa)));
     } else {
-      sprintf(thiswa->sSql, "DELETE FROM %s WHERE %s = %i", thiswa->sTable.c_str(), thiswa->sRecnoName,
+      sprintf(thiswa->sSql, "DELETE FROM %s WHERE %s = %i", thiswa->sTable.c_str(), thiswa->sRecnoName.c_str(),
               static_cast<int>(GetCurrentRecordNumOra(thiswa)));
     }
 
@@ -3260,7 +3260,7 @@ static HB_ERRCODE sqlExOraRecall(SQLEXORAAREAP thiswa)
   if (isDeleted && thiswa->sqlarea.ulhDeleted > 0 && sr_UseDeleteds()) {
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
     sprintf(thiswa->sSql, "UPDATE %s SET %s = '%c'%s WHERE %s = %i", thiswa->sTable.c_str(), thiswa->sDeletedName.c_str(), ' ',
-            thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ", thiswa->sRecnoName,
+            thiswa->iTCCompat >= 4 ? ", R_E_C_D_E_L_ = R_E_C_N_O_" : " ", thiswa->sRecnoName.c_str(),
             static_cast<int>(GetCurrentRecordNumOra(thiswa)));
 
     // res = SQLAllocStmt((HDBC) thiswa->hDbc, &(thiswa->hStmt));
@@ -3381,9 +3381,11 @@ static HB_ERRCODE sqlExOraClose(SQLEXORAAREAP thiswa)
   if (thiswa->sFields) {
     hb_xfree(thiswa->sFields);
   }
-  if (thiswa->sRecnoName) {
-    hb_xfree(thiswa->sRecnoName);
-  }
+  //if (thiswa->sRecnoName) {
+  //  hb_xfree(thiswa->sRecnoName);
+  //}
+  thiswa->sRecnoName.clear();
+  thiswa->sRecnoName.shrink_to_fit();
   //if (thiswa->sDeletedName) {
   //  hb_xfree(thiswa->sDeletedName);
   //}
@@ -3478,8 +3480,8 @@ static HB_ERRCODE sqlExOraNewArea(SQLEXORAAREAP thiswa)
   thiswa->aFields = nullptr;
   //thiswa->sTable = nullptr;
   thiswa->sOwner = nullptr;
-  thiswa->sRecnoName = nullptr;
-  thiswa->sDeletedName = nullptr;
+  //thiswa->sRecnoName = nullptr;
+  //thiswa->sDeletedName = nullptr;
   thiswa->sqlarea.iFieldListStatus = FIELD_LIST_LEARNING;
   thiswa->hStmt = nullptr;
   thiswa->hStmtBuffer = nullptr;
