@@ -591,7 +591,8 @@ HB_FUNC(SR_ESCAPESTRING)
   }
 }
 
-char *SR_QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase, HB_BOOL bRTrim, HB_SIZE *iSizeOut) // TODO: static ?
+namespace SQLRDD {
+char *QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase, HB_BOOL bRTrim, HB_SIZE *iSizeOut) // TODO: static ?
 {
   auto ToBuffer = static_cast<char *>(hb_xgrab((iSize * 2) + 3));
 
@@ -647,6 +648,7 @@ char *SR_QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatab
   ToBuffer[iSize] = '\0';
   *iSizeOut = iSize;
   return ToBuffer;
+}
 }
 
 HB_FUNC(SR_ESCAPENUM)
@@ -1073,7 +1075,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
     } else {
 #if 0 // TODO: old code for reference (to be deleted)
          if( HB_IS_STRING(pFieldData) && bTCCompat ) {
-            sValue = SR_QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false, &iSizeOut);
+            sValue = SQLRDD::QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false, &iSizeOut);
             return sValue;
          } else if( HB_IS_STRING(pFieldData) ) {
             sValue = static_cast<char *>(hb_xgrab(4));
@@ -1093,7 +1095,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
       case HB_IT_STRING:
       case HB_IT_MEMO: {
         if (bTCCompat) {
-          sValue = SR_QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false,
+          sValue = SQLRDD::QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false,
                                          &iSizeOut);
           return sValue;
         } else {
@@ -1119,7 +1121,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
 
 #if 0 // TODO: old code for reference (to be deleted)
    if( HB_IS_STRING(pFieldData) ) {
-      sValue = SR_QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, !bTCCompat, &iSizeOut);
+      sValue = SQLRDD::QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, !bTCCompat, &iSizeOut);
    } else if( HB_IS_NUMBER(pFieldData) ) {
       sValue = hb_itemStr(pFieldData, pFieldLen, pFieldDec);
       iTrim = 0;
@@ -1192,7 +1194,7 @@ char *SR_quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec,
   case HB_IT_STRING:
   case HB_IT_MEMO: {
     sValue =
-        SR_QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, !bTCCompat, &iSizeOut);
+        SQLRDD::QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, !bTCCompat, &iSizeOut);
     break;
   }
   case HB_IT_INTEGER:
