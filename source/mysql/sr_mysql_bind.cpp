@@ -81,9 +81,9 @@ static int s_iConnectionCount = 0;
 
 #define LOGFILE "mysql.log"
 
-#define GET_MYSQL_SESSION(session, numpar) PMYSQL_SESSION session = (PMYSQL_SESSION)hb_itemGetPtr(hb_param(numpar, HB_IT_POINTER))
+#define GET_MYSQL_SESSION(session, numpar) auto session = (MYSQL_SESSION *)hb_itemGetPtr(hb_param(numpar, HB_IT_POINTER))
 
-typedef struct _MYSQL_SESSION
+struct MYSQL_SESSION
 {
   int status;                   // Execution return value
   int numcols;                  // Result set columns
@@ -91,16 +91,14 @@ typedef struct _MYSQL_SESSION
   MYSQL *dbh;                   // Connection handler
   MYSQL_RES *stmt;              // Current statement handler
   HB_ULONGLONG ulAffected_rows; // Number of affected rows
-} MYSQL_SESSION;
-
-typedef MYSQL_SESSION *PMYSQL_SESSION;
+};
 
 //----------------------------------------------------------------------------//
 
 HB_FUNC_STATIC(SR_MYSCONNECT)
 {
-  // PMYSQL_SESSION session = (PMYSQL_SESSION) hb_xgrab(sizeof(MYSQL_SESSION));
-  PMYSQL_SESSION session = (PMYSQL_SESSION)hb_xgrabz(sizeof(MYSQL_SESSION));
+  // MYSQL_SESSION *session = (MYSQL_SESSION *) hb_xgrab(sizeof(MYSQL_SESSION));
+  MYSQL_SESSION *session = (MYSQL_SESSION *)hb_xgrabz(sizeof(MYSQL_SESSION));
   auto szHost = hb_parc(1);
   auto szUser = hb_parc(2);
   auto szPass = hb_parc(3);
@@ -811,7 +809,7 @@ HB_FUNC_STATIC(SR_MYSTABLEATTR)
 {
   char attcmm[256] = {0};
   int row, rows, type;
-  PMYSQL_SESSION session;
+  MYSQL_SESSION *session;
 
   MYSQL_FIELD *field;
 
@@ -819,7 +817,7 @@ HB_FUNC_STATIC(SR_MYSTABLEATTR)
     hb_retnl(-2);
   }
 
-  session = (PMYSQL_SESSION)hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
+  session = (MYSQL_SESSION *)hb_itemGetPtr(hb_param(1, HB_IT_POINTER));
   assert(session->dbh != nullptr);
 
   sprintf(attcmm, "select * from %s where 0 = 1", hb_parc(2));
