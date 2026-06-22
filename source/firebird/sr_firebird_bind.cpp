@@ -172,13 +172,12 @@ HB_FUNC_STATIC(SR_FBCONNECT)
   char dpb[256];
   int i, len;
 
-  // FB_SESSION *session = (FB_SESSION *) hb_xgrab(sizeof(FB_SESSION));
-  //
-  //    memset(session, 0, sizeof(FB_SESSION));
-  FB_SESSION *session = (FB_SESSION *)hb_xgrabz(sizeof(FB_SESSION));
+  // auto session = static_cast<FB_SESSION *>(hb_xgrab(sizeof(FB_SESSION)));
+  // memset(session, 0, sizeof(FB_SESSION));
+  auto session = static_cast<FB_SESSION *>(hb_xgrabz(sizeof(FB_SESSION)));
   session->db = 0;
   session->transac = 0;
-  session->sqlda = (XSQLDA ISC_FAR *)hb_xgrab(XSQLDA_LENGTH(MAX_COLUMNS_IN_QUERY));
+  session->sqlda = static_cast<XSQLDA ISC_FAR *>(hb_xgrab(XSQLDA_LENGTH(MAX_COLUMNS_IN_QUERY)));
   session->sqlda->sqln = MAX_COLUMNS_IN_QUERY;
   session->sqlda->version = SQLDA_VERSION1;
   session->stmt = 0;
@@ -218,7 +217,6 @@ HB_FUNC_STATIC(SR_FBCONNECT)
     hb_xfree(session->sqlda);
     hb_xfree(session);
     hb_retnl(SQL_ERROR);
-    return;
   } else {
     hb_retni(SQL_SUCCESS);
     hb_storptr(static_cast<void *>(session), 5);
