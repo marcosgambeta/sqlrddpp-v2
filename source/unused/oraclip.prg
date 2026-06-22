@@ -1538,7 +1538,6 @@ FUNCTION OraTBrowse(nCursor1, cSql, c, oBrowse, bBLock)
          EXIT
       CASE  _ORATBROWSE_EXIT
         Ret := .F.
-        EXIT
       ENDSWITCH
    ENDDO
 
