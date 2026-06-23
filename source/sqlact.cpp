@@ -199,24 +199,19 @@ PHB_ITEM SQLpCodeGenArrayItem(PHB_ITEM pArray, PHB_ITEM value)
 
 PHB_ITEM SQLpCodeGenArrayInt(PHB_ITEM pArray, int code)
 {
-  PHB_ITEM pItem = hb_itemPutNILen(nullptr, code, 6);
-
+  auto pItem = hb_itemPutNILen(nullptr, code, 6);
   hb_arrayAddForward(pArray, pItem);
   hb_itemRelease(pItem);
-
   return pArray;
 }
 
 PHB_ITEM SQLpCodeGenArrayIntInt(PHB_ITEM pArray, int code, int code2)
 {
-  PHB_ITEM pItem;
-
-  pItem = hb_itemPutNILen(nullptr, code, 6);
+  auto pItem = hb_itemPutNILen(nullptr, code, 6);
   hb_arrayAddForward(pArray, pItem);
   hb_itemPutNILen(pItem, code2, 6);
   hb_arrayAddForward(pArray, pItem);
   hb_itemRelease(pItem);
-
   return pArray;
 }
 
@@ -228,7 +223,6 @@ PHB_ITEM SQLpCodeGenIntArray(int code, PHB_ITEM pArray)
   hb_itemPutNILen(pItem, code, 6);
   hb_arraySetForward(pArray, 1, pItem);
   hb_itemRelease(pItem);
-
   return pArray;
 }
 
