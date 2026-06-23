@@ -70,8 +70,8 @@ HB_FUNC(SR_SQLPARSE) // SqlParse(cCommand, @nError, @nErrorPos)
   HB_SIZE uLenPhrase = hb_parclen(1);
 
   if (uLenPhrase) {
-    // sql_stmt * stmt = (sql_stmt *) hb_xgrab(sizeof(sql_stmt));
-    sql_stmt *stmt = (sql_stmt *)hb_xgrabz(sizeof(sql_stmt));
+    // auto stmt = static_cast<sql_stmt *>(hb_xgrab(sizeof(sql_stmt)));
+    auto stmt = static_cast<sql_stmt *>(hb_xgrabz(sizeof(sql_stmt)));
 
     const char *sqlPhrase;
     const char *sqlIniPos;

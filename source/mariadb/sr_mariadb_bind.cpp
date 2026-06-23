@@ -98,8 +98,8 @@ struct MARIADB_SESSION
 // SR_MARIADBCONNECT(cHost, cUser, cPasssword, cDatabase, nPort, , nTimeout, lCompress) -> pSession
 HB_FUNC_STATIC(SR_MARIADBCONNECT)
 {
-  // MARIADB_SESSION *session = (MARIADB_SESSION *) hb_xgrab(sizeof(MARIADB_SESSION));
-  MARIADB_SESSION *session = (MARIADB_SESSION *)hb_xgrabz(sizeof(MARIADB_SESSION));
+  // auto session = static_cast<MARIADB_SESSION *>(hb_xgrab(sizeof(MARIADB_SESSION)));
+  auto session = static_cast<MARIADB_SESSION *>(hb_xgrabz(sizeof(MARIADB_SESSION)));
   auto szHost = hb_parc(1);
   auto szUser = hb_parc(2);
   auto szPass = hb_parc(3);

@@ -483,7 +483,7 @@ HB_FUNC_STATIC(SR_FBEXECUTE)
       break;
     }
     }
-    var->sqlind = (short *)hb_xgrab(sizeof(short));
+    var->sqlind = static_cast<short *>(hb_xgrab(sizeof(short)));
   }
 
   session->transactionPending = 1;

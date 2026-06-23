@@ -760,7 +760,7 @@ void ReleaseColStatements(SQLEXAREA *thiswa, int iCols)
 
 void SetColStatements(SQLEXAREA *thiswa)
 {
-  thiswa->colStmt = (HSTMT *)hb_xgrab(hb_arrayLen(thiswa->aFields) * sizeof(HSTMT));
+  thiswa->colStmt = static_cast<HSTMT *>(hb_xgrab(hb_arrayLen(thiswa->aFields) * sizeof(HSTMT)));
   memset(thiswa->colStmt, 0, hb_arrayLen(thiswa->aFields) * sizeof(HSTMT));
 }
 
@@ -1089,7 +1089,7 @@ void SR_SetIndexBindStructure(SQLEXAREA *thiswa)
     thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
     // Alloc memory for binding structures
-    thiswa->IndexBindings[thiswa->hOrdCurrent] = (INDEXBIND *)hb_xgrab(thiswa->indexColumns * sizeof(INDEXBIND));
+    thiswa->IndexBindings[thiswa->hOrdCurrent] = static_cast<INDEXBIND *>(hb_xgrab(thiswa->indexColumns * sizeof(INDEXBIND)));
     memset(thiswa->IndexBindings[thiswa->hOrdCurrent], 0, thiswa->indexColumns * sizeof(INDEXBIND));
 
     // Now we should bind all index columns to be used by SKIP
@@ -1106,7 +1106,7 @@ void SR_SetIndexBindStructure(SQLEXAREA *thiswa)
   } else {
     thiswa->indexColumns = 1; // Natural order, RECNO
     // Alloc memory for binding structures
-    thiswa->IndexBindings[thiswa->hOrdCurrent] = (INDEXBIND *)hb_xgrab(thiswa->indexColumns * sizeof(INDEXBIND));
+    thiswa->IndexBindings[thiswa->hOrdCurrent] = static_cast<INDEXBIND *>(hb_xgrab(thiswa->indexColumns * sizeof(INDEXBIND)));
     memset(thiswa->IndexBindings[thiswa->hOrdCurrent], 0, thiswa->indexColumns * sizeof(INDEXBIND));
     IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
     IndexBind->lFieldPosDB = thiswa->ulhRecno;
@@ -1130,7 +1130,7 @@ void SR_SetCurrRecordStructure(SQLEXAREA *thiswa)
 
   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
-  thiswa->CurrRecord = (COLUMNBIND *)hb_xgrab(iCols * sizeof(COLUMNBIND));
+  thiswa->CurrRecord = static_cast<COLUMNBIND *>(hb_xgrab(iCols * sizeof(COLUMNBIND)));
   memset(thiswa->CurrRecord, 0, iCols * sizeof(COLUMNBIND));
 
   BindStructure = thiswa->CurrRecord;
@@ -3491,8 +3491,8 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREA *thiswa)
   thiswa->bConditionChanged2 = false;
   thiswa->bOrderChanged = false;
   thiswa->bConnVerified = false;
-  thiswa->recordList = (HB_ULONG *)hb_xgrab(RECORD_LIST_SIZE * sizeof(HB_ULONG));
-  thiswa->lRecordToRetrieve = (HB_ULONG *)hb_xgrab(s_pageReadSize * sizeof(HB_ULONG));
+  thiswa->recordList = static_cast<HB_ULONG *>(hb_xgrab(RECORD_LIST_SIZE * sizeof(HB_ULONG)));
+  thiswa->lRecordToRetrieve = static_cast<HB_ULONG *>(hb_xgrab(s_pageReadSize * sizeof(HB_ULONG)));
   thiswa->deletedList = static_cast<char *>(hb_xgrab(RECORD_LIST_SIZE * sizeof(char)));
   thiswa->sSql = static_cast<char *>(hb_xgrab(MAX_SQL_QUERY_LEN * sizeof(char)));
   memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
@@ -3510,7 +3510,7 @@ static HB_ERRCODE sqlExNewArea(SQLEXAREA *thiswa)
   memset(thiswa->updatedMask, 0, MAX_FIELDS);
   memset(thiswa->editMask, 0, MAX_FIELDS);
   memset(thiswa->specialMask, 0, MAX_FIELDS);
-  thiswa->IndexBindings = (INDEXBIND **)hb_xgrab(sizeof(INDEXBIND *) * MAX_INDEXES);
+  thiswa->IndexBindings = static_cast<INDEXBIND **>(hb_xgrab(sizeof(INDEXBIND *) * MAX_INDEXES));
   memset(thiswa->IndexBindings, 0, sizeof(INDEXBIND *) * MAX_INDEXES);
 
   return errCode;

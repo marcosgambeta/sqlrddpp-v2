@@ -93,8 +93,8 @@ static void myNoticeProcessor(void *arg, const char *message)
 // SR_PGSConnect(ConnectionString) => ConnHandle
 HB_FUNC_STATIC(SR_PGSCONNECT)
 {
-  // PSQL_SESSION *session = (PSQL_SESSION *) hb_xgrab(sizeof(PSQL_SESSION));
-  PSQL_SESSION *session = (PSQL_SESSION *)hb_xgrabz(sizeof(PSQL_SESSION));
+  // auto session = static_cast<PSQL_SESSION *>(hb_xgrab(sizeof(PSQL_SESSION)));
+  auto session = static_cast<PSQL_SESSION *>(hb_xgrabz(sizeof(PSQL_SESSION)));
 
   //    memset(session, 0, sizeof(PSQL_SESSION));
   session->iAffectedRows = 0;

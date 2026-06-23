@@ -97,8 +97,8 @@ struct MYSQL_SESSION
 
 HB_FUNC_STATIC(SR_MYSCONNECT)
 {
-  // MYSQL_SESSION *session = (MYSQL_SESSION *) hb_xgrab(sizeof(MYSQL_SESSION));
-  MYSQL_SESSION *session = (MYSQL_SESSION *)hb_xgrabz(sizeof(MYSQL_SESSION));
+  // auto session = static_cast<MYSQL_SESSION *>(hb_xgrab(sizeof(MYSQL_SESSION)));
+  auto session = static_cast<MYSQL_SESSION *>(hb_xgrabz(sizeof(MYSQL_SESSION)));
   auto szHost = hb_parc(1);
   auto szUser = hb_parc(2);
   auto szPass = hb_parc(3);

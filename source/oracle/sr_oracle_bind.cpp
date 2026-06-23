@@ -146,7 +146,7 @@ static HB_USHORT OCI_initilized = 0;
 
 HB_FUNC_STATIC(SR_SQLO_CONNECT)
 {
-  POCI_SESSION session = (POCI_SESSION)hb_xgrab(sizeof(OCI_SESSION));
+  auto session = static_cast<POCI_SESSION>(hb_xgrab(sizeof(OCI_SESSION)));
 
   if (!OCI_initilized) {
 #if defined(ENABLE_PTHREADS) && defined(HAVE_PTHREAD_H)
@@ -1192,9 +1192,9 @@ HB_FUNC(SR_ORACLEBINDALLOC)
 
   if (session != nullptr) {
     iBind = hb_parni(2);
-    // session->pLink = (ORA_BIND_COLS *) hb_xgrab(sizeof(ORA_BIND_COLS) * iBind);
+    // session->pLink = static_cast<ORA_BIND_COLS *>(hb_xgrab(sizeof(ORA_BIND_COLS) * iBind));
     // memset(session->pLink, 0, sizeof(ORA_BIND_COLS) * iBind);
-    session->pLink = (ORA_BIND_COLS *)hb_xgrabz(sizeof(ORA_BIND_COLS) * iBind);
+    session->pLink = static_cast<ORA_BIND_COLS *>(hb_xgrabz(sizeof(ORA_BIND_COLS) * iBind));
     session->ubBindNum = iBind;
   }
   hb_retni(1);

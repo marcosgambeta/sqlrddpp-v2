@@ -1669,7 +1669,7 @@ static MXML_STATUS mxml_node_write(MXML_OUTPUT *out, PHB_ITEM pNode, int style)
 // Currently not used
 static MXML_OUTPUT * mxml_output_new(MXML_OUTPUT_FUNC func, int node_count)
 {
-  MXML_OUTPUT *ret = (MXML_OUTPUT *)MXML_ALLOCATOR(sizeof(MXML_OUTPUT));
+  auto ret = static_cast<MXML_OUTPUT *>(MXML_ALLOCATOR(sizeof(MXML_OUTPUT)));
 
   if (ret == nullptr) {
     return nullptr;
@@ -1821,7 +1821,7 @@ static void mxml_output_func_to_sgs(MXML_OUTPUT *out, const char *s, HB_ISIZ len
 #if 0
 static MXML_REFIL * mxml_refil_new(MXML_REFIL_FUNC func, char *buf, HB_ISIZ buflen, HB_ISIZ bufsize)
 {
-  MXML_REFIL *ret = (MXML_REFIL *)MXML_ALLOCATOR(sizeof(MXML_REFIL));
+  auto ret = static_cast<MXML_REFIL *>(MXML_ALLOCATOR(sizeof(MXML_REFIL)));
 
   if (ret == nullptr) {
     return nullptr;
@@ -1938,7 +1938,7 @@ static void mxml_refill_from_handle_func(MXML_REFIL *ref)
 // Creates a new self growing string, with buffer set to minimal buffer length
 static MXML_SGS *mxml_sgs_new()
 {
-  MXML_SGS *ret = (MXML_SGS *)MXML_ALLOCATOR(sizeof(MXML_SGS));
+  auto ret = static_cast<MXML_SGS *>(MXML_ALLOCATOR(sizeof(MXML_SGS)));
 
   if (ret == nullptr) {
     return nullptr;
@@ -2046,7 +2046,7 @@ static const char *mxml_error_desc(MXML_ERROR_CODE code)
 {
   int iCode = (static_cast<int>(code)) - 1;
 
-  if (iCode < 0 || iCode > (signed)(sizeof(edesc) / sizeof(char *))) {
+  if (iCode < 0 || iCode > static_cast<signed>(sizeof(edesc) / sizeof(char *))) {
     return nullptr;
   }
 

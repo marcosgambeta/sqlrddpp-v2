@@ -883,7 +883,6 @@ HB_FUNC_STATIC(SR_DESCRIB)
   SQLSMALLINT wNullable = SR_PAR_SQLSMALLINT(9);
   // SQLTCHAR bBuffer[128] = {0};
 
-  SQLTCHAR *bBuffer;
   RETCODE wResult;
   HB_ULONG ulSystemID = hb_parnl(10);
 
@@ -891,7 +890,7 @@ HB_FUNC_STATIC(SR_DESCRIB)
     lLen = 64;
   }
 
-  bBuffer = static_cast<SQLTCHAR *>(hb_xgrab(lLen * sizeof(SQLTCHAR)));
+  auto bBuffer = static_cast<SQLTCHAR *>(hb_xgrab(lLen * sizeof(SQLTCHAR)));
   bBuffer[0] = '\0';
 
   wResult = SQLDescribeCol((HSTMT)hb_parptr(1), SR_PAR_SQLUSMALLINT(2), static_cast<SQLTCHAR *>(bBuffer), lLen,

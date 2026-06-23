@@ -769,9 +769,9 @@ void ReleaseColStatementsOra(SQLEXORAAREAP thiswa, int iCols)
 
 void SetColStatementsOra(SQLEXORAAREAP thiswa)
 {
-  // thiswa->colStmt = (PCOLUMNSTATEMENT) hb_xgrabz(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNSTATEMENT));
+  // thiswa->colStmt = static_cast<PCOLUMNSTATEMENT>(hb_xgrabz(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNSTATEMENT)));
   // memset(thiswa->colStmt, 0, hb_arrayLen(thiswa->aFields) * sizeof(COLUMNSTATEMENT));
-  thiswa->colStmt = (STATEMENT_DATA *)hb_xgrabz(hb_arrayLen(thiswa->aFields) * sizeof(STATEMENT_DATA));
+  thiswa->colStmt = static_cast<STATEMENT_DATA *>(hb_xgrabz(hb_arrayLen(thiswa->aFields) * sizeof(STATEMENT_DATA)));
   memset(thiswa->colStmt, 0, hb_arrayLen(thiswa->aFields) * sizeof(STATEMENT_DATA));
 }
 
@@ -1096,7 +1096,7 @@ void SetIndexBindStructureOra(SQLEXORAAREAP thiswa)
 
     // Alloc memory for binding structures
     thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent] =
-        (INDEXBINDORAP)hb_xgrabz(thiswa->indexColumns * sizeof(INDEXBINDORA));
+        static_cast<INDEXBINDORAP>(hb_xgrabz(thiswa->indexColumns * sizeof(INDEXBINDORA)));
     // memset(thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent], 0, thiswa->indexColumns * sizeof(INDEXBIND));
 
     // Now we should bind all index columns to be used by SKIP
@@ -1114,7 +1114,7 @@ void SetIndexBindStructureOra(SQLEXORAAREAP thiswa)
     thiswa->indexColumns = 1; // Natural order, RECNO
     // Alloc memory for binding structures
     thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent] =
-        (INDEXBINDORAP)hb_xgrabz(thiswa->indexColumns * sizeof(INDEXBINDORA));
+        static_cast<INDEXBINDORAP>(hb_xgrabz(thiswa->indexColumns * sizeof(INDEXBINDORA)));
     // memset(thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent], 0, thiswa->indexColumns * sizeof(INDEXBIND));
     IndexBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
     IndexBind->lFieldPosDB = thiswa->sqlarea.ulhRecno;
@@ -1136,7 +1136,7 @@ void SetCurrRecordStructureOra(SQLEXORAAREAP thiswa)
 
   auto iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
 
-  thiswa->CurrRecord = (COLUMNBINDORAP)hb_xgrabz(iCols * sizeof(COLUMNBINDORA));
+  thiswa->CurrRecord = static_cast<COLUMNBINDORAP>(hb_xgrabz(iCols * sizeof(COLUMNBINDORA)));
   // memset(thiswa->CurrRecord, 0, iCols * sizeof(COLUMNBIND));
 
   BindStructure = thiswa->CurrRecord;
@@ -3504,12 +3504,12 @@ static HB_ERRCODE sqlExOraNewArea(SQLEXORAAREAP thiswa)
   thiswa->bOrderChanged = false;
   thiswa->bConnVerified = false;
 
-  // thiswa->recordList = (HB_ULONG *) hb_xgrabDebug(__LINE__, __FILE__, RECORD_LIST_SIZE * sizeof(HB_ULONG));
-  // thiswa->lRecordToRetrieve = (HB_ULONG *) hb_xgrabDebug(__LINE__, __FILE__, pageReadSize * sizeof(HB_ULONG));
+  // thiswa->recordList = static_cast<HB_ULONG *>(hb_xgrabDebug(__LINE__, __FILE__, RECORD_LIST_SIZE * sizeof(HB_ULONG)));
+  // thiswa->lRecordToRetrieve = static_cast<HB_ULONG *>(hb_xgrabDebug(__LINE__, __FILE__, pageReadSize * sizeof(HB_ULONG)));
   // thiswa->deletedList = static_cast<char *>(hb_xgrabDebug(__LINE__, __FILE__, RECORD_LIST_SIZE * sizeof(char)));
   // thiswa->sSql = static_cast<char *>(hb_xgrabDebug(__LINE__, __FILE__, MAX_SQL_QUERY_LEN * sizeof(char)));
-  thiswa->recordList = (HB_ULONGLONG *)hb_xgrabz(RECORD_LIST_SIZE * sizeof(HB_ULONGLONG));
-  thiswa->lRecordToRetrieve = (HB_ULONGLONG *)hb_xgrabz(pageReadSize * sizeof(HB_ULONGLONG));
+  thiswa->recordList = static_cast<HB_ULONGLONG *>(hb_xgrabz(RECORD_LIST_SIZE * sizeof(HB_ULONGLONG)));
+  thiswa->lRecordToRetrieve = static_cast<HB_ULONGLONG *>(hb_xgrabz(pageReadSize * sizeof(HB_ULONGLONG)));
   thiswa->deletedList = static_cast<char *>(hb_xgrabz(RECORD_LIST_SIZE * sizeof(char)));
   thiswa->sSql = static_cast<char *>(hb_xgrabz(MAX_SQL_QUERY_LEN * sizeof(char)));
   // memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
@@ -3529,7 +3529,7 @@ static HB_ERRCODE sqlExOraNewArea(SQLEXORAAREAP thiswa)
   memset(thiswa->updatedMask, 0, MAX_FIELDS);
   memset(thiswa->editMask, 0, MAX_FIELDS);
   memset(thiswa->specialMask, 0, MAX_FIELDS);
-  thiswa->IndexBindings = (INDEXBINDORAP *)hb_xgrabz(sizeof(INDEXBINDORAP) * MAX_INDEXES);
+  thiswa->IndexBindings = static_cast<INDEXBINDORAP *>(hb_xgrabz(sizeof(INDEXBINDORAP) * MAX_INDEXES));
   // memset(thiswa->IndexBindings, 0, sizeof(INDEXBIND *) * MAX_INDEXES);
   // for (i = 0; i < MAX_INDEXES; i++) {
   //   thiswa->IndexBindings[i] = NULL;

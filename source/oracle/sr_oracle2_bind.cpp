@@ -158,8 +158,8 @@ static void err_handler(OCI_Error *err)
 
 HB_FUNC_STATIC(SR_SQLO2_CONNECT)
 {
-  // POCI_ORASESSION session = (POCI_ORASESSION) hb_xgrab(sizeof(OCI_ORASESSION));
-  POCI_ORASESSION session = (POCI_ORASESSION)hb_xgrabz(sizeof(OCI_ORASESSION));
+  // auto session = static_cast<POCI_ORASESSION>(hb_xgrab(sizeof(OCI_ORASESSION)));
+  auto session = static_cast<POCI_ORASESSION>(hb_xgrabz(sizeof(OCI_ORASESSION)));
   //    int lPool = 0; //  HB_ISLOG(5) ? hb_parl(5) : 0;
   //    char sPool[30] = {0};
 
@@ -623,7 +623,7 @@ HB_FUNC_STATIC(SR_ORACLEBINDALLOC2)
 
   if (session != nullptr) {
     iBind = hb_parni(2);
-    session->pLink = (ORA_BIND_COLS2 *)hb_xgrabz(sizeof(ORA_BIND_COLS2) * iBind);
+    session->pLink = static_cast<ORA_BIND_COLS2 *>(hb_xgrabz(sizeof(ORA_BIND_COLS2) * iBind));
     // memset(session->pLink, 0, sizeof(ORA_BIND_COLS) * iBind);
     session->ubBindNum = iBind;
   }

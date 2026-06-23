@@ -128,7 +128,7 @@ const char *_sqlo_sqloraID = "$Id$";
 /*#define TEST_WITH_SIZEOF_RETURNING_ULONG*/
 
 #ifdef TEST_WITH_SIZEOF_RETURNING_ULONG
-#define sizeof(_a) (unsigned long)sizeof(_a)
+#define sizeof(_a) static_cast<unsigned long>(sizeof(_a))
 #endif
 #define LOGFILE "oci.log"
 /**
@@ -1317,7 +1317,7 @@ static inline int DEFUN(_set_prefetch_rows, (stp, nrows), sqlo_stmt_struct_ptr_t
   assert(stp->dbp->errhp != nullptr);
   dbp = stp->dbp;
 
-  dbp->status = OCIAttrSet((dvoid *)stp->stmthp, (ub4)OCI_HTYPE_STMT, &prefetch_rows, (ub4)sizeof(prefetch_rows),
+  dbp->status = OCIAttrSet((dvoid *)stp->stmthp, (ub4)OCI_HTYPE_STMT, &prefetch_rows, static_cast<ub4>(sizeof(prefetch_rows)),
                            (ub4)OCI_ATTR_PREFETCH_ROWS, dbp->errhp);
 
   CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "_get_stmt_state", "OCIAttrGet");
@@ -1850,14 +1850,14 @@ static int DEFUN(_alloc_bindp, (stp, size), sqlo_stmt_struct_ptr_t stp AND unsig
 
       TRACE(4, fprintf(_get_trace_fp(dbp), "_alloc_bindp: alloc sth: %u to %u elements\n", stp->sth, size););
 
-      stp->bindpv = (OCIBind **)hb_xgrabDebug(__LINE__, sizeof(OCIBind *) * size);
-      stp->indpv = (short *)hb_xgrabDebug(__LINE__, sizeof(short) * size);
+      stp->bindpv = static_cast<OCIBind **>(hb_xgrabDebug(__LINE__, sizeof(OCIBind *) * size));
+      stp->indpv = static_cast<short *>(hb_xgrabDebug(__LINE__, sizeof(short) * size));
     } else {
 
       TRACE(4, fprintf(_get_trace_fp(dbp), "_alloc_bindpv: realloc sth: %u to %u elements\n", stp->sth, size););
 
-      stp->bindpv = (OCIBind **)hb_xreallocDebug(__LINE__, stp->bindpv, sizeof(OCIBind *) * size);
-      stp->indpv = (short *)hb_xreallocDebug(__LINE__, stp->indpv, sizeof(short) * size);
+      stp->bindpv = static_cast<OCIBind **>(hb_xreallocDebug(__LINE__, stp->bindpv, sizeof(OCIBind *) * size));
+      stp->indpv = static_cast<short *>(hb_xreallocDebug(__LINE__, stp->indpv, sizeof(short) * size));
     }
 
     /* init the new elements */
@@ -1950,25 +1950,25 @@ static int DEFUN(_alloc_definep, (stp, size), sqlo_stmt_struct_ptr_t stp AND uns
     if (0 == stp->defnpv_size) {
       TRACE(4, fprintf(_get_trace_fp(dbp), "_alloc_definep: alloc sth: %u for %u columns\n", stp->sth, size););
 
-      stp->defnpv = (OCIDefine **)hb_xgrabDebug(__LINE__, sizeof(OCIDefine *) * size);
-      stp->ocolsv = (sqlo_col_struct_t *)hb_xgrabDebug(__LINE__, sizeof(sqlo_col_struct_t) * size);
-      stp->outv = (char **)hb_xgrabDebug(__LINE__, sizeof(char *) * size);
-      stp->outv_size = (ub4 *)hb_xgrabDebug(__LINE__, sizeof(ub4) * size);
-      stp->oindv = (short *)hb_xgrabDebug(__LINE__, sizeof(short) * size);
-      stp->rlenv = (ub4 *)hb_xgrabDebug(__LINE__, sizeof(ub4) * size);
-      stp->ocol_namev = (char **)hb_xgrabDebug(__LINE__, sizeof(char *) * size);
-      stp->ocol_namev_size = (unsigned int *)hb_xgrabDebug(__LINE__, sizeof(ub4) * size);
+      stp->defnpv = static_cast<OCIDefine **>(hb_xgrabDebug(__LINE__, sizeof(OCIDefine *) * size));
+      stp->ocolsv = static_cast<sqlo_col_struct_t *>(hb_xgrabDebug(__LINE__, sizeof(sqlo_col_struct_t) * size));
+      stp->outv = static_cast<char **>(hb_xgrabDebug(__LINE__, sizeof(char *) * size));
+      stp->outv_size = static_cast<ub4 *>(hb_xgrabDebug(__LINE__, sizeof(ub4) * size));
+      stp->oindv = static_cast<short *>(hb_xgrabDebug(__LINE__, sizeof(short) * size));
+      stp->rlenv = static_cast<ub4 *>(hb_xgrabDebug(__LINE__, sizeof(ub4) * size));
+      stp->ocol_namev = static_cast<char **>(hb_xgrabDebug(__LINE__, sizeof(char *) * size));
+      stp->ocol_namev_size = static_cast<unsigned int *>(hb_xgrabDebug(__LINE__, sizeof(ub4) * size));
     } else {
       TRACE(4, fprintf(_get_trace_fp(dbp), "_alloc_definep: realloc sth: %u to %u elements\n", stp->sth, size););
 
-      stp->defnpv = (OCIDefine **)hb_xreallocDebug(__LINE__, stp->defnpv, sizeof(OCIDefine *) * size);
-      stp->ocolsv = (sqlo_col_struct_t *)hb_xreallocDebug(__LINE__, stp->ocolsv, sizeof(sqlo_col_struct_t) * size);
-      stp->outv = (char **)hb_xreallocDebug(__LINE__, stp->outv, sizeof(char *) * size);
-      stp->outv_size = (ub4 *)hb_xreallocDebug(__LINE__, stp->outv_size, sizeof(ub4) * size);
-      stp->oindv = (short *)hb_xreallocDebug(__LINE__, stp->oindv, sizeof(short) * size);
-      stp->rlenv = (ub4 *)hb_xreallocDebug(__LINE__, stp->rlenv, sizeof(ub4) * size);
-      stp->ocol_namev = (char **)hb_xreallocDebug(__LINE__, stp->ocol_namev, sizeof(char *) * size);
-      stp->ocol_namev_size = (ub4 *)hb_xreallocDebug(__LINE__, stp->ocol_namev_size, sizeof(ub4) * size);
+      stp->defnpv = static_cast<OCIDefine **>(hb_xreallocDebug(__LINE__, stp->defnpv, sizeof(OCIDefine *) * size));
+      stp->ocolsv = static_cast<sqlo_col_struct_t *>(hb_xreallocDebug(__LINE__, stp->ocolsv, sizeof(sqlo_col_struct_t) * size));
+      stp->outv = static_cast<char **>(hb_xreallocDebug(__LINE__, stp->outv, sizeof(char *) * size));
+      stp->outv_size = static_cast<ub4 *>(hb_xreallocDebug(__LINE__, stp->outv_size, sizeof(ub4) * size));
+      stp->oindv = static_cast<short *>(hb_xreallocDebug(__LINE__, stp->oindv, sizeof(short) * size));
+      stp->rlenv = static_cast<ub4 *>(hb_xreallocDebug(__LINE__, stp->rlenv, sizeof(ub4) * size));
+      stp->ocol_namev = static_cast<char **>(hb_xreallocDebug(__LINE__, stp->ocol_namev, sizeof(char *) * size));
+      stp->ocol_namev_size = static_cast<ub4 *>(hb_xreallocDebug(__LINE__, stp->ocol_namev_size, sizeof(ub4) * size));
     }
 
     /* init the new elements */
@@ -2250,7 +2250,7 @@ static int DEFUN(_save_oci_status, (dbp, action, object, lineno),
     break;
   }
   case OCI_SUCCESS_WITH_INFO: {
-    (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)nullptr, &dbp->errcode, (text *)errbuf, (ub4)sizeof(errbuf),
+    (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)nullptr, &dbp->errcode, (text *)errbuf, static_cast<ub4>(sizeof(errbuf)),
                       OCI_HTYPE_ERROR);
 #ifndef NDEBUG
     sprintf(dbp->errmsg, "%s\n(line: %d)\n", errbuf, lineno);
@@ -2268,7 +2268,7 @@ static int DEFUN(_save_oci_status, (dbp, action, object, lineno),
     break;
   }
   case OCI_ERROR: {
-    (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)nullptr, &dbp->errcode, (text *)errbuf, (ub4)sizeof(errbuf),
+    (void)OCIErrorGet(dbp->errhp, (ub4)1, (text *)nullptr, &dbp->errcode, (text *)errbuf, static_cast<ub4>(sizeof(errbuf)),
                       OCI_HTYPE_ERROR);
 #ifndef NDEBUG
     sprintf(dbp->errmsg, "%s\n(line: %d)\n", errbuf, lineno);
@@ -4120,7 +4120,7 @@ int DEFUN(sqlo_init, (threaded_mode, max_db, max_cursors),
   /* check if it the first time we are called */
   if (!_dbv) {
     /* We need to allocate the array of pointers to sqlo_db_struct_t */
-    _dbv = (sqlo_db_struct_t **)hb_xgrabDebug(__LINE__, _dbv_size * sizeof(sqlo_db_struct_ptr_t));
+    _dbv = static_cast<sqlo_db_struct_t **>(hb_xgrabDebug(__LINE__, _dbv_size * sizeof(sqlo_db_struct_ptr_t)));
     if (!_dbv) {
       EXEC_WHEN_THREADING(_init_unlock();); /* end of critical section */
       return SQLO_ERRMALLOC;

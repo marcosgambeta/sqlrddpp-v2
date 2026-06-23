@@ -206,7 +206,7 @@ static void SerializeMemo(PHB_ITEM pFieldData)
 
 void SR_SetInsertRecordStructure(SQLEXAREA *thiswa)
 {
-  thiswa->InsertRecord = (COLUMNBIND *)hb_xgrab(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND));
+  thiswa->InsertRecord = static_cast<COLUMNBIND *>(hb_xgrab(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND)));
   memset(thiswa->InsertRecord, 0, hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBIND));
 }
 

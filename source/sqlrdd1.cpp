@@ -1466,12 +1466,12 @@ static HB_ERRCODE sqlSetFieldExtent(SQLAREA *thiswa, HB_USHORT uiFieldExtent)
     uiFieldExtent++;
   }
 
-  // thiswa->uiBufferIndex = (int *) hb_xgrab(uiFieldExtent * sizeof(int));
-  // thiswa->uiFieldList = (int *) hb_xgrab(uiFieldExtent * sizeof(int));
+  // thiswa->uiBufferIndex = static_cast<int *>(hb_xgrab(uiFieldExtent * sizeof(int)));
+  // thiswa->uiFieldList = static_cast<int *>(hb_xgrab(uiFieldExtent * sizeof(int)));
   // memset(thiswa->uiBufferIndex, 0, uiFieldExtent * sizeof(int));
   // memset(thiswa->uiFieldList,  0, uiFieldExtent * sizeof(int));
-  thiswa->uiBufferIndex = (int *)hb_xgrabz(uiFieldExtent * sizeof(int));
-  thiswa->uiFieldList = (int *)hb_xgrabz(uiFieldExtent * sizeof(int));
+  thiswa->uiBufferIndex = static_cast<int *>(hb_xgrabz(uiFieldExtent * sizeof(int)));
+  thiswa->uiFieldList = static_cast<int *>(hb_xgrabz(uiFieldExtent * sizeof(int)));
   return HB_SUCCESS;
 }
 

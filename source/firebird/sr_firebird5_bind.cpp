@@ -514,7 +514,7 @@ HB_FUNC_STATIC(SR_FBEXECUTE5)
       var->sqldata = static_cast<ISC_SCHAR *>(hb_xgrab(sizeof(char) * var->sqllen));
     }
     }
-    var->sqlind = (short *)hb_xgrab(sizeof(short));
+    var->sqlind = static_cast<short *>(hb_xgrab(sizeof(short)));
   }
 
   session->transactionPending = 1;
