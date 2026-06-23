@@ -178,6 +178,32 @@ HB_FUNC(SR_INSTALLDSN)
   }
 }
 
+HB_FUNC(SR_INSTALLUSERDSN)
+{
+  int x, y;
+
+  if (hb_pcount() != 2) {
+    hb_retl(false);
+  } else {
+    auto szDriver = hb_parc(1);
+    char *szAttributes = hb_strdup(hb_parc(2));
+
+    for (x = static_cast<int>(strlen(szAttributes)), y = 0; y < x; y++) {
+      if (szAttributes[y] == ';') {
+        szAttributes[y] = '\0';
+      }
+    }
+
+    // remove the DSN if it already existed
+    SQLConfigDataSource(nullptr, ODBC_REMOVE_DSN, szDriver, szAttributes);
+
+    // create a new DSN
+    hb_retl(SQLConfigDataSource(nullptr, ODBC_ADD_DSN, szDriver, szAttributes));
+
+    hb_xfree(static_cast<void *>(szAttributes));
+  }
+}
+
 //----------------------------------------------------------------------------//
 
 HB_FUNC(SR_UNINSTALLDSN)
@@ -198,6 +224,29 @@ HB_FUNC(SR_UNINSTALLDSN)
 
     // remove the DSN if it already existed
     SQLConfigDataSource(nullptr, ODBC_REMOVE_SYS_DSN, szDriver, szAttributes);
+
+    hb_xfree(static_cast<void *>(szAttributes));
+  }
+}
+
+HB_FUNC(SR_UNINSTALLUSERDSN)
+{
+  int x, y;
+
+  if (hb_pcount() != 2) {
+    hb_retl(false);
+  } else {
+    auto szDriver = hb_parc(1);
+    char *szAttributes = hb_strdup(hb_parc(2));
+
+    for (x = static_cast<int>(strlen(szAttributes)), y = 0; y < x; y++) {
+      if (szAttributes[y] == ';') {
+        szAttributes[y] = '\0';
+      }
+    }
+
+    // remove the DSN if it already existed
+    SQLConfigDataSource(nullptr, ODBC_REMOVE_DSN, szDriver, szAttributes);
 
     hb_xfree(static_cast<void *>(szAttributes));
   }
