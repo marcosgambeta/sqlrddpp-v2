@@ -254,8 +254,6 @@ HB_FUNC_STATIC(SR_FBCONNECT4)
 HB_FUNC_STATIC(SR_FBCLOSE4)
 {
   GET_FB_SESSION(session, 1);
-  int i;
-  XSQLVAR *var;
 
   if (session == nullptr) {
     hb_retni(SQL_ERROR);
@@ -271,6 +269,9 @@ HB_FUNC_STATIC(SR_FBCLOSE4)
   if (isc_detach_database(session->status, &(session->db))) {
     ERRORLOGANDEXIT(session, "FBCLOSE");
   }
+
+  int i;
+  XSQLVAR *var;
 
   for (i = 0, var = session->sqlda->sqlvar; i < MAX_COLUMNS_IN_QUERY; i++, var++) {
     if (var->sqldata) {
