@@ -80,10 +80,12 @@ HB_FUNC(SR_SQLPARSE) // SqlParse(cCommand, @nError, @nErrorPos)
     sqlIniPos = sqlPhrase = hb_parc(1);
 
     if (SqlParse(stmt, sqlPhrase, PARSE_ALL_QUERY)) {
-      // printf("Parse OK. Retornado array de %i posicoes.\n", stmt->pArray->item.asArray.value->ulLen);
+      // printf("Parse OK. Retornado array de %i posicoes.\n",
+      // stmt->pArray->item.asArray.value->ulLen);
     } else {
       stmt->pArray = hb_itemArrayNew(0);
-      // printf("Parse ERROR. Retornado array de %i posicoes.\n", stmt->pArray->item.asArray.value->ulLen);
+      // printf("Parse ERROR. Retornado array de %i posicoes.\n",
+      // stmt->pArray->item.asArray.value->ulLen);
 
       if (HB_ISBYREF(2)) {
         hb_itemPutNI(hb_param(2, HB_IT_ANY), stmt->errMsg);
@@ -591,8 +593,10 @@ HB_FUNC(SR_ESCAPESTRING)
   }
 }
 
-namespace SQLRDD {
-char *QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase, bool bRTrim, HB_SIZE *iSizeOut) // TODO: static ?
+namespace SQLRDD
+{
+char *QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase, bool bRTrim,
+                            HB_SIZE *iSizeOut) // TODO: static ?
 {
   auto ToBuffer = static_cast<char *>(hb_xgrab((iSize * 2) + 3));
 
@@ -649,7 +653,7 @@ char *QuoteTrimEscapeString(const char *FromBuffer, HB_SIZE iSize, int idatabase
   *iSizeOut = iSize;
   return ToBuffer;
 }
-}
+} // namespace SQLRDD
 
 HB_FUNC(SR_ESCAPENUM)
 {
@@ -665,8 +669,8 @@ HB_FUNC(SR_ESCAPENUM)
   auto FromBuffer = hb_parc(1);
 
   if (!(HB_ISCHAR(1) && HB_ISNUM(2) && HB_ISNUM(3))) {
-    hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPENUM", 3, hb_param(1, HB_IT_ANY), hb_param(2, HB_IT_ANY),
-                         hb_param(3, HB_IT_ANY));
+    hb_errRT_BASE_SubstR(EG_ARG, 3012, nullptr, "SR_ESCAPENUM", 3, hb_param(1, HB_IT_ANY),
+                         hb_param(2, HB_IT_ANY), hb_param(3, HB_IT_ANY));
     return;
   }
 
@@ -980,7 +984,8 @@ HB_BOOL hb_arraySetL(PHB_ITEM pArray, HB_ULONG ulIndex, HB_BOOL lVal)
 
 //-----------------------------------------------------------------------------//
 
-namespace SQLRDD {
+namespace SQLRDD
+{
 bool itemEmpty(PHB_ITEM pItem)
 {
   switch (hb_itemType(pItem)) {
@@ -1033,8 +1038,8 @@ bool itemEmpty(PHB_ITEM pItem)
   case HB_IT_POINTER: {
     return hb_itemGetPtr(pItem) == nullptr;
   }
-// TODO: check
-// #ifndef __XHARBOUR__
+    // TODO: check
+    // #ifndef __XHARBOUR__
   case HB_IT_SYMBOL: {
     PHB_SYMB pSym = hb_itemGetSymbol(pItem);
     if (pSym && (pSym->scope.value & HB_FS_DEFERRED) && pSym->pDynSym) {
@@ -1042,19 +1047,21 @@ bool itemEmpty(PHB_ITEM pItem)
     }
     return pSym == nullptr || pSym->value.pFunPtr == nullptr;
   }
-// #endif
+    // #endif
   default: {
     return true;
   }
   }
 }
-}
+} // namespace SQLRDD
 
 //-----------------------------------------------------------------------------//
 
-namespace SQLRDD {
-char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable, int nSystemID,
-                 HB_BOOL bTCCompat, HB_BOOL bMemo, HB_BOOL *bNullArgument) // TODO: not used
+namespace SQLRDD
+{
+char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable,
+                 int nSystemID, HB_BOOL bTCCompat, HB_BOOL bMemo,
+                 HB_BOOL *bNullArgument) // TODO: not used
 {
   char *sValue, sDate[9];
   HB_SIZE iSizeOut;
@@ -1063,7 +1070,8 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
 
   *bNullArgument = false;
 
-  if (SQLRDD::itemEmpty(pFieldData) && (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
+  if (SQLRDD::itemEmpty(pFieldData) &&
+      (!(HB_IS_ARRAY(pFieldData) || HB_IS_OBJECT(pFieldData) || HB_IS_HASH(pFieldData))) &&
       (((nSystemID == SQLRDD::RDBMS::POSTGR) && HB_IS_DATE(pFieldData)) ||
        ((nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
     if (bNullable || HB_IS_DATE(pFieldData)) {
@@ -1098,8 +1106,9 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
       case HB_IT_STRING:
       case HB_IT_MEMO: {
         if (bTCCompat) {
-          sValue = SQLRDD::QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, false,
-                                         &iSizeOut);
+          sValue = SQLRDD::QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData),
+                                                 hb_itemGetCLen(pFieldData), nSystemID, false,
+                                                 &iSizeOut);
           return sValue;
         } else {
           sValue = static_cast<char *>(hb_xgrab(4));
@@ -1197,7 +1206,8 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
   case HB_IT_STRING:
   case HB_IT_MEMO: {
     sValue =
-        SQLRDD::QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData), nSystemID, !bTCCompat, &iSizeOut);
+        SQLRDD::QuoteTrimEscapeString(hb_itemGetCPtr(pFieldData), hb_itemGetCLen(pFieldData),
+                                      nSystemID, !bTCCompat, &iSizeOut);
     break;
   }
   case HB_IT_INTEGER:
@@ -1290,4 +1300,4 @@ char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB
 
   return sValue;
 }
-}
+} // namespace SQLRDD

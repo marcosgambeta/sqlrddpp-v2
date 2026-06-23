@@ -141,8 +141,10 @@ struct SQLAREA
 
 // prototypes
 
-namespace SQLRDD {
-void commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
+namespace SQLRDD
+{
+void commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode,
+                 const char *filename);
 }
 
 #endif // SQLRDD_H

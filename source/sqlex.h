@@ -59,29 +59,29 @@
 
 #define SUPERTABLE (&sqlExSuper)
 
-//#define MAX_INDEXES 51    // 50 + Natural Order
+// #define MAX_INDEXES 51    // 50 + Natural Order
 constexpr int MAX_INDEXES = 51;
-//#define MAX_INDEX_COLS 10 // Seek will work on indexes with up to MAX_INDEX_COLS columns
+// #define MAX_INDEX_COLS 10 // Seek will work on indexes with up to MAX_INDEX_COLS columns
 constexpr int MAX_INDEX_COLS = 10;
-//#define PREPARED_SQL_LEN 400
+// #define PREPARED_SQL_LEN 400
 constexpr int PREPARED_SQL_LEN = 400;
-//#define RECORD_LIST_SIZE 250
+// #define RECORD_LIST_SIZE 250
 constexpr int RECORD_LIST_SIZE = 250;
-//#define COLUMN_BLOCK_SIZE 64
+// #define COLUMN_BLOCK_SIZE 64
 constexpr int COLUMN_BLOCK_SIZE = 64;
-//#define FIELD_LIST_SIZE 6000
+// #define FIELD_LIST_SIZE 6000
 constexpr int FIELD_LIST_SIZE = 6000;
-//#define FIELD_LIST_SIZE_PARAM 600
+// #define FIELD_LIST_SIZE_PARAM 600
 constexpr int FIELD_LIST_SIZE_PARAM = 600;
-//#define MAX_SQL_QUERY_LEN 32000
+// #define MAX_SQL_QUERY_LEN 32000
 constexpr int MAX_SQL_QUERY_LEN = 32000;
-//#define PAGE_READ_SIZE 50
+// #define PAGE_READ_SIZE 50
 constexpr int PAGE_READ_SIZE = 50;
-//#define BUFFER_POOL_SIZE 250
+// #define BUFFER_POOL_SIZE 250
 constexpr int BUFFER_POOL_SIZE = 250;
-//#define DEFAULT_INDEX_COLUMN_MAX_LEN 200
+// #define DEFAULT_INDEX_COLUMN_MAX_LEN 200
 constexpr int DEFAULT_INDEX_COLUMN_MAX_LEN = 200;
-//#define INITIAL_MEMO_ALLOC 256
+// #define INITIAL_MEMO_ALLOC 256
 constexpr int INITIAL_MEMO_ALLOC = 256;
 
 //                                                    1 1 11 1 1 11 1 12 2 2
@@ -331,7 +331,7 @@ struct SQLEXAREA
   // SQL Statement to get WA buffer
   char *sSqlBuffer;
   // Qualified table name
-  std::string sTable; //char *sTable;
+  std::string sTable; // char *sTable;
   // Database schema included in sTable
   char *sOwner;
   // Where clause
@@ -339,9 +339,9 @@ struct SQLEXAREA
   // Order By clause
   char *sOrderBy;
   // Recno column name
-  std::string sRecnoName; //char *sRecnoName;
+  std::string sRecnoName; // char *sRecnoName;
   // Deleted column name
-  std::string sDeletedName; //char *sDeletedName;
+  std::string sDeletedName; // char *sDeletedName;
   // String for recordset limit
   char sLimit1[50];
   // String for recordset limit
@@ -398,20 +398,25 @@ struct SQLEXAREA
 
 // prototypes
 
-//int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact); NOTE: changed to static
-//void SR_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBuff, HB_BOOL bQueryOnly,
-//                  HB_ULONG ulSystemID, HB_BOOL bTranslate); NOTE: changed to static
+// int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, HB_BOOL fExact); NOTE: changed to static
+// void SR_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_ISIZ lLenBuff,
+// HB_BOOL bQueryOnly,
+//                   HB_ULONG ulSystemID, HB_BOOL bTranslate); NOTE: changed to static
 
-namespace SQLRDD {
-void commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode, const char *filename);
+namespace SQLRDD
+{
+void commonError(AREAP ThisDb, const HB_USHORT uiGenCode, const HB_USHORT uiSubCode,
+                 const char *filename);
 char *QualifyName(char *szName, SQLEXAREA *thiswa);
 void odbcErrorDiag(HSTMT hStmt, const char *routine, const char *szSql, int line);
-void odbcErrorDiagRTE(HSTMT hStmt, const char *routine, const char *szSql, SQLRETURN res, int line, const char *module);
-char *QuoteTrimEscapeString(char *FromBuffer, HB_ULONG iSize, int idatabase, bool bRTrim, HB_ULONG *iSizeOut);
-char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable, int nSystemID,
-                 HB_BOOL bTCCompat, HB_BOOL bMemo, HB_BOOL *bNullArgument);
+void odbcErrorDiagRTE(HSTMT hStmt, const char *routine, const char *szSql, SQLRETURN res,
+                      int line, const char *module);
+char *QuoteTrimEscapeString(char *FromBuffer, HB_ULONG iSize, int idatabase, bool bRTrim,
+                            HB_ULONG *iSizeOut);
+char *quotedNull(PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, HB_BOOL bNullable,
+                 int nSystemID, HB_BOOL bTCCompat, HB_BOOL bMemo, HB_BOOL *bNullArgument);
 bool itemEmpty(PHB_ITEM pItem);
-}
+} // namespace SQLRDD
 
 HB_ERRCODE SR_SetBindEmptylValue(COLUMNBIND *BindStructure);
 HB_ERRCODE SR_SetBindValue(PHB_ITEM pFieldData, COLUMNBIND *BindStructure, HSTMT hStmt);
@@ -423,8 +428,8 @@ void SR_setResultSetLimit(SQLEXAREA *thiswa, int iRows);
 void SR_SetIndexBindStructure(SQLEXAREA *thiswa);
 void SR_SetInsertRecordStructure(SQLEXAREA *thiswa);
 HB_ULONG SR_GetCurrentRecordNum(SQLEXAREA *thiswa);
-extern void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQueryOnly, HB_ULONG ulSystemID,
-                        HB_BOOL bTranslate, HB_USHORT ui);
+extern void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQueryOnly,
+                           HB_ULONG ulSystemID, HB_BOOL bTranslate, HB_USHORT ui);
 
 // INSERT and UPDATE prototypes
 
@@ -442,6 +447,7 @@ HB_ERRCODE SR_ExecuteUpdateStmt(SQLEXAREA *thiswa);
 HB_ERRCODE SR_FeedSeekKeyToBindings(SQLEXAREA *thiswa, PHB_ITEM pKey, int *queryLevel);
 bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel);
 void SR_BindSeekStmt(SQLEXAREA *thiswa, int queryLevel);
-HB_ERRCODE SR_getPreparedSeek(SQLEXAREA *thiswa, int queryLevel, HB_USHORT *iIndex, HSTMT *hStmt);
+HB_ERRCODE SR_getPreparedSeek(SQLEXAREA *thiswa, int queryLevel, HB_USHORT *iIndex,
+                              HSTMT *hStmt);
 
 #endif // ODBCRDD_H

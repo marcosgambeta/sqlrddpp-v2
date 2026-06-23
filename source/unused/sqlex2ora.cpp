@@ -151,8 +151,10 @@ static void ResolveSpecialCols(SQLEXORAAREAP thiswa)
       hb_evalRelease(&info);
 
       // Get field position in ::aLocalBuffer
-      // uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_arrayGetItemPtr(pIndex, INDEXMAN_SYNTH_COLPOS)));
-      uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_SYNTH_COLPOS)));
+      // uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_arrayGetItemPtr(pIndex,
+      // INDEXMAN_SYNTH_COLPOS)));
+      uiPos =
+          static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_SYNTH_COLPOS)));
       thiswa->specialMask[uiPos] = '1';
       hb_arraySetForward(thiswa->sqlarea.aBuffer, uiPos, pKeyVal);
       hb_itemRelease(pKeyVal);
@@ -168,8 +170,10 @@ static void ResolveSpecialCols(SQLEXORAAREAP thiswa)
       hb_evalRelease(&info);
 
       // Get field position in ::aLocalBuffer
-      // uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_arrayGetItemPtr(pIndex, INDEXMAN_FOR_COLPOS)));
-      uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_FOR_COLPOS)));
+      // uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_arrayGetItemPtr(pIndex,
+      // INDEXMAN_FOR_COLPOS)));
+      uiPos =
+          static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_FOR_COLPOS)));
       thiswa->specialMask[uiPos] = '1';
       hb_arraySetForward(thiswa->sqlarea.aBuffer, uiPos, pKeyVal);
       hb_itemRelease(pKeyVal);
@@ -195,7 +199,8 @@ static void SerializeMemo(PHB_ITEM pFieldData)
 
 void SetInsertRecordStructureOra(SQLEXORAAREAP thiswa)
 {
-  thiswa->InsertRecord = static_cast<COLUMNBINDORAP>(hb_xgrabz(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBINDORA)));
+  thiswa->InsertRecord = static_cast<COLUMNBINDORAP>(
+      hb_xgrabz(hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBINDORA)));
   // memset(thiswa->InsertRecord, 0, hb_arrayLen(thiswa->aFields) * sizeof(COLUMNBINDORA));
 }
 
@@ -238,7 +243,8 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
     bMultiLang = hb_arrayGetL(pFieldStruct, FIELD_MULTILANG);
     bIsMemo = cType == 'M';
 
-    if (i != static_cast<int>(thiswa->sqlarea.ulhRecno)) { // RECNO is never included in INSERT column list
+    if (i != static_cast<int>(
+                 thiswa->sqlarea.ulhRecno)) { // RECNO is never included in INSERT column list
       temp = hb_strdup(static_cast<const char *>(sFields));
       temp1 = hb_strdup(static_cast<const char *>(sParams));
       sprintf(sFields, "%s,%c%s%c", temp, OPEN_QUALIFIER(thiswa), QualifyName2(colName, thiswa),
@@ -331,10 +337,13 @@ void CreateInsertStmtOra(SQLEXORAAREAP thiswa)
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   }
   if (thiswa->nSystemID == SQLRDD::RDBMS::MSSQL7) {
-    sprintf(thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData VALUES (%s );%s", declare,
-            thiswa->sTable.c_str(), sFields, thiswa->sRecnoName.c_str(), sParams, ident);
+    sprintf(thiswa->sSql,
+            "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData VALUES (%s );%s",
+            declare, thiswa->sTable.c_str(), sFields, thiswa->sRecnoName.c_str(), sParams,
+            ident);
   } else {
-    sprintf(thiswa->sSql, "INSERT INTO %s (%s ) VALUES (%s )%s", thiswa->sTable.c_str(), sFields, sParams, ident);
+    sprintf(thiswa->sSql, "INSERT INTO %s (%s ) VALUES (%s )%s", thiswa->sTable.c_str(),
+            sFields, sParams, ident);
   }
 
   hb_xfree(sFields);
@@ -349,14 +358,16 @@ HB_ERRCODE PrepareInsertStmtOra(SQLEXORAAREAP thiswa)
   thiswa->hStmtInsert = OCI_StatementCreate(GetConnection(thiswa->hDbc));
 
   if (thiswa->hStmtInsert == nullptr) {
-    OraErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmtOra/SQLAllocStmt", thiswa->sSql, 0, __LINE__, __FILE__);
+    OraErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmtOra/SQLAllocStmt", thiswa->sSql, 0,
+                    __LINE__, __FILE__);
     return HB_FAILURE;
   }
   OCI_AllowRebinding(thiswa->hStmtInsert, 1);
   // res = SQLPrepare(thiswa->hStmtInsert, static_cast<char *>(thiswa->sSql), SQL_NTS);
 
   if (!OCI_Prepare(thiswa->hStmtInsert, (thiswa->sSql))) { // if (CHECK_SQL_N_OK(res))
-    OraErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmtOra", thiswa->sSql, 0, __LINE__, __FILE__);
+    OraErrorDiagRTE(thiswa->hStmtInsert, "PrepareInsertStmtOra", thiswa->sSql, 0, __LINE__,
+                    __FILE__);
     return HB_FAILURE;
   }
 
@@ -376,7 +387,9 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
   iBind = 0;
 
   for (iCol = 1; iCol <= iCols; iCol++) {
-    if (iCol != static_cast<int>(thiswa->sqlarea.ulhRecno)) { // RECNO is never included in INSERT column list
+    if (iCol !=
+        static_cast<int>(
+            thiswa->sqlarea.ulhRecno)) { // RECNO is never included in INSERT column list
       iBind++;
       switch (InsertRecord->iCType) {
       case SQL_C_CHAR: {
@@ -387,8 +400,8 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
         //                        InsertRecord->ColumnSize,
         //                        InsertRecord->DecimalDigits,
         //                        InsertRecord->asChar.value, 0, &(InsertRecord->lIndPtr));
-        res = OCI_BindString(thiswa->hStmtInsert, InsertRecord->szBindName, InsertRecord->asChar.value,
-                             InsertRecord->ColumnSize);
+        res = OCI_BindString(thiswa->hStmtInsert, InsertRecord->szBindName,
+                             InsertRecord->asChar.value, InsertRecord->ColumnSize);
         break;
       }
       case SQL_C_BINARY: {
@@ -409,7 +422,8 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
         break;
       }
       case SQL_C_NUMERIC: {
-        res = OCI_BindUnsignedBigInt(thiswa->hStmtInsert, InsertRecord->szBindName, &InsertRecord->asNumeric);
+        res = OCI_BindUnsignedBigInt(thiswa->hStmtInsert, InsertRecord->szBindName,
+                                     &InsertRecord->asNumeric);
         break;
       }
       case SQL_C_DOUBLE: {
@@ -420,7 +434,8 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
         //                        InsertRecord->ColumnSize,
         //                        InsertRecord->DecimalDigits,
         //                        &(InsertRecord->asNumeric), 0, &(InsertRecord->lIndPtr));
-        res = OCI_BindDouble(thiswa->hStmtInsert, InsertRecord->szBindName, &InsertRecord->asDouble);
+        res = OCI_BindDouble(thiswa->hStmtInsert, InsertRecord->szBindName,
+                             &InsertRecord->asDouble);
         break;
       }
       case SQL_C_TYPE_TIMESTAMP: {
@@ -432,10 +447,12 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
         //                        0,
         //                        &(InsertRecord->asTimestamp), 0, &(InsertRecord->lIndPtr));
         InsertRecord->asDate2 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-        // OCI_DateSetDateTime(InsertRecord->asDate2, InsertRecord->asTimestamp.year, InsertRecord->asTimestamp.month,
-        // InsertRecord->asTimestamp.day, InsertRecord->asTimestamp.hour, InsertRecord->asTimestamp.minute,
+        // OCI_DateSetDateTime(InsertRecord->asDate2, InsertRecord->asTimestamp.year,
+        // InsertRecord->asTimestamp.month, InsertRecord->asTimestamp.day,
+        // InsertRecord->asTimestamp.hour, InsertRecord->asTimestamp.minute,
         // InsertRecord->asTimestamp.second);
-        res = OCI_BindDate(thiswa->hStmtInsert, InsertRecord->szBindName, InsertRecord->asDate2);
+        res =
+            OCI_BindDate(thiswa->hStmtInsert, InsertRecord->szBindName, InsertRecord->asDate2);
         break;
       }
       case SQL_C_TYPE_DATE: {
@@ -447,7 +464,8 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
         //                        0,
         //                        &(InsertRecord->asDate), 0, &(InsertRecord->lIndPtr));
         InsertRecord->asDate1 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-        res = OCI_BindDate(thiswa->hStmtInsert, InsertRecord->szBindName, InsertRecord->asDate1);
+        res =
+            OCI_BindDate(thiswa->hStmtInsert, InsertRecord->szBindName, InsertRecord->asDate1);
         break;
       }
       case SQL_C_BIT: {
@@ -457,7 +475,8 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
         //                        InsertRecord->ColumnSize,
         //                        InsertRecord->DecimalDigits,
         //                        &(InsertRecord->asLogical), 0, NULL);
-        res = OCI_BindUnsignedBigInt(thiswa->hStmtInsert, InsertRecord->szBindName, &InsertRecord->asLogical);
+        res = OCI_BindUnsignedBigInt(thiswa->hStmtInsert, InsertRecord->szBindName,
+                                     &InsertRecord->asLogical);
         break;
       }
       }
@@ -467,7 +486,8 @@ HB_ERRCODE BindInsertColumnsOra(SQLEXORAAREAP thiswa)
       InsertRecord->iParNum = iBind;
 
       if (!res) {
-        OraErrorDiagRTE(thiswa->hStmtInsert, "BindInsertColumnsOra", thiswa->sSql, 0, __LINE__, __FILE__);
+        OraErrorDiagRTE(thiswa->hStmtInsert, "BindInsertColumnsOra", thiswa->sSql, 0, __LINE__,
+                        __FILE__);
         return HB_FAILURE;
       }
     }
@@ -499,7 +519,8 @@ HB_ERRCODE FeedRecordColsOra(SQLEXORAAREAP thiswa, HB_BOOL bUpdate)
     if ((!bUpdate) || (bUpdate && (thiswa->editMask[i - 1] || thiswa->specialMask[i - 1]))) {
       if (i == static_cast<int>(thiswa->sqlarea.ulhDeleted)) {
         SetBindEmptylValue2(InsertRecord); // Writes a ' ' to deleted flag
-      } else if (i != static_cast<int>(thiswa->sqlarea.ulhRecno)) { // RECNO is never included in INSERT column list
+      } else if (i != static_cast<int>(thiswa->sqlarea.ulhRecno)) { // RECNO is never included
+                                                                    // in INSERT column list
         // Get item value from Workarea
         pFieldData = hb_arrayGetItemPtr(thiswa->sqlarea.aBuffer, i);
 
@@ -521,7 +542,8 @@ HB_ERRCODE FeedRecordColsOra(SQLEXORAAREAP thiswa, HB_BOOL bUpdate)
             SerializeMemo(pFieldData);
           }
 
-          if (SetBindValue2(pFieldData, InsertRecord, bUpdate ? thiswa->hStmtUpdate : thiswa->hStmtInsert) ==
+          if (SetBindValue2(pFieldData, InsertRecord,
+                            bUpdate ? thiswa->hStmtUpdate : thiswa->hStmtInsert) ==
               HB_FAILURE) {
             return HB_FAILURE;
           }
@@ -547,10 +569,12 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
   iCols = hb_arrayLen(thiswa->aFields);
   for (i = 1; i <= iCols; i++) {
     if (InsertRecord->iCType == SQL_C_BINARY) {
-      // SR_TraceLog("ccc.log", "escrevendo lob  InsertRecord->asChar.value %s InsertRecord->asChar.size %lu \n ",
-      // InsertRecord->asChar.value, InsertRecord->asChar.size);
+      // SR_TraceLog("ccc.log", "escrevendo lob  InsertRecord->asChar.value %s
+      // InsertRecord->asChar.size %lu \n ", InsertRecord->asChar.value,
+      // InsertRecord->asChar.size);
       res = OCI_LobSeek(InsertRecord->lob1, 0, OCI_SEEK_SET);
-      res = OCI_LobWrite(InsertRecord->lob1, static_cast<void *>(InsertRecord->asChar.value), InsertRecord->asChar.size);
+      res = OCI_LobWrite(InsertRecord->lob1, static_cast<void *>(InsertRecord->asChar.value),
+                         InsertRecord->asChar.size);
     }
     if (InsertRecord->lIndPtr == SQL_NULL_DATA) {
       OCI_BindSetNull(OCI_GetBind(thiswa->hStmtInsert, i));
@@ -562,7 +586,8 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
   res = OCI_Execute(thiswa->hStmtInsert);
 
   if (!res) {
-    OraErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmtOra/SQLExecute", thiswa->sSql, res, __LINE__, __FILE__);
+    OraErrorDiagRTE(thiswa->hStmtInsert, "ExecuteInsertStmtOra/SQLExecute", thiswa->sSql, res,
+                    __LINE__, __FILE__);
     // OCI_StatementFree(thiswa->hStmtInsert);
     return HB_FAILURE;
   }
@@ -616,7 +641,8 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
     // if (CHECK_SQL_N_OK(res))
     rs = OCI_GetResultset(thiswa->hStmtNextval);
     if (rs == nullptr) {
-      OraErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmtOra/Fetch", ident, res, __LINE__, __FILE__);
+      OraErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmtOra/Fetch", ident, res, __LINE__,
+                      __FILE__);
       // thiswa->hStmtNextval = NULL;
       return HB_FAILURE;
     }
@@ -626,7 +652,8 @@ HB_ERRCODE ExecuteInsertStmtOra(SQLEXORAAREAP thiswa)
     thiswa->recordList[0] = OCI_GetUnsignedBigInt(rs, 1);
 
     if (thiswa->recordList[0] == 0) {
-      OraErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmtOra/GetData", ident, res, __LINE__, __FILE__);
+      OraErrorDiagRTE(thiswa->hStmtNextval, "ExecuteInsertStmtOra/GetData", ident, res,
+                      __LINE__, __FILE__);
       return HB_FAILURE;
     }
     break;
@@ -668,7 +695,8 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
   // res = SQLAllocHandle(SQL_HANDLE_STMT, (HDBC) thiswa->hDbc, &(thiswa->hStmtUpdate));
   thiswa->hStmtUpdate = OCI_StatementCreate(GetConnection(thiswa->hDbc));
   if (thiswa->hStmtUpdate == nullptr) {
-    OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, 0, __LINE__, __FILE__);
+    OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, 0, __LINE__,
+                    __FILE__);
   }
 
   iCols = static_cast<int>(hb_arrayLen(thiswa->aFields));
@@ -686,29 +714,31 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
       if (!thiswa->specialMask[i]) {
         thiswa->updatedMask[i] = '1';
       } else if (thiswa->sqlarea.hOrdCurrent != 0) {
-        thiswa->bIndexTouchedInUpdate = true; // If there is any special column, we cannot be sure
-                                                 // current order is not affected by UPDATE, so it takes
-                                                 // worst scenario
+        thiswa->bIndexTouchedInUpdate = true; // If there is any special column, we cannot be
+                                              // sure current order is not affected by UPDATE,
+                                              // so it takes worst scenario
       }
       // Bind the query column
       iBind++;
       // Create SQL
       temp = hb_strdup(static_cast<const char *>(thiswa->sSql));
-      sprintf(thiswa->sSql, "%s%c %c%s%c = :%s", temp, iBind > 1 ? ',' : ' ', OPEN_QUALIFIER(thiswa),
-              CurrRecord->colName, CLOSE_QUALIFIER(thiswa), CurrRecord->colName);
+      sprintf(thiswa->sSql, "%s%c %c%s%c = :%s", temp, iBind > 1 ? ',' : ' ',
+              OPEN_QUALIFIER(thiswa), CurrRecord->colName, CLOSE_QUALIFIER(thiswa),
+              CurrRecord->colName);
       hb_xfree(temp);
     }
     CurrRecord++;
   }
   temp = hb_strdup(static_cast<const char *>(thiswa->sSql));
   sprintf(szBindName, ":%s", thiswa->sRecnoName.c_str());
-  sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = %s", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
-          CLOSE_QUALIFIER(thiswa), szBindName);
+  sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = %s", temp, OPEN_QUALIFIER(thiswa),
+          thiswa->sRecnoName.c_str(), CLOSE_QUALIFIER(thiswa), szBindName);
   hb_xfree(temp);
   // SR_TraceLog("aaa.log", "query update %s\n", thiswa->sSql);
   res = OCI_Prepare(thiswa->hStmtUpdate, static_cast<char *>(thiswa->sSql));
   if (!res) {
-    OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, res, __LINE__, __FILE__);
+    OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, res, __LINE__,
+                    __FILE__);
     return HB_FAILURE;
   }
 
@@ -721,9 +751,9 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
       if (!thiswa->specialMask[i]) {
         thiswa->updatedMask[i] = '1';
       } else if (thiswa->sqlarea.hOrdCurrent != 0) {
-        thiswa->bIndexTouchedInUpdate = true; // If there is any special column, we cannot be sure
-                                                 // current order is not affected by UPDATE, so it takes
-                                                 // worst scenario
+        thiswa->bIndexTouchedInUpdate = true; // If there is any special column, we cannot be
+                                              // sure current order is not affected by UPDATE,
+                                              // so it takes worst scenario
       }
       // Bind the query column
       iBind++;
@@ -737,8 +767,8 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
         //                        CurrRecord->ColumnSize,
         //                        CurrRecord->DecimalDigits,
         //                        CurrRecord->asChar.value, 0, &(CurrRecord->lIndPtr));
-        res = OCI_BindString(thiswa->hStmtUpdate, CurrRecord->szBindName, CurrRecord->asChar.value,
-                             CurrRecord->ColumnSize);
+        res = OCI_BindString(thiswa->hStmtUpdate, CurrRecord->szBindName,
+                             CurrRecord->asChar.value, CurrRecord->ColumnSize);
         break;
       }
       case SQL_C_BINARY: {
@@ -759,7 +789,8 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
       }
       case SQL_C_NUMERIC: {
         sprintf(szBindName, ":%i", iBind);
-        res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, CurrRecord->szBindName, &CurrRecord->asNumeric);
+        res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, CurrRecord->szBindName,
+                                     &CurrRecord->asNumeric);
         break;
       }
       case SQL_C_DOUBLE: {
@@ -771,7 +802,8 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
         //                        CurrRecord->ColumnSize,
         //                        CurrRecord->DecimalDigits,
         //                        &(CurrRecord->asNumeric), 0, &(CurrRecord->lIndPtr));
-        res = OCI_BindDouble(thiswa->hStmtUpdate, CurrRecord->szBindName, &CurrRecord->asDouble);
+        res =
+            OCI_BindDouble(thiswa->hStmtUpdate, CurrRecord->szBindName, &CurrRecord->asDouble);
         break;
       }
       case SQL_C_TYPE_TIMESTAMP: {
@@ -784,8 +816,9 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
         //                        0,
         //                        &(CurrRecord->asTimestamp), 0, &(CurrRecord->lIndPtr));
         CurrRecord->asDate2 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-        OCI_DateSetDateTime(CurrRecord->asDate2, CurrRecord->asTimestamp.year, CurrRecord->asTimestamp.month,
-                            CurrRecord->asTimestamp.day, CurrRecord->asTimestamp.hour, CurrRecord->asTimestamp.minute,
+        OCI_DateSetDateTime(CurrRecord->asDate2, CurrRecord->asTimestamp.year,
+                            CurrRecord->asTimestamp.month, CurrRecord->asTimestamp.day,
+                            CurrRecord->asTimestamp.hour, CurrRecord->asTimestamp.minute,
                             CurrRecord->asTimestamp.second);
         res = OCI_BindDate(thiswa->hStmtUpdate, CurrRecord->szBindName, CurrRecord->asDate2);
         break;
@@ -800,7 +833,8 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
         //                        0,
         //                        &(CurrRecord->asDate), 0, &(CurrRecord->lIndPtr));
         CurrRecord->asDate1 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-        OCI_DateSetDate(CurrRecord->asDate1, CurrRecord->asDate.year, CurrRecord->asDate.month, CurrRecord->asDate.day);
+        OCI_DateSetDate(CurrRecord->asDate1, CurrRecord->asDate.year, CurrRecord->asDate.month,
+                        CurrRecord->asDate.day);
         res = OCI_BindDate(thiswa->hStmtUpdate, CurrRecord->szBindName, CurrRecord->asDate1);
         break;
       }
@@ -812,14 +846,16 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
         //                        CurrRecord->ColumnSize,
         //                        CurrRecord->DecimalDigits,
         //                        &(CurrRecord->asLogical), 0, NULL);
-        res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, CurrRecord->szBindName, &CurrRecord->asLogical);
+        res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, CurrRecord->szBindName,
+                                     &CurrRecord->asLogical);
       }
       }
 
       CurrRecord->iParNum = iBind;
 
       if (!res) {
-        OraErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
+        OraErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__,
+                        __FILE__);
         return HB_FAILURE;
       }
     }
@@ -828,26 +864,31 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
 
   // temp = hb_strdup(static_cast<const char *>(thiswa->sSql));
   // sprintf(szBindName, ":%s", thiswa->sRecnoName.c_str());
-  // sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = %s", temp, OPEN_QUALIFIER(thiswa), thiswa->sRecnoName.c_str(),
-  // CLOSE_QUALIFIER(thiswa), szBindName); hb_xfree(temp); res = SQLBindParameter(thiswa->hStmtUpdate, ++iBind,
-  // SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0, &(thiswa->lUpdatedRecord), 0, NULL);
-  res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, thiswa->sRecnoName.c_str(), &thiswa->lUpdatedRecord);
+  // sprintf(thiswa->sSql, "%s\n WHERE %c%s%c = %s", temp, OPEN_QUALIFIER(thiswa),
+  // thiswa->sRecnoName.c_str(), CLOSE_QUALIFIER(thiswa), szBindName); hb_xfree(temp); res =
+  // SQLBindParameter(thiswa->hStmtUpdate, ++iBind, SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER,
+  // 15, 0, &(thiswa->lUpdatedRecord), 0, NULL);
+  res = OCI_BindUnsignedBigInt(thiswa->hStmtUpdate, thiswa->sRecnoName.c_str(),
+                               &thiswa->lUpdatedRecord);
   if (!res) {
-    OraErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__, __FILE__);
+    OraErrorDiagRTE(thiswa->hStmtUpdate, "BindUpdateColumns", thiswa->sSql, res, __LINE__,
+                    __FILE__);
     return HB_FAILURE;
   }
 
   // res = SQLPrepare(thiswa->hStmtUpdate, static_cast<char *>(thiswa->sSql), SQL_NTS);
   // res = OCI_Prepare(thiswa->hStmtUpdate, static_cast<char *>(thiswa->sSql));
   // if (!res) {
-  //   OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, res, __LINE__, __FILE__);
-  //   return HB_FAILURE;
+  //   OraErrorDiagRTE(thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, res, __LINE__,
+  //   __FILE__); return HB_FAILURE;
   // }
 
   if ((!thiswa->bIndexTouchedInUpdate) && thiswa->sqlarea.hOrdCurrent) {
     // Check if any updated column is included in current index column list
-    pColumns = hb_arrayGetItemPtr(hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent)),
-                                  INDEX_FIELDS);
+    pColumns = hb_arrayGetItemPtr(
+        hb_arrayGetItemPtr(thiswa->sqlarea.aOrders,
+                           static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent)),
+        INDEX_FIELDS);
     thiswa->indexColumns = hb_arrayLen(pColumns);
 
     for (i = 1; i <= thiswa->indexColumns; i++) {
@@ -872,7 +913,8 @@ HB_ERRCODE ExecuteUpdateStmtOra(SQLEXORAAREAP thiswa)
 
   thiswa->lUpdatedRecord = GetCurrentRecordNumOra(thiswa);
 
-  if (FeedRecordColsOra(thiswa, true) == HB_FAILURE) { // Stmt created and prepared, only need to push data
+  if (FeedRecordColsOra(thiswa, true) ==
+      HB_FAILURE) { // Stmt created and prepared, only need to push data
     return HB_FAILURE;
   }
 
@@ -882,7 +924,8 @@ HB_ERRCODE ExecuteUpdateStmtOra(SQLEXORAAREAP thiswa)
   res = OCI_Execute(thiswa->hStmtUpdate);
 
   if (!res) {
-    OraErrorDiagRTE(thiswa->hStmtUpdate, "ExecuteUpdateStmtOra", thiswa->sSql, res, __LINE__, __FILE__);
+    OraErrorDiagRTE(thiswa->hStmtUpdate, "ExecuteUpdateStmtOra", thiswa->sSql, res, __LINE__,
+                    __FILE__);
     // OCI_StatementFree(thiswa->hStmtInsert);
     return HB_FAILURE;
   }

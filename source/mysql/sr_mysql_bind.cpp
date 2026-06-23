@@ -48,8 +48,8 @@
 // define _WINSOCKAPI_ what effectively breaks compilation of code using
 // sockets. It means that we have to include windows.h before xHarbour
 // header files.
-#if defined(WINNT) || defined(_Windows) || defined(__NT__) || defined(_WIN32) || defined(_WINDOWS_) ||                 \
-    defined(__WINDOWS_386__) || defined(__WIN32__)
+#if defined(WINNT) || defined(_Windows) || defined(__NT__) || defined(_WIN32) ||               \
+    defined(_WINDOWS_) || defined(__WINDOWS_386__) || defined(__WIN32__)
 #include <windows.h>
 #endif
 
@@ -81,7 +81,8 @@ static int s_iConnectionCount = 0;
 
 #define LOGFILE "mysql.log"
 
-#define GET_MYSQL_SESSION(session, numpar) auto session = (MYSQL_SESSION *)hb_itemGetPtr(hb_param(numpar, HB_IT_POINTER))
+#define GET_MYSQL_SESSION(session, numpar)                                                     \
+  auto session = (MYSQL_SESSION *)hb_itemGetPtr(hb_param(numpar, HB_IT_POINTER))
 
 struct MYSQL_SESSION
 {
@@ -114,11 +115,14 @@ HB_FUNC_STATIC(SR_MYSCONNECT)
 
   if (session->dbh != nullptr) {
     s_iConnectionCount++;
-    mysql_options(session->dbh, MYSQL_OPT_CONNECT_TIMEOUT, reinterpret_cast<const char *>(&uiTimeout));
+    mysql_options(session->dbh, MYSQL_OPT_CONNECT_TIMEOUT,
+                  reinterpret_cast<const char *>(&uiTimeout));
     if (lCompress) {
-      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr, CLIENT_ALL_FLAGS);
+      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr,
+                         CLIENT_ALL_FLAGS);
     } else {
-      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr, CLIENT_ALL_FLAGS2);
+      mysql_real_connect(session->dbh, szHost, szUser, szPass, szDb, uiPort, nullptr,
+                         CLIENT_ALL_FLAGS2);
     }
     hb_retptr(static_cast<void *>(session));
   } else {
@@ -251,8 +255,8 @@ HB_FUNC_STATIC(SR_MYSFETCH)
 
 //----------------------------------------------------------------------------//
 
-static void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuff, HB_BOOL bQueryOnly,
-                  HB_ULONG ulSystemID, HB_BOOL bTranslate)
+static void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE lLenBuff,
+                         HB_BOOL bQueryOnly, HB_ULONG ulSystemID, HB_BOOL bTranslate)
 {
   HB_LONG lType;
   HB_SIZE lLen, lDec;
@@ -360,7 +364,8 @@ static void MSQLFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer, HB_SIZE
         hb_vmDo(2);
         hb_itemMove(pItem, pTemp);
         hb_itemRelease(pTemp);
-      } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 && (!sr_lSerializedAsString())) {
+      } else if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 &&
+                 (!sr_lSerializedAsString())) {
         if (s_pSym_SR_DESERIALIZE == nullptr) {
           s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");
           if (s_pSym_SR_DESERIALIZE == nullptr) {
@@ -469,10 +474,12 @@ HB_FUNC_STATIC(SR_MYSLINEPROCESSED)
 
         if (lIndex != 0) {
           if (thisrow[lIndex - 1]) {
-            MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), temp, static_cast<char *>(thisrow[lIndex - 1]), lens[lIndex - 1],
-                         bQueryOnly, ulSystemID, bTranslate);
+            MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), temp,
+                         static_cast<char *>(thisrow[lIndex - 1]), lens[lIndex - 1], bQueryOnly,
+                         ulSystemID, bTranslate);
           } else {
-            MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), temp, "", 0, bQueryOnly, ulSystemID, bTranslate);
+            MSQLFieldGet(hb_arrayGetItemPtr(pFields, col + 1), temp, "", 0, bQueryOnly,
+                         ulSystemID, bTranslate);
           }
         }
         hb_arraySetForward(pRet, col + 1, temp);
@@ -654,7 +661,7 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
 {
   GET_MYSQL_SESSION(session, 1);
   int row, rows, type;
-  //PHB_ITEM temp;
+  // PHB_ITEM temp;
   HB_ITEM temp{};
   MYSQL_FIELD *field;
 
@@ -669,7 +676,7 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
 
   rows = session->numcols;
   auto ret = hb_itemNew(nullptr);
-  //temp = hb_itemNew(nullptr); (using heap instead of stack)
+  // temp = hb_itemNew(nullptr); (using heap instead of stack)
   auto atemp = hb_itemNew(nullptr);
 
   hb_arrayNew(ret, rows);
@@ -690,7 +697,7 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
       unsigned int mbmax = 1;
       int char_len;
 
-      //hb_itemPutC(&temp, "C"); (moved below)
+      // hb_itemPutC(&temp, "C"); (moved below)
 
       mysql_get_character_set_info(session->dbh, &cs);
       if (cs.mbmaxlen > 0) {
@@ -763,14 +770,16 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
     }
     case MYSQL_LONG_TYPE: {
       hb_arraySetForward(atemp, FIELD_TYPE, hb_itemPutC(&temp, "N"));
-      hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(&temp, HB_MIN(11, static_cast<int>(field->length))));
+      hb_arraySetForward(atemp, FIELD_LEN,
+                         hb_itemPutNI(&temp, HB_MIN(11, static_cast<int>(field->length))));
       hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(&temp, 0));
       hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(&temp, SQL_NUMERIC));
       break;
     }
     case MYSQL_INT24_TYPE: {
       hb_arraySetForward(atemp, FIELD_TYPE, hb_itemPutC(&temp, "N"));
-      hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(&temp, HB_MIN(8, static_cast<int>(field->length))));
+      hb_arraySetForward(atemp, FIELD_LEN,
+                         hb_itemPutNI(&temp, HB_MIN(8, static_cast<int>(field->length))));
       hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(&temp, 0));
       hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(&temp, SQL_NUMERIC));
       break;
@@ -780,7 +789,8 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
     case MYSQL_DOUBLE_TYPE:
     case MYSQL_NEWDECIMAL_TYPE: {
       hb_arraySetForward(atemp, FIELD_TYPE, hb_itemPutC(&temp, "N"));
-      hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(&temp, static_cast<int>(field->length)));
+      hb_arraySetForward(atemp, FIELD_LEN,
+                         hb_itemPutNI(&temp, static_cast<int>(field->length)));
       hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(&temp, field->decimals));
       hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(&temp, SQL_NUMERIC));
       break;
@@ -791,12 +801,13 @@ HB_FUNC_STATIC(SR_MYSQUERYATTR)
     }
 
     // Nullable
-    hb_arraySetForward(atemp, FIELD_NULLABLE, hb_itemPutL(&temp, IS_NOT_NULL(field->flags) ? false : true));
+    hb_arraySetForward(atemp, FIELD_NULLABLE,
+                       hb_itemPutL(&temp, IS_NOT_NULL(field->flags) ? false : true));
     // add to main array
     hb_arraySetForward(ret, row + 1, atemp);
   }
   hb_itemRelease(atemp);
-  //hb_itemRelease(temp);
+  // hb_itemRelease(temp);
   hb_itemReturnForward(ret);
   hb_itemRelease(ret);
 }
@@ -827,7 +838,8 @@ HB_FUNC_STATIC(SR_MYSTABLEATTR)
   session->stmt = mysql_store_result(session->dbh);
 
   if (!session->stmt) {
-    SR_TraceLog(LOGFILE, "Query error : %i - %s\n", mysql_errno(session->dbh), mysql_error(session->dbh));
+    SR_TraceLog(LOGFILE, "Query error : %i - %s\n", mysql_errno(session->dbh),
+mysql_error(session->dbh));
   }
 
   auto ret = hb_itemNew(nullptr);
@@ -934,16 +946,16 @@ HB_FUNC_STATIC(SR_MYSTABLEATTR)
     case MYSQL_LONG_TYPE: {
       hb_itemPutC(temp, "N");
       hb_arraySetForward(atemp, FIELD_TYPE, temp);
-      hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(11, static_cast<int>(field->length))));
-      hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
+      hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(11,
+static_cast<int>(field->length)))); hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
       hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_NUMERIC));
       break;
     }
     case MYSQL_INT24_TYPE: {
       hb_itemPutC(temp, "N");
       hb_arraySetForward(atemp, FIELD_TYPE, temp);
-      hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(8, static_cast<int>(field->length))));
-      hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
+      hb_arraySetForward(atemp, FIELD_LEN, hb_itemPutNI(temp, HB_MIN(8,
+static_cast<int>(field->length)))); hb_arraySetForward(atemp, FIELD_DEC, hb_itemPutNI(temp, 0));
       hb_arraySetForward(atemp, FIELD_DOMAIN, hb_itemPutNI(temp, SQL_NUMERIC));
       break;
     }
@@ -959,7 +971,8 @@ HB_FUNC_STATIC(SR_MYSTABLEATTR)
     }
 
     // Nullable
-    hb_arraySetForward(atemp, FIELD_NULLABLE, hb_itemPutL(temp, IS_NOT_NULL(field->flags) ? false : true));
+    hb_arraySetForward(atemp, FIELD_NULLABLE, hb_itemPutL(temp, IS_NOT_NULL(field->flags) ?
+false : true));
     // add to main array
     hb_arraySetForward(ret, row + 1, atemp);
   }

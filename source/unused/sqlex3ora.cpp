@@ -65,23 +65,25 @@ extern HB_ERRCODE FeedSeekStmtOra(SQLEXORAAREAP thiswa, int queryLevel);
 static void createSeekQueryOra(SQLEXORAAREAP thiswa, HB_BOOL bUseOptimizerHints)
 {
   if (getColumnListOra(thiswa)) {
-    thiswa->bConditionChanged1 = true; // SEKIP statements are no longer valid - column list has changed!
+    thiswa->bConditionChanged1 =
+        true; // SEKIP statements are no longer valid - column list has changed!
   }
   if (thiswa->sSql) {
     memset(thiswa->sSql, 0, MAX_SQL_QUERY_LEN * sizeof(char));
   }
   if (bUseOptimizerHints) {
     if (thiswa->bOracle12) {
-      sprintf(thiswa->sSql, "SELECT %s \nFROM %s A %s FETCH FIRST 1 ROWS ONLY", thiswa->sFields, thiswa->sTable.c_str(),
-              thiswa->sWhere);
+      sprintf(thiswa->sSql, "SELECT %s \nFROM %s A %s FETCH FIRST 1 ROWS ONLY", thiswa->sFields,
+              thiswa->sTable.c_str(), thiswa->sWhere);
     } else {
-      sprintf(thiswa->sSql, "SELECT /*+ INDEX_ASC( A %s ) */ %s %s \nFROM %s A %s AND ROWNUM <= 1",
-              thiswa->sOrderBy, // thiswa->sOrderBy has the index name, not the index column list
-              thiswa->sLimit1, thiswa->sFields, thiswa->sTable.c_str(), thiswa->sWhere);
+      sprintf(
+          thiswa->sSql, "SELECT /*+ INDEX_ASC( A %s ) */ %s %s \nFROM %s A %s AND ROWNUM <= 1",
+          thiswa->sOrderBy, // thiswa->sOrderBy has the index name, not the index column list
+          thiswa->sLimit1, thiswa->sFields, thiswa->sTable.c_str(), thiswa->sWhere);
     }
   } else {
-    sprintf(thiswa->sSql, "SELECT %s %s \nFROM %s A %s %s %s", thiswa->sLimit1, thiswa->sFields, thiswa->sTable.c_str(),
-            thiswa->sWhere,
+    sprintf(thiswa->sSql, "SELECT %s %s \nFROM %s A %s %s %s", thiswa->sLimit1, thiswa->sFields,
+            thiswa->sTable.c_str(), thiswa->sWhere,
             thiswa->sOrderBy, // thiswa->sOrderBy has the index column list
             thiswa->sLimit2);
   }
@@ -118,14 +120,16 @@ static HB_ERRCODE getSeekWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType,
 
     if (BindStructure->isArgumentNull) {
       *bUseOptimizerHints = false; // We cannot use this high speed solution
-                                      // because Oracle does not store NULLs in indexes
+                                   // because Oracle does not store NULLs in indexes
 
       if (BindStructure->iCType == SQL_C_DOUBLE) {
         temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
-        sprintf(thiswa->sWhere, "%s %s ( A.%c%s%c %s %s OR A.%c%s%c IS NULL )", bWhere ? temp : "\nWHERE",
-                bWhere ? "AND" : "", OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa),
-                iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "IS", iCol == queryLevel ? "0" : "NULL",
-                OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa));
+        sprintf(thiswa->sWhere, "%s %s ( A.%c%s%c %s %s OR A.%c%s%c IS NULL )",
+                bWhere ? temp : "\nWHERE", bWhere ? "AND" : "", OPEN_QUALIFIER(thiswa),
+                BindStructure->colName, CLOSE_QUALIFIER(thiswa),
+                iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "IS",
+                iCol == queryLevel ? "0" : "NULL", OPEN_QUALIFIER(thiswa),
+                BindStructure->colName, CLOSE_QUALIFIER(thiswa));
         hb_xfree(temp);
       } else {
         if (iCol == queryLevel && iListType == LIST_SKIP_FWD) {
@@ -134,21 +138,23 @@ static HB_ERRCODE getSeekWhereExpressionOra(SQLEXORAAREAP thiswa, int iListType,
           // or equal to NULL, so we do not add any restriction to WHERE clause.
         } else {
           temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
-          sprintf(thiswa->sWhere, "%s %s A.%c%s%c IS NULL", bWhere ? temp : "\nWHERE", bWhere ? "AND" : "",
-                  OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa));
+          sprintf(thiswa->sWhere, "%s %s A.%c%s%c IS NULL", bWhere ? temp : "\nWHERE",
+                  bWhere ? "AND" : "", OPEN_QUALIFIER(thiswa), BindStructure->colName,
+                  CLOSE_QUALIFIER(thiswa));
           hb_xfree(temp);
         }
       }
     } else {
       temp = hb_strdup(static_cast<const char *>(thiswa->sWhere));
-      sprintf(thiswa->sWhere, "%s %s A.%c%s%c %s :%s", bWhere ? temp : "\nWHERE", bWhere ? "AND" : "",
-              OPEN_QUALIFIER(thiswa), BindStructure->colName, CLOSE_QUALIFIER(thiswa),
-              iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "=", BindStructure->colName);
+      sprintf(thiswa->sWhere, "%s %s A.%c%s%c %s :%s", bWhere ? temp : "\nWHERE",
+              bWhere ? "AND" : "", OPEN_QUALIFIER(thiswa), BindStructure->colName,
+              CLOSE_QUALIFIER(thiswa), iCol == queryLevel ? (bDirectionFWD ? ">=" : "<=") : "=",
+              BindStructure->colName);
       hb_xfree(temp);
     }
     bWhere = true;
-    // Culik Movido a posicao do seekbind para essa posicao, onde estava assumuia que o inicio era o ultimo item da
-    // chave
+    // Culik Movido a posicao do seekbind para essa posicao, onde estava assumuia que o inicio
+    // era o ultimo item da chave
     SeekBind++; // place offset
   }
 
@@ -183,9 +189,12 @@ HB_ERRCODE prepareSeekQueryOra(SQLEXORAAREAP thiswa, INDEXBINDORAP SeekBind)
   // if (hPrep == NULL) {
   //   return HB_FAILURE;
   // }
-  OCI_AllowRebinding(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt, 1);
+  OCI_AllowRebinding(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt
+                                                                 : SeekBind->SeekBwdStmt,
+                     1);
 
-  if (!OCI_Prepare(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt,
+  if (!OCI_Prepare(thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt
+                                                               : SeekBind->SeekBwdStmt,
                    thiswa->sSql)) {
     return HB_FAILURE;
   }
@@ -229,7 +238,8 @@ HB_BOOL CreateSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
       (thiswa->recordListDirection == LIST_FORWARD && (!SeekBind->SeekFwdStmt)) ||
       (thiswa->recordListDirection == LIST_BACKWARD && (!SeekBind->SeekBwdStmt))) {
 
-    pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders, static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
+    pIndexRef = hb_arrayGetItemPtr(thiswa->sqlarea.aOrders,
+                                   static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent));
     pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
     thiswa->indexColumns = hb_arrayLen(pColumns);
 
@@ -245,14 +255,16 @@ HB_BOOL CreateSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
       SeekBind->SeekBwdStmt = nullptr;
     }
 
-    getSeekWhereExpressionOra(thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD,
-                              queryLevel, &bUseOptimizerHints);
+    getSeekWhereExpressionOra(
+        thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD,
+        queryLevel, &bUseOptimizerHints);
     getOrderByExpressionOra(thiswa, bUseOptimizerHints);
     setResultSetLimitOra(thiswa, 1);
     createSeekQueryOra(thiswa, bUseOptimizerHints);
 
     prepareSeekQueryOra(thiswa, SeekBind);
-    thiswa->bOrderChanged = false; // we set to use the new key after enter here, so we disable for next seek
+    thiswa->bOrderChanged =
+        false; // we set to use the new key after enter here, so we disable for next seek
     return true;
   } else {
     return false;
@@ -275,15 +287,17 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
     // previous SEEK, so we must reconstruct thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent]
     // based on current index
 
-    thiswa->bConditionChanged2 = true;                // Force SEEK query to be rebuilt
-    SeekBind->hIndexOrder = thiswa->sqlarea.hOrdCurrent; // Store latest prepared index order query
+    thiswa->bConditionChanged2 = true; // Force SEEK query to be rebuilt
+    SeekBind->hIndexOrder =
+        thiswa->sqlarea.hOrdCurrent; // Store latest prepared index order query
 
     for (iCol = 1; iCol <= thiswa->indexColumns; iCol++) {
       BindStructure = GetBindStructOra(thiswa, SeekBind);
 
       if (!thiswa->sqlarea.uiFieldList[(BindStructure->lFieldPosDB) - 1]) {
-        thiswa->sqlarea.uiFieldList[(BindStructure->lFieldPosDB) - 1] = true; // Force index columns to be present in
-                                                                                 // query cos sqlKeyCompare will need it
+        thiswa->sqlarea.uiFieldList[(BindStructure->lFieldPosDB) - 1] =
+            true; // Force index columns to be present in
+                  // query cos sqlKeyCompare will need it
         thiswa->sqlarea.iFieldListStatus = FIELD_LIST_CHANGED;
       }
 
@@ -304,7 +318,9 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
 
       SeekBind++;
     }
-    SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent]; // Reset position to 1st index column
+    SeekBind =
+        thiswa
+            ->IndexBindings[thiswa->sqlarea.hOrdCurrent]; // Reset position to 1st index column
   }
 
   // Push pKey value splitted into SeekBindings structures
@@ -323,7 +339,9 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
       switch (BindStructure->iCType) {
       case SQL_C_CHAR: {
         int nTrim, i;
-        size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
+        size = lenKey > static_cast<int>(BindStructure->ColumnSize)
+                   ? (static_cast<int>(BindStructure->ColumnSize))
+                   : lenKey;
         nTrim = size;
 
         // RTrim() the string value
@@ -367,12 +385,14 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
       }
       case SQL_C_NUMERIC: {
         size = BindStructure->ColumnSize;
-        BindStructure->asNumeric = static_cast<HB_LONG>(hb_strVal(szKey, BindStructure->ColumnSize));
+        BindStructure->asNumeric =
+            static_cast<HB_LONG>(hb_strVal(szKey, BindStructure->ColumnSize));
         break;
       }
       case SQL_C_DOUBLE: {
         size = BindStructure->ColumnSize;
-        BindStructure->asDouble = static_cast<double>(hb_strVal(szKey, BindStructure->ColumnSize));
+        BindStructure->asDouble =
+            static_cast<double>(hb_strVal(szKey, BindStructure->ColumnSize));
         break;
       }
       case SQL_C_TYPE_TIMESTAMP: {
@@ -383,7 +403,9 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
         char datemask[9] = "10000101";
         char *mask = datemask;
 
-        size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
+        size = lenKey > static_cast<int>(BindStructure->ColumnSize)
+                   ? (static_cast<int>(BindStructure->ColumnSize))
+                   : lenKey;
 
         // Must fix partial date seek
         for (iPos = 0; iPos < size; iPos++) {
@@ -412,7 +434,9 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
         char datemask[9] = "10000101";
         char *mask = datemask;
 
-        size = lenKey > static_cast<int>(BindStructure->ColumnSize) ? (static_cast<int>(BindStructure->ColumnSize)) : lenKey;
+        size = lenKey > static_cast<int>(BindStructure->ColumnSize)
+                   ? (static_cast<int>(BindStructure->ColumnSize))
+                   : lenKey;
 
         // Must fix partial date seek
         for (iPos = 0; iPos < size; iPos++) {
@@ -471,7 +495,8 @@ HB_ERRCODE FeedSeekKeyToBindingsOra(SQLEXORAAREAP thiswa, PHB_ITEM pKey, int *qu
         return HB_FAILURE;
       }
     } else if (HB_IS_NUMERIC(pKey)) {
-      if (BindStructure->iCType != SQL_C_DOUBLE || BindStructure->iCType != SQL_C_NUMERIC) { // Check column data type
+      if (BindStructure->iCType != SQL_C_DOUBLE ||
+          BindStructure->iCType != SQL_C_NUMERIC) { // Check column data type
         // To Do: Raise RT error
         return HB_FAILURE;
       }
@@ -507,8 +532,10 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
   // removed, this line bellow make the data be the last field name
   // SeekBind += (queryLevel - 1); // place offset
 
-  hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt;
-  sSql = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
+  hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt
+                                                      : SeekBind->SeekBwdStmt;
+  sSql =
+      thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
   SeekBindParam = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
   iBind = 1;
 
@@ -528,11 +555,13 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
         //                        BindStructure->ColumnSize,
         //                        BindStructure->DecimalDigits,
         //                        BindStructure->asChar.value, 0, NULL);
-        res = OCI_BindString(hStmt, BindStructure->szBindName, BindStructure->asChar.value, BindStructure->ColumnSize);
+        res = OCI_BindString(hStmt, BindStructure->szBindName, BindStructure->asChar.value,
+                             BindStructure->ColumnSize);
         break;
       }
       case SQL_C_NUMERIC: {
-        res = OCI_BindUnsignedBigInt(hStmt, BindStructure->szBindName, &BindStructure->asNumeric);
+        res =
+            OCI_BindUnsignedBigInt(hStmt, BindStructure->szBindName, &BindStructure->asNumeric);
         break;
       }
       case SQL_C_DOUBLE: {
@@ -553,9 +582,10 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
         //                        0,
         //                        &(BindStructure->asTimestamp), 0, 0);
         BindStructure->asDate2 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-        OCI_DateSetDateTime(BindStructure->asDate2, BindStructure->asTimestamp.year, BindStructure->asTimestamp.month,
-                            BindStructure->asTimestamp.day, BindStructure->asTimestamp.hour,
-                            BindStructure->asTimestamp.minute, BindStructure->asTimestamp.second);
+        OCI_DateSetDateTime(BindStructure->asDate2, BindStructure->asTimestamp.year,
+                            BindStructure->asTimestamp.month, BindStructure->asTimestamp.day,
+                            BindStructure->asTimestamp.hour, BindStructure->asTimestamp.minute,
+                            BindStructure->asTimestamp.second);
         res = OCI_BindDate(hStmt, BindStructure->szBindName, BindStructure->asDate2);
         break;
       }
@@ -569,13 +599,14 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
         // SR_TraceLog("sqltrace.log", " %s  %i %i %i \n", sSql, BindStructure->asDate.year,
         // BindStructure->asDate.month, BindStructure->asDate.day);
         BindStructure->asDate1 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-        OCI_DateSetDate(BindStructure->asDate1, BindStructure->asDate.year, BindStructure->asDate.month,
-                        BindStructure->asDate.day);
+        OCI_DateSetDate(BindStructure->asDate1, BindStructure->asDate.year,
+                        BindStructure->asDate.month, BindStructure->asDate.day);
         res = OCI_BindDate(hStmt, BindStructure->szBindName, BindStructure->asDate1);
         break;
       }
       case SQL_C_BIT: {
-        res = OCI_BindUnsignedBigInt(hStmt, BindStructure->szBindName, &BindStructure->asLogical);
+        res =
+            OCI_BindUnsignedBigInt(hStmt, BindStructure->szBindName, &BindStructure->asLogical);
         // res = SQLBindParameter(hStmt, iBind, SQL_PARAM_INPUT,
         //                        BindStructure->iCType,
         //                        BindStructure->iSQLType,
@@ -598,7 +629,8 @@ void BindSeekStmtora(SQLEXORAAREAP thiswa, int queryLevel)
 
 //------------------------------------------------------------------------
 
-HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT *iIndex, OCI_Statement **hStmt,
+HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT *iIndex,
+                              OCI_Statement **hStmt,
                               OCI_Resultset **rs) // Returns true if any result found
 {
   int res;
@@ -610,7 +642,8 @@ HB_ERRCODE getPreparedSeekora(SQLEXORAAREAP thiswa, int queryLevel, HB_USHORT *i
   // SeekBind += (queryLevel - 1); // place offset
   HB_SYMBOL_UNUSED(queryLevel);
 
-  *hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt;
+  *hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt
+                                                       : SeekBind->SeekBwdStmt;
 
   // res = SQLExecute(*hStmt);
   res = OCI_Execute(*hStmt);
@@ -672,20 +705,22 @@ HB_ERRCODE FeedSeekStmtOra(SQLEXORAAREAP thiswa, int queryLevel)
 
   SeekBind = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
 
-  sSql = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
+  sSql =
+      thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
 
   SeekBindParam = thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent];
 
   for (iLoop = 1; iLoop <= queryLevel; iLoop++) {
     InsertRecord = GetBindStructOra(thiswa, SeekBindParam);
     if (InsertRecord->iCType == SQL_C_TYPE_TIMESTAMP) {
-      OCI_DateSetDateTime(InsertRecord->asDate2, InsertRecord->asTimestamp.year, InsertRecord->asTimestamp.month,
-                          InsertRecord->asTimestamp.day, InsertRecord->asTimestamp.hour,
-                          InsertRecord->asTimestamp.minute, InsertRecord->asTimestamp.second);
+      OCI_DateSetDateTime(InsertRecord->asDate2, InsertRecord->asTimestamp.year,
+                          InsertRecord->asTimestamp.month, InsertRecord->asTimestamp.day,
+                          InsertRecord->asTimestamp.hour, InsertRecord->asTimestamp.minute,
+                          InsertRecord->asTimestamp.second);
     }
     if (InsertRecord->iCType == SQL_C_TYPE_DATE) {
-      OCI_DateSetDate(InsertRecord->asDate1, InsertRecord->asDate.year, InsertRecord->asDate.month,
-                      InsertRecord->asDate.day);
+      OCI_DateSetDate(InsertRecord->asDate1, InsertRecord->asDate.year,
+                      InsertRecord->asDate.month, InsertRecord->asDate.day);
     }
     InsertRecord++;
   }
