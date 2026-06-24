@@ -1131,7 +1131,7 @@ static HB_ERRCODE sqlFlush(SQLAREA *thiswa)
 static HB_ERRCODE sqlGetValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM value)
 {
   PHB_ITEM itemTemp3;
-  //PHB_ITEM pFieldNum; (using stack instead of heap)
+  PHB_ITEM pFieldNum;
   HB_SIZE nPos;
   LPFIELD pField;
 
@@ -1146,11 +1146,10 @@ static HB_ERRCODE sqlGetValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
 
   if (HB_IS_NIL(itemTemp)) {
     hb_itemRelease(itemTemp);
-    //pFieldNum = hb_itemNew(nullptr);
-    HB_ITEM pFieldNum{};
-    hb_itemPutNI(&pFieldNum, thiswa->uiBufferIndex[fieldNum - 1]);
-    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGETVALUE, 1, &pFieldNum);
-    //hb_itemRelease(pFieldNum);
+    pFieldNum = hb_itemNew(nullptr);
+    hb_itemPutNI(pFieldNum, thiswa->uiBufferIndex[fieldNum - 1]);
+    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGETVALUE, 1, pFieldNum);
+    hb_itemRelease(pFieldNum);
     itemTemp = hb_itemArrayGet(thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1]);
   }
 
