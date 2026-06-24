@@ -538,7 +538,7 @@ static int SR_sqlKeyCompare(AREAP thiswa, PHB_ITEM pKey, bool fExact)
       SELF_GOTOP((AREAP)thiswa);
       reinterpret_cast<SQLAREA *>(thiswa)->firstinteract = false;
     }
-    PHB_ITEM itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
+    auto itemTemp = hb_itemArrayGet(pTag, INDEX_KEY_CODEBLOCK);
     if (HB_IS_NUMBER(itemTemp)) {
       pKeyVal = hb_itemArrayGet(reinterpret_cast<SQLAREA *>(thiswa)->aBuffer,
                                 hb_arrayGetNL(pTag, INDEX_KEY_CODEBLOCK));
@@ -1130,7 +1130,7 @@ static HB_ERRCODE sqlFlush(SQLAREA *thiswa)
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlGetValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM value)
 {
-  PHB_ITEM itemTemp, itemTemp3;
+  PHB_ITEM itemTemp3;
   PHB_ITEM pFieldNum;
   HB_SIZE nPos;
   LPFIELD pField;
@@ -1142,7 +1142,7 @@ static HB_ERRCODE sqlGetValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     thiswa->firstinteract = false;
   }
   pField = thiswa->area.lpFields + fieldNum - 1;
-  itemTemp = hb_itemArrayGet(thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1]);
+  auto itemTemp = hb_itemArrayGet(thiswa->aBuffer, thiswa->uiBufferIndex[fieldNum - 1]);
 
   if (HB_IS_NIL(itemTemp)) {
     hb_itemRelease(itemTemp);
@@ -1278,7 +1278,7 @@ static HB_ERRCODE sqlPutValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
   }
 
   auto fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
-  PHB_ITEM pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
+  auto pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
   //                if( s_pSym_SR_FROMXML == NULL ) {
   //                   s_pSym_SR_FROMXML = hb_dynsymFindName("ESCREVE");
   //                   if( s_pSym_SR_FROMXML  == NULL ) {
