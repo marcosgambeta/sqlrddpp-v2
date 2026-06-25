@@ -1265,6 +1265,12 @@ static HB_ERRCODE sqlGoCold(SQLAREA *thiswa)
 // (DBENTRYP_SI)
 static HB_ERRCODE sqlPutValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM value)
 {
+  PHB_ITEM pDest;
+  LPFIELD pField;
+  char *cfield;
+  double dNum;
+  HB_USHORT len, dec, fieldindex;
+  PHB_ITEM pFieldNum;
   // HB_BOOL bOk = true;
   // PHB_DYNS s_pSym_SR_FROMXML = NULL;
 
@@ -1277,8 +1283,8 @@ static HB_ERRCODE sqlPutValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     SELF_FORCEREL(&thiswa->area);
   }
 
-  auto fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
-  auto pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
+  fieldindex = static_cast<HB_USHORT>(thiswa->uiBufferIndex[fieldNum - 1]);
+  pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
   //                if( s_pSym_SR_FROMXML == NULL ) {
   //                   s_pSym_SR_FROMXML = hb_dynsymFindName("ESCREVE");
   //                   if( s_pSym_SR_FROMXML  == NULL ) {
@@ -1293,9 +1299,10 @@ static HB_ERRCODE sqlPutValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
   //
   if (HB_IS_NIL(pDest)) {
     hb_itemRelease(pDest);
-    HB_ITEM pFieldNum{};
-    hb_itemPutNI(&pFieldNum, thiswa->uiBufferIndex[fieldNum - 1]);
-    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGETVALUE, 1, &pFieldNum);
+    pFieldNum = hb_itemNew(nullptr);
+    hb_itemPutNI(pFieldNum, thiswa->uiBufferIndex[fieldNum - 1]);
+    hb_objSendMessage(thiswa->oWorkArea, s_pSym_SQLGETVALUE, 1, pFieldNum);
+    hb_itemRelease(pFieldNum);
     pDest = hb_itemArrayGet(thiswa->aBuffer, fieldindex);
   }
 
@@ -1304,26 +1311,24 @@ static HB_ERRCODE sqlPutValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     thiswa->uiFieldList[fieldNum - 1] = 1;
   }
 
-  LPFIELD pField = thiswa->area.lpFields + fieldNum - 1;
+  pField = thiswa->area.lpFields + fieldNum - 1;
 
   // test compatible datatypes
   // if (HB_IS_TIMESTAMP(value)) { //|| HB_IS_DATE(pDest))
   //   bOk = false;
   //   hb_arraySet(thiswa->aBuffer, fieldindex, value);
   // }
-  if ((HB_IS_NUMBER(pDest) && HB_IS_NUMBER(value)) ||
-      (HB_IS_STRING(pDest) && HB_IS_STRING(value)) ||
-      (HB_IS_LOGICAL(pDest) && HB_IS_LOGICAL(value)) ||
-      (HB_IS_DATE(pDest) && HB_IS_DATE(value)) ||
-      (HB_IS_TIMESTAMP(pDest) && HB_IS_DATETIME(value)) ||
-      (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value))) {
+  if ((HB_IS_NUMBER(pDest) && HB_IS_NUMBER(value)) || (HB_IS_STRING(pDest) && HB_IS_STRING(value)) ||
+      (HB_IS_LOGICAL(pDest) && HB_IS_LOGICAL(value)) || (HB_IS_DATE(pDest) && HB_IS_DATE(value)) ||
+      (HB_IS_TIMESTAMP(pDest) && HB_IS_DATETIME(value)) || (HB_IS_DATETIME(pDest) && HB_IS_DATETIME(value))) {
+
     if (pField->uiType == HB_FT_STRING) {
-      auto nSize = hb_itemGetCLen(value);
-      HB_SIZE nLen = pField->uiLen;
-      auto cfield = static_cast<char *>(hb_xgrab(nLen + 1));
+      HB_SIZE nSize = hb_itemGetCLen(value), nLen = pField->uiLen;
+
+      cfield = static_cast<char *>(hb_xgrab(nLen + 1));
 #ifndef HB_CDP_SUPPORT_OFF
-      hb_cdpnDup2(hb_itemGetCPtr(value), nSize, cfield, &nLen,
-                  thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP(), thiswa->area.cdPage);
+      hb_cdpnDup2(hb_itemGetCPtr(value), nSize, cfield, &nLen, thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP(),
+                  thiswa->area.cdPage);
       nSize = nLen;
       nLen = pField->uiLen;
 #else
@@ -1335,12 +1340,12 @@ static HB_ERRCODE sqlPutValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
       cfield[nLen] = '\0';
       hb_itemPutCLPtr(value, cfield, nLen);
     } else if (pField->uiType == HB_FT_LONG) {
-      HB_USHORT len = pField->uiLen;
-      HB_USHORT dec = pField->uiDec;
+      len = pField->uiLen;
+      dec = pField->uiDec;
       if (dec > 0) {
         len -= (dec + 1);
       }
-      double dNum = hb_itemGetND(value);
+      dNum = hb_itemGetND(value);
       hb_itemPutNLen(value, dNum, len, dec);
     }
 
@@ -1363,8 +1368,7 @@ static HB_ERRCODE sqlPutValue(SQLAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM valu
     return HB_SUCCESS;
 #else
     char type_err[128];
-    sprintf(type_err, "data type origin: %i - data type target %i", hb_itemType(value),
-            hb_itemType(pDest));
+    sprintf(type_err, "data type origin: %i - data type target %i", hb_itemType(value), hb_itemType(pDest));
     hb_itemRelease(pDest);
     SQLRDD::commonError(&thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, type_err);
     return HB_FAILURE;
