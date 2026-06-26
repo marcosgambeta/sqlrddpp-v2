@@ -133,23 +133,12 @@ PROCEDURE Main()
       dispend()
       nKey := inkey(0)
       SWITCH nKey
-      CASE K_UP
-         oTB:up()
-         EXIT
-      CASE K_DOWN
-         oTB:down()
-         EXIT
-      CASE K_LEFT
-         oTB:left()
-         EXIT
-      CASE K_RIGHT
-         oTB:right()
-         EXIT
-      CASE K_PGUP
-         oTB:PageUp()
-         EXIT
-      CASE K_PGDN
-         oTB:PageDown()
+      CASE K_UP    ; oTB:up()     ; EXIT
+      CASE K_DOWN  ; oTB:down()   ; EXIT
+      CASE K_LEFT  ; oTB:left()   ; EXIT
+      CASE K_RIGHT ; oTB:right()  ; EXIT
+      CASE K_PGUP  ; oTB:PageUp() ; EXIT
+      CASE K_PGDN  ; oTB:PageDown()
       ENDSWITCH
    ENDDO
 
