@@ -209,7 +209,7 @@ PROCEDURE Main()
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
 
-   ? "Testing index 3 (DATE"
+   ? "Testing index 3 (DATE)"
    SET INDEX TO index3
    nSeekFound := 0
    nSeekNotFound := 0
