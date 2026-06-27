@@ -9,8 +9,9 @@
 
 #include "sqlrdd.ch"
 
+// Make a copy of this file and change the values below or use the command line parameters.
 // To run the test:
-// testseek --server <servername> --uid <username> --pwd <userpassword> --dtb <databasename>
+// testseek --server <servername> --port <port> --uid <username> --pwd <userpassword> --database <databasename> --newtable --droptable
 // NOTE: the database must exist before runnning the test.
 
 #define RDD_NAME "SQLRDD"
@@ -21,10 +22,13 @@
 REQUEST SQLRDD
 REQUEST SR_PGS
 
-STATIC s_SERVER := "localhost"
-STATIC s_UID    := "postgres"
-STATIC s_PWD    := "password"
-STATIC s_DTB    := "dbtest"
+STATIC s_SERVER     := "localhost"
+STATIC s_PORT       := "5432"
+STATIC s_UID        := "postgres"
+STATIC s_PWD        := ""
+STATIC s_DTB        := "dbtest"
+STATIC s_NEW_TABLE  := .F.
+STATIC s_DROP_TABLE := .F.
 
 PROCEDURE Main()
 
@@ -47,30 +51,30 @@ PROCEDURE Main()
    n := 1
    DO WHILE n <= PCount()
       DO CASE
-      CASE HB_PValue(n) == "--server"
-         s_SERVER := HB_PValue(++n)
-      CASE HB_PValue(n) == "--uid"
-         s_UID := HB_PValue(++n)
-      CASE HB_PValue(n) == "--pwd"
-         s_PWD := HB_PValue(++n)
-      CASE HB_PValue(n) == "--dtb"
-         s_DTB := HB_PValue(++n)
+      CASE HB_PValue(n) == "--server"    ; s_SERVER := HB_PValue(++n)
+      CASE HB_PValue(n) == "--port"      ; s_PORT := HB_PValue(++n)
+      CASE HB_PValue(n) == "--uid"       ; s_UID := HB_PValue(++n)
+      CASE HB_PValue(n) == "--pwd"       ; s_PWD := HB_PValue(++n)
+      CASE HB_PValue(n) == "--dtb"       ; s_DTB := HB_PValue(++n)
+      CASE HB_PValue(n) == "--newtable"  ; s_NEW_TABLE := .T.
+      CASE HB_PValue(n) == "--droptable" ; s_DROP_TABLE := .T.
       ENDCASE
       ++n
    ENDDO
 
    rddSetDefault(RDD_NAME)
 
-   nConnection := sr_AddConnection(CONNECT_POSTGRES, "PGS=" + s_SERVER + ";UID=" + s_UID + ";PWD=" + s_PWD + ";DTB=" + s_DTB)
+   nConnection := sr_AddConnection(CONNECT_POSTGRES, "PGS=" + s_SERVER + ";PORT=" + s_PORT + ";UID=" + s_UID + ";PWD=" + s_PWD + ";DTB=" + s_DTB)
 
    IF nConnection < 0
-      alert("Connection error. See sqlerror.log for details.")
+      ? "Connection error. See sqlerror.log for details."
+      WAIT
       QUIT
    ENDIF
 
    sr_StartLog(nConnection)
 
-   IF sr_ExistTable(TABLE_NAME)
+   IF s_NEW_TABLE .AND. sr_ExistTable(TABLE_NAME)
       sr_DropTable(TABLE_NAME)
    ENDIF
 
@@ -284,8 +288,10 @@ PROCEDURE Main()
    ? "Closing table"
    CLOSE DATABASE
 
-   ? "Removing table"
-   sr_DropTable(TABLE_NAME)
+   IF s_DROP_TABLE .AND. sr_ExistTable(TABLE_NAME)
+      ? "Removing table"
+      sr_DropTable(TABLE_NAME)
+   ENDIF
 
    sr_StopLog(nConnection)
 
