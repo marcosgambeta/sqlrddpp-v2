@@ -14,11 +14,7 @@
 // odbctestseek --driver <drivername> --server <servername> --port <port> --uid <username> --pwd <userpassword> --database <databasename> --options <options> --newtable --droptable
 // NOTE: the database must exist before runnning the test.
 
-#define RDD_NAME "SQLEX"
-#define TABLE_NAME "testseek"
-#define NUM_REC 1000
-#define NUM_TIMES 2
-
+REQUEST SQLRDD
 REQUEST SQLEX
 REQUEST SR_ODBC
 
@@ -29,8 +25,12 @@ STATIC s_UID        := "root"
 STATIC s_PWD        := ""
 STATIC s_DATABASE   := "dbtest"
 STATIC s_OPTIONS    := "TCPIP=1"
+STATIC s_TABLE_NAME := "testseek"
 STATIC s_NEW_TABLE  := .F.
 STATIC s_DROP_TABLE := .F.
+STATIC s_RECORDS    := 1000
+STATIC s_TIMES      := 2
+STATIC s_RDD_NAME   := "SQLEX"
 
 PROCEDURE Main()
 
@@ -60,13 +60,32 @@ PROCEDURE Main()
       CASE HB_PValue(n) == "--pwd"       ; s_PWD := HB_PValue(++n)
       CASE HB_PValue(n) == "--database"  ; s_DATABASE := HB_PValue(++n)
       CASE HB_PValue(n) == "--options"   ; s_OPTIONS := HB_PValue(++n)
+      CASE HB_PValue(n) == "--table"     ; s_TABLE_NAME := HB_PValue(++n)
       CASE HB_PValue(n) == "--newtable"  ; s_NEW_TABLE := .T.
       CASE HB_PValue(n) == "--droptable" ; s_DROP_TABLE := .T.
+      CASE HB_PValue(n) == "--records"   ; s_RECORDS := val(HB_PValue(++n))
+      CASE HB_PValue(n) == "--times"     ; s_TIMES := val(HB_PValue(++n))
+      CASE HB_PValue(n) == "--rdd"       ; s_RDD_NAME := HB_PValue(++n)
       ENDCASE
       ++n
    ENDDO
 
-   rddSetDefault(RDD_NAME)
+   IF s_RECORDS < 300
+      ? "The minimum value for --records is 300"
+      WAIT
+      QUIT
+   ENDIF
+
+   ? "Using RDD " + s_RDD_NAME
+   rddSetDefault(s_RDD_NAME)
+
+   ? "Driver=", s_DRIVER
+   ? "Server=", s_SERVER
+   ? "Port=", s_PORT
+   ? "Database=", s_DATABASE
+   ? "Uid=", s_UID
+   ? "Pwd=", s_PWD
+   ? "Options=", s_OPTIONS
 
    nConnection := sr_AddConnection(CONNECT_ODBC, ;
       "Driver="   + s_DRIVER   + ";" + ;
@@ -85,27 +104,39 @@ PROCEDURE Main()
 
    sr_StartLog(nConnection)
 
-   IF s_NEW_TABLE .AND. sr_ExistTable(TABLE_NAME)
-      sr_DropTable(TABLE_NAME)
+   IF s_NEW_TABLE .AND. sr_ExistTable(s_TABLE_NAME)
+      sr_DropIndex("index1")
+      sr_DropIndex("index2")
+      sr_DropIndex("index3")
+      sr_DropIndex("index4")
+      sr_DropTable(s_TABLE_NAME)
    ENDIF
 
    // TODO: add more data types
-   IF !sr_ExistTable(TABLE_NAME)
+   IF !sr_ExistTable(s_TABLE_NAME)
       ? "Creating table"
-      dbCreate(TABLE_NAME, {{"ID        ", "N", 10, 0}, ;
-                            {"NAME      ", "C", 10, 0}, ;
-                            {"DATE      ", "D",  8, 0}}, RDD_NAME)
+      dbCreate(s_TABLE_NAME, {{"ID        ", "N", 10, 0}, ;
+                              {"NAME      ", "C", 10, 0}, ;
+                              {"DATE      ", "D",  8, 0}}, s_RDD_NAME)
    ENDIF
 
    ? "Opening table"
-   USE (TABLE_NAME) EXCLUSIVE VIA (RDD_NAME)
+   USE (s_TABLE_NAME) EXCLUSIVE VIA (s_RDD_NAME)
    ? "bof()", bof()
    ? "eof()", eof()
    ? "reccount()", reccount()
 
-   IF reccount() == 0 // < NUM_REC
+   IF s_NEW_TABLE
+      ? "Creating indexes"
+      INDEX ON ID TO index1
+      INDEX ON NAME TO index2
+      INDEX ON DATE TO index3
+      INDEX ON NAME + dtos(DATE) TO index4
+   ENDIF
+
+   IF reccount() == 0 // < s_RECORDS
       ? "Adding records"
-      FOR n := 1 TO NUM_REC
+      FOR n := 1 TO s_RECORDS
          APPEND BLANK
          REPLACE ID WITH n
          REPLACE NAME WITH strzero(n, 10)
@@ -113,21 +144,24 @@ PROCEDURE Main()
       NEXT n
    ENDIF
 
-   ? "Creating indexes"
-   INDEX ON ID TO index1
-   INDEX ON NAME TO index2
-   INDEX ON DATE TO index3
-   INDEX ON NAME + dtos(DATE) TO index4
+   ? "Closing table"
+   USE
+
+   ? "Opening table and indexes"
+   USE (s_TABLE_NAME) INDEX index1,index2,index3,index4 EXCLUSIVE VIA (s_RDD_NAME)
+
+   //-------------------------------------------------------------------------//
 
    ? "Testing index 1 (ID)"
    SET INDEX TO index1
+   ? "ordkeycount=", ordkeycount(), iif(ordkeycount() == s_RECORDS, "OK", "ERROR")
    nSeekFound := 0
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
+   FOR n := 1 TO s_RECORDS * s_TIMES
       // create a valid id
-      nID := hb_RandomInt(1, NUM_REC)
+      nID := hb_RandomInt(1, s_RECORDS)
       SEEK nID
       IF found() .AND. !bof() .AND. !eof() .AND. FIELD->ID == nId
          ++nSeekFound
@@ -135,7 +169,7 @@ PROCEDURE Main()
          ++nSeekFailed
       ENDIF
       // create a invalid id
-      nID := hb_RandomInt(NUM_REC + 1, NUM_REC + NUM_REC)
+      nID := hb_RandomInt(s_RECORDS + 1, s_RECORDS + s_RECORDS)
       SEEK nId
       IF !found() .AND. !bof() .AND. eof()
          ++nSeekNotFound
@@ -144,23 +178,27 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_RECORDS * s_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_RECORDS * s_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
 
+   //-------------------------------------------------------------------------//
+
    ? "Testing index 1 (ID) with scope"
    SET INDEX TO index1
-   SET SCOPE TO 101, (NUM_REC - 100)
+   ? "ordkeycount (before scope)=", ordkeycount(), iif(ordkeycount() == s_RECORDS, "OK", "ERROR")
+   SET SCOPE TO 101, (s_RECORDS - 100)
+   ? "ordkeycount (after scope)=", ordkeycount(), iif(ordkeycount() == s_RECORDS - 200, "OK", "ERROR")
    nSeekFound := 0
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
+   FOR n := 1 TO s_RECORDS * s_TIMES
       // create a valid id
-      nID := hb_RandomInt(101, NUM_REC - 100)
+      nID := hb_RandomInt(101, s_RECORDS - 100)
       SEEK nID
       IF found() .AND. !bof() .AND. !eof() .AND. FIELD->ID == nId
          ++nSeekFound
@@ -170,8 +208,8 @@ PROCEDURE Main()
       // create a invalid id
       SWITCH hb_RandomInt(1, 3)
       CASE 1; nID := hb_RandomInt(1, 100); EXIT // key is valid, but out of scope
-      CASE 2; nID := hb_RandomInt(NUM_REC - 100 + 1, NUM_REC); EXIT // key is valid, but out of scope
-      CASE 3; nID := hb_RandomInt(NUM_REC + 1, NUM_REC + NUM_REC); EXIT // key is invalid
+      CASE 2; nID := hb_RandomInt(s_RECORDS - 100 + 1, s_RECORDS); EXIT // key is valid, but out of scope
+      CASE 3; nID := hb_RandomInt(s_RECORDS + 1, s_RECORDS + s_RECORDS); EXIT // key is invalid
       ENDSWITCH
       SEEK nId
       IF !found() .AND. !bof() .AND. eof()
@@ -181,23 +219,75 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_RECORDS * s_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_RECORDS * s_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
    SET SCOPE TO
 
-   ? "Testing index 2 (NAME)"
-   SET INDEX TO index2
+   //-------------------------------------------------------------------------//
+
+   ? "Testing index 1 (ID) with filter"
+   SET INDEX TO index1
+   ? "ordkeycount (before filter)=", ordkeycount(), iif(ordkeycount() == s_RECORDS, "OK", "ERROR")
+   SET FILTER TO ID/2==int(ID/2)
+   ? "ordkeycount (after filter)=", ordkeycount(), iif(ordkeycount() == s_RECORDS, "OK", "ERROR")
    nSeekFound := 0
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
+   FOR n := 1 TO s_RECORDS * s_TIMES
+      // create a valid id
+      DO WHILE .T.
+         nID := hb_RandomInt(1, s_RECORDS)
+         IF nID / 2 == Int(nID / 2)
+            EXIT
+         ENDIF
+      ENDDO
+      SEEK nID
+      IF found() .AND. !bof() .AND. !eof() .AND. FIELD->ID == nId
+         ++nSeekFound
+      ELSE
+         ++nSeekFailed
+      ENDIF
+      // create a invalid id
+      DO WHILE .T.
+         nID := hb_RandomInt(1, s_RECORDS)
+         IF nID/2 != int(nID/2)
+            EXIT
+         ENDIF
+      ENDDO
+      SEEK nId
+      IF !found() .AND. !bof() .AND. eof()
+         ++nSeekNotFound
+      ELSE
+         ++nSeekFailed
+      ENDIF
+   NEXT n
+   ? time()
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_RECORDS * s_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_RECORDS * s_TIMES, "OK", "ERROR")
+   // must be 0
+   ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
+   SET SCOPE TO
+   SET FILTER TO
+
+   //-------------------------------------------------------------------------//
+
+   ? "Testing index 2 (NAME)"
+   SET INDEX TO index2
+   ? "ordkeycount=", ordkeycount(), iif(ordkeycount() == s_RECORDS, "OK", "ERROR")
+   nSeekFound := 0
+   nSeekNotFound := 0
+   nSeekFailed := 0
+   ? time()
+   FOR n := 1 TO s_RECORDS * s_TIMES
       // create a valid name
-      cName := strzero(hb_RandomInt(1, NUM_REC), 10)
+      cName := strzero(hb_RandomInt(1, s_RECORDS), 10)
       SEEK cName
       IF found() .AND. !bof() .AND. !eof() .AND. FIELD->NAME == cName
          ++nSeekFound
@@ -205,7 +295,7 @@ PROCEDURE Main()
          ++nSeekFailed
       ENDIF
       // create a invalid name
-      cName := strzero(hb_RandomInt(NUM_REC + 1, NUM_REC + NUM_REC), 10)
+      cName := strzero(hb_RandomInt(s_RECORDS + 1, s_RECORDS + s_RECORDS), 10)
       SEEK cName
       IF !found() .AND. !bof() .AND. eof()
          ++nSeekNotFound
@@ -214,22 +304,25 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_RECORDS * s_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_RECORDS * s_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
 
+   //-------------------------------------------------------------------------//
+
    ? "Testing index 3 (DATE)"
    SET INDEX TO index3
+   ? "ordkeycount=", ordkeycount(), iif(ordkeycount() == s_RECORDS, "OK", "ERROR")
    nSeekFound := 0
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
+   FOR n := 1 TO s_RECORDS * s_TIMES
       // create a valid date
-      dDate := date() - hb_RandomInt(1, NUM_REC)
+      dDate := date() - hb_RandomInt(1, s_RECORDS)
       SEEK dDate
       IF found() .AND. !bof() .AND. !eof() .AND. FIELD->DATE == dDate
          ++nSeekFound
@@ -237,7 +330,7 @@ PROCEDURE Main()
          ++nSeekFailed
       ENDIF
       // create a invalid date
-      dDate := date() + hb_RandomInt(1, NUM_REC)
+      dDate := date() + hb_RandomInt(1, s_RECORDS)
       SEEK dDate
       IF !found() .AND. !bof() .AND. eof()
          ++nSeekNotFound
@@ -246,21 +339,24 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_RECORDS * s_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_RECORDS * s_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
 
+   //-------------------------------------------------------------------------//
+
    ? "Testing index 4 (NAME+DTOS(DATE))"
    SET INDEX TO index4
+   ? "ordkeycount=", ordkeycount(), iif(ordkeycount() == s_RECORDS, "OK", "ERROR")
    nSeekFound := 0
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
-      nRand := hb_RandomInt(1, NUM_REC)
+   FOR n := 1 TO s_RECORDS * s_TIMES
+      nRand := hb_RandomInt(1, s_RECORDS)
       // create a valid name
       cName := strzero(nRand, 10)
       // create a valid date
@@ -272,9 +368,9 @@ PROCEDURE Main()
          ++nSeekFailed
       ENDIF
       // create a invalid name
-      cName := strzero(hb_RandomInt(NUM_REC + 1, NUM_REC + NUM_REC), 10)
+      cName := strzero(hb_RandomInt(s_RECORDS + 1, s_RECORDS + s_RECORDS), 10)
       // create a invalid date
-      dDate := date() + hb_RandomInt(1, NUM_REC)
+      dDate := date() + hb_RandomInt(1, s_RECORDS)
       SEEK cName + dtos(dDate)
       IF !found() .AND. !bof() .AND. eof()
          ++nSeekNotFound
@@ -283,25 +379,29 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_RECORDS * s_TIMES, "OK", "ERROR")
+   // must be s_RECORDS * s_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_RECORDS * s_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
 
-   ? "Removing indexes"
-   sr_DropIndex("index1")
-   sr_DropIndex("index2")
-   sr_DropIndex("index3")
-   sr_DropIndex("index4")
+   //-------------------------------------------------------------------------//
+
+   IF s_DROP_TABLE
+      ? "Removing indexes"
+      sr_DropIndex("index1")
+      sr_DropIndex("index2")
+      sr_DropIndex("index3")
+      sr_DropIndex("index4")
+   ENDIF
 
    ? "Closing table"
    CLOSE DATABASE
 
-   IF s_DROP_TABLE .AND. sr_ExistTable(TABLE_NAME)
+   IF s_DROP_TABLE .AND. sr_ExistTable(s_TABLE_NAME)
       ? "Removing table"
-      sr_DropTable(TABLE_NAME)
+      sr_DropTable(s_TABLE_NAME)
    ENDIF
 
    sr_StopLog(nConnection)
