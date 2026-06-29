@@ -499,7 +499,7 @@ METHOD SR_WORKAREA:GetSelectList()
    LOCAL aInd
 
    IF ::lCollectingBehavior .OR. ::lAllColumnsSelected
-      IF ::osql:nsystemID == SQLRDD_RDBMS_POSTGR .AND. SR_getUseXmlField()
+      IF SR_getUseXmlField()
       ELSE
          AEval(::aFields, {|x, i|HB_SYMBOL_UNUSED(x), ::aFields[i, FIELD_ENUM] := i})
          RETURN " A.* "
@@ -524,7 +524,7 @@ METHOD SR_WORKAREA:GetSelectList()
       IF ::aSelectList[i] == 1
          nFeitos++
          cSelectList += IIf(nFeitos > 1, ", A.", "A.") + SR_DBQUALIFY(::aNames[i], ::oSql:nSystemID)
-         IF ::osql:nsystemID == SQLRDD_RDBMS_POSTGR .AND. ::aFields[i, FIELD_DOMAIN] == SQL_LONGVARCHARXML
+         IF ::aFields[i, FIELD_DOMAIN] == SQL_LONGVARCHARXML
             cSelectList += "::varchar"
          ENDIF
 
@@ -535,7 +535,7 @@ METHOD SR_WORKAREA:GetSelectList()
    NEXT i
 
    IF nFeitos == nLen
-      IF ::osql:nsystemID == SQLRDD_RDBMS_POSTGR .AND. SR_getUseXmlField()
+      IF SR_getUseXmlField()
       ELSE
          cSelectList := " A.* "
          ::lAllColumnsSelected := .T.
@@ -721,9 +721,6 @@ METHOD SR_WORKAREA:LoadRegisteredTags()
    FOR EACH aInd IN ::aIndexMgmnt
       ASize(aInd, INDEXMAN_SIZE)
       IF SubStr(aInd[INDEXMAN_IDXKEY], 4, 1) == "@"
-         //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
-         //   aInd[INDEXMAN_VIRTUAL_SYNTH] := SubStr(aInd[INDEXMAN_IDXKEY], 1, 3) + SubStr(::cFileName, 1, 25)
-         //ENDIF
          aInd[INDEXMAN_IDXKEY] := SubStr(aInd[INDEXMAN_IDXKEY], 5)
       ENDIF
       IF !Empty(aInd[INDEXMAN_COLUMNS])
@@ -748,290 +745,51 @@ METHOD SR_WORKAREA:LoadRegisteredTags()
 
    IF s_lUseDBCatalogs
       aRet := {}
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_IBMDB2
-      //   ::oSql:Exec("SELECT NAME, COLNAMES FROM SYSIBM.SYSINDEXES WHERE CREATOR != 'SYSIBM' AND TBNAME = '" + ::cFileName + "' ORDER BY 1", .F., .T., @aRet)
-      //   FOR EACH aInd IN aRet
-      //      aInd[1] := Upper(RTrim(aInd[1]))
-      //      IF Right(aInd[1], 4) == "_UNQ"
-      //         LOOP
-      //      ENDIF
-      //      aCols := hb_atokens(AllTrim(aInd[2]), "+")
-      //      ADel(aCols, 1)
-      //      ASize(aCols, Len(aCols) - 1)    // Remove first "+"
-      //      aThisIndex := Array(INDEXMAN_SIZE)
-      //      aThisIndex[INDEXMAN_TABLE] := ::cFileName
-      //      aThisIndex[INDEXMAN_SIGNATURE] := "DBCATALOG"
-      //      aThisIndex[INDEXMAN_IDXNAME] := aInd[1]
-      //      aThisIndex[INDEXMAN_IDXKEY] := ""
-      //      FOR i := 1 TO Len(aCols)
-      //         IF AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_" .AND. Len(aCols) == 1
-      //            EXIT
-      //         ENDIF
-      //         aThisIndex[INDEXMAN_IDXKEY] += IIf(i > 1, ',"', Chr(34)) + AllTrim(aCols[i]) + Chr(34)
-      //         IF AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_"
-      //            EXIT
-      //         ENDIF
-      //      NEXT i
-      //      IF Empty(aThisIndex[INDEXMAN_IDXKEY])
-      //         EXIT
-      //      ENDIF
-      //      aThisIndex[INDEXMAN_FOR_EXPRESS] := ""
-      //      aThisIndex[INDEXMAN_COLUMNS] := ""
-      //      aThisIndex[INDEXMAN_TAG] := aInd[1]
-#ifdef __XHARBOUR__
-      //      aThisIndex[INDEXMAN_TAGNUM] := StrZero(hb_EnumIndex(), 6)
-#else
-      //      aThisIndex[INDEXMAN_TAGNUM] := StrZero(aInd:__EnumIndex(), 6)
-#endif
-      //      aThisIndex[INDEXMAN_KEY_CODEBLOCK] := &( "{|| " + aThisIndex[INDEXMAN_IDXKEY] + " }")
-      //      aThisIndex[INDEXMAN_SYNTH_COLPOS] := 0
-      //      aThisIndex[INDEXMAN_FOR_COLPOS] := 0
-      //
-      //      AAdd(::aIndexMgmnt, aThisIndex)
-      //   NEXT
-      //   EXIT
-      //CASE SQLRDD_RDBMS_MYSQL
-      //CASE SQLRDD_RDBMS_MARIADB
-      //   aRet := {}
-      //   ::oSql:Exec("show index from " + ::cFileName, .F., .T., @aRet)
-      //
-      //   aCols := {}
-      //   FOR EACH aInd IN aRet
-      //      IF (npos := AScan(aCols, {|x|x[1] == aInd[3]})) == 0
-      //         AAdd(aCols, {aInd[3], ""})
-      //      ENDIF
-      //      HB_SYMBOL_UNUSED(npos)
-      //   NEXT
-      //
-      //   FOR EACH aInd IN aCols
-      //
-      //     clast := aInd[1]
-      //     cind := ""
-      //
-      //     FOR EACH citem IN aret
-      //        IF citem[3] == clast
-      //           cind += AllTrim(citem[5]) + ","
-      //        ENDIF
-      //     NEXT
-      //
-      //     cind := SubStr(cind, 1, Len(cind) - 1) // remove ","
-      //     aInd[2] := Upper(cind)
-      //
-      //   NEXT
-      //
-      //   FOR EACH aInd IN aCols
-      //
-      //      IF Asc(Right(AllTrim(aInd[2]), 1)) == 0
-      //         aInd[2] := SubStr(aInd[2], 1, Len(AllTrim(aInd[2])) - 1)
-      //      ENDIF
-      //
-      //      aCols := hb_atokens(AllTrim(aInd[2]), ",")
-      //
-      //      aThisIndex := Array(INDEXMAN_SIZE)
-      //      aThisIndex[INDEXMAN_TABLE] := ::cFileName
-      //      aThisIndex[INDEXMAN_SIGNATURE] := "DBCATALOG"
-      //      aThisIndex[INDEXMAN_IDXNAME] := RTrim(aInd[1])
-      //      aThisIndex[INDEXMAN_IDXKEY] := ""
-      //      FOR i := 1 TO Len(aCols)
-      //         IF ( AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_") .AND. Len(aCols) == 1
-      //            EXIT
-      //         ENDIF
-      //         aThisIndex[INDEXMAN_IDXKEY] += IIf(i > 1, "," + Chr(34), Chr(34)) + AllTrim(aCols[i]) + Chr(34)
-      //         IF AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_"
-      //            EXIT
-      //         ENDIF
-      //      NEXT i
-      //      IF Empty(aThisIndex[INDEXMAN_IDXKEY]) .AND. Len(::aIndexMgmnt) > 0
-      //         EXIT
-      //      ENDIF
-      //      IF !Empty(aThisIndex[INDEXMAN_IDXKEY])
-      //         aThisIndex[INDEXMAN_FOR_EXPRESS] := ""
-      //         aThisIndex[INDEXMAN_COLUMNS] := ""
-      //         aThisIndex[INDEXMAN_TAG] := RTrim(aInd[1])
-#ifdef __XHARBOUR__
-      //         aThisIndex[INDEXMAN_TAGNUM] := StrZero(hb_EnumIndex(), 6)
-#else
-      //         aThisIndex[INDEXMAN_TAGNUM] := StrZero(aInd:__EnumIndex(), 6)
-#endif
-      //         aThisIndex[INDEXMAN_KEY_CODEBLOCK] := &( "{|| " + aThisIndex[INDEXMAN_IDXKEY] + " }")
-      //         aThisIndex[INDEXMAN_SYNTH_COLPOS] := 0
-      //         aThisIndex[INDEXMAN_FOR_COLPOS] := 0
-      //         AAdd(::aIndexMgmnt, aThisIndex)
-      //      ENDIF
-      //   NEXT
-      //
-      //   EXIT
+      ::oSql:oSqlTransact:Exec("SELECT DISTINCT cls.oid, cls.relname as idxname FROM pg_index idx JOIN pg_class cls ON cls.oid=indexrelid JOIN pg_class tab ON tab.oid=indrelid WHERE tab.relname = '" + Lower(::cFileName) + "' order by idxname", .F., .T., @aRet)
+      ::oSql:oSqlTransact:Commit()
+      FOR EACH aInd IN aRet
+         aThisIndex := Array(INDEXMAN_SIZE)
+         aThisIndex[INDEXMAN_TABLE] := ::cFileName
+         aThisIndex[INDEXMAN_SIGNATURE] := "DBCATALOG"
+         aThisIndex[INDEXMAN_IDXNAME] := Upper(RTrim(aInd[2]))
 
-      //CASE SQLRDD_RDBMS_SYBASE
-      //   EXIT
+         IF Right(aThisIndex[INDEXMAN_IDXNAME], 4) == "_UNQ"
+            LOOP
+         ENDIF
 
-      CASE SQLRDD_RDBMS_POSTGR
-         ::oSql:oSqlTransact:Exec("SELECT DISTINCT cls.oid, cls.relname as idxname FROM pg_index idx JOIN pg_class cls ON cls.oid=indexrelid JOIN pg_class tab ON tab.oid=indrelid WHERE tab.relname = '" + Lower(::cFileName) + "' order by idxname", .F., .T., @aRet)
-         ::oSql:oSqlTransact:Commit()
-         FOR EACH aInd IN aRet
-            aThisIndex := Array(INDEXMAN_SIZE)
-            aThisIndex[INDEXMAN_TABLE] := ::cFileName
-            aThisIndex[INDEXMAN_SIGNATURE] := "DBCATALOG"
-            aThisIndex[INDEXMAN_IDXNAME] := Upper(RTrim(aInd[2]))
-
-            IF Right(aThisIndex[INDEXMAN_IDXNAME], 4) == "_UNQ"
-               LOOP
-            ENDIF
-
-            aThisIndex[INDEXMAN_IDXKEY] := ""
-            aCols := {}
-            FOR i := 1 TO 20
-               ::oSql:oSqlTransact:Exec("SELECT pg_get_indexdef(" + Str(aInd[1]) + "," + Str(i, 2) + ",true)", .F., .T., @aCols)
-               ::oSql:oSqlTransact:Commit()
-               IF Len(aCols) > 0 .AND. !Empty(aCols[1, 1])
-                  aCols[1, 1] := Upper(AllTrim(aCols[1, 1]))
-                  IF aCols[1, 1] == ::cRecnoName .OR. aCols[1, 1] == "R_E_C_N_O_" .AND. i == 1
-                     EXIT
-                  ENDIF
-                  aThisIndex[INDEXMAN_IDXKEY] += IIf(i > 1, ',"', Chr(34)) + aCols[1, 1] + Chr(34)
-                  IF aCols[1, 1] == ::cRecnoName .OR. aCols[1, 1] == "R_E_C_N_O_"
-                     EXIT
-                  ENDIF
-               ELSE
+         aThisIndex[INDEXMAN_IDXKEY] := ""
+         aCols := {}
+         FOR i := 1 TO 20
+            ::oSql:oSqlTransact:Exec("SELECT pg_get_indexdef(" + Str(aInd[1]) + "," + Str(i, 2) + ",true)", .F., .T., @aCols)
+            ::oSql:oSqlTransact:Commit()
+            IF Len(aCols) > 0 .AND. !Empty(aCols[1, 1])
+               aCols[1, 1] := Upper(AllTrim(aCols[1, 1]))
+               IF aCols[1, 1] == ::cRecnoName .OR. aCols[1, 1] == "R_E_C_N_O_" .AND. i == 1
                   EXIT
                ENDIF
-            NEXT i
-            IF !Empty(aThisIndex[INDEXMAN_IDXKEY])
-               aThisIndex[INDEXMAN_FOR_EXPRESS] := ""
-               aThisIndex[INDEXMAN_COLUMNS] := ""
-               aThisIndex[INDEXMAN_TAG] := Upper(RTrim(aInd[2]))
-#ifdef __XHARBOUR__
-               aThisIndex[INDEXMAN_TAGNUM] := StrZero(hb_EnumIndex(), 6)
-#else
-               aThisIndex[INDEXMAN_TAGNUM] := StrZero(aInd:__EnumIndex(), 6)
-#endif
-               aThisIndex[INDEXMAN_KEY_CODEBLOCK] := &( "{|| " + aThisIndex[INDEXMAN_IDXKEY] + " }")
-               aThisIndex[INDEXMAN_SYNTH_COLPOS] := 0
-               aThisIndex[INDEXMAN_FOR_COLPOS] := 0
-               AAdd(::aIndexMgmnt, aThisIndex)
+               aThisIndex[INDEXMAN_IDXKEY] += IIf(i > 1, ',"', Chr(34)) + aCols[1, 1] + Chr(34)
+               IF aCols[1, 1] == ::cRecnoName .OR. aCols[1, 1] == "R_E_C_N_O_"
+                  EXIT
+               ENDIF
+            ELSE
+               EXIT
             ENDIF
-         NEXT
-         EXIT
-
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   ::oSql:Exec("select index_name, column_name, column_position from user_ind_columns where table_name = '" + ::cFileName + "' and index_name not like 'X_WA_Sys%' order by 1, 3", .F., .T., @aRet)
-      //   IF Len(aRet) > 0
-      //      cLast := aRet[1, 1]
-      //      aCols := {}
-      //      FOR EACH aInd IN aRet
-      //         IF aInd[1] == cLast
-      //            AAdd(aCols, aInd[2])
-      //            LOOP
-      //         ENDIF
-      //         aThisIndex := Array(INDEXMAN_SIZE)
-      //         aThisIndex[INDEXMAN_TABLE] := ::cFileName
-      //         aThisIndex[INDEXMAN_SIGNATURE] := "DBCATALOG"
-      //         aThisIndex[INDEXMAN_IDXNAME] := RTrim(cLast)
-      //         aThisIndex[INDEXMAN_IDXKEY] := ""
-      //         FOR i := 1 TO Len(aCols)
-      //            IF AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_" .AND. Len(aCols) == 1
-      //               EXIT
-      //            ENDIF
-      //            aThisIndex[INDEXMAN_IDXKEY] += IIf(i > 1, ',"', Chr(34)) + AllTrim(aCols[i]) + Chr(34)
-      //            IF AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_"
-      //               EXIT
-      //            ENDIF
-      //         NEXT i
-      //         IF !Empty(aThisIndex[INDEXMAN_IDXKEY]) .AND. Right(RTrim(cLast), 4) != "_UNQ"
-      //            aThisIndex[INDEXMAN_FOR_EXPRESS] := ""
-      //            aThisIndex[INDEXMAN_COLUMNS] := ""
-      //            aThisIndex[INDEXMAN_TAG] := RTrim(cLast)
+         NEXT i
+         IF !Empty(aThisIndex[INDEXMAN_IDXKEY])
+            aThisIndex[INDEXMAN_FOR_EXPRESS] := ""
+            aThisIndex[INDEXMAN_COLUMNS] := ""
+            aThisIndex[INDEXMAN_TAG] := Upper(RTrim(aInd[2]))
 #ifdef __XHARBOUR__
-      //            aThisIndex[INDEXMAN_TAGNUM] := StrZero(hb_EnumIndex(), 6)
+            aThisIndex[INDEXMAN_TAGNUM] := StrZero(hb_EnumIndex(), 6)
 #else
-      //            aThisIndex[INDEXMAN_TAGNUM] := StrZero(aInd:__EnumIndex(), 6)
+            aThisIndex[INDEXMAN_TAGNUM] := StrZero(aInd:__EnumIndex(), 6)
 #endif
-      //            aThisIndex[INDEXMAN_KEY_CODEBLOCK] := &( "{|| " + aThisIndex[INDEXMAN_IDXKEY] + " }")
-      //            aThisIndex[INDEXMAN_SYNTH_COLPOS] := 0
-      //            aThisIndex[INDEXMAN_FOR_COLPOS] := 0
-      //            AAdd(::aIndexMgmnt, aThisIndex)
-      //         ENDIF
-      //         cLast := aInd[1]
-      //         aCols := {aInd[2]}
-      //      NEXT
-      //
-      //      aThisIndex := Array(INDEXMAN_SIZE)
-      //      aThisIndex[INDEXMAN_TABLE] := ::cFileName
-      //      aThisIndex[INDEXMAN_SIGNATURE] := "DBCATALOG"
-      //      aThisIndex[INDEXMAN_IDXNAME] := RTrim(cLast)
-      //      aThisIndex[INDEXMAN_IDXKEY] := ""
-      //      FOR i := 1 TO Len(aCols)
-      //         IF AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_" .AND. Len(aCols) == 1
-      //            EXIT
-      //         ENDIF
-      //         aThisIndex[INDEXMAN_IDXKEY] += IIf(i > 1, ',"', Chr(34)) + AllTrim(aCols[i]) + Chr(34)
-      //         IF AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_"
-      //            EXIT
-      //         ENDIF
-      //      NEXT i
-      //      IF !Empty(aThisIndex[INDEXMAN_IDXKEY]) .AND. Right(RTrim(cLast), 4) != "_UNQ"
-      //         aThisIndex[INDEXMAN_FOR_EXPRESS] := ""
-      //         aThisIndex[INDEXMAN_COLUMNS] := ""
-      //         aThisIndex[INDEXMAN_TAG] := RTrim(cLast)
-#ifdef __XHARBOUR__
-      //         aThisIndex[INDEXMAN_TAGNUM] := StrZero(hb_EnumIndex(), 6) // TODO: HB_ENUMINDEX outside of a FOR EACH
-#else
-      //         aThisIndex[INDEXMAN_TAGNUM] := StrZero(_sr_EnumIndex(), 6) // TODO: _sr_ENUMINDEX outside of a FOR EACH
-#endif
-      //         aThisIndex[INDEXMAN_KEY_CODEBLOCK] := &( "{|| " + aThisIndex[INDEXMAN_IDXKEY] + " }")
-      //         aThisIndex[INDEXMAN_SYNTH_COLPOS] := 0
-      //         aThisIndex[INDEXMAN_FOR_COLPOS] := 0
-      //         AAdd(::aIndexMgmnt, aThisIndex)
-      //      ENDIF
-      //
-      //   ENDIF
-      //   EXIT
-      //CASE SQLRDD_RDBMS_MSSQL7
-      //CASE SQLRDD_RDBMS_AZURE
-      //   ::oSql:Exec("sp_helpindex " + ::cFileName, .F., .T., @aRet)
-      //
-      //   FOR EACH aInd IN aRet
-      //      IF Asc(Right(AllTrim(aInd[3]), 1)) == 0
-      //         aInd[3] := SubStr(aInd[3], 1, Len(AllTrim(aInd[3])) - 1)
-      //      ENDIF
-      //      aCols := hb_atokens(AllTrim(aInd[3]), ",")
-      //
-      //      aThisIndex := Array(INDEXMAN_SIZE)
-      //      aThisIndex[INDEXMAN_TABLE] := ::cFileName
-      //      aThisIndex[INDEXMAN_SIGNATURE] := "DBCATALOG"
-      //      aThisIndex[INDEXMAN_IDXNAME] := RTrim(aInd[1])
-      //      aThisIndex[INDEXMAN_IDXKEY] := ""
-      //      FOR i := 1 TO Len(aCols)
-      //         IF (AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_") .AND. Len(aCols) == 1
-      //            EXIT
-      //         ENDIF
-      //         aThisIndex[INDEXMAN_IDXKEY] += IIf(i > 1, ',"', Chr(34)) + AllTrim(aCols[i]) + Chr(34)
-      //         IF AllTrim(aCols[i]) == ::cRecnoName .OR. AllTrim(aCols[i]) == "R_E_C_N_O_"
-      //            EXIT
-      //         ENDIF
-      //      NEXT i
-      //      IF Empty(aThisIndex[INDEXMAN_IDXKEY]) .AND. Len(::aIndexMgmnt) > 0
-      //         EXIT
-      //      ENDIF
-      //      IF       !Empty(aThisIndex[INDEXMAN_IDXKEY]) ;
-      //         .AND. Right(aThisIndex[INDEXMAN_IDXNAME], 4) != "_UNQ" ;
-      //         .AND. Right(aThisIndex[INDEXMAN_IDXNAME], 3) != "_PK"
-      //         aThisIndex[INDEXMAN_FOR_EXPRESS] := ""
-      //         aThisIndex[INDEXMAN_COLUMNS] := ""
-      //         aThisIndex[INDEXMAN_TAG] := RTrim(aInd[1])
-#ifdef __XHARBOUR__
-      //         aThisIndex[INDEXMAN_TAGNUM] := StrZero(hb_EnumIndex(), 6)
-#else
-      //         aThisIndex[INDEXMAN_TAGNUM] := StrZero(aInd:__EnumIndex(), 6)
-#endif
-      //         aThisIndex[INDEXMAN_KEY_CODEBLOCK] := &( "{|| " + aThisIndex[INDEXMAN_IDXKEY] + " }")
-      //         aThisIndex[INDEXMAN_SYNTH_COLPOS] := 0
-      //         aThisIndex[INDEXMAN_FOR_COLPOS] := 0
-      //         AAdd(::aIndexMgmnt, aThisIndex)
-      //      ENDIF
-      //   NEXT
-      ENDSWITCH
+            aThisIndex[INDEXMAN_KEY_CODEBLOCK] := &( "{|| " + aThisIndex[INDEXMAN_IDXKEY] + " }")
+            aThisIndex[INDEXMAN_SYNTH_COLPOS] := 0
+            aThisIndex[INDEXMAN_FOR_COLPOS] := 0
+            AAdd(::aIndexMgmnt, aThisIndex)
+         ENDIF
+      NEXT
    ENDIF
 
    IF !lCDXCompat
@@ -1099,28 +857,7 @@ METHOD SR_WORKAREA:GetNextRecordNumber()
    IF !::oSql:lUseSequences .OR. !::lUseSequences
       nRet := Eval(SR_GetNextRecordBlock(), Self)
    ELSE
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_INGRES
-      //   aRet := {}
-      //   ::oSql:Exec("SELECT SQ_" + ::cFileName + ".nextval", .F., .T., @aRet)
-      //   IF Len(aRet) > 0
-      //      nRet := aRet[1, 1]
-      //   ENDIF
-      //   EXIT
-      //CASE SQLRDD_RDBMS_FIREBR
-      //   aRet := {}
-      //   ::oSql:Exec("SELECT gen_id(" + ::cFileName + ",1) FROM RDB$DATABASE", .F., .T., @aRet)
-      //   IF Len(aRet) > 0
-      //      nRet := aRet[1, 1]
-      //   ENDIF
-      //   EXIT
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         nRet := ::aInfo[AINFO_RCOUNT] + 1
-      ENDSWITCH
+      nRet := ::aInfo[AINFO_RCOUNT] + 1
    ENDIF
 
 RETURN nRet
@@ -1385,59 +1122,44 @@ METHOD SR_WORKAREA:LockTable(lCheck4ExcLock, lFLock)
    DEFAULT lCheck4ExcLock TO .T.
    DEFAULT lFLock TO .F.
 
-   SWITCH ::oSql:nSystemID
+   FOR i := 1 TO LOCKTABLE_TRIES
 
-   //CASE SQLRDD_RDBMS_IBMDB2
-   //CASE SQLRDD_RDBMS_MYSQL
-   //CASE SQLRDD_RDBMS_MARIADB
-   //CASE SQLRDD_RDBMS_SYBASE
-   //   EXIT
+      IF lCheck4ExcLock
 
-   //CASE SQLRDD_RDBMS_MSSQL7
-   //CASE SQLRDD_RDBMS_ORACLE
-   CASE SQLRDD_RDBMS_POSTGR
-   //CASE SQLRDD_RDBMS_AZURE
+         // Step 1: Try to create a LOCK to check If someone have this table EXCLUSIVE
+         // Lock format is: EXCLUSIVE_TABLE_LOCK_SIGN + TableName
 
-      FOR i := 1 TO LOCKTABLE_TRIES
+         lRet := SR_SetLocks(EXCLUSIVE_TABLE_LOCK_SIGN + Upper(::cFileName), ::oSql, 4)
 
-         IF lCheck4ExcLock
-
-            // Step 1: Try to create a LOCK to check If someone have this table EXCLUSIVE
-            // Lock format is: EXCLUSIVE_TABLE_LOCK_SIGN + TableName
-
-            lRet := SR_SetLocks(EXCLUSIVE_TABLE_LOCK_SIGN + Upper(::cFileName), ::oSql, 4)
-
-            // Step 2: If LOCK acquired, RELEASE IT and return TRUE, else LOOP
-
-            IF lRet
-               // Ok, nobody have it EXCLUSIVE !
-               SR_ReleaseLocks(EXCLUSIVE_TABLE_LOCK_SIGN + Upper(::cFileName), ::oSql)
-            ENDIF
-
-         ELSE
-
-            // Try to create a LOCK to this table
-            // Lock format is: EXCLUSIVE_TABLE_LOCK_SIGN + TableName
-            // IF LOCK acquired, return TRUE. Lock MUST be removed at workarea close
-
-            IF lFLock
-               lRet := SR_SetLocks(FLOCK_TABLE_LOCK_SIGN + Upper(::cFileName), ::oSql, 4)
-            ELSE
-               lRet := SR_SetLocks({FLOCK_TABLE_LOCK_SIGN + Upper(::cFileName), ;
-                  EXCLUSIVE_TABLE_LOCK_SIGN + Upper(::cFileName), ;
-                  SHARED_TABLE_LOCK_SIGN + Upper(::cFileName)}, ::oSql, 4)
-            ENDIF
-
-         ENDIF
+         // Step 2: If LOCK acquired, RELEASE IT and return TRUE, else LOOP
 
          IF lRet
-            EXIT
+            // Ok, nobody have it EXCLUSIVE !
+            SR_ReleaseLocks(EXCLUSIVE_TABLE_LOCK_SIGN + Upper(::cFileName), ::oSql)
          ENDIF
 
-         Inkey(0.5)         // wait .5 seconds before trying again
-      NEXT i
+      ELSE
 
-   ENDSWITCH
+         // Try to create a LOCK to this table
+         // Lock format is: EXCLUSIVE_TABLE_LOCK_SIGN + TableName
+         // IF LOCK acquired, return TRUE. Lock MUST be removed at workarea close
+
+         IF lFLock
+            lRet := SR_SetLocks(FLOCK_TABLE_LOCK_SIGN + Upper(::cFileName), ::oSql, 4)
+         ELSE
+            lRet := SR_SetLocks({FLOCK_TABLE_LOCK_SIGN + Upper(::cFileName), ;
+               EXCLUSIVE_TABLE_LOCK_SIGN + Upper(::cFileName), ;
+               SHARED_TABLE_LOCK_SIGN + Upper(::cFileName)}, ::oSql, 4)
+         ENDIF
+
+      ENDIF
+
+      IF lRet
+         EXIT
+      ENDIF
+
+      Inkey(0.5)         // wait .5 seconds before trying again
+   NEXT i
 
    IF !lCheck4ExcLock .AND. lRet
       ::lTableLocked := .T.
@@ -1468,18 +1190,7 @@ METHOD SR_WORKAREA:UnlockTable(lClosing)
       RETURN .F. // USE EXCLUSIVE cannot be released until file is closed
    ENDIF
 
-   SWITCH ::oSql:nSystemID
-   //CASE SQLRDD_RDBMS_IBMDB2 // TODO: unnecessary
-   //CASE SQLRDD_RDBMS_MYSQL // TODO: unnecessary
-   //CASE SQLRDD_RDBMS_MARIADB // TODO: unnecessary
-   //CASE SQLRDD_RDBMS_SYBASE // TODO: unnecessary
-   //   EXIT
-   //CASE SQLRDD_RDBMS_MSSQL7
-   //CASE SQLRDD_RDBMS_ORACLE
-   CASE SQLRDD_RDBMS_POSTGR
-   //CASE SQLRDD_RDBMS_AZURE
-      SR_ReleaseLocks({EXCLUSIVE_TABLE_LOCK_SIGN + Upper(::cFileName), FLOCK_TABLE_LOCK_SIGN + Upper(::cFileName)}, ::oSql)
-   ENDSWITCH
+   SR_ReleaseLocks({EXCLUSIVE_TABLE_LOCK_SIGN + Upper(::cFileName), FLOCK_TABLE_LOCK_SIGN + Upper(::cFileName)}, ::oSql)
 
    ::lTableLocked := .F.
    nPos := AScan(::aExclusive, {|x|x[1] == ::nThisArea})
@@ -1503,23 +1214,7 @@ METHOD SR_WORKAREA:LineCount(lMsg)
    IF ::lISAM
 
       IF s_nLineCountResult == 0
-         SWITCH ::oSql:nSystemID
-         CASE SQLRDD_RDBMS_POSTGR
-            ::oSql:Exec("SELECT " + SR_DBQUALIFY(::cRecnoName, SQLRDD_RDBMS_POSTGR) + " FROM " + ::cQualifiedTableName + " ORDER BY " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " DESC LIMIT 1" + IIf(::oSql:lComments, " /* Counting Records */", ""), lMsg, .T., @aRet)
-            EXIT
-         //CASE SQLRDD_RDBMS_FIREBR
-         //   ::oSql:Exec("SELECT gen_id(" + ::cFileName + ",0) FROM RDB$DATABASE", .F., .T., @aRet)
-         //   EXIT
-         //CASE SQLRDD_RDBMS_CACHE
-         //   ::oSql:Exec("SELECT TOP 1 " + SR_DBQUALIFY(::cRecnoName, SQLRDD_RDBMS_CACHE) + " FROM " + ::cOwner + ::cFileName + " ORDER BY " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " DESC", lMsg, .T., @aRet)
-         //   EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
-           ::oSql:Exec("SELECT MAX( " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " ) FROM " + ::cQualifiedTableName + IIf(::oSql:lComments, " /* Counting Records */", ""), lMsg, .T., @aRet)
-         ENDSWITCH
+         ::oSql:Exec("SELECT " + SR_DBQUALIFY(::cRecnoName, SQLRDD_RDBMS_POSTGR) + " FROM " + ::cQualifiedTableName + " ORDER BY " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " DESC LIMIT 1" + IIf(::oSql:lComments, " /* Counting Records */", ""), lMsg, .T., @aRet)
 
          IF Len(aRet) > 0 .AND. !HB_IsNumeric(aRet[1, 1])
             ::oSql:Exec("SELECT COUNT( " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " ) FROM " + ::cQualifiedTableName + IIf(::oSql:lComments, " /* Counting Records */", ""), lMsg, .T., @aRet)
@@ -1608,41 +1303,13 @@ METHOD SR_WORKAREA:sqlOpenAllIndexes()
             cCol := SubStr(aCols[i], 1, nPosAt)
          ENDIF
 
-         SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_ORACLE
-         //CASE SQLRDD_RDBMS_FIREBR
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-         //   cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " NULLS FIRST,"
-         //   cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC NULLS LAST,"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_IBMDB2
-         //   IF "08.0" $ ::oSql:cSystemVers .AND. (!"08.00" $ ::oSql:cSystemVers)
-         //      cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " NULLS FIRST,"
-         //      cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC NULLS LAST,"
-         //   ELSE
-         //      cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + ","
-         //      cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC,"
-         //   ENDIF
-         //   EXIT
-         CASE SQLRDD_RDBMS_POSTGR
-            IF ::osql:lPostgresql8
-               cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " NULLS FIRST,"
-               cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC NULLS LAST,"
-            ELSE
-               cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + ","
-               cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC,"
-            ENDIF
-            EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
+         IF ::osql:lPostgresql8
+            cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " NULLS FIRST,"
+            cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC NULLS LAST,"
+         ELSE
             cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + ","
             cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC,"
-         ENDSWITCH
+         ENDIF
 
          IF (nPos := AScan(::aNames, {|x|x == cCol})) != 0
             IF ::aNames[nPos] != ::cRecnoName
@@ -2164,7 +1831,7 @@ METHOD SR_WORKAREA:Quoted(uData, trim, nLen, nDec, nTargetDB, lSynthetic)
       trim := .F.
    ENDIF
 
-   IF Empty(uData) .AND. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. cType == "D"
+   IF Empty(uData) .AND. cType == "D"
       IF lSynthetic
          RETURN "        "
       ELSE
@@ -2177,65 +1844,22 @@ METHOD SR_WORKAREA:Quoted(uData, trim, nLen, nDec, nTargetDB, lSynthetic)
 
    CASE "C"
    CASE "M"
-      IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. !trim
-         RETURN "E'" + RTrim(SR_ESCAPESTRING(uData, ::oSql:nSystemID)) + "'"
-      ELSEIF !trim
-         RETURN "'" + SR_ESCAPESTRING(uData, ::oSql:nSystemID) + "'"
-      ELSEIF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. trim
+      IF !trim
          RETURN "E'" + RTrim(SR_ESCAPESTRING(uData, ::oSql:nSystemID)) + "'"
       ELSEIF trim
-         RETURN "'" + RTrim(SR_ESCAPESTRING(uData, ::oSql:nSystemID)) + "'"
+         RETURN "E'" + RTrim(SR_ESCAPESTRING(uData, ::oSql:nSystemID)) + "'"
       ENDIF
       EXIT
 
    CASE "D"
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   RETURN "TO_DATE('" + RTrim(DToS(uData)) + "','YYYYMMDD')"
-      //CASE SQLRDD_RDBMS_INFORM
-      //   RETURN "'" + SR_dtoUS(uData) + "'"
-      //CASE SQLRDD_RDBMS_SQLBAS
-      //   RETURN "'" + SR_dtosdot(uData) + "'"
-      //CASE SQLRDD_RDBMS_IBMDB2
-      //CASE SQLRDD_RDBMS_ADABAS
-      //   RETURN "'" + Transform(DToS(uData), "@R 9999-99-99") + "'"
-      //CASE SQLRDD_RDBMS_FIREBR
-      //CASE SQLRDD_RDBMS_FIREBR3
-      //CASE SQLRDD_RDBMS_FIREBR4
-      //CASE SQLRDD_RDBMS_FIREBR5
-      //   RETURN "'" + Transform(DToS(uData), "@R 9999/99/99") + "'"
-      //CASE SQLRDD_RDBMS_INGRES
-      //   RETURN "'" + SR_dtoDot(uData) + "'"
-      //CASE SQLRDD_RDBMS_CACHE
-      //   RETURN "{d '" + Transform(DToS(IIf(Year(uData) < 1850, SToD("18500101"), uData)), "@R 9999-99-99") + "'}"
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         RETURN "'" + DToS(uData) + "'"
-      ENDSWITCH
+      RETURN "'" + DToS(uData) + "'"
 
    CASE "T"
-      SWITCH ::oSql:nSystemID
-      CASE SQLRDD_RDBMS_POSTGR
-      //CASE SQLRDD_RDBMS_MYSQL
-      //CASE SQLRDD_RDBMS_MARIADB
-         IF nLen == 4
-            RETURN "'" + HB_TSTOSTR(udata, .T.) + "'"
-         ENDIF
-         //RETURN "'" + Transform(hb_ttos(uData), '@R 9999-99-99 99:99:99') + "'"
-         RETURN "'" + HB_TSTOSTR(uData) + "'"
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   RETURN " TIMESTAMP '" + Transform(hb_ttos(uData), "@R 9999-99-99 99:99:99") + "'"
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         cRet := SR_STRTOHEX(HB_Serialize(uData))
-         RETURN ::Quoted(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, trim, nLen, nDec, nTargetDB)
-      ENDSWITCH
+      IF nLen == 4
+         RETURN "'" + HB_TSTOSTR(udata, .T.) + "'"
+      ENDIF
+      //RETURN "'" + Transform(hb_ttos(uData), '@R 9999-99-99 99:99:99') + "'"
+      RETURN "'" + HB_TSTOSTR(uData) + "'"
 
    CASE "N"
       IF nLen == NIL
@@ -2245,21 +1869,7 @@ METHOD SR_WORKAREA:Quoted(uData, trim, nLen, nDec, nTargetDB, lSynthetic)
       ENDIF
 
    CASE "L"
-      SWITCH ::oSql:nSystemID
-      CASE SQLRDD_RDBMS_POSTGR
-      //CASE SQLRDD_RDBMS_FIREBR3
-      //CASE SQLRDD_RDBMS_FIREBR4
-      //CASE SQLRDD_RDBMS_FIREBR5
-         RETURN IIf(uData, "true", "false")
-      //CASE SQLRDD_RDBMS_INFORM
-      //   RETURN IIf(uData, "'t'", "'f'")
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         RETURN IIf(uData, "1", "0")
-      ENDSWITCH
+      RETURN IIf(uData, "true", "false")
 
 #ifdef __XHARBOUR__
    DEFAULT
@@ -2286,12 +1896,14 @@ METHOD SR_WORKAREA:QuotedNull(uData, trim, nLen, nDec, nTargetDB, lNull, lMemo)
    LOCAL cRet
    LOCAL cOldSet := SET(_SET_DATEFORMAT)
 
+   HB_SYMBOL_UNUSED(cOldSet)
+
    DEFAULT trim TO .F.
    DEFAULT nTargetDB TO ::oSql:nSystemID
    DEFAULT lNull TO .T.
    DEFAULT lMemo TO .F.
 
-   IF Empty(uData) .AND. (!cType $ "AOH") .AND. ((nTargetDB == SQLRDD_RDBMS_POSTGR .AND. cType $ "DCMNT" .AND. cType != "L") .OR. (nTargetDB != SQLRDD_RDBMS_POSTGR .AND. cType != "L"))
+   IF Empty(uData) .AND. (!cType $ "AOH") .AND. (cType $ "DCMNT" .AND. cType != "L")
       IF lNull
          RETURN "NULL"
       ELSE
@@ -2304,12 +1916,10 @@ METHOD SR_WORKAREA:QuotedNull(uData, trim, nLen, nDec, nTargetDB, lNull, lMemo)
             IF ::nTCCompat > 0
                RETURN "'" + uData + "'"
             ENDIF
-            IF nTargetDB == SQLRDD_RDBMS_POSTGR
-               IF SR_SETPGSOLDBEHAVIOR()
-                  RETURN "''"
-               ELSE
-                  RETURN "' '"
-               ENDIF
+            IF SR_SETPGSOLDBEHAVIOR()
+               RETURN "''"
+            ELSE
+               RETURN "' '"
             ENDIF
             RETURN "' '"
          CASE "N"
@@ -2331,44 +1941,15 @@ METHOD SR_WORKAREA:QuotedNull(uData, trim, nLen, nDec, nTargetDB, lNull, lMemo)
 
    CASE "C"
    CASE "M"
-      IF nTargetDB == SQLRDD_RDBMS_POSTGR .AND. !trim
+      IF !trim
          RETURN "E'" + SR_ESCAPESTRING(uData, nTargetDB) + "'"
-      ELSEIF !trim
-         RETURN "'" + SR_ESCAPESTRING(uData, nTargetDB) + "'"
-      ELSEIF nTargetDB == SQLRDD_RDBMS_POSTGR .AND. trim
-         RETURN "E'" + RTrim(SR_ESCAPESTRING(uData, nTargetDB)) + "'"
       ELSEIF trim
-         RETURN "'" + RTrim(SR_ESCAPESTRING(uData, nTargetDB)) + "'"
+         RETURN "E'" + RTrim(SR_ESCAPESTRING(uData, nTargetDB)) + "'"
       ENDIF
 
    CASE "D"
       IF !lMemo
-         SWITCH nTargetDB
-         //CASE SQLRDD_RDBMS_ORACLE
-         //   RETURN "TO_DATE('" + RTrim(DToS(uData)) + "','YYYYMMDD')"
-         //CASE SQLRDD_RDBMS_INFORM
-         //   RETURN "'" + SR_dtoUS(uData) + "'"
-         //CASE SQLRDD_RDBMS_SQLBAS
-         //   RETURN "'" + SR_dtosDot(uData) + "'"
-         //CASE SQLRDD_RDBMS_IBMDB2
-         //CASE SQLRDD_RDBMS_ADABAS
-         //   RETURN "'" + Transform(DToS(uData), "@R 9999-99-99") + "'"
-         //CASE SQLRDD_RDBMS_FIREBR
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-         //   RETURN "'" + Transform(DToS(uData), "@R 9999-99-99") + "'"
-         //CASE SQLRDD_RDBMS_INGRES
-         //   RETURN "'" + SR_dtoDot(uData) + "'"
-         //CASE SQLRDD_RDBMS_CACHE
-         //   RETURN "{d '" + Transform(DToS(IIf(Year(uData) < 1850, SToD("18500101"), uData)), "@R 9999-99-99") + "'}"
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
-            RETURN "'" + DToS(uData) + "'"
-         ENDSWITCH
+         RETURN "'" + DToS(uData) + "'"
       ENDIF
       cRet := SR_STRTOHEX(HB_Serialize(uData))
       RETURN ::Quoted(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
@@ -2377,27 +1958,11 @@ METHOD SR_WORKAREA:QuotedNull(uData, trim, nLen, nDec, nTargetDB, lNull, lMemo)
       IF Empty(uData)
          RETURN "NULL"
       ENDIF
-      SWITCH ::oSql:nSystemID
-      CASE SQLRDD_RDBMS_POSTGR
-      //CASE SQLRDD_RDBMS_MYSQL
-      //CASE SQLRDD_RDBMS_MARIADB
-         IF nLen == 4
-            RETURN "'" + HB_TSTOSTR(udata, .T.) + "'"
-         ENDIF
-         //RETURN "'" + Transform(hb_ttos(uData), '@R 9999-99-99 99:99:99') + "'"
-         RETURN "'" + HB_TSTOSTR(uData) + "'"
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   RETURN " TIMESTAMP '" + Transform(hb_ttos(uData), "@R 9999-99-99 99:99:99") + "'"
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         Set(_SET_DATEFORMAT, "yyyy-mm-dd")
-         cRet := hb_ttoc(uData)
-         Set(_SET_DATEFORMAT, cOldSet)
-         RETURN "'" + cRet + "'"
-      ENDSWITCH
+      IF nLen == 4
+         RETURN "'" + HB_TSTOSTR(udata, .T.) + "'"
+      ENDIF
+      //RETURN "'" + Transform(hb_ttos(uData), '@R 9999-99-99 99:99:99') + "'"
+      RETURN "'" + HB_TSTOSTR(uData) + "'"
 
    CASE "N"
       IF nLen != NIL .AND. !lMemo
@@ -2409,12 +1974,8 @@ METHOD SR_WORKAREA:QuotedNull(uData, trim, nLen, nDec, nTargetDB, lNull, lMemo)
       RETURN ::Quoted(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
 
    CASE "L"
-      IF (nTargetDB == SQLRDD_RDBMS_POSTGR /*.OR. nTargetDB == SQLRDD_RDBMS_FIREBR3 .OR. nTargetDB == SQLRDD_RDBMS_FIREBR4 .OR. nTargetDB == SQLRDD_RDBMS_FIREBR5*/) .AND. !lMemo
+      IF !lMemo
          RETURN IIf(uData, "true", "false")
-      //ELSEIF nTargetDB == SQLRDD_RDBMS_INFORM
-      //   RETURN IIf(uData, "'t'", "'f'")
-      ELSEIF !lMemo
-         RETURN IIf(uData, "1", "0")
       ENDIF
       cRet := SR_STRTOHEX(HB_Serialize(uData))
       RETURN ::Quoted(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
@@ -2556,7 +2117,7 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
       IF !lInsert
          IF ::lVers
             lInsert := .T.
-            IF (!::oSql:lUseSequences .OR. !::lUseSequences) .OR. (::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES)
+            IF (!::oSql:lUseSequences .OR. !::lUseSequences)
                ::aInfo[AINFO_RECNO] := 0
                aBuffer[::hnRecno] := 0               // This forces NEW recno number
             ENDIF
@@ -2595,15 +2156,8 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
                IF lML .AND. HB_IsString(aBuffer[nThisField])
                   aBuffer[nThisField] := hb_Hash(SR_SetBaseLang(), aBuffer[nThisField])
                ENDIF
-               IF (lMemo .OR. lML) .AND. (::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS .OR. ::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2) .AND. ::aFields[nThisField, 6] != SQL_FAKE_LOB  // .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE
-                  IF !HB_IsString(aBuffer[nThisField])
-                     cMemo := SR_STRTOHEX(HB_Serialize(aBuffer[nThisField]))
-                     cMemo := SQL_SERIALIZED_SIGNATURE + Str(Len(cMemo), 10) + cMemo
-                  ELSE
-                     cMemo := aBuffer[nThisField]
-                  ENDIF
-                  AAdd(aMemos, {::aNames[nThisField], cMemo})
-                  LOOP
+               // TODO: review
+               IF (lMemo .OR. lML) .AND. ::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .AND. ::aFields[nThisField, 6] != SQL_FAKE_LOB
 #ifdef SQLRDD_TOPCONN
                ELSEIF ::aFields[nThisField, 6] == SQL_FAKE_DATE
                   cRet += IIf(!lFirst, ", ", "") + SR_DBQUALIFY(::aNames[nThisField], ::oSql:nSystemID) + " = '" + DToS(aBuffer[nThisField]) + "' "
@@ -2621,8 +2175,6 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
                   nlen := Len(oxml:tostring(SR_XML_STYLE_NONEWLINE))
                   cVal := IIf(!lFirst, ", ", "") + SR_DBQUALIFY(::aNames[nThisField], ::oSql:nSystemID) + " = " + ::QuotedNull(oxml:tostring(SR_XML_STYLE_NONEWLINE), .T., IIf(lMemo, NIL, nLen), nDec, , lNull, lMemo)
 #endif
-               //ELSEIF ::aFields[nthisField, 6] == SQL_VARBINARY .AND. ::osql:nsystemID ==SQLRDD_RDBMS_MSSQL7
-               //   cVal := '0x'+hb_StrtoHex(aBuffer[nThisField])
                ELSE
                   LOOP
                ENDIF
@@ -2639,20 +2191,12 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
                FOR nInd := 1 TO Len(::aIndexMgmnt)
                   IF !Empty(::aIndexMgmnt[nInd, INDEXMAN_COLUMNS])
                      cKey := (::cAlias)->(SR_ESCAPESTRING(Eval(::aIndexMgmnt[nInd, INDEXMAN_KEY_CODEBLOCK]), ::oSql:nSystemID))
-                     //IF ::osql:nsystemID ==SQLRDD_RDBMS_POSTGR
-                        cRet += ", " + SR_DBQUALIFY("INDKEY_" + ::aIndexMgmnt[nInd, INDEXMAN_COLUMNS], ::oSql:nSystemID) + " = E'" + cKey + "' "
-                     //ELSE
-                     //   cRet += ", " + SR_DBQUALIFY("INDKEY_" + ::aIndexMgmnt[nInd, INDEXMAN_COLUMNS], ::oSql:nSystemID) + " = '" + cKey + "' "
-                     //ENDIF
+                     cRet += ", " + SR_DBQUALIFY("INDKEY_" + ::aIndexMgmnt[nInd, INDEXMAN_COLUMNS], ::oSql:nSystemID) + " = E'" + cKey + "' "
                      ::aLocalBuffer[::aIndexMgmnt[nInd, INDEXMAN_SYNTH_COLPOS]] := cKey
                   ENDIF
                   IF !Empty(::aIndexMgmnt[nInd, INDEXMAN_FOR_CODEBLOCK])
                      cKey := (::cAlias)->(Eval(::aIndexMgmnt[nInd, INDEXMAN_FOR_CODEBLOCK]))
-                     //IF ::osql:nsystemID ==SQLRDD_RDBMS_POSTGR
-                        cRet += ", " + SR_DBQUALIFY("INDFOR_" + SubStr(::aIndexMgmnt[nInd, INDEXMAN_FOR_EXPRESS], 2, 3), ::oSql:nSystemID) + " = E'" + cKey + "' "
-                     //ELSE
-                     //   cRet += ", " + SR_DBQUALIFY("INDFOR_" + SubStr(::aIndexMgmnt[nInd, INDEXMAN_FOR_EXPRESS], 2, 3), ::oSql:nSystemID) + " = '" + cKey + "' "
-                     //ENDIF
+                     cRet += ", " + SR_DBQUALIFY("INDFOR_" + SubStr(::aIndexMgmnt[nInd, INDEXMAN_FOR_EXPRESS], 2, 3), ::oSql:nSystemID) + " = E'" + cKey + "' "
                      ::aLocalBuffer[::aIndexMgmnt[nInd, INDEXMAN_FOR_COLPOS]] := cKey
                   ENDIF
                NEXT nInd
@@ -2738,31 +2282,6 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
                   ENDIF
                   cVal += IIf(!lFirst, ", ", "( ") + ::QuotedNull(aBuffer[i], .T., NIL, nDec, , lNull, lMemo)
                   lFirst := .F.
-               ELSEIF !::lQuickAppend .OR. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES
-                  SWITCH ::oSql:nSystemID
-                  //CASE SQLRDD_RDBMS_INGRES
-                  //CASE SQLRDD_RDBMS_FIREBR
-                  //   IF Empty(::aInfo[AINFO_RECNO])
-                  //      aBuffer[::hnRecno] := ::GetNextRecordNumber()
-                  //      ::aInfo[AINFO_RECNO] := aBuffer[::hnRecno]
-                  //   ELSE
-                  //      aBuffer[::hnRecno] := ::aInfo[AINFO_RECNO]
-                  //   ENDIF
-                  //   IF ::cIns == NIL
-                  //      cRet += IIf(!lFirst, ", ", "( ") + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID)
-                  //   ENDIF
-                  //   cVal += IIf(!lFirst, ", ", "( ") + LTrim(Str(aBuffer[::hnRecno], 15))
-                  //   lFirst := .F.
-                  //   EXIT
-                  //CASE SQLRDD_RDBMS_INFORM // TODO: unnecessary
-                  //CASE SQLRDD_RDBMS_ORACLE // TODO: unnecessary
-                  //CASE SQLRDD_RDBMS_MSSQL7 // TODO: unnecessary
-                  CASE SQLRDD_RDBMS_POSTGR // TODO: unnecessary
-                  //CASE SQLRDD_RDBMS_MSSQL6 // TODO: unnecessary
-                  //CASE SQLRDD_RDBMS_SYBASE // TODO: unnecessary
-                  //CASE SQLRDD_RDBMS_IBMDB2 // Use IDENTITY column (or similar) // TODO: unnecessary
-                  //CASE SQLRDD_RDBMS_AZURE // TODO: unnecessary
-                  ENDSWITCH
                ENDIF
             ELSE
                IF lMemo .OR. lML
@@ -2774,18 +2293,7 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
                   ENDIF
                   HB_SYMBOL_UNUSED(cMemo)
 
-                  //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. Len(cMemo) > 2000  // .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE
-                  //   AAdd(aMemos, {::aNames[i], cMemo})
-                  //   cMemo := NIL
-                  //ELSEIF ::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .AND. Len(cMemo) > 32000
-                  //   AAdd(aMemos, {::aNames[i], cMemo})
-                  //   cMemo := NIL
-                  //ELSEIF ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS // .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 // ADABAS always need binding
-                  //   AAdd(aMemos, {::aNames[i], cMemo})
-                  //   LOOP
-                  //ELSE
-                     cMemo := aBuffer[i]
-                  //ENDIF
+                  cMemo := aBuffer[i]
                ELSE
                   cMemo := aBuffer[i]
                ENDIF
@@ -2817,11 +2325,7 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
 #endif
                   EXIT
                CASE SQL_VARBINARY
-                  //IF ::osql:nsystemID ==SQLRDD_RDBMS_MSSQL7
-                  //   cVal += IIf(!lFirst, ", ", "( ") + "0x" + hb_StrtoHex(cmemo)
-                  //ELSE
-                     cVal += IIf(!lFirst, ", ", "( ") + ::QuotedNull(cMemo, .T., IIf(lMemo, NIL, nLen), nDec, , lNull, lMemo)
-                  //ENDIF
+                  cVal += IIf(!lFirst, ", ", "( ") + ::QuotedNull(cMemo, .T., IIf(lMemo, NIL, nLen), nDec, , lNull, lMemo)
                   EXIT
 #ifdef __XHARBOUR__
                DEFAULT
@@ -2842,11 +2346,7 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
                   cRet += IIf(!lFirst, ", ", "( ") + SR_DBQUALIFY("INDKEY_" + ::aIndexMgmnt[nInd, INDEXMAN_COLUMNS], ::oSql:nSystemID)
                ENDIF
                cKey := (::cAlias)->(SR_ESCAPESTRING(Eval(::aIndexMgmnt[nInd, INDEXMAN_KEY_CODEBLOCK]), ::oSql:nSystemID))
-               //IF ::osql:nsystemID ==SQLRDD_RDBMS_POSTGR
-                  cVal += IIf(!lFirst, ", E'", "( E'") + cKey + "'"
-               //ELSE
-               //   cVal += IIf(!lFirst, ", '", "( '") + cKey + "'"
-               //ENDIF
+               cVal += IIf(!lFirst, ", E'", "( E'") + cKey + "'"
                ::aLocalBuffer[::aIndexMgmnt[nInd, INDEXMAN_SYNTH_COLPOS]] := cKey
             ENDIF
             IF !Empty(::aIndexMgmnt[nInd, INDEXMAN_FOR_CODEBLOCK])
@@ -2854,35 +2354,10 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
                   cRet += IIf(!lFirst, ", ", "( ") + SR_DBQUALIFY("INDFOR_" + SubStr(::aIndexMgmnt[nInd, INDEXMAN_FOR_EXPRESS], 2, 3), ::oSql:nSystemID)
                ENDIF
                cKey := (::cAlias)->(Eval(::aIndexMgmnt[nInd, INDEXMAN_FOR_CODEBLOCK]))
-               //IF ::osql:nsystemID ==SQLRDD_RDBMS_POSTGR
-                  cVal += IIf(!lFirst, ", E'", "( E'") + cKey + "'"
-               //ELSE
-               //   cVal += IIf(!lFirst, ", '", "( '") + cKey + "'"
-               //ENDIF
+               cVal += IIf(!lFirst, ", E'", "( E'") + cKey + "'"
                ::aLocalBuffer[::aIndexMgmnt[nInd, INDEXMAN_FOR_COLPOS]] := cKey
             ENDIF
          NEXT nInd
-
-         //SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_MSSQL7
-         //CASE SQLRDD_RDBMS_AZURE
-         //   IF ::oSql:lUseSequences .AND. ::lUseSequences
-         //      //cIdent := "; SELECT IDENT_CURRENT('" + ::cfilename + "');"
-         //      cIdent := "; SELECT " + ::cRecnoName + " FROM @InsertedData;"
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_IBMDB2
-         //   IF ::oSql:lUseSequences .AND. ::lUseSequences .AND. !("DB2/400" $ ::oSql:cSystemName)
-         //      cIdent := "; VALUES IDENTITY_VAL_LOCAL();"
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-         //   IF ::oSql:lUseSequences .AND. ::lUseSequences
-         //      cIdent := "  RETURNING  " + ::cRecnoName
-         //   ENDIF
-         //ENDSWITCH
 
          aRet := {}
 
@@ -2892,11 +2367,7 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
          ACopy(aBuffer, ::aOldBuffer)
 
          IF ::cIns == NIL
-            //IF ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7
-            //   ::cIns := "Declare @InsertedData table (" + ::cRecnoName + " numeric(15,0) );INSERT INTO " + ::cQualifiedTableName + " " + cRet + " ) OUTPUT Inserted." + ::cRecnoName + " INTO @InsertedData VALUES "
-            //ELSE
-               ::cIns := "INSERT INTO " + ::cQualifiedTableName + " " + cRet + " ) VALUES "
-            //ENDIF
+            ::cIns := "INSERT INTO " + ::cQualifiedTableName + " " + cRet + " ) VALUES "
          ENDIF
 
          IF ::oSql:Execute(::cIns + cVal + " ) " + cIdent, , ::nLogMode) != SQL_SUCCESS
@@ -2908,145 +2379,35 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
 
          IF ::oSql:lUseSequences .AND. ::lUseSequences .AND. !::lQuickAppend
 
-            SWITCH ::oSql:nSystemID
-            //CASE SQLRDD_RDBMS_FIREBR3
-            //CASE SQLRDD_RDBMS_FIREBR4
-            //CASE SQLRDD_RDBMS_FIREBR5
-            //   ::oSql:MoreResults(@aRet)
-            //   IF Len(aRet) > 0
-            //      aBuffer[::hnRecno] := aRet[1, 1]
-            //   ELSE
-            //      ::RunTimeErr("11", SR_Msg(11) + ::cFileName + " SQL Statement: " + ::cIns + cVal + " ) " + cIdent  + " " + ::oSql:LastError())
-            //      ::dNextDt := NIL
-            //      RETURN .F.
-            //   ENDIF
-            //   EXIT
-            //CASE SQLRDD_RDBMS_MSSQL7
-            //CASE SQLRDD_RDBMS_AZURE
-            //   ::oSql:MoreResults(@aRet)
-            //   ::oSql:MoreResults(@aRet)
-            //   IF Len(aRet) > 0
-            //      aBuffer[::hnRecno] := aRet[1, 1]
-            //   ELSE
-            //      ::RunTimeErr("11", SR_Msg(11) + ::cFileName + " SQL Statement: " + ::cIns + cVal + " ) " + cIdent  + " " + ::oSql:LastError())
-            //      ::dNextDt := NIL
-            //      RETURN .F.
-            //   ENDIF
-            //   ::oSql:FreeStatement()
-            //   EXIT
-            //CASE SQLRDD_RDBMS_IBMDB2
-            //   IF "DB2/400" $ ::oSql:cSystemName
-            //      ::oSql:FreeStatement()
-            //      aRet := {}
-            //      ::oSql:Exec("SELECT IDENTITY_VAL_LOCAL() AS RECORD FROM " + ::cOwner + ::cFileName + " WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = IDENTITY_VAL_LOCAL()" , .F., .T., @aRet)
-            //      IF Len(aRet) > 0
-            //         aBuffer[::hnRecno] := aRet[1, 1]
-            //      ELSE
-            //         ::RunTimeErr("11", SR_Msg(11) + ::cFileName)
-            //         ::dNextDt := NIL
-            //         RETURN .F.
-            //      ENDIF
-            //   ELSE
-            //      ::oSql:MoreResults(@aRet)
-            //      ::oSql:MoreResults(@aRet)
-            //      IF Len(aRet) > 0
-            //         aBuffer[::hnRecno] := aRet[1, 1]
-            //      ELSE
-            //         ::RunTimeErr("11", SR_Msg(11) + ::cFileName)
-            //         ::dNextDt := NIL
-            //         RETURN .F.
-            //      ENDIF
-            //      ::oSql:FreeStatement()
-            //      EXIT
-            //   ENDIF
-            //   EXIT
-            //CASE SQLRDD_RDBMS_ORACLE
-            //   ::oSql:FreeStatement()
-            //   aRet := {}
-            //   SWITCH ::nSequencePerTable
-            //   CASE SEQ_PER_TABLE
-            //      ::oSql:Exec("SELECT " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ.CURRVAL FROM DUAL", .T., .T., @aRet)
-            //      IF Len(aRet) > 0
-            //         aBuffer[::hnRecno] := aRet[1, 1]
-            //      ENDIF
-            //      EXIT
-            //   CASE SEQ_NOTDEFINED
-            //      ::oSql:Exec("SELECT " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ.CURRVAL FROM DUAL", .F., .T., @aRet)
-            //      IF Len(aRet) > 0
-            //         ::nSequencePerTable := SEQ_PER_TABLE
-            //         aBuffer[::hnRecno] := aRet[1, 1]
-            //      ELSE
-            //         ::nSequencePerTable := SEQ_PER_DATABASE
-            //         aRet := {}
-            //         ::oSql:Exec("SELECT " + ::cOwner + "SQ_NRECNO.CURRVAL FROM DUAL", .F., .T., @aRet)
-            //         IF Len(aRet) > 0
-            //            aBuffer[::hnRecno] := aRet[1, 1]
-            //         ENDIF
-            //      ENDIF
-            //      EXIT
-            //   CASE SEQ_PER_DATABASE
-            //      ::oSql:Exec("SELECT SQ_NRECNO.CURRVAL FROM DUAL", .F., .T., @aRet)
-            //      IF Len(aRet) > 0
-            //         aBuffer[::hnRecno] := aRet[1, 1]
-            //      ENDIF
-            //   ENDSWITCH
-            //   EXIT
-            CASE SQLRDD_RDBMS_POSTGR
-               ::oSql:FreeStatement()
-               aRet := {}
-               SWITCH ::nSequencePerTable
-               CASE SEQ_PER_TABLE
-                  ::oSql:Exec("SELECT currval('" + ::cOwner + LimitLen(::cFileName, 3) + "_SQ')", .F., .T., @aRet)
-                  IF Len(aRet) > 0
-                     aBuffer[::hnRecno] := aRet[1, 1]
-                  ENDIF
-                  EXIT
-               CASE SEQ_NOTDEFINED
-                  ::oSql:Exec("SELECT currval('" + ::cOwner + LimitLen(::cFileName, 3) + "_SQ')", .F., .T., @aRet)
-                  IF Len(aRet) > 0
-                     ::nSequencePerTable := SEQ_PER_TABLE
-                     aBuffer[::hnRecno] := aRet[1, 1]
-                  ELSE
-                     ::oSql:Commit()
-                     ::nSequencePerTable := SEQ_PER_DATABASE
-                     aRet := {}
-                     ::oSql:Exec("SELECT currval('SQ_NRECNO')", .F., .T., @aRet)
-                     IF Len(aRet) > 0
-                        aBuffer[::hnRecno] := aRet[1, 1]
-                     ENDIF
-                  ENDIF
-                  EXIT
-               CASE SEQ_PER_DATABASE
+            ::oSql:FreeStatement()
+            aRet := {}
+            SWITCH ::nSequencePerTable
+            CASE SEQ_PER_TABLE
+               ::oSql:Exec("SELECT currval('" + ::cOwner + LimitLen(::cFileName, 3) + "_SQ')", .F., .T., @aRet)
+               IF Len(aRet) > 0
+                  aBuffer[::hnRecno] := aRet[1, 1]
+               ENDIF
+               EXIT
+            CASE SEQ_NOTDEFINED
+               ::oSql:Exec("SELECT currval('" + ::cOwner + LimitLen(::cFileName, 3) + "_SQ')", .F., .T., @aRet)
+               IF Len(aRet) > 0
+                  ::nSequencePerTable := SEQ_PER_TABLE
+                  aBuffer[::hnRecno] := aRet[1, 1]
+               ELSE
+                  ::oSql:Commit()
+                  ::nSequencePerTable := SEQ_PER_DATABASE
+                  aRet := {}
                   ::oSql:Exec("SELECT currval('SQ_NRECNO')", .F., .T., @aRet)
                   IF Len(aRet) > 0
                      aBuffer[::hnRecno] := aRet[1, 1]
                   ENDIF
-               ENDSWITCH
+               ENDIF
                EXIT
-            //CASE SQLRDD_RDBMS_MYSQL
-            //CASE SQLRDD_RDBMS_MARIADB
-            //   ::oSql:FreeStatement()
-            //   aRet := {}
-            //   ::oSql:Exec("SELECT LAST_INSERT_ID()", .F., .T., @aRet)
-            //   IF Len(aRet) > 0
-            //      aBuffer[::hnRecno] := aRet[1, 1]
-            //   ELSE
-            //      ::RunTimeErr("11", SR_Msg(11) + ::cFileName)
-            //      ::dNextDt := NIL
-            //      RETURN .F.
-            //   ENDIF
-            //   EXIT
-            //CASE SQLRDD_RDBMS_INFORM
-            //   ::oSql:FreeStatement()
-            //   aRet := {}
-            //   ::oSql:Exec("select first 1 dbinfo('sqlca.sqlerrd1') from systables", .F., .T., @aRet)
-            //   IF Len(aRet) > 0
-            //      aBuffer[::hnRecno] := aRet[1, 1]
-            //   ELSE
-            //      ::RunTimeErr("11", SR_Msg(11) + ::cFileName)
-            //      ::dNextDt := NIL
-            //      RETURN .F.
-            //   ENDIF
+            CASE SEQ_PER_DATABASE
+               ::oSql:Exec("SELECT currval('SQ_NRECNO')", .F., .T., @aRet)
+               IF Len(aRet) > 0
+                  aBuffer[::hnRecno] := aRet[1, 1]
+               ENDIF
             ENDSWITCH
          ENDIF
 
@@ -3650,24 +3011,6 @@ METHOD SR_WORKAREA:IniFields(lReSelect, lLoadCache, aInfo)
       aFlds := {}
       HB_SYMBOL_UNUSED(aFlds)
 
-      SWITCH ::oSQL:nSystemID
-      //CASE SQLRDD_RDBMS_IBMDB2 // TODO: unnecessary
-      //CASE SQLRDD_RDBMS_MYSQL // TODO: unnecessary
-      //CASE SQLRDD_RDBMS_MARIADB // TODO: unnecessary
-      //CASE SQLRDD_RDBMS_SYBASE // TODO: unnecessary
-      //   EXIT
-      //CASE SQLRDD_RDBMS_MSSQL7
-      //CASE SQLRDD_RDBMS_AZURE
-      //   ::oSql:Exec("sp_pkeys " + ::cFileName, .T., .T., @aFlds)
-      //   IF Len(aFlds) == 1
-      //      ::hnRecno := AScan(::aFields, {|x|x[1] == AllTrim(Upper(aflds[1, 4]))})
-      //      ::cRecnoName := aflds[1, 4]
-      //   ENDIF
-      //   EXIT
-      //CASE SQLRDD_RDBMS_ORACLE // TODO: unnecessary
-      CASE SQLRDD_RDBMS_POSTGR // TODO: unnecessary
-      ENDSWITCH
-
       IF Empty(::hnRecno)
          ::RuntimeErr("24", SR_Msg(24) + ::cRecnoName  + " / " + ::cFileName)
       ENDIF
@@ -4045,409 +3388,7 @@ METHOD SR_WORKAREA:sqlSeek(uKey, lSoft, lLast)
    ::aInfo[AINFO_SKIPCOUNT] := 0
    uSet := Set(_SET_EXACT, .F.)
 
-   //IF lSoft .AND. ::lISAM .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. ::aIndex[::aInfo[AINFO_INDEXORD], VIRTUAL_INDEX_NAME] != NIL .AND. HB_IsChar(uKey)
-   //
-   //   nLen := Max(Len(::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS]) - 1, 1)      // Esse -1 é para remover o NRECNO que SEMPRE faz parte do indice !
-   //   nCons := 0
-   //   nLenKey := Len(uKey)
-   //   //cPart := "" (unnecessary, cPart is used only inside the loop FOR/NEXT)
-   //   //HB_SYMBOL_UNUSED(cPart)
-   //
-   //   FOR i := 1 TO nLen
-   //
-   //      nThis := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], FIELD_LEN]
-   //      cPart := SubStr(uKey, nCons + 1, nThis)
-   //
-   //      AAdd(::aPosition, ::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2])
-   //
-   //      cType := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], 2]
-   //      lNull := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], 5]
-   //      // unnecessary, the value is not used
-   //      //nFDec := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], 4]
-   //      //HB_SYMBOL_UNUSED(nFDec)
-   //      // unnecessary, the value is not used
-   //      //nFLen := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], 3]
-   //      //HB_SYMBOL_UNUSED(nFLen)
-   //
-   //      IF i == 1 .AND. nThis >= Len(uKey)
-   //         IF uKey == ""
-   //            EXIT
-   //         ENDIF
-   //      ELSE
-   //         IF Len(cPart) == 0
-   //            EXIT
-   //         ENDIF
-   //      ENDIF
-   //
-   //      AAdd(::aQuoted, ::QuotedNull(::ConvType(cPart, cType, @lPartialSeek, nThis, ::aInfo[AINFO_REVERSE_INDEX]), !lSoft, , , , lNull)) // Reverse Index should add % to end of string or seek will never find current record if partial
-   //      AAdd(::aDat,    ::ConvType(IIf(lSoft, cPart, RTrim(cPart)), cType, , nThis))
-   //
-   //      nCons += nThis
-   //
-   //      IF nLenKey < nCons
-   //         EXIT
-   //      ENDIF
-   //
-   //   NEXT i
-   //
-   //   cJoin1 := " " + ::cQualifiedTableName + " A "
-   //   cJoin3 := ::GetSelectList()
-   //
-   //   IF ::aInfo[AINFO_REVERSE_INDEX] .OR. lLast
-   //      cSql := 'SELECT /*+ INDEX( A ' + 'D$' + ::aIndex[::aInfo[AINFO_INDEXORD], VIRTUAL_INDEX_NAME] + ") */ " + cJoin3 + "FROM" + cJoin1 + ::WhereVMinor( uKey ) + " AND ROWNUM <= 1"
-   //   ELSE
-   //      cSql := 'SELECT /*+ INDEX( A ' + 'A$' + ::aIndex[::aInfo[AINFO_INDEXORD], VIRTUAL_INDEX_NAME] + ") */ " + cJoin3 + "FROM" + cJoin1 + ::WhereVMajor( uKey ) + " AND ROWNUM <= 1"
-   //   ENDIF
-   //
-   //   ::oSql:Execute(cSql + IIf(::oSql:lComments, " /* SoftSeek " + Str(::aInfo[AINFO_INDEXORD]) + " */", ""))
-   //
-   //   ::aInfo[AINFO_NCACHEEND] := ::aInfo[AINFO_NCACHEBEGIN] := 0
-   //   ::aInfo[AINFO_NPOSCACHE] := 0
-   //   ::FirstFetch()
-   //
-   //   IF ::lNoData .OR. ::aInfo[AINFO_EOF]
-   //      ::aInfo[AINFO_EOF] := .T.
-   //      ::aInfo[AINFO_FOUND] := .F.
-   //   ELSE
-   //
-   //      IF HB_IsChar(uKey) .AND. uKey == ""
-   //         ::aInfo[AINFO_FOUND] := .T.
-   //      ELSE
-   //         FOR i := 1 TO Len(::aQuoted)
-   //            DO CASE
-   //            CASE HB_IsChar(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsChar(::aDat[i]) .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ( ::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB) .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
-   //               ::aInfo[AINFO_FOUND] := (Upper(::aLocalBuffer[::aPosition[i]]) = Upper(::aDat[i]))
-   //            CASE HB_IsNumeric(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsChar(::aDat[i])
-   //               ::aInfo[AINFO_FOUND] := (::aLocalBuffer[::aPosition[i]] = Val(::aDat[i]))
-   //            CASE HB_IsChar(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsNumeric(::aDat[i])
-   //               ::aInfo[AINFO_FOUND] := (::aLocalBuffer[::aPosition[i]] = Str(::aDat[i]))
-   //            CASE HB_IsDate(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsChar(::aDat[i])
-   //               ::aInfo[AINFO_FOUND] := (::aLocalBuffer[::aPosition[i]] = SToD(::aDat[i]))
-   //            CASE HB_IsDate(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsDate(::aDat[i]) .AND. ::nPartialDateSeek > 0 .AND. i == Len(::aQuoted)
-   //               ::aInfo[AINFO_FOUND] := (Left(DToS(::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek) == Left(DToS(::aDat[i]), ::nPartialDateSeek))
-   //            CASE HB_IsDate(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsDate(::aDat[i]) .AND. ::nPartialDateSeek == 0 .AND. i == Len(::aQuoted) .AND. lsoft
-   //               ::aInfo[AINFO_FOUND] := (DToS(::aLocalBuffer[::aPosition[i]]) >= DToS(::aDat[i]))
-   //            CASE HB_IsDateTime(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsDateTime(::aDat[i]) .AND. ::nPartialDateSeek > 0 .AND. i == Len(::aQuoted)
-   //               ::aInfo[AINFO_FOUND] := (Left(hb_ttos(::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek) == Left(hb_ttos(::aDat[i]), ::nPartialDateSeek))
-   //            CASE HB_IsDateTime(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsDateTime(::aDat[i]) .AND. ::nPartialDateSeek == 0 .AND. i == Len(::aQuoted) .AND. lsoft
-   //               ::aInfo[AINFO_FOUND] := (hb_ttos(::aLocalBuffer[::aPosition[i]]) >=  hb_ttos(::aDat[i]))
-   //            CASE ValType(::aLocalBuffer[::aPosition[i]]) != ValType(::aDat[i])
-   //               ::RuntimeErr("28")
-   //               Set(_SET_EXACT, uSet)
-   //               RETURN NIL
-   //            OTHERWISE
-   //               ::aInfo[AINFO_FOUND] := (::aLocalBuffer[::aPosition[i]] = ::aDat[i])
-   //            ENDCASE
-   //
-   //            IF !::aInfo[AINFO_FOUND]
-   //               EXIT
-   //            ENDIF
-   //         NEXT i
-   //      ENDIF
-   //   ENDIF
-   //
-   //   IF ::aInfo[AINFO_FOUND]
-   //      ::aInfo[AINFO_EOF] := .F.
-   //      ::aInfo[AINFO_BOF] := .F.
-   //      ::aInfo[AINFO_RECNO] := ::aLocalBuffer[::hnRecno]
-   //   ELSE
-   //      ::aInfo[AINFO_FOUND] := .F.
-   //      IF lSoft .AND. ::lNoData
-   //         ::GetBuffer(.T.)
-   //         ::aInfo[AINFO_RECNO] := ::aInfo[AINFO_RCOUNT] + 1
-   //         ::aLocalBuffer[::hnRecno] := ::aInfo[AINFO_RECNO]
-   //      ELSEIF lSoft
-   //         ::aInfo[AINFO_EOF] := .F.
-   //         ::aInfo[AINFO_RECNO] := ::aLocalBuffer[::hnRecno]
-   //      ELSE
-   //         ::GetBuffer(.T.)
-   //         ::aInfo[AINFO_RECNO] := ::aInfo[AINFO_RCOUNT] + 1
-   //         ::aLocalBuffer[::hnRecno] := ::aInfo[AINFO_RECNO]
-   //      ENDIF
-   //   ENDIF
-   //
-   //   ::oSql:FreeStatement()
-   //
-   //ELSEIF ::lISAM .AND. ::oSql:nSystemID != SQLRDD_RDBMS_POSTGR
-   //
-   //   IF ValType(uKey) $ "NDLT"       // One field seek, piece of cake!
-   //
-   //      lNull := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, 1, 2], 5]
-   //      nFDec := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, 1, 2], 4]
-   //      nFLen := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, 1, 2], 3]
-   //
-   //      cRet := " WHERE (( "
-   //
-   //      IF ::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, 1, 2] == ::hnDeleted .AND. HB_IsLogical(uKey)
-   //         IF ::nTCCompat > 0
-   //            cQot := IIf(uKey, "'*'", "' '")
-   //            AAdd(::aDat, IIf(uKey, "*", " "))
-   //         ELSE
-   //            cQot := IIf(uKey, "'T'", "' '")
-   //            AAdd(::aDat, IIf(uKey, "T", " "))
-   //         ENDIF
-   //      ELSE
-   //         IF "INDKEY_" $ ::aNames[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, 1, 2]] .AND. HB_IsNumeric(uKey)
-   //            cField :=  Upper(::aIndex[::aInfo[AINFO_INDEXORD], INDEX_KEY])
-   //            IF "VAL(" $ CFIELD
-   //               CfIELD := StrTran(CfIELD, "VAL(", "")
-   //               CfIELD := StrTran(CfIELD, ")", "")
-   //               nfieldPos := AScan(::aFields, {|x|x[1] == cField})
-   //               IF nFieldPos >0
-   //                  cKeyValue := Str(uKey, ::aFields[nFieldPos, 3]) + "%"
-   //                  lLikeSep := .T.
-   //               ENDIF
-   //            ENDIF
-   //         ENDIF
-   //         IF !Empty(cKeyValue)
-   //            cQot := ::QuotedNull(cKeyValue, , nFLen, nFDec, , lNull)
-   //         ELSE
-   //            cQot := ::QuotedNull(uKey, , nFLen, nFDec, , lNull)
-   //         ENDIF
-   //         IF lLikeSep
-   //            AAdd(::aDat, Str(uKey, ::aFields[nFieldPos, 3]))
-   //         ELSE
-   //            AAdd(::aDat, uKey)
-   //         ENDIF
-   //      ENDIF
-   //
-   //      IF ::aInfo[AINFO_REVERSE_INDEX] .OR. lLast
-   //         cSep := IIf(cQot == "NULL", " IS ", IIf(lSoft, " <= ", IIf(lLikeSep, " Like ", " = ")))
-   //      ELSE
-   //         cSep := IIf(cQot == "NULL", " IS ", IIf(lSoft, " >= ", IIf(lLikeSep, " Like ", " = ")))
-   //      ENDIF
-   //      cNam := "A." + SR_DBQUALIFY(::aNames[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, 1, 2]], ::oSql:nSystemID)
-   //
-   //      AAdd(::aPosition, ::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, 1, 2])
-   //      AAdd(::aQuoted, ::Quoted(uKey))
-   //
-   //      // If Null, we don't need WHERE clause on Soft Seeks
-   //      IF !IsNull(cQot) .OR. !lSoft
-   //         cRet += cNam + cSep + cQot + " "
-   //      ENDIF
-   //
-   //   ELSEIF HB_IsChar(uKey)
-   //
-   //      nLen := Max(Len(::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS]) - 1, 1)      // Esse -1 é para remover o NRECNO que SEMPRE faz parte do indice !
-   //      nCons := 0
-   //      nLenKey := Len(uKey)
-   //      //cPart := "" (unnecessary, cPart is used only inside the loop FOR/NEXT)
-   //      //HB_SYMBOL_UNUSED(cPart)
-   //
-   //      FOR i := 1 TO nLen
-   //
-   //         nThis := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], FIELD_LEN]
-   //         cPart := SubStr(uKey, nCons + 1, nThis)
-   //
-   //         AAdd(::aPosition, ::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2])
-   //
-   //         cType := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], 2]
-   //         lNull := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], 5]
-   //         // unnecessary, the value is not used
-   //         //nFDec := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], 4]
-   //         //HB_SYMBOL_UNUSED(nFDec)
-   //         // unnecessary, the value is not used
-   //         //nFLen := ::aFields[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2], 3]
-   //         //HB_SYMBOL_UNUSED(nFLen)
-   //
-   //         IF i == 1 .AND. nThis >= Len(uKey)
-   //            IF uKey == ""
-   //               EXIT
-   //            ENDIF
-   //         ELSE
-   //            IF Len(cPart) == 0
-   //               EXIT
-   //            ENDIF
-   //         ENDIF
-   //
-   //         AAdd(::aQuoted, ::QuotedNull(::ConvType(cPart, cType, @lPartialSeek, nThis, ::aInfo[AINFO_REVERSE_INDEX]), !lSoft, , , , lNull)) // Reverse Index should add % to end of string or seek will never find current record if partial
-   //         AAdd(::aDat,    ::ConvType(IIf(lSoft, cPart, RTrim(cPart)), cType, , nThis))
-   //
-   //         nCons += nThis
-   //
-   //         IF nLenKey < nCons
-   //            EXIT
-   //         ENDIF
-   //
-   //      NEXT i
-   //
-   //      cRet := " WHERE (( "
-   //      nLen := Min(nLen, Len(::aQuoted))
-   //
-   //      IF lSoft
-   //         nSimpl := nLen
-   //      ELSE
-   //         nSimpl := 1
-   //      ENDIF
-   //
-   //      FOR j := 1 TO nSimpl
-   //
-   //         IF j >= 2
-   //            cRet += e" ) OR \r\n ( "
-   //         ENDIF
-   //
-   //         nFeitos := 0
-   //
-   //         FOR i := 1 TO (nLen - j + 1)
-   //
-   //            cQot := ::aQuoted[i]
-   //            cNam := "A." + SR_DBQUALIFY(::aNames[::aIndex[::aInfo[AINFO_INDEXORD], INDEX_FIELDS, i, 2]], ::oSql:nSystemID)
-   //
-   //            IF lPartialSeek .AND. i == nLen
-   //               IF ::aInfo[AINFO_REVERSE_INDEX]
-   //                  cSep := IIf(lSoft, IIf(j == 1, " <= ", " < "), IIf(cQot == "NULL", " IS ", " LIKE "))
-   //               ELSEIF ::nPartialDateSeek > 0  // Partial date seek
-   //                  cSep := IIf(j == 1, " >= ", " > ")
-   //               ELSE
-   //                  cSep := IIf(lSoft, IIf(j == 1, " >= ", " > "), IIf(cQot == "NULL", " IS ", " LIKE "))
-   //                  IF cQot != "NULL" .AND. !lSoft .AND. !("TO_DATE(" $ cQot)
-   //                     cTemp := SubStr(cQot, 1, Len(cQot) - 1)
-   //                     SWITCH ::oSql:nSystemID
-   //                     CASE SQLRDD_RDBMS_MSSQL7
-   //                     CASE SQLRDD_RDBMS_AZURE
-   //                        cTemp := StrTran(cTemp, "%", "!%")
-   //                        EXIT
-   //                     CASE SQLRDD_RDBMS_MYSQL
-   //                     CASE SQLRDD_RDBMS_MARIADB
-   //                        cTemp := StrTran(cTemp, "%", "\%")
-   //                        cTemp := StrTran(cTemp, "_", "\_")
-   //                     ENDSWITCH
-   //                     cQot := cTemp + "%'"
-   //                  ENDIF
-   //               ENDIF
-   //            ELSE
-   //               IF ::aInfo[AINFO_REVERSE_INDEX] .OR. lLast
-   //                  cSep := IIf(lSoft, IIf(i != nLen - j + 1 .OR. j == 1, " <= ", " < "), IIf(cQot == "NULL", " IS ", " = "))
-   //               ELSE
-   //                  cSep := IIf(lSoft, IIf(i != nLen - j + 1 .OR. j == 1, " >= ", " > "), IIf(cQot == "NULL", " IS ", " = "))
-   //               ENDIF
-   //            ENDIF
-   //
-   //            // When using >=, If the quoted value is NULL, this column does't mind to this query.
-   //
-   //            IF (cSep == " >= " .OR. cSep == " <= " ) .AND. IsNull(::aQuoted[i])
-   //               LOOP
-   //            ENDIF
-   //
-   //            IF cSep == " > " .AND. ::aQuoted[i] == "NULL"
-   //               cSep := " IS NOT "
-   //            ELSEIF cSep == " < " .AND. ::aQuoted[i] == "NULL"
-   //               LOOP        // ToDo: less than NULL does not exist (or negative if numeric field)
-   //            ENDIF
-   //
-   //            nFeitos ++
-   //
-   //            cRet += IIf(nFeitos > 1, " AND ", "") + cNam + cSep + cQot + IIf(cSep == " LIKE " .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE), " ESCAPE '!' ", " ")
-   //
-   //         NEXT i
-   //
-   //         IF j == 1 .AND. nFeitos == 0
-   //            cRet := " WHERE (( 1 = 1 "
-   //            EXIT
-   //         ENDIF
-   //
-   //      NEXT j
-   //
-   //   ELSE
-   //      ::RuntimeErr("26")
-   //      Set(_SET_EXACT, uSet)
-   //      RETURN NIL
-   //   ENDIF
-   //
-   //   cTemp := ::SolveRestrictors()
-   //
-   //   IF cRet == " WHERE (( "
-   //      IF Empty(cTemp)
-   //         cRet := ""
-   //      ELSE
-   //         cRet := " WHERE " + cTemp
-   //      ENDIF
-   //   ELSE
-   //      cRet += ")) "
-   //      IF !Empty(cTemp)
-   //         cRet += " AND " + cTemp
-   //      ENDIF
-   //   ENDIF
-   //
-   //   cJoin1 := " " + ::cQualifiedTableName + " A "
-   //   cJoin3 := ::GetSelectList()
-   //
-   //   IF ::lFetchAll
-   //      //::oSql:Execute("SELECT" + Eval(::Optmizer_ns, Max(::nCurrentFetch, 50)) + cJoin3 + "FROM" + cJoin1 + cRet + ::OrderBy(NIL,.T.) + Eval(::Optmizer_ne, Max(::nCurrentFetch, 50)) + IIf(::oSql:lComments, " /* " + IIf(lSoft, "Soft", "") + "Seek " + Str(::aInfo[AINFO_INDEXORD]) + " */",""))
-   //      ::oSql:Execute("SELECT" + Eval(::Optmizer_ns, Max(::nCurrentFetch, 50)) + cJoin3 + "FROM" + cJoin1 + cRet + ::OrderBy(NIL, IIf(lLast, .F., .T.)) + Eval(::Optmizer_ne, Max(::nCurrentFetch, 50)) + IIf(::oSql:lComments, " /* " + IIf(lSoft, "Soft", "") + "Seek " + Str(::aInfo[AINFO_INDEXORD]) + " */",""))
-   //   ELSE
-   //      //::oSql:Execute("SELECT" + ::Optmizer_1s + cJoin3 + "FROM" + cJoin1 + cRet + ::OrderBy(NIL,.T.) + ::Optmizer_1e + IIf(::oSql:lComments, " /* " + IIf(lSoft, "Soft", "") + "Seek " + Str(::aInfo[AINFO_INDEXORD]) + " */",""))
-   //      ::oSql:Execute("SELECT" + ::Optmizer_1s + cJoin3 + "FROM" + cJoin1 + cRet + ::OrderBy(NIL, IIf(lLast, .F., .T.)) + ::Optmizer_1e + IIf(::oSql:lComments, " /* " + IIf(lSoft, "Soft", "") + "Seek " + Str(::aInfo[AINFO_INDEXORD]) + " */",""))
-   //   ENDIF
-   //
-   //   ::aInfo[AINFO_NCACHEEND] := ::aInfo[AINFO_NCACHEBEGIN] := 0
-   //   ::aInfo[AINFO_NPOSCACHE] := 0
-   //   ::FirstFetch()
-   //
-   //   IF ::lNoData .OR. ::aInfo[AINFO_EOF]
-   //      ::aInfo[AINFO_EOF] := .T.
-   //      ::aInfo[AINFO_FOUND] := .F.
-   //   ELSE
-   //
-   //      IF HB_IsChar(uKey) .AND. uKey == ""
-   //         ::aInfo[AINFO_FOUND] := .T.
-   //      ELSE
-   //         FOR i := 1 TO Len(::aQuoted)
-   //            DO CASE
-   //            CASE HB_IsChar(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsChar(::aDat[i]) .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB) .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
-   //               ::aInfo[AINFO_FOUND] := (Upper(::aLocalBuffer[::aPosition[i]]) = Upper(::aDat[i]))
-   //            CASE HB_IsNumeric(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsChar(::aDat[i])
-   //               ::aInfo[AINFO_FOUND] := (::aLocalBuffer[::aPosition[i]] = Val(::aDat[i]))
-   //            CASE HB_IsChar(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsNumeric(::aDat[i])
-   //               ::aInfo[AINFO_FOUND] := (::aLocalBuffer[::aPosition[i]] = Str(::aDat[i]))
-   //            CASE HB_IsDate(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsChar(::aDat[i])
-   //               ::aInfo[AINFO_FOUND] := (::aLocalBuffer[::aPosition[i]] = SToD(::aDat[i]))
-   //            CASE HB_IsDate(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsDate(::aDat[i]) .AND. ::nPartialDateSeek > 0 .AND. i == Len(::aQuoted)
-   //               ::aInfo[AINFO_FOUND] := (Left(DToS(::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek) == Left(DToS(::aDat[i]), ::nPartialDateSeek))
-   //            CASE HB_IsDate(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsDate(::aDat[i]) .AND. ::nPartialDateSeek == 0 .AND. i == Len(::aQuoted) .AND. lsoft
-   //               ::aInfo[AINFO_FOUND] := (DToS(::aLocalBuffer[::aPosition[i]]) >= DToS(::aDat[i]))
-   //            CASE HB_IsDateTime(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsDateTime(::aDat[i]) .AND. ::nPartialDateSeek > 0 .AND. i == Len(::aQuoted)
-   //               ::aInfo[AINFO_FOUND] := (Left(hb_ttos(::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek) == Left(hb_ttos(::aDat[i]), ::nPartialDateSeek))
-   //            CASE HB_IsDateTime(::aLocalBuffer[::aPosition[i]]) .AND. HB_IsDateTime(::aDat[i]) .AND. ::nPartialDateSeek == 0 .AND. i == Len(::aQuoted) .AND. lsoft
-   //               ::aInfo[AINFO_FOUND] := (hb_ttos(::aLocalBuffer[::aPosition[i]]) >= hb_ttos(::aDat[i]))
-   //            CASE ValType(::aLocalBuffer[::aPosition[i]]) != ValType(::aDat[i])
-   //               ::RuntimeErr("28")
-   //               Set(_SET_EXACT, uSet)
-   //               RETURN NIL
-   //            OTHERWISE
-   //               ::aInfo[AINFO_FOUND] := (::aLocalBuffer[::aPosition[i]] = ::aDat[i])
-   //            ENDCASE
-   //
-   //            IF !::aInfo[AINFO_FOUND]
-   //               EXIT
-   //            ENDIF
-   //         NEXT i
-   //      ENDIF
-   //   ENDIF
-   //
-   //   IF ::aInfo[AINFO_FOUND]
-   //      ::aInfo[AINFO_EOF] := .F. // 06/01/2004 - fixing skip after dbseek
-   //      ::aInfo[AINFO_BOF] := .F.
-   //      ::aInfo[AINFO_RECNO] := ::aLocalBuffer[::hnRecno]
-   //   ELSE
-   //      ::aInfo[AINFO_FOUND] := .F.
-   //      IF lSoft .AND. ::lNoData
-   //         ::GetBuffer(.T.)
-   //         ::aInfo[AINFO_RECNO] := ::aInfo[AINFO_RCOUNT] + 1
-   //         ::aLocalBuffer[::hnRecno] := ::aInfo[AINFO_RECNO]
-   //      ELSEIF lSoft
-   //         ::aInfo[AINFO_EOF] := .F.
-   //         ::aInfo[AINFO_RECNO] := ::aLocalBuffer[::hnRecno]
-   //      ELSE
-   //         ::GetBuffer(.T.)
-   //         ::aInfo[AINFO_RECNO] := ::aInfo[AINFO_RCOUNT] + 1
-   //         ::aLocalBuffer[::hnRecno] := ::aInfo[AINFO_RECNO]
-   //      ENDIF
-   //   ENDIF
-   //
-   //   ::oSql:FreeStatement()
-   //
-   /*ELSE*/IF ::lISAM .AND. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
+   IF ::lISAM
 
       IF ValType(uKey) $ "NDLT"       // One field seek, piece of cake!
 
@@ -4806,68 +3747,22 @@ METHOD ReadPage(nDirection, lWasDel) CLASS SR_WORKAREA
    cJoin1 := " " + ::cQualifiedTableName + " A "
    cJoin3 := ::GetSelectList()
 
-   SWITCH ::oSql:nSystemID
-   //CASE SQLRDD_RDBMS_INGRES
-   //CASE SQLRDD_RDBMS_INFORM
-   //CASE SQLRDD_RDBMS_IBMDB2
-   //   IF ::aInfo[AINFO_REVERSE_INDEX]
-   //      cTemp := IIf(nDirection != ORD_DIR_FWD, ::WhereMajor(), ::WhereMinor())
-   //   ELSE
-   //      cTemp := IIf(nDirection == ORD_DIR_FWD, ::WhereMajor(), ::WhereMinor())
-   //   ENDIF
-   //   cSql := "SELECT" + Eval(::Optmizer_ns, ::nCurrentFetch) + cJoin3 + "FROM" + cJoin1 + cTemp + ::OrderBy(NIL, nDirection == ORD_DIR_FWD) + Eval(::Optmizer_ne, ::nCurrentFetch) +;
-   //            IIf(::oSql:lComments, " /* Skip " + IIf(nDirection == ORD_DIR_FWD, "FWD", "BWD") + " */","")
-   //   cSql := ::ParseIndexColInfo(cSQL)
-   //   EXIT
+   IF ::aInfo[AINFO_REVERSE_INDEX]
+      aTemp := IIf(nDirection != ORD_DIR_FWD, ::WherePgsMajor(), ::WherePgsMinor())
+   ELSE
+      aTemp := IIf(nDirection == ORD_DIR_FWD, ::WherePgsMajor(), ::WherePgsMinor())
+   ENDIF
 
-   CASE SQLRDD_RDBMS_POSTGR
-      IF ::aInfo[AINFO_REVERSE_INDEX]
-         aTemp := IIf(nDirection != ORD_DIR_FWD, ::WherePgsMajor(), ::WherePgsMinor())
-      ELSE
-         aTemp := IIf(nDirection == ORD_DIR_FWD, ::WherePgsMajor(), ::WherePgsMinor())
+   cTemp := "SELECT" + Eval(::Optmizer_ns, ::nCurrentFetch) + cJoin3 + "FROM" + cJoin1
+
+   FOR i := 1 TO Len(aTemp)
+      cSql += "SELECT * FROM (" + cTemp + " WHERE " + aTemp[i] + ::OrderBy(NIL, nDirection == ORD_DIR_FWD) + Eval(::Optmizer_ne, ::nCurrentFetch) + " ) TMP" + AllTrim(Str(i))
+      IF i != Len(aTemp)
+         cSql += SR_CRLF + "UNION" + SR_CRLF
       ENDIF
-
-      cTemp := "SELECT" + Eval(::Optmizer_ns, ::nCurrentFetch) + cJoin3 + "FROM" + cJoin1
-
-      FOR i := 1 TO Len(aTemp)
-         cSql += "SELECT * FROM (" + cTemp + " WHERE " + aTemp[i] + ::OrderBy(NIL, nDirection == ORD_DIR_FWD) + Eval(::Optmizer_ne, ::nCurrentFetch) + " ) TMP" + AllTrim(Str(i))
-         IF i != Len(aTemp)
-            cSql += SR_CRLF + "UNION" + SR_CRLF
-         ENDIF
-      NEXT i
-      cSql += StrTran(::OrderBy(NIL, nDirection == ORD_DIR_FWD), "A.", "") + Eval(::Optmizer_ne, ::nCurrentFetch) +;
-              IIf(::oSql:lComments, " /* Skip " + IIf(nDirection == ORD_DIR_FWD, "FWD", "BWD") + " */","")
-      EXIT
-
-   //CASE SQLRDD_RDBMS_ORACLE
-   //   IF Len(::aIndex) > 0 .AND. ::aInfo[AINFO_INDEXORD] > 0 .AND. ::aIndex[::aInfo[AINFO_INDEXORD], VIRTUAL_INDEX_NAME] != NIL
-   //      IF ::aInfo[AINFO_REVERSE_INDEX]
-   //         cTemp := IIf(nDirection != ORD_DIR_FWD, ::WhereVMajor(), ::WhereVMinor())
-   //         cSql := "SELECT /*+ INDEX( A " + IIf(nDirection != ORD_DIR_FWD, "A$", "D$") + ::aIndex[::aInfo[AINFO_INDEXORD], VIRTUAL_INDEX_NAME] + ") */ " + cJoin3 + "FROM" + cJoin1 + cTemp + " AND ROWNUM <= " + Str(::nCurrentFetch+2) + " " + ;
-   //            ::OrderBy(NIL, nDirection == ORD_DIR_FWD) + IIf(::oSql:lComments, " /* Skip " + IIf(nDirection == ORD_DIR_FWD, "FWD", "BWD") + " */", "")
-   //      ELSE
-   //         cTemp := IIf(nDirection == ORD_DIR_FWD, ::WhereVMajor(), ::WhereVMinor())
-   //         cSql := "SELECT /*+ INDEX( A " + IIf(nDirection == ORD_DIR_FWD, "A$", "D$") + ::aIndex[::aInfo[AINFO_INDEXORD], VIRTUAL_INDEX_NAME] + ") */ " + cJoin3 + "FROM" + cJoin1 + cTemp + " AND ROWNUM <= " + Str(::nCurrentFetch+2)+ " " + ;
-   //            ::OrderBy(NIL, nDirection == ORD_DIR_FWD) + IIf(::oSql:lComments, " /* Skip " + IIf(nDirection == ORD_DIR_FWD, "FWD", "BWD") + " */", "")
-   //      ENDIF
-   //      EXIT  // Leave this exist HERE !!!!
-   //   ENDIF
-
-#ifdef __XHARBOUR__
-   DEFAULT
-#else
-   OTHERWISE
-#endif
-      IF ::aInfo[AINFO_REVERSE_INDEX]
-         cTemp := IIf(nDirection != ORD_DIR_FWD, ::WhereMajor(), ::WhereMinor())
-      ELSE
-         cTemp := IIf(nDirection == ORD_DIR_FWD, ::WhereMajor(), ::WhereMinor())
-      ENDIF
-      cSql := "SELECT" + Eval(::Optmizer_ns, ::nCurrentFetch) + cJoin3 + "FROM" + cJoin1 + cTemp + ::OrderBy(NIL, nDirection == ORD_DIR_FWD) + Eval(::Optmizer_ne, ::nCurrentFetch) +;
-               IIf(::oSql:lComments, " /* Skip " + IIf(nDirection == ORD_DIR_FWD, "FWD", "BWD") + " */", "")
-      cSql := ::ParseIndexColInfo(cSQL)
-
-   ENDSWITCH
+   NEXT i
+   cSql += StrTran(::OrderBy(NIL, nDirection == ORD_DIR_FWD), "A.", "") + Eval(::Optmizer_ne, ::nCurrentFetch) +;
+           IIf(::oSql:lComments, " /* Skip " + IIf(nDirection == ORD_DIR_FWD, "FWD", "BWD") + " */","")
 
   ::oSql:Execute(cSql)
 
@@ -5428,17 +4323,9 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
    ::oSql:Commit()
    ::oSql:nTransacCount := 0
 
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-   //   ::oSql:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_ON)
-   //ENDIF
-
    // Drop the table
 
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
-      ::oSql:Exec("DROP TABLE " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + " CASCADE" + IIf(::oSql:lComments, " /* create table */", ""), .F.)
-   //ELSE
-   //   ::oSql:Exec("DROP TABLE " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + IIf(::oSql:nSystemID == SQLRDD_RDBMS_ORACLE, " CASCADE CONSTRAINTS", "") + IIf(::oSql:lComments, " /* create table */", ""), .F.)
-   //ENDIF
+   ::oSql:Exec("DROP TABLE " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + " CASCADE" + IIf(::oSql:lComments, " /* create table */", ""), .F.)
    ::oSql:Commit()
 
    // Catalogs cleanup
@@ -5465,9 +4352,6 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
       IF ::oSql:Exec("SELECT * FROM " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + IIf(::oSql:lComments, " /* check dropped table */", ""), .F.) == SQL_SUCCESS
          SR_MsgLogFile("Could not drop existing table " + cTblName + " in dbCreate()")
          ::lOpened := .F.
-         //IF ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-         //   ::oSql:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF)
-         //ENDIF
          RETURN Self
       ENDIF
    ENDIF
@@ -5475,13 +4359,11 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
 
    // If Postgres, create SEQUENCE per table
 
-   IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
-      ::oSql:Commit()
-      ::oSql:Exec("DROP SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ", .F.)
-      ::oSql:Commit()
-      ::oSql:Exec("CREATE SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ START 1")
-      ::oSql:Commit()
-   ENDIF
+   ::oSql:Commit()
+   ::oSql:Exec("DROP SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ", .F.)
+   ::oSql:Commit()
+   ::oSql:Exec("CREATE SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ START 1")
+   ::oSql:Commit()
 
    // Create the new table
 
@@ -5520,7 +4402,7 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
    AAdd(aCreate, {::cRecnoName, "N", 15, 0, .F., , MULTILANG_FIELD_OFF, , , 0, .F.})
 
    IF SR_UseDeleteds()
-      AAdd(aCreate, {::cDeletedName, "C", 1, 0, IIf(::oSql:nSystemID == SQLRDD_RDBMS_ORACLE, .T., .F.), , MULTILANG_FIELD_OFF, , , 0, .F.})
+      AAdd(aCreate, {::cDeletedName, "C", 1, 0, .F., , MULTILANG_FIELD_OFF, , , 0, .F.})
    ENDIF
 
 
@@ -5550,455 +4432,51 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
       SWITCH aCreate[i, FIELD_TYPE]
 
       CASE "C"
-         SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_ORACLE
-         //   IF aCreate[i, FIELD_LEN] > 30
-         //      cSql += "VARCHAR2(" + LTrim(Str(Min(aCreate[i, FIELD_LEN], 4000), 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      IF aCreate[i, FIELD_LEN] > s_nMininumVarchar2Size .AND. s_nMininumVarchar2Size < 30
-         //         cSql += "VARCHAR(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //      ELSE
-         //         cSql += "CHAR(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //      ENDIF
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SQLBAS
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "LONG VARCHAR"
-         //   ELSE
-         //      cSql += "VARCHAR(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lPrimary, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_MSSQL6
-         //CASE SQLRDD_RDBMS_MSSQL7
-         //CASE SQLRDD_RDBMS_AZURE
-         CASE SQLRDD_RDBMS_POSTGR
-         //CASE SQLRDD_RDBMS_CACHE
-         //CASE SQLRDD_RDBMS_ADABAS
-            //IF ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE
-            //   IF ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
-            //      IF aCreate[i, FIELD_LEN] > 10
-            //         cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IIf(lNotNull, " NOT NULL", "")
-            //      ELSE
-            //         cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
-            //      ENDIF
-            //   ELSE
-            //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IIf(lNotNull, " NOT NULL", "")
-            //   ENDIF
-            /*ELSE*/IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. aCreate[i, FIELD_LEN] > s_nMininumVarchar2Size - 1 // 10
-               cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-            ELSE
-               cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-            ENDIF
-            IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. cField == ::cDeletedName
-               cSql += " default ' '"
-            ENDIF
-            EXIT
-         //CASE SQLRDD_RDBMS_MYSQL
-         //CASE SQLRDD_RDBMS_MARIADB
-         //   IF aCreate[i, FIELD_LEN] > 255
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_IBMDB2
-         //   IF aCreate[i, FIELD_LEN] > 128
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHARACTER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_INGRES
-         //   cSql += "varchar(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY", IIf(lNotNull, " NOT NULL", ""))
-         //   EXIT
-         //CASE SQLRDD_RDBMS_INFORM
-         //   cSql += "CHARACTER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY", IIf(lNotNull, " NOT NULL", ""))
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ACCESS
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "TEXT"
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")"
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SQLANY
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "LONG VARCHAR "
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + "  " + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_FIREBR
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(!Empty(::oSql:cCharSet), " CHARACTER SET " + ::oSql:cCharSet, "") + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(!Empty(::oSql:cCharSet), " CHARACTER SET " + ::oSql:cCharSet, "")  + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SYBASE
-         //   IF aCreate[i, FIELD_LEN] > 30
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
-            SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
-         ENDSWITCH
+         IF aCreate[i, FIELD_LEN] > s_nMininumVarchar2Size - 1 // 10
+            cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
+         ELSE
+            cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
+         ENDIF
+         IF cField == ::cDeletedName
+            cSql += " default ' '"
+         ENDIF
          EXIT
 
       CASE "D"
-         SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_ORACLE
-         //CASE SQLRDD_RDBMS_SQLBAS
-         //CASE SQLRDD_RDBMS_INFORM
-         //CASE SQLRDD_RDBMS_INGRES
-         //CASE SQLRDD_RDBMS_MYSQL
-         //CASE SQLRDD_RDBMS_MARIADB
-         //CASE SQLRDD_RDBMS_FIREBR
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-         //CASE SQLRDD_RDBMS_CACHE
-         //   cSql += "DATE"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SYBASE
-         //   cSql += "DATETIME"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_IBMDB2
-         CASE SQLRDD_RDBMS_POSTGR
-         //CASE SQLRDD_RDBMS_ADABAS
-            cSql += "DATE"
-            EXIT
-         //CASE SQLRDD_RDBMS_ACCESS
-         //CASE SQLRDD_RDBMS_MSSQL6
-         //CASE SQLRDD_RDBMS_MSSQL7
-         //CASE SQLRDD_RDBMS_AZURE
-         //   IF ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
-         //      cSql += "DATE NULL "
-         //   ELSE
-         //      cSql += "DATETIME NULL"
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SQLANY
-         //   cSql += "TIMESTAMP"
-         //   EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
-            SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
-         ENDSWITCH
+         cSql += "DATE"
          EXIT
 
       CASE "L"
-         SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_MSSQL6
-         //CASE SQLRDD_RDBMS_MSSQL7
-         //CASE SQLRDD_RDBMS_AZURE
-         //CASE SQLRDD_RDBMS_CACHE
-         //   cSql += "BIT"
-         //   EXIT
-         CASE SQLRDD_RDBMS_POSTGR
-         //CASE SQLRDD_RDBMS_ADABAS
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-            cSql += "BOOLEAN"
-            EXIT
-         //CASE SQLRDD_RDBMS_MYSQL
-         //CASE SQLRDD_RDBMS_MARIADB
-         //   cSql += "TINYINT"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_IBMDB2
-         //CASE SQLRDD_RDBMS_FIREBR
-         //   cSql += "SMALLINT"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SYBASE
-         //   cSql += "BIT NOT NULL"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SQLANY
-         //   cSql += "NUMERIC (1) NULL"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ORACLE
-         //   cSql += "SMALLINT"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_INFORM
-         //   cSql += "BOOLEAN"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_INGRES
-         //   cSql += "tinyint"
-         //   EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
-            SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
-         ENDSWITCH
+         cSql += "BOOLEAN"
          EXIT
 
       CASE "M"
-         SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_SQLBAS
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "LONG VARCHAR"
-         //   ELSE
-         //      cSql += "VARCHAR(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lPrimary, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ORACLE
-         //   cSql += "CLOB"
-         //   cLobs += IIf(Empty(cLobs), "", ",") + SR_DBQUALIFY(cField, ::oSql:nSystemID)
-         //   EXIT
-         //CASE SQLRDD_RDBMS_IBMDB2
-         //   cSql += "CLOB (256000) " + IIf("DB2/400" $ ::oSql:cSystemName, "",  " NOT LOGGED COMPACT")
-         //   EXIT
-         CASE SQLRDD_RDBMS_POSTGR
-            IF aCreate[i, FIELD_LEN] == 4
-               cSql += "XML"
-            ELSE
-               cSql += "TEXT"
-            ENDIF
-            EXIT
-         //CASE SQLRDD_RDBMS_MSSQL6
-         //CASE SQLRDD_RDBMS_MSSQL7
-         //CASE SQLRDD_RDBMS_AZURE
-         ////CASE SQLRDD_RDBMS_POSTGR
-         //CASE SQLRDD_RDBMS_INFORM
-         //CASE SQLRDD_RDBMS_CACHE
-         //   cSql += "TEXT"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_MYSQL
-         //CASE SQLRDD_RDBMS_MARIADB
-         //   cSql += s_cMySqlMemoDataType
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ADABAS
-         //   cSql += "LONG"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_INGRES
-         //   cSql += "long varchar"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ACCESS
-         //   cSql += "TEXT NULL"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SYBASE
-         //   cSql += "TEXT"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SQLANY
-         //   cSql += "LONG VARCHAR"
-         //   EXIT
-         //CASE SQLRDD_RDBMS_FIREBR
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-         //   cSql += "BLOB SUB_TYPE 1" + IIf(!Empty(::oSql:cCharSet), " CHARACTER SET " + ::oSql:cCharSet, "")
-         //   EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
-            SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
-         ENDSWITCH
+         IF aCreate[i, FIELD_LEN] == 4
+            cSql += "XML"
+         ELSE
+            cSql += "TEXT"
+         ENDIF
          EXIT
 
       CASE "N"
-         SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_MSSQL6
-         //CASE SQLRDD_RDBMS_MSSQL7
-         //CASE SQLRDD_RDBMS_SYBASE
-         //CASE SQLRDD_RDBMS_AZURE
-         //   IF cField == ::cRecnoName
-         //      IF ::oSql:lUseSequences
-         //         cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") IDENTITY"
-         //      ELSE
-         //         cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL UNIQUE"
-         //      ENDIF
-         //   ELSE
-         //      cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_CACHE
-         //   IF cField == ::cRecnoName
-         //      cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") UNIQUE " + [default objectscript '##class(] + SR_GetToolsOwner() + [SequenceControler).NEXTVAL("] + ::cFileName + [")']
-         //   ELSE
-         //      cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-         //   ENDIF
-         //   EXIT
-         CASE SQLRDD_RDBMS_POSTGR
-            IF cField == ::cRecnoName
-               cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") default (nextval('" + ::cOwner + LimitLen(::cFileName, 3) + "_SQ')) NOT NULL UNIQUE"
-            ELSE
-               cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ")  default 0 " + IIf(lNotNull, " NOT NULL ", "")
-            ENDIF
-            EXIT
-         //CASE SQLRDD_RDBMS_MYSQL
-         //   IF cField == ::cRecnoName
-         //      cSql += "BIGINT (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") NOT NULL UNIQUE AUTO_INCREMENT "
-         //   ELSE
-         //      // use type DECIMAL instead of REAL when using MySQL 8 or upper,
-         //      // except if the flag 'SQLRDD_MYSQL_REAL_DATA_TYPE' is set
-         //      #ifdef SQLRDD_MYSQL_REAL_DATA_TYPE
-         //      cSql += s_cMySqlNumericDataType + " (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-         //      #else
-         //      IF SubStr(::oSql:cSystemVers, 1, 1) == "5"
-         //         // maintain the original behavior when using MySQL 5
-         //         cSql += s_cMySqlNumericDataType + " (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-         //      ELSE
-         //         cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-         //      ENDIF
-         //      #endif
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_MARIADB
-         //   IF cField == ::cRecnoName
-         //      cSql += "BIGINT (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") NOT NULL UNIQUE AUTO_INCREMENT "
-         //   ELSE
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ORACLE
-         //   IF cField == ::cRecnoName
-         //      cSql += "NUMBER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" +;
-         //              IIf(lNotNull, " NOT NULL UNIQUE USING INDEX ( CREATE INDEX " + ::cOwner + LimitLen(::cFileName, 3) + "_UK ON " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + "( " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + ")" +;
-         //              IIf(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx()) , "") + ")"
-         //   ELSE
-         //      cSql += "NUMBER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_IBMDB2
-         //   IF cField == ::cRecnoName
-         //      IF ::oSql:lUseSequences
-         //         cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1, NO CACHE)"
-         //      ELSE
-         //         cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL"
-         //      ENDIF
-         //   ELSE
-         //      cSql += "DECIMAL(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ADABAS
-         //   IF cField == ::cRecnoName
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL DEFAULT SERIAL"
-         //   ELSE
-         //      cSql += "DECIMAL(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_INGRES
-         //   IF cField == ::cRecnoName
-         //      cSql += "DECIMAL (" + ltrim (str (aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL UNIQUE"
-         //   ELSE
-         //      cSql += "DECIMAL (" + ltrim (str (aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY ", IIf(lNotNull, " NOT NULL", ""))
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_INFORM
-         //   IF cField == ::cRecnoName
-         //      cSql += "SERIAL NOT NULL UNIQUE"
-         //   ELSE
-         //      cSql += "DECIMAL (" + ltrim (str (aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY ", IIf(lNotNull, " NOT NULL", ""))
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_FIREBR
-         //   IF cField == ::cRecnoName
-         //      cSql += "DECIMAL (" + ltrim (str (aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL UNIQUE "
-         //   ELSE
-         //      IF aCreate[i, FIELD_LEN] > 18
-         //         cSql += "DOUBLE PRECISION" + IIf(lPrimary .OR. lNotNull, " NOT NULL", " ")
-         //      ELSE
-         //         cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) +  ")" + IIf(lPrimary .OR. lNotNull, " NOT NULL", " ")
-         //      ENDIF
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-         //   IF cField == ::cRecnoName
-         //      cSql += "DECIMAL (" + ltrim (str (aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") GENERATED BY DEFAULT AS IDENTITY  NOT NULL UNIQUE "
-         //   ELSE
-         //      IF aCreate[i, FIELD_LEN] > 18
-         //         cSql += "DOUBLE PRECISION" + IIf(lPrimary .OR. lNotNull, " NOT NULL", " ")
-         //      ELSE
-         //         cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) +  ")" + IIf(lPrimary .OR. lNotNull, " NOT NULL", " ")
-         //      ENDIF
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SQLBAS
-         //   IF aCreate[i, FIELD_LEN] > 15
-         //      cSql += "NUMBER" + IIf(lPrimary, " NOT NULL", " ")
-         //   ELSE
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lPrimary, " NOT NULL", " ")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SQLANY
-         //   cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ACCESS
-         //   cSql += "NUMERIC"
-         //   EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
-            SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
-         ENDSWITCH
+         IF cField == ::cRecnoName
+            cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") default (nextval('" + ::cOwner + LimitLen(::cFileName, 3) + "_SQ')) NOT NULL UNIQUE"
+         ELSE
+            cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ")  default 0 " + IIf(lNotNull, " NOT NULL ", "")
+         ENDIF
          EXIT
 
-      // including xml data type
       // postgresql datetime
       CASE "T"
-         SWITCH ::oSql:nSystemID
-         CASE SQLRDD_RDBMS_POSTGR
-            IF aCreate[i, FIELD_LEN] == 4
-                cSql += "time  without time zone "
-            ELSE
-                cSql += "timestamp  without time zone "
-            ENDIF
-            EXIT
-         //CASE SQLRDD_RDBMS_MYSQL
-         //CASE SQLRDD_RDBMS_MARIADB
-         //   IF aCreate[i, FIELD_LEN] == 4
-         //       cSql += "time "
-         //   ELSE
-         //       cSql += "DATETIME "
-         //   ENDIF
-         //   EXIT
-         //// oracle datetime
-         //CASE SQLRDD_RDBMS_ORACLE
-         //CASE SQLRDD_RDBMS_FIREBR
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-         //   cSql += "TIMESTAMP "
-         //   EXIT
-         //CASE SQLRDD_RDBMS_MSSQL7 // .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
-         //   cSql += "DATETIME NULL "
-         //   EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
-            SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
-         ENDSWITCH
+         IF aCreate[i, FIELD_LEN] == 4
+            cSql += "time  without time zone "
+         ELSE
+            cSql += "timestamp  without time zone "
+         ENDIF
          EXIT
 
       CASE "V"
-         //IF ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7
-         //   cSql += " VARBINARY(MAX) "
-         //ELSE
-            SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
-         //ENDIF
+         SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
          EXIT
 
 #ifdef __XHARBOUR__
@@ -6020,152 +4498,30 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
 
    cSql += " )"
 
-   // TODO: switch
-
-   //If ::oSql:nSystemID == SQLRDD_RDBMS_MYSQL
-        //cSql += " Type=InnoDb "
-   //ENDIF
-
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB
-   //   cSql += " Engine=InnoDb "
-   //ENDIF
-
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_MYSQL
-
-#if 0
-   //   IF Val(SubStr(::oSql:cSystemVers, 1, 3)) < 505 // NOTE: not working with MySQL 8 [MAG]
-   //      cSql += " Type=InnoDb "
-   //   ELSE
-   //      cSql += " Engine=InnoDb "
-   //   ENDIF
-#endif
-   //   IF SubStr(::oSql:cSystemVers, 1, 1) == "5" // NOTE: trying another method [MAG]
-   //      cSql += " Type=InnoDb "
-   //   ELSE
-   //      cSql += " Engine=InnoDb "
-   //   ENDIF
-
-   //ENDIF
-
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. !Empty(SR_SetTblSpaceData())
-   //   cSql += " TABLESPACE " + SR_SetTblSpaceData()
-   //ENDIF
-
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. (!Empty(SR_SetTblSpaceLob())) .AND. (!Empty(cLobs))
-   //   cSql += " LOB (" + cLobs + ") STORE AS (TABLESPACE " + SR_SetTblSpaceLob() + ")"
-   //ENDIF
-
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_INGRES
-   //   nRowSize += 1000     // prevent INDKEY_...
-   //   DO CASE
-//      CASE nRowSize < 3988
-//         cRowSize := "4096"
-   //   CASE nRowSize < 8084
-   //      cRowSize := "8192"
-//      CASE nRowSize < 16276
-//         cRowSize := "16384"
-   //   CASE nRowSize < 32660
-   //      cRowSize := "32768"
-   //   OTHERWISE
-   //      cRowSize := "65536"
-   //   ENDCASE
-//      cSql += " structure=btree"
-//      cSql += " with page_size= " + cRowSize + " structure=btree"
-   //ENDIF
-
-// TODO: end switch
-
    ::oSql:Commit()
    nRet := ::oSql:Exec(cSql, .T.)
    lRet := nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO
    ::oSql:Commit()
 
-   IF lRet .AND. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE // .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE // Create SR_RECNO INDEX
+   // TODO: review code below
+   IF lRet .AND. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE // Create SR_RECNO INDEX
    // Culik 18/10/2010 se o server suporta clustered index, adicionamos o mesmo na criacao
       cSql := "CREATE " + IIf(::oSql:lClustered, " CLUSTERED " , " ") + "INDEX " + LimitLen(::cFileName, 3) + "_SR ON " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + "(" + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + ") " + IIf(::oSql:lComments, " /* Unique Index */", "")
       lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS
       ::oSql:Commit()
    ENDIF
 
-   //IF lRet .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. ::oSql:lUseSequences  // Create RECNO Trigger
-   //   ::oSql:Exec("DROP SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ", .F.)
-   //   ::oSql:Commit()
-   //   ::oSql:Exec("CREATE SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ START WITH 1")
-   //   ::CreateOrclFunctions(::cOwner, ::cFileName)
-   //ENDIF
-
-   //IF lRet .AND. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE
-   //   ::oSql:Commit()
-   //   ::oSql:Exec("call " +  SR_GetToolsOwner() + [RESET("] + ::cFileName + [")], .F.)
-   //   ::oSql:Commit()
-   //ENDIF
-
-   //IF lRet .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES .AND. ::oSql:lUseSequences  // Create RECNO Trigger
-   //   ::oSql:Commit()
-   //   ::oSql:Exec("modify " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + " to btree with page_size = " + cRowSize, .T.) // + "unique on " + ::cRecnoName
-   //   ::oSql:Commit()
-   //   ::oSql:Exec("DROP SEQUENCE "  + ::cOwner + "SQ_" + cTblName, .F.)
-   //   ::oSql:Commit()
-   //   ::oSql:Exec("CREATE SEQUENCE " + ::cOwner + "SQ_" + cTblName + " AS BIGINT START WITH 1")
-   //   ::oSql:Commit()
-   //ENDIF
-
-   //IF lRet .AND. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .AND. ::oSql:lUseSequences  // Create RECNO Trigger
-   //   ::oSql:Commit()
-   //
-   //   IF ::oSql:Exec("SELECT gen_id( " + ::cOwner+cTblName + ", 1) FROM RDB$DATABASE", .F.) != SQL_SUCCESS
-   //      ::oSql:Exec("CREATE GENERATOR " + ::cOwner + cTblName)
-   //      ::oSql:Commit()
-   //   ENDIF
-   //
-   //   ::oSql:Exec("SET GENERATOR " + ::cOwner + cTblName + " TO 0")
-   //   ::oSql:Commit()
-   //
-   //   cSql := "CREATE TRIGGER " + ::cOwner + cTblName + "_SR  FOR " + ::cOwner + cTblName +;
-   //           " ACTIVE BEFORE INSERT POSITION 0 " +;
-   //           " as " +;
-   //           "begin " +;
-   //           "If (new." + ::cRecnoName + " is null) then " + ;
-   //           "new." + ::cRecnoName + " = gen_id( " + ::cOwner+cTblName + ", 1); " + ;
-   //           "end"
-   //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS
-   //   ::oSql:Commit()
-   //
-   //ENDIF
-
    IF lRet .AND. Len(aPk) > 0     // Creates the primary key
 
       ASort(aPk, , , {|x, y|x[1] < y[1]})
       cSql := ""
 
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_MSSQL6
-      //CASE SQLRDD_RDBMS_MSSQL7
-      //CASE SQLRDD_RDBMS_FIREBR
-      //CASE SQLRDD_RDBMS_MYSQL
-      //CASE SQLRDD_RDBMS_MARIADB
-      CASE SQLRDD_RDBMS_POSTGR
-      //CASE SQLRDD_RDBMS_AZURE
-         cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + " ADD CONSTRAINT " + cTblName + "_PK PRIMARY KEY ("
-         FOR i := 1 TO Len(aPk)
-            cSql += IIf(i == 1, "", ", ")
-            cSql += aPk[i, 2]
-         NEXT i
-         cSql += ")"
-         EXIT
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + " ADD CONSTRAINT " + cTblName + "_PK PRIMARY KEY ("
-      //   FOR i := 1 TO Len(aPk)
-      //      cSql += IIf(i == 1, "", ", ")
-      //      cSql += aPk[i, 2]
-      //   NEXT i
-      //   cSql += ") USING INDEX ( CREATE INDEX " + ::cOwner + LimitLen(::cFileName, 3) + "_PK ON " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + "( "
-      //   FOR i := 1 TO Len(aPk)
-      //      cSql += IIf(i == 1, "", ", ")
-      //      cSql += aPk[i, 2]
-      //   NEXT i
-      //   cSql += ")" + IIf(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx()) + ")"
-      ENDSWITCH
+      cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + " ADD CONSTRAINT " + cTblName + "_PK PRIMARY KEY ("
+      FOR i := 1 TO Len(aPk)
+         cSql += IIf(i == 1, "", ", ")
+         cSql += aPk[i, 2]
+      NEXT i
+      cSql += ")"
 
       IF Len(cSql) > 0
          lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS
@@ -6193,10 +4549,6 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
       SR_ReloadMLHash(::oSql)
    ENDIF
 
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-   //   ::oSql:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF)
-   //ENDIF
-
    IF ::LineCount(.F.) == -1
       ::lOpened := .F.
       ::RuntimeErr("27", SR_Msg(27) , 2, EG_OPEN, ESQLRDD_OPEN)
@@ -6219,55 +4571,8 @@ METHOD sqlCreate(aStruct, cFileName, cAlias, nArea) CLASS SR_WORKAREA
    ::Optmizer_ne := {||""}
    ::Optmizer_ns := {||""}
 
-   SWITCH ::oSql:nSystemID
-   //CASE SQLRDD_RDBMS_MSSQL7
-   //CASE SQLRDD_RDBMS_AZURE
-   //CASE SQLRDD_RDBMS_CACHE
-   //   ::Optmizer_1s := " TOP 1"
-   //   ::Optmizer_ns := {|x|" TOP " + Str(x + 2, 5)}
-   //   EXIT
-   //CASE SQLRDD_RDBMS_FIREBR
-   //   IF ::oSql:cSystemVers >= "2.0"
-   //      ::Optmizer_1e := " ROWS 1"
-   //      ::Optmizer_ne := {|x|" ROWS " + Str(x + 2, 5)}
-   //   ELSE
-   //      ::Optmizer_1s := " FIRST 1"
-   //      ::Optmizer_ns := {|x|" FIRST " + Str(x + 2, 5)}
-   //   ENDIF
-   //   EXIT
-   //CASE SQLRDD_RDBMS_INFORM
-   //   ::Optmizer_1s := " FIRST 1"
-   //   ::Optmizer_ns := {|x|" FIRST " + Str(x + 2, 5)}
-   //   EXIT
-   //CASE SQLRDD_RDBMS_ORACLE
-   //   //::Optmizer_1s := " /*+ FIRST_ROWS(1) */ "
-   //   //::Optmizer_ns := {|x|" /*+ FIRST_ROWS(" + Str(x + 2, 5) + ") */ "}
-   //   IF OracleMinVersion(::oSql:cSystemVers) < 9
-   //      ::Optmizer_1s := " /* + FIRST_ROWS(1) */ "
-   //      ::Optmizer_ns := {|x|" /* + FIRST_ROWS(" + Str(x + 2, 5) + ") */"}
-   //   ELSE
-   //      ::Optmizer_1s := " /* + FIRST_ROWS_1 */ "
-   //      ::Optmizer_ns := {|x|" /* + FIRST_ROWS_" + ALLTRIM(Str(x + 2, 5)) + " */ "}
-   //   ENDIF
-   //   EXIT
-   CASE SQLRDD_RDBMS_POSTGR
-   //CASE SQLRDD_RDBMS_MYSQL
-   //CASE SQLRDD_RDBMS_MARIADB
-      ::Optmizer_1e := " LIMIT 1"
-      ::Optmizer_ne := {|x|" LIMIT " + Str(x + 2, 5)}
-      EXIT
-   //CASE SQLRDD_RDBMS_IBMDB2
-   //   IF !("DB2/400" $ ::oSql:cSystemName .OR. "SQLDS/VM" $ ::oSql:cSystemName)
-   //      ::Optmizer_1e := " fetch first 1 row only"
-   //      ::Optmizer_ne := {|x|" fetch first " + Str(x + 2, 5) + " rows only"}
-   //   ENDIF
-   //   EXIT
-   //CASE SQLRDD_RDBMS_SYBASE
-   //   IF "12.53" $ ::oSql:cSystemVers
-   //      ::Optmizer_1s := " TOP 1"
-   //      ::Optmizer_ns := {|x|" TOP " + Str(x + 2, 5)}
-   //   ENDIF
-   ENDSWITCH
+   ::Optmizer_1e := " LIMIT 1"
+   ::Optmizer_ne := {|x|" LIMIT " + Str(x + 2, 5)}
 
    ::aInfo[AINFO_HNRECNO] := ::hnRecno
    ::aInfo[AINFO_HNDELETED] := ::hnDeleted
@@ -6605,55 +4910,8 @@ METHOD sqlOpenArea(cFileName, nArea, lShared, lReadOnly, cAlias, nDBConnection) 
       ::Optmizer_ne := {||""}
       ::Optmizer_ns := {||""}
 
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_MSSQL7
-      //CASE SQLRDD_RDBMS_AZURE
-      //CASE SQLRDD_RDBMS_CACHE
-      //   ::Optmizer_1s := " TOP 1"
-      //   ::Optmizer_ns := {|x|" TOP " + Str(x +2 , 5)}
-      //   EXIT
-      //CASE SQLRDD_RDBMS_FIREBR
-      //   IF ::oSql:cSystemVers >= "2.0"
-      //      ::Optmizer_1e := " ROWS 1"
-      //      ::Optmizer_ne := {|x|" ROWS " + Str(x + 2, 5)}
-      //   ELSE
-      //      ::Optmizer_1s := " FIRST 1"
-      //      ::Optmizer_ns := {|x|" FIRST " + Str(x + 2, 5)}
-      //   ENDIF
-      //   EXIT
-      //CASE SQLRDD_RDBMS_INFORM
-      //   ::Optmizer_1s := " FIRST 1"
-      //   ::Optmizer_ns := {|x|" FIRST " + Str(x + 2, 5)}
-      //   EXIT
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   //::Optmizer_1s := " /*+ FIRST_ROWS(1) */ "
-      //   //::Optmizer_ns := {|x|" /*+ FIRST_ROWS(" + Str(x + 2, 5) + ") */ "}
-      //   IF OracleMinVersion(::oSql:cSystemVers) < 9
-      //      ::Optmizer_1s := " /* + FIRST_ROWS(1) */ "
-      //      ::Optmizer_ns := {|x|" /* + FIRST_ROWS(" + Str(x + 2, 5) + ") */"}
-      //   ELSE
-      //      ::Optmizer_1s := " /* + FIRST_ROWS_1 */ "
-      //      ::Optmizer_ns := {|x|" /* + FIRST_ROWS_" + ALLTRIM(Str(x+  2, 5)) + " */ "}
-      //   ENDIF
-      //   EXIT
-      CASE SQLRDD_RDBMS_POSTGR
-      //CASE SQLRDD_RDBMS_MYSQL
-      //CASE SQLRDD_RDBMS_MARIADB
-         ::Optmizer_1e := " LIMIT 1"
-         ::Optmizer_ne := {|x|" LIMIT " + Str(x + 2, 5)}
-         EXIT
-      //CASE SQLRDD_RDBMS_IBMDB2
-      //   IF !("DB2/400" $ ::oSql:cSystemName .OR. "SQLDS/VM" $ ::oSql:cSystemName)
-      //      ::Optmizer_1e := " fetch first 1 row only"
-      //      ::Optmizer_ne := {|x|" fetch first " + Str(x + 2, 5) + " rows only"}
-      //   ENDIF
-      //   EXIT
-      //CASE SQLRDD_RDBMS_SYBASE
-      //   IF "12.53" $ ::oSql:cSystemVers
-      //      ::Optmizer_1s := " TOP 1"
-      //      ::Optmizer_ns := {|x|" TOP " + Str(x + 2, 5)}
-      //   ENDIF
-      ENDSWITCH
+      ::Optmizer_1e := " LIMIT 1"
+      ::Optmizer_ne := {|x|" LIMIT " + Str(x + 2, 5)}
    ENDIF
 
    ::aInfo[AINFO_HNRECNO] := ::hnRecno
@@ -6742,26 +5000,12 @@ METHOD sqlZap() CLASS SR_WORKAREA
          RETURN .F.
       ENDIF
 
-      //IF ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .AND. ::oSql:lUseSequences .AND. ::lUseSequences
-      //   ::oSql:Commit()
-      //   ::oSql:Exec("SET GENERATOR " + ::cFileName + " TO 0")
-      //   ::oSql:Commit()
-      //ENDIF
-      IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. ::oSql:lUseSequences .AND. ::lUseSequences
+      IF ::oSql:lUseSequences .AND. ::lUseSequences
          ::oSql:Commit()
          ::oSql:Exec("select setval('" +::cOwner + LimitLen(::cFileName, 3) + "_SQ'  , 1)")
          ::oSql:Commit()
       ENDIF
 
-#if 0
-      //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. .AND. ::lUseSequences
-      //   ::oSql:Commit()
-      //   ::oSql:Exec("DROP SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ", .F.)
-      //   ::oSql:Commit()
-      //   ::oSql:Exec("CREATE SEQUENCE " + ::cOwner + LimitLen(::cFileName, 3) + "_SQ START WITH 1")
-      //   ::oSql:Commit()
-      //ENDIF
-#endif
       ::sqlFlush()
 
       ::aInfo[AINFO_NCACHEEND] := ::aInfo[AINFO_NCACHEBEGIN] := 0
@@ -6803,10 +5047,10 @@ METHOD sqlOrderListAdd(cBagName, cTag) CLASS SR_WORKAREA
    HB_SYMBOL_UNUSED(cList)
 
    IF !Empty(cVInd := SR_GetSVIndex())
-      lSyntheticVirtual := .F. //::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
+      lSyntheticVirtual := .F.
       cPhysicalVIndexName := SubStr(cVInd, 1, 3) + SubStr(::cFileName, 1, 25)
    ELSEIF Len(cBagName) > 0 .AND. SubStr(cBagName, 4, 1) == "@"
-      lSyntheticVirtual := .F. //::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
+      lSyntheticVirtual := .F.
       cPhysicalVIndexName := SubStr(cBagName, 1, 3) + SubStr(::cFileName, 1, 25)
       cBagName := SubStr(cBagName, 5)
    ELSE
@@ -6914,24 +5158,8 @@ METHOD sqlOrderListAdd(cBagName, cTag) CLASS SR_WORKAREA
          cPhysicalVIndexName := NIL
       ENDIF
 
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_IBMDB2
-      //   IF "08.0" $ ::oSql:cSystemVers .AND. (!"08.00" $ ::oSql:cSystemVers)
-      //      cSqlA := " ORDER BY row_number() over( ORDER BY "
-      //      cSqlD := " ORDER BY row_number() over( ORDER BY "
-      //   ELSE
-      //      cSqlA := " ORDER BY "
-      //      cSqlD := " ORDER BY "
-      //   ENDIF
-      //   EXIT
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         cSqlA := " ORDER BY "
-         cSqlD := " ORDER BY "
-      ENDSWITCH
+      cSqlA := " ORDER BY "
+      cSqlD := " ORDER BY "
 
       cXBase := ""
 
@@ -6948,38 +5176,13 @@ METHOD sqlOrderListAdd(cBagName, cTag) CLASS SR_WORKAREA
             cCol := SubStr(aCols[i], 1, nPosAt)
          ENDIF
 
-         SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_ORACLE
-         //CASE SQLRDD_RDBMS_FIREBR
-         //   cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " NULLS FIRST,"
-         //   cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC NULLS LAST,"
-         //   EXIT
-         CASE SQLRDD_RDBMS_POSTGR
-            IF ::osql:lPostgresql8
-               cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " NULLS FIRST,"
-               cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC NULLS LAST,"
-            ELSE
-               cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + ","
-               cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC,"
-            ENDIF
-            EXIT
-         //CASE SQLRDD_RDBMS_IBMDB2
-         //   IF "08.0" $ ::oSql:cSystemVers .AND. (!"08.00" $ ::oSql:cSystemVers)
-         //      cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " NULLS FIRST,"
-         //      cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC NULLS LAST,"
-         //   ELSE
-         //      cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + ","
-         //      cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC,"
-         //   ENDIF
-         //   EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
+         IF ::osql:lPostgresql8
+            cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " NULLS FIRST,"
+            cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC NULLS LAST,"
+         ELSE
             cSqlA += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + ","
             cSqlD += " A." + SR_DBQUALIFY(cCol, ::oSql:nSystemID) + " DESC,"
-         ENDSWITCH
+         ENDIF
 
          IF (nPos := AScan(::aNames, {|x|x == cCol})) != 0
             IF ::aNames[nPos] != ::cRecnoName
@@ -7016,24 +5219,8 @@ METHOD sqlOrderListAdd(cBagName, cTag) CLASS SR_WORKAREA
 
       cXBase := Left(cXBase, Len(cXBase) - 2)
 
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_IBMDB2
-      //   IF "08.0" $ ::oSql:cSystemVers .AND. (!"08.00" $ ::oSql:cSystemVers)
-      //      cSqlA := Left(cSqlA, Len(cSqlA) - 1) + " ) "
-      //      cSqlD := Left(cSqlD, Len(cSqlD) - 1) + " ) "
-      //   ELSE
-      //      cSqlA := Left(cSqlA, Len(cSqlA) - 1) + " "
-      //      cSqlD := Left(cSqlD, Len(cSqlD) - 1) + " "
-      //   ENDIF
-      //   EXIT
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         cSqlA := Left(cSqlA, Len(cSqlA) - 1) + " "
-         cSqlD := Left(cSqlD, Len(cSqlD) - 1) + " "
-      ENDSWITCH
+      cSqlA := Left(cSqlA, Len(cSqlA) - 1) + " "
+      cSqlD := Left(cSqlD, Len(cSqlD) - 1) + " "
 
       ::aIndex[nLen, ORDER_ASCEND] := cSqlA
       ::aIndex[nLen, ORDER_DESEND] := cSqlD
@@ -7364,10 +5551,10 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
    ENDIF
 
    IF !Empty(cVInd := SR_GetSVIndex())
-      lSyntheticVirtual := .F. //::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
+      lSyntheticVirtual := .F.
       cPhysicalVIndexName := SubStr(cVInd, 1, 3) + SubStr(::cFileName, 1, 25)
    ELSEIF Len(cColumns) > 4 .AND. SubStr(cColumns, 4, 1) == "@"
-      lSyntheticVirtual := .F. //::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
+      lSyntheticVirtual := .F.
       cPhysicalVIndexName := SubStr(cColumns, 1, 3) + SubStr(::cFileName, 1, 25)
       cColumns := SubStr(cColumns, 5)
    ENDIF
@@ -7471,36 +5658,8 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
    ENDIF
 
    IF !lSyntheticIndex .AND. Len(aCols) > SR_GetSyntheticIndexMinimun()
-      //IF ::oSql:nSystemID != SQLRDD_RDBMS_ORACLE
-         lSyntheticIndex := .T.
-         lSyntheticVirtual := .F.
-      //ELSE     // Oracle can workaround with SinthetycVirtualIndex
-      //
-      //   IF !SR_GetOracleSyntheticVirtual() // if set to false, use normal index, dont created the function based indexes
-      //      lSyntheticIndex := .T.
-      //      lSyntheticVirtual := .F.
-      //   ELSE
-      //      lSyntheticVirtual := .T.
-      //      ::LoadRegisteredTags()
-      //
-      //      nVI := 1
-      //
-      //      DO WHILE nVI <= 999     // Determine an automatic name for SVI (SyntheticVirtualIndex)
-      //         lOk := .T.
-      //         FOR i := 1 TO Len(::aIndexMgmnt)
-      //            IF ::aIndexMgmnt[i, INDEXMAN_VIRTUAL_SYNTH] != NIL .AND. subStr(::aIndexMgmnt[i, INDEXMAN_VIRTUAL_SYNTH], 1, 3) == StrZero(nVI, 3)
-      //               nVI++
-      //               lOk := .F.
-      //               EXIT
-      //            ENDIF
-      //         NEXT i
-      //         IF lOK
-      //            cPhysicalVIndexName := StrZero(nVI, 3) + SubStr(::cFileName, 1, 25)
-      //            EXIT
-      //         ENDIF
-      //      ENDDO
-      //   ENDIF
-      //ENDIF
+      lSyntheticIndex := .T.
+      lSyntheticVirtual := .F.
    ENDIF
 
    aRet := Eval(SR_GetIndexInfoBlock(), cIndexName)
@@ -7515,10 +5674,6 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
    IF Empty(cTag) .AND. (!Empty(cIndexName)) .AND. (!lSyntheticIndex)
       cTag := cIndexName
    ENDIF
-
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-   //   ::oSql:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_ON)
-   //ENDIF
 
    // Removes from the control structures
 
@@ -7584,12 +5739,6 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
    IF Len(cIndexName) + nLenTag > 30
       cPhisicalName := Left(cIndexName, 30 - nLenTag) + IIf(lHaveTag, "_" + cTag, "_" + cNextTagNum)
    ENDIF
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. Len(cPhisicalName) > 30     // Oracle sucks!
-   //   cPhisicalName := Right(cPhisicalName, 30)
-   //ENDIF
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .AND. Len(cPhisicalName) > 18     // DB2 sucks!
-   //   cPhisicalName := Right(cPhisicalName, 18)
-   //ENDIF
    IF SubStr(cPhisicalName, 1, 1) == "_"
       cPhisicalName := "I" + SubStr(cPhisicalName, 2) // cPhisicalName[1] := "I"
    ENDIF
@@ -7634,11 +5783,7 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
       nKeySize := Len(SR_Val2Char(Eval(bIndexKey))) +15
 
       // Create the index column in the table and add it to aCols
-      //IF ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR
-      //   ::AlterColumns({{cColIndx, "C", Min(nKeySize, 180), 0, , SQL_CHAR}}, .F., .F.)
-      //ELSE
-         ::AlterColumns({{cColIndx, "C", Min(nKeysize, 254), 0, , SQL_CHAR}}, .F., .F.)
-      //ENDIF
+      ::AlterColumns({{cColIndx, "C", Min(nKeysize, 254), 0, , SQL_CHAR}}, .F., .F.)
 
       ::Refresh()
 //       bIndexKey := &("{|| " + AllTrim(cColumns) + " }")
@@ -7652,20 +5797,12 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
 
       IF cColFor == NIL
          DO WHILE !(::cAlias)->(Eof())
-            //IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
-               ::oSql:Exec(::cUpd + cColIndx + " = E'" + SR_ESCAPESTRING(SR_Val2Char(Eval(bIndexKey)) + Str(RecNo(), 15), ::oSql:nSystemID) + "' WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + Str((::cAlias)->(RecNo())))
-            //ELSE
-            //   ::oSql:Exec(::cUpd + cColIndx + " = '" + SR_ESCAPESTRING(SR_Val2Char(Eval(bIndexKey)) + Str(RecNo(), 15), ::oSql:nSystemID) + "' WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + Str((::cAlias)->(RecNo())))
-            //ENDIF
+            ::oSql:Exec(::cUpd + cColIndx + " = E'" + SR_ESCAPESTRING(SR_Val2Char(Eval(bIndexKey)) + Str(RecNo(), 15), ::oSql:nSystemID) + "' WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + Str((::cAlias)->(RecNo())))
             (::cAlias)->(dbSkip())
          ENDDO
       ELSE
          DO WHILE !(::cAlias)->(Eof())
-            //IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
-               ::oSql:Exec(::cUpd + cColIndx + " = E'" + SR_ESCAPESTRING(SR_Val2Char(Eval(bIndexKey)) + Str(RecNo(), 15), ::oSql:nSystemID) + "' WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + Str((::cAlias)->(RecNo())))
-            //ELSE
-            //   ::oSql:Exec(::cUpd + cColIndx + " = '" + SR_ESCAPESTRING(SR_Val2Char(Eval(bIndexKey)) + Str(RecNo(), 15), ::oSql:nSystemID) + "' WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + Str((::cAlias)->(RecNo())))
-            //ENDIF
+            ::oSql:Exec(::cUpd + cColIndx + " = E'" + SR_ESCAPESTRING(SR_Val2Char(Eval(bIndexKey)) + Str(RecNo(), 15), ::oSql:nSystemID) + "' WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + Str((::cAlias)->(RecNo())))
             ::oSql:Exec(::cUpd + cColFor  + " = '" + IIf(Eval(bIndexFor), "T", "F") + "' WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + Str((::cAlias)->(RecNo())))
             (::cAlias)->(dbSkip())
          ENDDO
@@ -7683,8 +5820,8 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
          ENDIF
       ENDIF
 
-      IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. ::osql:lPostgresql8
-               // PGS 8.3 will use it once released
+      IF ::osql:lPostgresql8
+         // PGS 8.3 will use it once released
          FOR i := 1 TO Len(aCols)
             cList += SR_DBQUALIFY(aCols[i], ::oSql:nSystemID) + " NULLS FIRST"
             cList += IIf(i == Len(aCols), "", ",")
@@ -7702,100 +5839,17 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
 
       // Drop the index
 
-      //IF !Empty(AllTrim(cConstraintName))
-         //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .OR. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   ::DropConstraint(::cFileName, AllTrim(cConstraintName), .T.)
-         //ENDIF
-      //ENDIF
-
       IF AScan(aOldPhisNames, cPhisicalName) == 0
          AAdd(aOldPhisNames, cPhisicalName)
       ENDIF
 
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_MSSQL6
-      //CASE SQLRDD_RDBMS_MSSQL7
-      //CASE SQLRDD_RDBMS_AZURE
-      //CASE SQLRDD_RDBMS_SYBASE
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + ::cQualifiedTableName + "." + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //   NEXT
-      //   cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create synthetic Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-      //CASE SQLRDD_RDBMS_MYSQL
-      //CASE SQLRDD_RDBMS_MARIADB
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + cName + " ON " + ::cQualifiedTableName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //   NEXT
-      //   cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create synthetic Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   IF cPhysicalVIndexName != NIL
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + "A$" + cPhysicalVIndexName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + "D$" + cPhysicalVIndexName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //   ENDIF
-      //   IF cPrevPhysicalVIndexName != NIL
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + "A$" + cPrevPhysicalVIndexName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + "D$" + cPrevPhysicalVIndexName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //   ENDIF
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //   NEXT
-      //   cSql := "CREATE INDEX " + ::cOwner + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql += IIf(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx())
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create synthetic Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-      //CASE SQLRDD_RDBMS_IBMDB2
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //   NEXT
-      //   cSql := "CREATE INDEX " + ::cOwner + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create synthetic Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-      //CASE SQLRDD_RDBMS_FIREBR
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //      ::oSql:Exec("DROP INDEX " + cName + "R" + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //   NEXT
-      //   cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   HB_SYMBOL_UNUSED(lRet)
-      //   cSql := "CREATE DESCENDING INDEX " + cPhisicalName + "R ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         FOR EACH cName IN aOldPhisNames
-            ::oSql:Exec("DROP INDEX " + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-         NEXT
-         cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-         ::oSql:Commit()
-         cSql +=  + IIf(::oSql:lComments, " /* Create synthetic Index */", "")
-         lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      ENDSWITCH
+      FOR EACH cName IN aOldPhisNames
+         ::oSql:Exec("DROP INDEX " + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
+      NEXT
+      cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
+      ::oSql:Commit()
+      cSql +=  + IIf(::oSql:lComments, " /* Create synthetic Index */", "")
+      lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
 
       IF lRet
          ::oSql:Commit()
@@ -7818,8 +5872,8 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
          (::cAlias)->(DBSetOrder(nOldOrd))
       ENDIF
 
-      IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. ::osql:lPostgresql8
-               // PGS 8.3 will use it once released
+      IF ::osql:lPostgresql8
+         // PGS 8.3 will use it once released
          FOR i := 1 TO Len(aCols)
             cList += SR_DBQUALIFY(aCols[i], ::oSql:nSystemID) + " NULLS FIRST"
             cList += IIf(i == Len(aCols), "", ",")
@@ -7837,118 +5891,20 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
 
       // Drop the index
 
-      //IF !Empty(AllTrim(cConstraintName))
-         //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .OR. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   ::DropConstraint(::cFileName, AllTrim(cConstraintName), .T.)
-         //ENDIF
-      //ENDIF
-
       IF AScan(aOldPhisNames, cPhisicalName) == 0
          AAdd(aOldPhisNames, cPhisicalName)
       ENDIF
 
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_MSSQL6
-      //CASE SQLRDD_RDBMS_MSSQL7
-      //CASE SQLRDD_RDBMS_AZURE
-      //CASE SQLRDD_RDBMS_SYBASE
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + ::cQualifiedTableName + "." + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //   NEXT
-      //   cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-      //CASE SQLRDD_RDBMS_MYSQL
-      //CASE SQLRDD_RDBMS_MARIADB
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + cName + " ON " + ::cQualifiedTableName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //   NEXT
-      //   cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   IF cPhysicalVIndexName != NIL
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + "A$" + cPhysicalVIndexName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + "D$" + cPhysicalVIndexName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //   ENDIF
-      //   IF cPrevPhysicalVIndexName != NIL
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + "A$" + cPrevPhysicalVIndexName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + "D$" + cPrevPhysicalVIndexName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //   ENDIF
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //   NEXT
-      //   cSql := "CREATE INDEX " + ::cOwner + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql += IIf(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx())
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-      //CASE SQLRDD_RDBMS_IBMDB2
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + ::cOwner + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //   NEXT
-      //   cSql := "CREATE INDEX " + ::cOwner + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-      //CASE SQLRDD_RDBMS_FIREBR
-      //   FOR EACH cName IN aOldPhisNames
-      //      ::oSql:Exec("DROP INDEX " + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //      ::oSql:Exec("DROP INDEX " + cName + "R" + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-      //      ::oSql:Commit()
-      //   NEXT
-      //   cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   HB_SYMBOL_UNUSED(lRet)
-      //   cSql := "CREATE DESCENDING INDEX " + cPhisicalName + "R ON " + ::cQualifiedTableName + " (" + cList + ")"
-      //   ::oSql:Commit()
-      //   cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
-      //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      //   EXIT
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         FOR EACH cName IN aOldPhisNames
-            ::oSql:Exec("DROP INDEX " + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
-         NEXT
-         cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
-         ::oSql:Commit()
-         cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
-         lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-      ENDSWITCH
+      FOR EACH cName IN aOldPhisNames
+         ::oSql:Exec("DROP INDEX " + cName + IIf(::oSql:lComments, " /* Create Index */", ""), .F.)
+      NEXT
+      cSql := "CREATE INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + " (" + cList + ")"
+      ::oSql:Commit()
+      cSql +=  + IIf(::oSql:lComments, " /* Create regular Index */", "")
+      lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
 
       IF lRet
          ::oSql:Commit()
-
-         //IF lSyntheticVirtual    // Should we create the Virtual Index too ?
-            //SWITCH ::oSql:nSystemID
-            //CASE SQLRDD_RDBMS_ORACLE
-            //   cSql := "CREATE INDEX " + ::cOwner + "A$" + cPhysicalVIndexName + " ON " + ::cQualifiedTableName + " (" + ::GetSyntheticVirtualExpr(aCols) + ")" +IIf(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx())
-            //   lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-            //   ::oSql:Commit()
-            //   IF lRet
-            //      cSql := "CREATE INDEX " + ::cOwner + "D$" + cPhysicalVIndexName + " ON " + ::cQualifiedTableName + " (" + ::GetSyntheticVirtualExpr(aCols) + " DESC )" +IIf(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx())
-            //      lRet := ::oSql:Exec(cSql, .T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
-            //      ::oSql:Commit()
-            //   ENDIF
-            //   EXIT
-            //ENDSWITCH
-         //ENDIF
 
          IF lRet
             cSql := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTINDEXES (TABLE_,SIGNATURE_,IDXNAME_,PHIS_NAME_,IDXKEY_,IDXFOR_,IDXCOL_,TAG_,TAGNUM_) VALUES ( '" + Upper(::cFileName) + "','" + DToS(Date()) + " " + Time() + IIf(lDesc, " D", " A") + "','"
@@ -7991,10 +5947,6 @@ METHOD sqlOrderCreate(cIndexName, cColumns, cTag, cConstraintName, cTargetTable,
 
    aInf := ::oSql:aTableInfo[::cOriginalFN]
    aInf[CACHEINFO_INDEX] := ::aIndexMgmnt
-
-   //IF ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-   //   ::oSql:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF)
-   //ENDIF
 
    ::aLastOrdCond := NIL
 
@@ -8434,27 +6386,22 @@ METHOD SR_WORKAREA:sqlLock(nType, uRecord)
 
    ::oSql:SetNextOpt(SQL_ATTR_QUERY_TIMEOUT, LOCK_TIMEOUT)
 
-   SWITCH ::oSql:nSystemID
-
-   //CASE SQLRDD_RDBMS_ORACLE
-   CASE SQLRDD_RDBMS_POSTGR
-      IF nType < 3
-         IF ::oSql:Exec("SELECT * FROM " + ::cQualifiedTableName + ;
-            IIf(nType < 3, " WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + ::Quoted(uRecord, , 15, 0), "") + " FOR UPDATE" + ::oSql:cLockWait + ;
-            IIf(::oSql:lComments, " /* Line Lock */", ""), .F., .T., @aResultSet, , , , , ::cRecnoName, ::cDeletedName, , ::nLogMode, SQLLOGCHANGES_TYPE_LOCK) != SQL_SUCCESS
-            lRet := .F.
-         ENDIF
-         IF Len(aResultSet) > 0 .AND. lret
-            ::UpdateCache(aResultSet)
-         ELSE
-            lRet := .F.
-         ENDIF
-      ELSE
-         IF !::LockTable(.F., .T.)
-            lRet := .F.
-         ENDIF
+   IF nType < 3
+      IF ::oSql:Exec("SELECT * FROM " + ::cQualifiedTableName + ;
+         IIf(nType < 3, " WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + ::Quoted(uRecord, , 15, 0), "") + " FOR UPDATE" + ::oSql:cLockWait + ;
+         IIf(::oSql:lComments, " /* Line Lock */", ""), .F., .T., @aResultSet, , , , , ::cRecnoName, ::cDeletedName, , ::nLogMode, SQLLOGCHANGES_TYPE_LOCK) != SQL_SUCCESS
+         lRet := .F.
       ENDIF
-      EXIT
+      IF Len(aResultSet) > 0 .AND. lret
+         ::UpdateCache(aResultSet)
+      ELSE
+         lRet := .F.
+      ENDIF
+   ELSE
+      IF !::LockTable(.F., .T.)
+         lRet := .F.
+      ENDIF
+   ENDIF
 
 #if 0
       // Commented 2005/02/04 - It's better to wait forever on a lock than have a corrupt transaction
@@ -8468,120 +6415,6 @@ METHOD SR_WORKAREA:sqlLock(nType, uRecord)
          ::oSql:Commit()
       ENDIF
 #endif
-
-   //CASE SQLRDD_RDBMS_FIREBR
-   //   IF nType < 3
-   //      IF ::oSql:Exec("SELECT * FROM " + ::cQualifiedTableName + ;
-   //         IIf(nType < 3, " WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + ::Quoted(uRecord, , 15, 0), "") + " FOR UPDATE WITH LOCK" + ;
-   //         IIf(::oSql:lComments, " /* Line Lock */", ""), .F., .T., @aResultSet, , , , , ::cRecnoName, ::cDeletedName, , ::nLogMode, SQLLOGCHANGES_TYPE_LOCK) != SQL_SUCCESS
-   //         lRet := .F.
-   //      ENDIF
-   //      IF Len(aResultSet) > 0 .AND. lret
-   //         ::UpdateCache(aResultSet)
-   //      ELSE
-   //         lRet := .F.
-   //      ENDIF
-   //   ELSE
-   //      IF !::LockTable(.F., .T.)
-   //         lRet := .F.
-   //      ENDIF
-   //   ENDIF
-   //   EXIT
-
-   //CASE SQLRDD_RDBMS_IBMDB2
-   //CASE SQLRDD_RDBMS_MYSQL
-   //CASE SQLRDD_RDBMS_MARIADB
-   //   IF nType < 3
-   //      IF ::oSql:Exec("SELECT * FROM " + ::cQualifiedTableName + ;
-   //         IIf(nType < 3, " WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + ::Quoted(uRecord, , 15, 0), "") + " FOR UPDATE" + ::oSql:cLockWait + ;
-   //         IIf(::oSql:lComments, " /* Line Lock */", ""), .F., .T., @aResultSet, , , , , ::cRecnoName, ::cDeletedName, , ::nLogMode, SQLLOGCHANGES_TYPE_LOCK) != SQL_SUCCESS
-   //         lRet := .F.
-   //      ENDIF
-   //      IF Len(aResultSet) > 0 .AND. lret
-   //         ::UpdateCache(aResultSet)
-   //      ELSE
-   //         lRet := .F.
-   //      ENDIF
-   //   ELSE
-   //      IF !::LockTable(.F., .T.)
-   //         lRet := .F.
-   //      ENDIF
-   //   ENDIF
-   //   EXIT
-
-   //CASE SQLRDD_RDBMS_INGRES
-   //   IF ::oSql:Exec("SELECT * FROM " + ::cQualifiedTableName + ;
-   //      IIf(nType < 3, " WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + ::Quoted(uRecord, , 15, 0), "") + ;
-   //      IIf(::oSql:lComments, " /* Lock */", ""), .F., .T., @aResultSet, , , , , ::cRecnoName, ::cDeletedName, , ::nLogMode, SQLLOGCHANGES_TYPE_LOCK) != SQL_SUCCESS
-   //      lRet := .F.
-   //   ENDIF
-   //   IF nType < 3
-   //      IF Len(aResultSet) > 0 .AND. lRet
-   //         ::UpdateCache(aResultSet)
-   //      ELSE
-   //         lRet := .F.
-   //      ENDIF
-   //   ENDIF
-   //   EXIT
-
-   //CASE SQLRDD_RDBMS_MSSQL7
-   //CASE SQLRDD_RDBMS_AZURE
-   //   IF nType < 3
-   //      IF ::oSql:Exec("SELECT * FROM " + ::cQualifiedTableName  + " WITH (UPDLOCK) WHERE " + ;
-   //         SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + ::Quoted(uRecord, , 15, 0) + ;
-   //         IIf(::oSql:lComments, " /* Lock row */", ""), .F., .T., @aResultSet, , , , , ::cRecnoName, ::cDeletedName, , ::nLogMode, SQLLOGCHANGES_TYPE_LOCK) != SQL_SUCCESS
-   //         lRet := .F.
-   //      ENDIF
-   //      IF Len(aResultSet) > 0 .AND. lRet
-   //         ::UpdateCache(aResultSet)
-   //      ELSE
-   //         lRet := .F.
-   //      ENDIF
-   //   ELSE
-   //      IF !::LockTable(.F., .T.)
-   //         lRet := .F.
-   //      ENDIF
-   //   ENDIF
-   //   EXIT
-
-   //CASE SQLRDD_RDBMS_SYBASE
-   //   IF ::oSql:Exec("UPDATE " + ::cQualifiedTableName + " SET " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + ::Quoted(uRecord, , 15, 0) + IIf(nType < 3, " WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + ::Quoted(uRecord, , 15, 0), "") + ;
-   //      + IIf(::oSql:lComments, " /* Lock */", ""), .F., .T., @aResultSet, , , , , ::cRecnoName, ::cDeletedName, , ::nLogMode, SQLLOGCHANGES_TYPE_LOCK) != SQL_SUCCESS
-   //      lRet := .F.
-   //   ENDIF
-   //   IF nType < 3
-   //      IF ::oSql:Exec("SELECT * FROM " + ::cQualifiedTableName + " WHERE " + SR_DBQUALIFY(::cRecnoName, ::oSql:nSystemID) + " = " + ::Quoted(uRecord, , 15, 0) + ;
-   //         IIf(::oSql:lComments, " /* Lock */", ""), .F., .T., @aResultSet, , , , , ::cRecnoName, ::cDeletedName, , ::nLogMode, SQLLOGCHANGES_TYPE_LOCK) != SQL_SUCCESS
-   //         lRet := .F.
-   //      ENDIF
-   //      IF Len(aResultSet) > 0 .AND. lRet
-   //         ::UpdateCache(aResultSet)
-   //      ELSE
-   //         // SR_MsgLogFile(SR_Msg(8) + AllTrim(Str(uRecord, 15)) + " + " + ::cOwner + AllTrim(::cFileName) + " + " + SR_Val2Char(::oSql:nRetCode))
-   //         lRet := .F.
-   //      ENDIF
-   //   ENDIF
-   //   EXIT
-
-   //CASE SQLRDD_RDBMS_CACHE
-/*
-drop function newage.LOCK
-drop function newage.UNLOCK
-
-create function newage.LOCK(lockName VARCHAR(50) default 'noname',
-timeout int default 4)
-for newage.LockControler
-returns INT
-LANGUAGE OBJECTSCRIPT
-{
-Set lockName="^"_lockName
-Lock +@lockName:timeout
-Else Quit 0
-Quit 1
-}
-*/
-
-   ENDSWITCH
 
    IF ::aInfo[AINFO_SHARED] .AND. lRet .AND. nType < 3
       AAdd(::aLocked, uRecord)
@@ -9251,41 +7084,7 @@ METHOD SR_WORKAREA:DropColRules(cColumn, lDisplayErrorMessage, aDeletedIndexes)
             ENDIF
             HB_SYMBOL_UNUSED(cPhysicalVIndexName)
 
-            SWITCH ::oSql:nSystemID
-            //CASE SQLRDD_RDBMS_MSSQL6
-            //CASE SQLRDD_RDBMS_MSSQL7
-            //CASE SQLRDD_RDBMS_AZURE
-            //CASE SQLRDD_RDBMS_SYBASE
-            //   nRet := ::oSql:Exec("DROP INDEX " + ::cQualifiedTableName + "." + cPhisicalName + IIf(::oSql:lComments, " /* Drop index before drop column */", ""), lDisplayErrorMessage)
-            //   EXIT
-            //CASE SQLRDD_RDBMS_MYSQL
-            //CASE SQLRDD_RDBMS_MARIADB
-            //   nRet := ::oSql:Exec("DROP INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + IIf(::oSql:lComments, " /* Drop index before drop column */", ""), lDisplayErrorMessage)
-            //   EXIT
-            //CASE SQLRDD_RDBMS_ORACLE
-            //   IF cPhysicalVIndexName != NIL
-            //      ::oSql:Exec("DROP INDEX " + ::cOwner + "A$" + cPhysicalVIndexName + IIf(::oSql:lComments, " /* Drop VIndex before drop column */", ""), .F.)
-            //      ::oSql:Commit()
-            //      ::oSql:Exec("DROP INDEX " + ::cOwner + "D$" + cPhysicalVIndexName + IIf(::oSql:lComments, " /* Drop VIndex before drop column */", ""), .F.)
-            //      ::oSql:Commit()
-            //   ENDIF
-            //   nRet := ::oSql:Exec("DROP INDEX " + ::cOwner + cPhisicalName + IIf(::oSql:lComments, " /* Drop index before drop column */", ""), lDisplayErrorMessage)
-            //   EXIT
-            //CASE SQLRDD_RDBMS_FIREBR
-            //   nRet := ::oSql:Exec("DROP INDEX " + cPhisicalName + IIf(::oSql:lComments, " /* Drop index before drop column */", ""), lDisplayErrorMessage)
-            //   HB_SYMBOL_UNUSED(nRet)
-            //   ::oSql:Commit()
-            //   // DELETED THE DESCENDING INDEX
-            //   nRet := ::oSql:Exec("DROP INDEX " + cPhisicalName + "R" + IIf(::oSql:lComments, " /* Drop index before drop column */", ""), lDisplayErrorMessage)
-            //   ::oSql:Commit()
-            //   EXIT
-#ifdef __XHARBOUR__
-            DEFAULT
-#else
-            OTHERWISE
-#endif
-               nRet := ::oSql:Exec("DROP INDEX " + cPhisicalName + IIf(::oSql:lComments, " /* Drop index before drop column */", ""), lDisplayErrorMessage)
-            ENDSWITCH
+            nRet := ::oSql:Exec("DROP INDEX " + cPhisicalName + IIf(::oSql:lComments, " /* Drop index before drop column */", ""), lDisplayErrorMessage)
 
             ::oSql:Commit()
 
@@ -9321,7 +7120,7 @@ RETURN nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO .OR. nRet == SQL_N
 METHOD SR_WORKAREA:DropColumn(cColumn, lDisplayErrorMessage, lRemoveFromWA)
 
    LOCAL i
-   LOCAL nRet := SQL_SUCCESS
+   LOCAL nRet //:= SQL_SUCCESS (value not used)
 
    DEFAULT lRemoveFromWA TO .F.
 
@@ -9329,30 +7128,8 @@ METHOD SR_WORKAREA:DropColumn(cColumn, lDisplayErrorMessage, lRemoveFromWA)
 
    ::DropColRules(cColumn, .F.)
 
-   SWITCH ::oSql:nSystemID
-   //CASE SQLRDD_RDBMS_ORACLE
-   //CASE SQLRDD_RDBMS_MSSQL6
-   //CASE SQLRDD_RDBMS_MSSQL7
-   //CASE SQLRDD_RDBMS_SQLANY
-   //CASE SQLRDD_RDBMS_SYBASE
-   //CASE SQLRDD_RDBMS_ACCESS
-   //CASE SQLRDD_RDBMS_INGRES
-   //CASE SQLRDD_RDBMS_SQLBAS
-   //CASE SQLRDD_RDBMS_ADABAS
-   //CASE SQLRDD_RDBMS_INFORM
-   //CASE SQLRDD_RDBMS_IBMDB2
-   //CASE SQLRDD_RDBMS_MYSQL
-   //CASE SQLRDD_RDBMS_MARIADB
-   CASE SQLRDD_RDBMS_POSTGR
-   //CASE SQLRDD_RDBMS_CACHE
-   //CASE SQLRDD_RDBMS_AZURE
-      nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " DROP COLUMN " + SR_DBQUALIFY(cColumn, ::oSql:nSystemID), lDisplayErrorMessage)
-      ::oSql:Commit()
-      EXIT
-   //CASE SQLRDD_RDBMS_FIREBR
-   //   nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " DROP " + SR_DBQUALIFY(cColumn, ::oSql:nSystemID), lDisplayErrorMessage)
-   //   ::oSql:Commit()
-   ENDSWITCH
+   nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " DROP COLUMN " + SR_DBQUALIFY(cColumn, ::oSql:nSystemID), lDisplayErrorMessage)
+   ::oSql:Commit()
 
    IF !lDisplayErrorMessage .AND. nRet != SQL_SUCCESS .AND. nRet != SQL_SUCCESS_WITH_INFO
       SR_LogFile("changestruct.log", {::cFileName, "Warning: DROP COLUMN:", cColumn, ::oSql:cSQLError})
@@ -9447,7 +7224,7 @@ METHOD SR_WORKAREA:AlterColumns(aCreate, lDisplayErrorMessage, lBakcup)
          ::DropColumn(cField, .F.)   // It may be a new column or not - don't care.
 
          cSql := "ALTER TABLE " + ::cQualifiedTableName
-         cSql += " ADD " + IIf(::oSql:nSystemID == SQLRDD_RDBMS_POSTGR, "COLUMN ", "") + SR_DBQUALIFY(AllTrim(cField), ::oSql:nSystemID)
+         cSql += " ADD " + "COLUMN " + SR_DBQUALIFY(AllTrim(cField), ::oSql:nSystemID)
          cSql += " "
 
          // lNotNull := (!aCreate[i, FIELD_NULLABLE]) .OR. lPrimary
@@ -9473,272 +7250,40 @@ METHOD SR_WORKAREA:AlterColumns(aCreate, lDisplayErrorMessage, lBakcup)
 
          DO CASE // TODO: switch ?
 
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
-         //   IF aCreate[i, FIELD_LEN] > 30
-         //      cSql += "VARCHAR2(" + LTrim(Str(Min(aCreate[i, FIELD_LEN], 4000), 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      IF aCreate[i, FIELD_LEN] > s_nMininumVarchar2Size .AND. s_nMininumVarchar2Size < 30
-         //         cSql += "VARCHAR2(" + LTrim(Str(Min(aCreate[i, FIELD_LEN], 4000), 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //      ELSE
-         //      cSql += "CHAR(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C" .OR. aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLBAS
-         //   IF aCreate[i, FIELD_LEN] > 254 .OR. aCreate[i, FIELD_TYPE] == "M"
-         //      cSql += "LONG VARCHAR"
-         //   ELSE
-         //      cSql += "VARCHAR(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lPrimary, " NOT NULL", "")
-         //   ENDIF
-
-         CASE (aCreate[i, FIELD_TYPE] == "C") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
-            IF ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE
-               IF ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
-                  IF aCreate[i, FIELD_LEN] > 10
-                     cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IIf(lNotNull, " NOT NULL", "")
-                  ELSE
-                     cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IIf(lNotNull, " NOT NULL", "")
-                  ENDIF
-               ELSE
-                  cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IIf(lNotNull, " NOT NULL", "")
-               ENDIF
-            ELSEIF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. aCreate[i, FIELD_LEN] > s_nMininumVarchar2Size -1 //10
+         CASE (aCreate[i, FIELD_TYPE] == "C")
+            IF aCreate[i, FIELD_LEN] > s_nMininumVarchar2Size -1 //10
                cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
             ELSE
                cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
             ENDIF
 
-         //CASE aCreate[i, FIELD_TYPE] == "C" .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   IF aCreate[i, FIELD_LEN] > 255
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2)
-         //   IF aCreate[i, FIELD_LEN] > 255
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHARACTER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES
-         //   cSql += "varchar(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY", IIf(lNotNull, " NOT NULL", ""))
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INFORM
-         //   cSql += "CHARACTER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY", IIf(lNotNull, " NOT NULL", ""))
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ACCESS
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "TEXT"
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")"
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLANY
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "LONG VARCHAR "
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + "  " + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(!Empty(::oSql:cCharSet), " CHARACTER SET " + ::oSql:cCharSet, "") + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(!Empty(::oSql:cCharSet), " CHARACTER SET " + ::oSql:cCharSet, "")  + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-         //   IF aCreate[i, FIELD_LEN] > 30
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "D") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_SQLBAS .OR. ::oSql:nSystemID == SQLRDD_RDBMS_INFORM .OR. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES .OR. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB) .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE)
-         //   cSql += "DATE"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "D") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-         //   cSql += "DATETIME"
-
-         CASE (aCreate[i, FIELD_TYPE] == "D") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS)
+         CASE (aCreate[i, FIELD_TYPE] == "D")
             cSql += "DATE"
 
-         //CASE (aCreate[i, FIELD_TYPE] == "D") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_ACCESS .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
-         //   cSql += "DATETIME NULL"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "D") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLANY
-         //   cSql += "TIMESTAMP"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "L") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
-         //   cSql += "BIT"
-
-         CASE (aCreate[i, FIELD_TYPE] == "L") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS)
+         CASE (aCreate[i, FIELD_TYPE] == "L")
             cSql += "BOOLEAN"
 
-         //CASE (aCreate[i, FIELD_TYPE] == "L") .AND. ((::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB))
-         //   cSql += "TINYINT"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "L") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR)
-         //   cSql += "SMALLINT"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "L") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-         //   cSql += "BIT NOT NULL"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "L") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLANY
-         //   cSql += "NUMERIC (1) NULL"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "L") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
-         //   cSql += "SMALLINT"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "L") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INFORM
-         //   cSql += "BOOLEAN"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "L") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES
-         //   cSql += "tinyint"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
-         //   cSql += "CLOB"
-         //   cLobs += IIf(Empty(cLobs), "", ",") + SR_DBQUALIFY(AllTrim(cField), ::oSql:nSystemID)
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2
-         //   cSql += "CLOB (256000) " + IIf("DB2/400" $ ::oSql:cSystemName, "",  " NOT LOGGED COMPACT")
-
-         CASE (aCreate[i, FIELD_TYPE] == "M") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_INFORM .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
+         CASE (aCreate[i, FIELD_TYPE] == "M")
             cSql += "TEXT"
 
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   cSql += s_cMySqlMemoDataType
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS
-         //   cSql += "LONG"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES
-         //   cSql += "long varchar"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ACCESS
-         //   cSql += "TEXT NULL"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-         //   cSql += "TEXT"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLANY
-         //   cSql += "LONG VARCHAR"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR
-         //   cSql += "BLOB SUB_TYPE 1" + IIf(!Empty(::oSql:cCharSet), " CHARACTER SET " + ::oSql:cCharSet, "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE) .AND. cField == ::cRecnoName
-         //   IF ::oSql:lUseSequences
-         //      cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") IDENTITY"
-         //   ELSE
-         //   cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL UNIQUE"
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE .AND. cField == ::cRecnoName
-         //   cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") UNIQUE " + [default objectscript '##class(] + SR_GetToolsOwner() + [SequenceControler).NEXTVAL("] + ::cFileName + [")']
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
-         //   cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-
-         CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. cField == ::cRecnoName
+         CASE (aCreate[i, FIELD_TYPE] == "N") .AND. cField == ::cRecnoName
             cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") default (nextval('" + ::cOwner + LimitLen(::cFileName, 3) + "_SQ')) NOT NULL UNIQUE"
-         CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
+
+         CASE (aCreate[i, FIELD_TYPE] == "N")
             cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ")  default 0 " + IIf(lNotNull, " NOT NULL ", "")
 
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB) .AND. cField == ::cRecnoName
-         //   cSql += "BIGINT (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") NOT NULL UNIQUE AUTO_INCREMENT "
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   cSql += s_cMySqlNumericDataType + " (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. cField == ::cRecnoName
-         //   cSql += "NUMBER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" +;
-         //        IIf(lNotNull, " NOT NULL UNIQUE USING INDEX ( CREATE INDEX " + ::cOwner + LimitLen(::cFileName, 3) + "_UK ON " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + "( " + ::cRecnoName + ")" +;
-         //        IIf(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx()) , "") + ")"
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
-         //   cSql += "NUMBER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .AND. cField == ::cRecnoName
-         //   IF ::oSql:lUseSequences
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1, NO CACHE)"
-         //   ELSE
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL"
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS .AND. cField == ::cRecnoName
-         //   cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL DEFAULT SERIAL"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS)
-         //   cSql += "DECIMAL(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES .AND. cField == ::cRecnoName
-         //   cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL UNIQUE "
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INFORM .AND. cField == ::cRecnoName
-         //   cSql += "SERIAL NOT NULL UNIQUE"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_INFORM .OR. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES)
-         //   cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY ", IIf(lNotNull, " NOT NULL", ""))
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLBAS
-         //   IF aCreate[i, FIELD_LEN] > 15
-         //      cSql += "NUMBER" + IIf(lPrimary, " NOT NULL", " ")
-         //   ELSE
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lPrimary, " NOT NULL", " ")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLANY
-         //   cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ACCESS
-         //   cSql += "NUMERIC"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .AND. cField == ::cRecnoName
-         //  cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL UNIQUE "
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_FIREBR3 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR4 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR5) .AND. cField == ::cRecnoName
-         //  cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") GENERATED BY DEFAULT AS IDENTITY  NOT NULL UNIQUE "
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR3 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR4 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR5)
-         //   IF aCreate[i, FIELD_LEN] > 18
-         //      cSql += "DOUBLE PRECISION" + IIf(lPrimary .OR. lNotNull, " NOT NULL", " ")
-         //   ELSE
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) +  ")" + IIf(lPrimary .OR. lNotNull, " NOT NULL", " ")
-         //   ENDIF
-         //// including xml data type
          // postgresql datetime
-         CASE (aCreate[i, FIELD_TYPE] == "T") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_POSTGR)
+         CASE (aCreate[i, FIELD_TYPE] == "T")
             IF aCreate[i, FIELD_LEN] == 4
                cSql += "time  without time zone "
             ELSE
                cSql += "timestamp  without time zone "
             ENDIF
-         //CASE (aCreate[i, FIELD_TYPE] == "T") .AND. (::osql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::osql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   IF aCreate[i, FIELD_LEN] == 4
-         //      cSql += "time "
-         //   ELSE
-         //      cSql += "DATETIME "
-         //   ENDIF
-
-         //// oracle datetime
-         //CASE (aCreate[i, FIELD_TYPE] == "T") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR3 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR4 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR5)
-         //   cSql += "TIMESTAMP "
-         //CASE (aCreate[i, FIELD_TYPE] == "T") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7) // .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
-         //   cSql += "DATETIME NULL "
-         //CASE (aCreate[i, FIELD_TYPE] == "T") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   cSql += "DATETIME "
-         //CASE (aCreate[i, FIELD_TYPE] == "V") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7)
-         //    cSql += " VARBINARY(MAX) "
 
          OTHERWISE
             SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
 
          ENDCASE
-
-         //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. (!Empty(SR_SetTblSpaceLob())) .AND. (!Empty(cLobs))
-         //   cSql += " LOB (" + cLobs + ") STORE AS (TABLESPACE " + SR_SetTblSpaceLob() + ")"
-         //ENDIF
 
          lRet2 := ::oSql:Exec(cSql, lDisplayErrorMessage) == SQL_SUCCESS
          ::oSql:Commit()
@@ -9886,15 +7431,7 @@ METHOD SR_WORKAREA:AlterColumnsDirect(aCreate, lDisplayErrorMessage, lBakcup, aR
       IF !(lCurrentIsMultLang .AND. aCreate[i, FIELD_TYPE] $ "MC")
 
          cSql := "ALTER TABLE " + ::cQualifiedTableName
-         IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR3 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR4 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR5
-            cSql += " ALTER " + SR_DBQUALIFY(AllTrim(cField), ::oSql:nSystemID) + " TYPE "
-         //ELSEIF ::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB
-         //   cSql += " MODIFY COLUMN " + SR_DBQUALIFY(AllTrim(cField), ::oSql:nSystemID)
-         //ELSEIF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
-         //   cSql += " MODIFY (" + SR_DBQUALIFY(AllTrim(cField), ::oSql:nSystemID)
-         //ELSEIF ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nsystemid == SQLRDD_RDBMS_CACHE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE
-         //   cSql += " ALTER COLUMN " + SR_DBQUALIFY(AllTrim(cField), ::oSql:nSystemID)
-         ENDIF
+         cSql += " ALTER " + SR_DBQUALIFY(AllTrim(cField), ::oSql:nSystemID) + " TYPE "
          cSql += " "
 
          // lNotNull := (!aCreate[i, FIELD_NULLABLE]) .OR. lPrimary
@@ -9919,129 +7456,21 @@ METHOD SR_WORKAREA:AlterColumnsDirect(aCreate, lDisplayErrorMessage, lBakcup, aR
          ENDIF
 
          DO CASE // TODO: switch ?
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
-         //   IF aCreate[i, FIELD_LEN] > 30
-         //      cSql += "VARCHAR2(" + LTrim(Str(Min(aCreate[i, FIELD_LEN], 4000), 9, 0)) + ")" + IIf(lNotNull, " NOT NULL )", ") ")
-         //   ELSE
-         //      IF aCreate[i, FIELD_LEN] > s_nMininumVarchar2Size .AND. s_nMininumVarchar2Size < 30
-         //         cSql += "VARCHAR2(" + LTrim(Str(Min(aCreate[i, FIELD_LEN], 4000), 9, 0)) + ")" + IIf(lNotNull, " NOT NULL )", ") ")
-         //      ELSE
-         //      cSql += "CHAR(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL )", ")")
-         //   ENDIF
-         //   ENDIF
 
-         //CASE (aCreate[i, FIELD_TYPE] == "C" .OR. aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLBAS
-         //   IF aCreate[i, FIELD_LEN] > 254 .OR. aCreate[i, FIELD_TYPE] == "M"
-         //      cSql += "LONG VARCHAR"
-         //   ELSE
-         //      cSql += "VARCHAR(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lPrimary, " NOT NULL", "")
-         //   ENDIF
-
-         CASE (aCreate[i, FIELD_TYPE] == "C") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
-            //IF ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE
-            //   cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IIf(lNotNull, " NOT NULL", "")
-            /*ELSE*/IF ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. aCreate[i, FIELD_LEN] > 10
+         CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
+            IF aCreate[i, FIELD_LEN] > 10
                cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
             ELSE
                cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
             ENDIF
 
-         //CASE aCreate[i, FIELD_TYPE] == "C" .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   IF aCreate[i, FIELD_LEN] > 255
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2)
-         //   IF aCreate[i, FIELD_LEN] > 255
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHARACTER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES
-         //   cSql += "varchar(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY", IF(lNotNull, " NOT NULL", ""))
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INFORM
-         //   cSql += "CHARACTER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY", IF(lNotNull, " NOT NULL", ""))
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ACCESS
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "TEXT"
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")"
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLANY
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "LONG VARCHAR "
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + "  " + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ( ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR3 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR4 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR5)
-         //   IF aCreate[i, FIELD_LEN] > 254
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(!Empty(::oSql:cCharSet), " CHARACTER SET " + ::oSql:cCharSet, "") + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(!Empty(::oSql:cCharSet), " CHARACTER SET " + ::oSql:cCharSet, "")  + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "C") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-         //   IF aCreate[i, FIELD_LEN] > 30
-         //      cSql += "VARCHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ELSE
-         //      cSql += "CHAR (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
-         //   cSql += "CLOB"
-         //   cLobs += IIf(Empty(cLobs), "", ",") + SR_DBQUALIFY(AllTrim(cField), ::oSql:nSystemID)
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2
-         //   cSql += "CLOB (256000) " + IIf("DB2/400" $ ::oSql:cSystemName, "",  " NOT LOGGED COMPACT")
-
-         CASE (aCreate[i, FIELD_TYPE] == "M") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_INFORM .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
+         CASE (aCreate[i, FIELD_TYPE] == "M")
             cSql += "TEXT"
 
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   cSql += s_cMySqlMemoDataType
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS
-         //   cSql += "LONG"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES
-         //   cSql += "long varchar"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ACCESS
-         //   cSql += "TEXT NULL"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE
-         //   cSql += "TEXT"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLANY
-         //   cSql += "LONG VARCHAR"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "M") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR3 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR4 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR5)
-         //   cSql += "BLOB SUB_TYPE 1" + IIf(!Empty(::oSql:cCharSet), " CHARACTER SET " + ::oSql:cCharSet, "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE) .AND. cField == ::cRecnoName
-         //   IF ::oSql:lUseSequences
-         //      cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") IDENTITY"
-         //   ELSE
-         //      cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL UNIQUE"
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE .AND. cField == ::cRecnoName
-         //   cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") UNIQUE " + [default objectscript '##class(] + SR_GetToolsOwner() + [SequenceControler).NEXTVAL("] + ::cFileName + [")']
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_CACHE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE)
-         //   cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str (aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-
-         CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR .AND. cField == ::cRecnoName
+         CASE (aCreate[i, FIELD_TYPE] == "N") .AND. cField == ::cRecnoName
             cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") default (nextval('" + ::cOwner + LimitLen(::cFileName, 3) + "_SQ')) NOT NULL UNIQUE"
-         CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
 
+         CASE (aCreate[i, FIELD_TYPE] == "N")
             cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ")" //
             nPos := AScan(::aFields, {|x|AllTrim(Upper(x[1])) == AllTrim(Upper(cField))})
             IF nPos >0
@@ -10058,82 +7487,18 @@ METHOD SR_WORKAREA:AlterColumnsDirect(aCreate, lDisplayErrorMessage, lBakcup, aR
                cSql3 := cSql3 + " NOT NULL "
             ENDIF
 
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB) .AND. cField == ::cRecnoName
-         //   cSql += "BIGINT (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + ") NOT NULL UNIQUE AUTO_INCREMENT "
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_MYSQL .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MARIADB)
-         //   cSql += s_cMySqlNumericDataType + " (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC])) + ") " + IIf(lNotNull, " NOT NULL ", "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. cField == ::cRecnoName
-         //   cSql += "NUMBER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" +;
-         //        IIf(lNotNull, " NOT NULL UNIQUE USING INDEX ( CREATE INDEX " + ::cOwner + LimitLen(::cFileName, 3) + "_UK ON " + ::cOwner + SR_DBQUALIFY(cTblName, ::oSql:nSystemID) + "( " + ::cRecnoName + ")" +;
-         //        IIf(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx()) , "") + ")"
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE
-         //   cSql += "NUMBER (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .AND. cField == ::cRecnoName
-         //   IF ::oSql:lUseSequences
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1, NO CACHE)"
-         //   ELSE
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL"
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS .AND. cField == ::cRecnoName
-         //   cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL DEFAULT SERIAL"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_ADABAS)
-         //   cSql += "DECIMAL(" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lNotNull, " NOT NULL", "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES .AND. cField == ::cRecnoName
-         //   cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL UNIQUE "
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_INFORM .AND. cField == ::cRecnoName
-         //   cSql += "SERIAL NOT NULL UNIQUE"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_INFORM .OR. ::oSql:nSystemID == SQLRDD_RDBMS_INGRES)
-         //   cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") " + IIf(lPrimary, "NOT NULL PRIMARY KEY ", IIf(lNotNull, " NOT NULL", ""))
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLBAS
-         //   IF aCreate[i, FIELD_LEN] > 15
-         //      cSql += "NUMBER" + IIf(lPrimary, " NOT NULL", " ")
-         //   ELSE
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ")" + IIf(lPrimary, " NOT NULL", " ")
-         //   ENDIF
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_SQLANY
-         //   cSql += "NUMERIC (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") " + IIf(lNotNull, " NOT NULL", "")
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_ACCESS
-         //   cSql += "NUMERIC"
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. (::oSql:nSystemID == SQLRDD_RDBMS_FIREBR3 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR4 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR5) .AND. cField == ::cRecnoName
-         //  cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") GENERATED BY DEFAULT AS IDENTITY  NOT NULL UNIQUE "
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .AND. cField == ::cRecnoName
-         //  cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN])) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) + ") NOT NULL UNIQUE "
-
-         //CASE (aCreate[i, FIELD_TYPE] == "N") .AND. ( ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR3 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR4 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_FIREBR5)
-         //   IF aCreate[i, FIELD_LEN] > 18
-         //      cSql += "DOUBLE PRECISION" + IIf(lPrimary .OR. lNotNull, " NOT NULL", " ")
-         //   ELSE
-         //      cSql += "DECIMAL (" + LTrim(Str(aCreate[i, FIELD_LEN], 9, 0)) + "," + LTrim(Str(aCreate[i, FIELD_DEC], 9, 0)) +  ")" + IIf(lPrimary .OR. lNotNull, " NOT NULL", " ")
-         //   ENDIF
-
          OTHERWISE
             SR_MsgLogFile(SR_Msg(9) + cField + " (" + aCreate[i, FIELD_TYPE] + ")")
 
          ENDCASE
 
-         //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. (!Empty(SR_SetTblSpaceLob())) .AND. (!Empty(cLobs))
-         //   cSql += " LOB (" + cLobs + ") STORE AS (TABLESPACE " + SR_SetTblSpaceLob() + ")"
-         //ENDIF
-
          lRet2 := ::oSql:Exec(cSql, lDisplayErrorMessage) == SQL_SUCCESS
          ::oSql:Commit()
-         IF !Empty(cSql2) .AND. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
+         IF !Empty(cSql2)
              ::osql:Exec(cSql2, lDisplayErrorMessage)
              ::osql:Commit()
          ENDIF
-         IF !Empty(cSql3) .AND. ::oSql:nSystemID == SQLRDD_RDBMS_POSTGR
+         IF !Empty(cSql3)
              ::osql:Exec(cSql3, lDisplayErrorMessage)
              ::osql:Commit()
          ENDIF
@@ -10176,11 +7541,7 @@ METHOD SR_WORKAREA:AlterColumnsDirect(aCreate, lDisplayErrorMessage, lBakcup, aR
 
       IF lDataInBackup
          // Put data back in column
-         //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. ::aFields[nPos_, 2] $ "CM"
-         //   ::oSql:Exec("UPDATE " + ::cQualifiedTableName + " SET " + SR_DBQUALIFY(::aFields[nPos_, 1], ::oSql:nSystemID) + " = RTRIM( BACKUP_ )", lDisplayErrorMessage)
-         //ELSE
-            ::oSql:Exec("UPDATE " + ::cQualifiedTableName + " SET " + SR_DBQUALIFY(::aFields[nPos_, 1], ::oSql:nSystemID) + " = BACKUP_", lDisplayErrorMessage)
-         //ENDIF
+         ::oSql:Exec("UPDATE " + ::cQualifiedTableName + " SET " + SR_DBQUALIFY(::aFields[nPos_, 1], ::oSql:nSystemID) + " = BACKUP_", lDisplayErrorMessage)
          ::oSql:Commit()
          // Drop backup
          ::DropColumn("BACKUP_", lDisplayErrorMessage)
@@ -10379,77 +7740,7 @@ METHOD SR_WORKAREA:AddRuleNotNull(cColumn)
 
          ::oSql:Commit()
 
-         SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_IBMDB2
-         //   IF ::AlterColumns({{::aFields[nCol, 1], ::aFields[nCol, 2], ::aFields[nCol, 3], ::aFields[nCol, 4], .F.}}, .T.)
-         //      nRet := SQL_SUCCESS
-         //   ELSE
-         //      nRet := SQL_ERROR
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_MYSQL
-         //CASE SQLRDD_RDBMS_MARIADB
-         //   SWITCH ::aFields[nCol, 2]
-         //   CASE "C"
-         //      IF ::aFields[nCol, 3] > 255
-         //         cType := "VARCHAR (" + Str(::aFields[nCol, 3], 3) + ")"
-         //      ELSE
-         //         cType := "CHAR (" + Str(::aFields[nCol, 3], 3) + ")"
-         //      ENDIF
-         //      EXIT
-         //   CASE "N"
-         //      IF ::oSql:nSystemID == SQLRDD_RDBMS_MYSQL
-         //         // use type DECIMAL instead of REAL when using MySQL 8 or upper,
-         //         // except if the flag 'SQLRDD_MYSQL_REAL_DATA_TYPE' is set
-         //         #ifdef SQLRDD_MYSQL_REAL_DATA_TYPE
-         //         cType := s_cMySqlNumericDataType + " (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-         //         #else
-         //         IF SubStr(::oSql:cSystemVers, 1, 1) == "5"
-         //            // maintain the original behavior when using MySQL 5
-         //            cType := s_cMySqlNumericDataType + " (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-         //         ELSE
-         //            cType := "DECIMAL (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-         //         ENDIF
-         //         #endif
-         //      ELSE
-         //         // MariaDB
-         //         cType := "DECIMAL (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-         //      ENDIF
-         //      EXIT
-         //   CASE "D"
-         //      cType := "DATE"
-         //   ENDSWITCH
-         //   nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " MODIFY " + cColumn + " " + cType + " NOT NULL", .F.)
-         //   EXIT
-         //CASE SQLRDD_RDBMS_SYBASE
-         //CASE SQLRDD_RDBMS_MSSQL7
-         //CASE SQLRDD_RDBMS_AZURE
-         //   SWITCH ::aFields[nCol, 2]
-         //   CASE "C"
-         //      cType := "CHAR (" + Str(::aFields[nCol, 3], 3) + ")"
-         //      EXIT
-         //   CASE "N"
-         //      cType := "NUMERIC (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-         //      EXIT
-         //   CASE "D"
-         //      cType := "DATETIME"
-         //   ENDSWITCH
-         //   nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " ALTER COLUMN " + cColumn + " " + cType + " NOT NULL", .F.)
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ORACLE
-         //   nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " MODIFY " + cColumn + " NOT NULL", .F.)
-         //   EXIT
-         CASE SQLRDD_RDBMS_POSTGR
-            nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " ALTER COLUMN " + cColumn + " SET NOT NULL", .F.)
-            EXIT
-         //CASE SQLRDD_RDBMS_FIREBR
-         //   nRet := ::oSql:Exec("update RDB$RELATION_FIELDS set RDB$NULL_FLAG = 1 where (RDB$FIELD_NAME = '" + cColumn + "') and (RDB$RELATION_NAME = '" + ::cFileName + "')", .T.)
-         //   EXIT
-         //CASE SQLRDD_RDBMS_FIREBR3
-         //CASE SQLRDD_RDBMS_FIREBR4
-         //CASE SQLRDD_RDBMS_FIREBR5
-         //   nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " ALTER " + cColumn + " NOT NULL", .F.)
-         ENDSWITCH
+         nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " ALTER COLUMN " + cColumn + " SET NOT NULL", .F.)
       ENDIF
    ENDIF
 
@@ -10475,60 +7766,7 @@ METHOD SR_WORKAREA:DropRuleNotNull(cColumn)
 
       ::oSql:Commit()
 
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_IBMDB2
-      //   EXIT
-      //CASE SQLRDD_RDBMS_MYSQL
-      //CASE SQLRDD_RDBMS_MARIADB
-      //   SWITCH ::aFields[nCol, 2]
-      //   CASE "C"
-      //      cType := "CHAR (" + Str(::aFields[nCol, 3], 3) + ")"
-      //      EXIT
-      //   CASE "N"
-      //      IF ::oSql:nSystemID == SQLRDD_RDBMS_MYSQL
-      //         // use type DECIMAL instead of REAL when using MySQL 8 or upper,
-      //         // except if the flag 'SQLRDD_MYSQL_REAL_DATA_TYPE' is set
-      //         #ifdef SQLRDD_MYSQL_REAL_DATA_TYPE
-      //         cType := s_cMySqlNumericDataType + " (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-      //         #else
-      //         IF SubStr(::oSql:cSystemVers, 1, 1) == "5"
-      //            // maintain the original behavior when using MySQL 5
-      //            cType := s_cMySqlNumericDataType + " (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-      //         ELSE
-      //            cType := "DECIMAL (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-      //         ENDIF
-      //         #endif
-      //      ELSE
-      //         // MariaDB
-      //         cType := "DECIMAL (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-      //      ENDIF
-      //      EXIT
-      //   CASE "D"
-      //      cType := "DATE"
-      //   ENDSWITCH
-      //   nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " MODIFY " + cColumn + " " + cType + " NULL", .F.)
-      //   EXIT
-      //CASE SQLRDD_RDBMS_SYBASE
-      //CASE SQLRDD_RDBMS_MSSQL7
-      //CASE SQLRDD_RDBMS_AZURE
-      //   SWITCH ::aFields[nCol, 2]
-      //   CASE "C"
-      //      cType := "CHAR (" + Str(::aFields[nCol, 3], 3) + ")"
-      //      EXIT
-      //   CASE "N"
-      //      cType := "NUMERIC (" + Str(::aFields[nCol, 3], 4) + "," + Str(::aFields[nCol, 4], 3) + ")"
-      //      EXIT
-      //   CASE "D"
-      //      cType := "DATETIME"
-      //   ENDSWITCH
-      //   nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " ALTER COLUMN " + cColumn + " " + cType + " NULL", .F.)
-      //   EXIT
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " MODIFY " + cColumn + " NULL", .F.)
-      //   EXIT
-      CASE SQLRDD_RDBMS_POSTGR
-         nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " ALTER COLUMN " + cColumn + " SET NULL", .F.)
-      ENDSWITCH
+      nRet := ::oSql:Exec("ALTER TABLE " + ::cQualifiedTableName + " ALTER COLUMN " + cColumn + " SET NULL", .F.)
    ENDIF
 
    IF nRet == SQL_SUCCESS .OR. nRet == SQL_SUCCESS_WITH_INFO .OR. nRet == SQL_NO_DATA_FOUND
@@ -10595,31 +7833,7 @@ METHOD SR_WORKAREA:DropConstraint(cTable, cConstraintName, lFKs, cConstrType)
 
       ELSE
 
-         SWITCH ::oSql:nSystemID
-         //CASE SQLRDD_RDBMS_MSSQL6
-         //CASE SQLRDD_RDBMS_MSSQL7
-         //CASE SQLRDD_RDBMS_SYBASE
-         //CASE SQLRDD_RDBMS_AZURE
-         //   cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTable,::oSql:nSystemID) + " DROP CONSTRAINT " + cConstraintName + IIf(::oSql:lComments, " /* Create Constraint */", "")
-         //   EXIT
-         //CASE SQLRDD_RDBMS_MYSQL
-         //CASE SQLRDD_RDBMS_MARIADB
-         //   IF AllTrim(cConstrType) == "PK"
-         //      cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTable,::oSql:nSystemID) + " DROP PRIMARY KEY " + IIf(::oSql:lComments, " /* Create Constraint */", "")
-         //   ELSE
-         //      cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTable,::oSql:nSystemID) + " DROP FOREIGN KEY " + cConstraintName + IIf(::oSql:lComments, " /* Create Constraint */", "")
-         //   ENDIF
-         //   EXIT
-         //CASE SQLRDD_RDBMS_ORACLE
-         //   cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTable,::oSql:nSystemID) + " DROP CONSTRAINT " + cConstraintName + IIf(::oSql:lComments, " /* Create Constraint */", "")
-         //   EXIT
-#ifdef __XHARBOUR__
-         DEFAULT
-#else
-         OTHERWISE
-#endif
-            cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTable,::oSql:nSystemID) + " DROP CONSTRAINT " + cConstraintName + IIf(::oSql:lComments, " /* Create Constraint */", "")
-         ENDSWITCH
+         cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTable,::oSql:nSystemID) + " DROP CONSTRAINT " + cConstraintName + IIf(::oSql:lComments, " /* Create Constraint */", "")
 
          lOk := ::oSql:Exec(cSql,.T.) == SQL_SUCCESS .OR. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
          ::oSql:Commit()
@@ -10679,13 +7893,6 @@ METHOD SR_WORKAREA:CreateConstraint(cSourceTable, aSourceColumns, cTargetTable, 
          cTargetColumns += IIf(i == Len(aTargetColumns), "", ",")
       NEXT i
 
-      //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. Len(cConstraintName) > 30     // Oracle sucks!
-      //   cConstraintName := Right(cConstraintName, 30)
-      //ENDIF
-
-      //IF ::oSql:nSystemID == SQLRDD_RDBMS_IBMDB2 .AND. Len(cConstraintName) > 18     // DB2 sucks!
-      //   cConstraintName := Right(cConstraintName, 18)
-      //ENDIF
       // ? "OK", AllTrim(::cFileName) , AllTrim(cTargetTable) , Upper(AllTrim(cSourceColumns)) , Upper(AllTrim(cTargetColumns))
       lPk := (AllTrim(::cFileName) == AllTrim(cTargetTable) .AND. Upper(AllTrim(cSourceColumns)) == Upper(AllTrim(cTargetColumns)))
 
@@ -10696,11 +7903,6 @@ METHOD SR_WORKAREA:CreateConstraint(cSourceTable, aSourceColumns, cTargetTable, 
             nCol := AScan(::aNames, {|x|Upper(AllTrim(x)) == Upper(AllTrim(aTargetColumns[i]))})
 
             IF nCol > 0 .AND. ::aFields[nCol, FIELD_NULLABLE]
-               //IF ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL6 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_MSSQL7 .OR. ::oSql:nSystemID == SQLRDD_RDBMS_SYBASE .OR. ::oSql:nSystemID == SQLRDD_RDBMS_AZURE
-               //   IF !::DropColRules(aTargetColumns[i], .F., @aRecreateIndex)
-               //      ::RunTimeErr("30", SR_Msg(30) + " Table: " + ::cFileName + " Column: " + aTargetColumns[i])
-               //   ENDIF
-               //ENDIF
                IF !::AddRuleNotNull(aTargetColumns[i])
                   ::RunTimeErr("30", SR_Msg(30) + " Table: " + ::cFileName + " Column: " + aTargetColumns[i])
                ENDIF
@@ -10718,60 +7920,13 @@ METHOD SR_WORKAREA:CreateConstraint(cSourceTable, aSourceColumns, cTargetTable, 
 
       ENDIF
 
-      SWITCH ::oSql:nSystemID
-      //CASE SQLRDD_RDBMS_MSSQL6
-      //CASE SQLRDD_RDBMS_MSSQL7
-      //CASE SQLRDD_RDBMS_SYBASE
-      //CASE SQLRDD_RDBMS_MYSQL
-      //CASE SQLRDD_RDBMS_MARIADB
-      //CASE SQLRDD_RDBMS_AZURE
-      //   IF lPk
-      //      cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " PRIMARY KEY (" + cTargetColumns + ")"
-      //   ELSE
-      //      cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " FOREIGN KEY (" + cSourceColumns + ") REFERENCES " + ::cOwner + SR_DBQUALIFY(cTargetTable,::oSql:nSystemID) + " (" + cTargetColumns + ")"
-      //   ENDIF
-      //   EXIT
-      //CASE SQLRDD_RDBMS_ORACLE
-      //   IF lPk
-      //      cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " PRIMARY KEY (" + cTargetColumns + ")"
-      //   ELSE
-      //      cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " FOREIGN KEY (" + cSourceColumns + ") REFERENCES " + ::cOwner + SR_DBQUALIFY(cTargetTable,::oSql:nSystemID) + " (" + cTargetColumns + ") "
-      //   ENDIF
-      //   EXIT
-      //CASE SQLRDD_RDBMS_FIREBR
-      //CASE SQLRDD_RDBMS_FIREBR3
-      //CASE SQLRDD_RDBMS_FIREBR4
-      //CASE SQLRDD_RDBMS_FIREBR5
-      //   IF lPk
-      //      cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " PRIMARY KEY (" + cTargetColumns + ")"
-      //   ELSE
-      //      cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " FOREIGN KEY (" + cSourceColumns + ") REFERENCES " + ::cOwner + SR_DBQUALIFY(cTargetTable,::oSql:nSystemID) + " (" + cTargetColumns + ")"
-      //   ENDIF
-      //   EXIT
-      CASE SQLRDD_RDBMS_POSTGR
-         cSourceColumns := StrTran(cSourceColumns, Chr(34), "")
-         cTargetColumns := StrTran(cTargetColumns, Chr(34), "")
-         IF lPk
-            cSql := "ALTER TABLE " + ::cOwner + StrTran(SR_DBQUALIFY(cSourceTable,::oSql:nSystemID), Chr(34), "") + " ADD CONSTRAINT " + cConstraintName + " PRIMARY KEY (" + cTargetColumns + ")"
-         ELSE
-            cSql := "ALTER TABLE " + ::cOwner + StrTran(SR_DBQUALIFY(cSourceTable,::oSql:nSystemID), Chr(34), "") + " ADD CONSTRAINT " + cConstraintName + " FOREIGN KEY (" + cSourceColumns + ") REFERENCES " + ::cOwner + StrTran(SR_DBQUALIFY(cTargetTable,::oSql:nSystemID), Chr(34), "") + " (" + cTargetColumns + ")"
-         ENDIF
-         EXIT
-#ifdef __XHARBOUR__
-      DEFAULT
-#else
-      OTHERWISE
-#endif
-         IF lPk
-            cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " PRIMARY KEY (" + cTargetColumns + ")"
-         ELSE
-            cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " FOREIGN KEY (" + cSourceColumns + ") REFERENCES " + ::cOwner + SR_DBQUALIFY(cTargetTable,::oSql:nSystemID) + " (" + cTargetColumns + ")"
-         ENDIF
-      ENDSWITCH
-
-      //IF ::oSql:nSystemID == SQLRDD_RDBMS_ORACLE .AND. lPK
-      //   cSql += IIf(Empty(SR_SetTblSpaceIndx()), "", " USING INDEX TABLESPACE " + SR_SetTblSpaceIndx())
-      //ENDIF
+      cSourceColumns := StrTran(cSourceColumns, Chr(34), "")
+      cTargetColumns := StrTran(cTargetColumns, Chr(34), "")
+      IF lPk
+         cSql := "ALTER TABLE " + ::cOwner + StrTran(SR_DBQUALIFY(cSourceTable,::oSql:nSystemID), Chr(34), "") + " ADD CONSTRAINT " + cConstraintName + " PRIMARY KEY (" + cTargetColumns + ")"
+      ELSE
+         cSql := "ALTER TABLE " + ::cOwner + StrTran(SR_DBQUALIFY(cSourceTable,::oSql:nSystemID), Chr(34), "") + " ADD CONSTRAINT " + cConstraintName + " FOREIGN KEY (" + cSourceColumns + ") REFERENCES " + ::cOwner + StrTran(SR_DBQUALIFY(cTargetTable,::oSql:nSystemID), Chr(34), "") + " (" + cTargetColumns + ")"
+      ENDIF
 
       cSql +=  + IIf(::oSql:lComments, " /* Create constraint */", "")
 
@@ -10998,23 +8153,7 @@ FUNCTION SR_TCNextRecord(oWA)
 
    LOCAL aRet := {}
 
-   SWITCH oWA:oSQL:nSystemID
-   //CASE SQLRDD_RDBMS_SYBASE
-   //CASE SQLRDD_RDBMS_MSSQL7
-   //CASE SQLRDD_RDBMS_AZURE
-   //   oWA:Exec("SELECT isnull(max(R_E_C_N_O_),0) + 1 AS R_E_C_N_O_ FROM " + SR_DBQUALIFY(oWA:cFileName, oWA:oSql:nSystemID), .F., .T., @aRet)
-   //   EXIT
-   //CASE SQLRDD_RDBMS_ORACLE
-   //   oWA:Exec("SELECT nvl(max(R_E_C_N_O_),0) + 1 AS R_E_C_N_O_ FROM " + SR_DBQUALIFY(oWA:cFileName, oWA:oSql:nSystemID), .F., .T., @aRet)
-   //   EXIT
-   //CASE SQLRDD_RDBMS_IBMDB2
-   //   oWA:Exec("SELECT value(max(R_E_C_N_O_),0) + 1 AS R_E_C_N_O_ FROM " + SR_DBQUALIFY(oWA:cFileName, oWA:oSql:nSystemID), .F., .T., @aRet)
-   //   EXIT
-   CASE SQLRDD_RDBMS_POSTGR
-   //CASE SQLRDD_RDBMS_MYSQL
-   //CASE SQLRDD_RDBMS_MARIADB
-      oWA:Exec("SELECT coalesce(max(R_E_C_N_O_),0) + 1 AS R_E_C_N_O_ FROM " + SR_DBQUALIFY(oWA:cFileName, oWA:oSql:nSystemID), .F., .T., @aRet)
-   ENDSWITCH
+   oWA:Exec("SELECT coalesce(max(R_E_C_N_O_),0) + 1 AS R_E_C_N_O_ FROM " + SR_DBQUALIFY(oWA:cFileName, oWA:oSql:nSystemID), .F., .T., @aRet)
 
 RETURN IIf(Len(aRet) > 0, aRet[1, 1], 0)
 
