@@ -1909,12 +1909,12 @@ FUNCTION SR_DetectDBFromDSN(cConnect)
       cBuff := Upper(aToken[1])
 #ifdef __XHARBOUR__
       DO CASE
-      CASE cBuff == "OCI"
-         RETURN CONNECT_ORACLE
-      CASE cBuff == "OCI2"
-         RETURN CONNECT_ORACLE2
-      CASE cBuff == "PGS"
-         RETURN CONNECT_POSTGRES
+      //CASE cBuff == "OCI"
+      //   RETURN CONNECT_ORACLE
+      //CASE cBuff == "OCI2"
+      //   RETURN CONNECT_ORACLE2
+      //CASE cBuff == "PGS"
+      //   RETURN CONNECT_POSTGRES
       CASE cBuff == "MYSQL"
          RETURN CONNECT_MYSQL
       CASE cBuff == "MARIA"
@@ -1922,50 +1922,50 @@ FUNCTION SR_DetectDBFromDSN(cConnect)
          RETURN CONNECT_MARIADB
       CASE cBuff == "MARIADB"
          RETURN CONNECT_MARIADB
-      CASE cBuff == "FB" .OR. ;
-           cBuff == "FIREBIRD" .OR. ;
-           cBuff == "IB"
-         RETURN CONNECT_FIREBIRD
-      CASE cBuff == "FB3" .OR. ;
-           cBuff == "FIREBIRD3"
-         RETURN CONNECT_FIREBIRD3
-      CASE cBuff == "FB4" .OR. ;
-           cBuff == "FIREBIRD4"
-         RETURN CONNECT_FIREBIRD4
-      CASE cBuff == "FB5" .OR. ;
-           cBuff == "FIREBIRD5"
-         RETURN CONNECT_FIREBIRD5
+      //CASE cBuff == "FB" .OR. ;
+      //     cBuff == "FIREBIRD" .OR. ;
+      //     cBuff == "IB"
+      //   RETURN CONNECT_FIREBIRD
+      //CASE cBuff == "FB3" .OR. ;
+      //     cBuff == "FIREBIRD3"
+      //   RETURN CONNECT_FIREBIRD3
+      //CASE cBuff == "FB4" .OR. ;
+      //     cBuff == "FIREBIRD4"
+      //   RETURN CONNECT_FIREBIRD4
+      //CASE cBuff == "FB5" .OR. ;
+      //     cBuff == "FIREBIRD5"
+      //   RETURN CONNECT_FIREBIRD5
       CASE cBuff == "DSN" .OR. ;
            cBuff == "DRIVER"
          RETURN CONNECT_ODBC
       ENDCASE
 #else
       SWITCH cBuff
-      CASE "OCI"
-         RETURN CONNECT_ORACLE
-      CASE "OCI2"
-         RETURN CONNECT_ORACLE2
-      CASE "PGS"
-         RETURN CONNECT_POSTGRES
+      //CASE "OCI"
+      //   RETURN CONNECT_ORACLE
+      //CASE "OCI2"
+      //   RETURN CONNECT_ORACLE2
+      //CASE "PGS"
+      //   RETURN CONNECT_POSTGRES
       CASE "MYSQL"
          RETURN CONNECT_MYSQL
       CASE "MARIA"
       CASE "MARIADB"
          //RETURN CONNECT_MARIA (deprecated)
          RETURN CONNECT_MARIADB
-      CASE "FB"
-      CASE "FIREBIRD"
-      CASE "IB"
-         RETURN CONNECT_FIREBIRD
-      CASE "FB3"
-      CASE "FIREBIRD3"
-         RETURN CONNECT_FIREBIRD3
-      CASE "FB4"
-      CASE "FIREBIRD4"
-         RETURN CONNECT_FIREBIRD4
-      CASE "FB5"
-      CASE "FIREBIRD5"
-         RETURN CONNECT_FIREBIRD5
+      //CASE "FB"
+      //CASE "FIREBIRD"
+      //CASE "IB"
+      //   RETURN CONNECT_FIREBIRD
+      //CASE "FB3"
+      //CASE "FIREBIRD3"
+      //   RETURN CONNECT_FIREBIRD3
+      //CASE "FB4"
+      //CASE "FIREBIRD4"
+      //   RETURN CONNECT_FIREBIRD4
+      //CASE "FB5"
+      //CASE "FIREBIRD5"
+      //   RETURN CONNECT_FIREBIRD5
       CASE "DSN"
       CASE "DRIVER"
          RETURN CONNECT_ODBC
