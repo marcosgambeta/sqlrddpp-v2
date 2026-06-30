@@ -2,4 +2,5 @@
 sqlrddpp-v2.hbp
 sqlrddpp-v2-firebird.hbp
 sqlrddpp-v2-mysql.hbp
+sqlrddpp-v2-oracle.hbp
 sqlrddpp-v2-postgresql.hbp
