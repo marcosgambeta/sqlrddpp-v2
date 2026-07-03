@@ -641,11 +641,7 @@ METHOD SR_CONNECTION:Exec(cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRec
                   CASE ARRAY_BLOCK4
                      nAllocated := ARRAY_BLOCK5
                      EXIT
-#ifdef __XHARBOUR__
-                  DEFAULT
-#else
-                  OTHERWISE
-#endif
+                  SR_OTHERWISE
                      nAllocated += ARRAY_BLOCK5
                   ENDSWITCH
 
@@ -1312,11 +1308,7 @@ METHOD SR_CONNECTION:Connect(cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxB
    CASE SQLRDD_RDBMS_ORACLE
       ::cLockWait := " WAIT " + Str(Int(::nLockWaitTime))
       EXIT
-#ifdef __XHARBOUR__
-   DEFAULT
-#else
-   OTHERWISE
-#endif
+   SR_OTHERWISE
       ::cLockWait := ""
    ENDSWITCH
 
