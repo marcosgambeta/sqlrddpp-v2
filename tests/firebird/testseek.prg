@@ -12,15 +12,18 @@
 // Make a copy of this file and change the values below (if necessary).
 // NOTE: the database will be created automatically.
 
-STATIC s_SERVER := ""
-STATIC s_UID    := "SYSDBA"
-STATIC s_PWD    := "masterkey"
-STATIC s_DTB    := "testseek.fdb"
+STATIC s_SERVER     := ""
+STATIC s_PORT       := "3050"
+STATIC s_UID        := "SYSDBA"
+STATIC s_PWD        := "masterkey"
+STATIC s_DTB        := "testseek.fdb"
+STATIC s_TABLE_NAME := "testseek"
+STATIC s_NEW_TABLE  := .F.
+STATIC s_DROP_TABLE := .F.
+STATIC s_NUM_REC    := 1000
+STATIC s_NUM_TIMES  := 2
 
 #define RDD_NAME "SQLRDD"
-#define TABLE_NAME "testseek"
-#define NUM_REC 1000
-#define NUM_TIMES 2
 
 REQUEST SQLRDD
 REQUEST SR_FIREBIRD5
@@ -46,17 +49,25 @@ PROCEDURE Main()
    n := 1
    DO WHILE n <= PCount()
       DO CASE
-      CASE HB_PValue(n) == "--server"
-         s_SERVER := HB_PValue(++n)
-      CASE HB_PValue(n) == "--uid"
-         s_UID := HB_PValue(++n)
-      CASE HB_PValue(n) == "--pwd"
-         s_PWD := HB_PValue(++n)
-      CASE HB_PValue(n) == "--dtb"
-         s_DTB := HB_PValue(++n)
+      CASE HB_PValue(n) == "--server"    ; s_SERVER := HB_PValue(++n)
+      CASE HB_PValue(n) == "--port"      ; s_PORT := HB_PValue(++n)
+      CASE HB_PValue(n) == "--uid"       ; s_UID := HB_PValue(++n)
+      CASE HB_PValue(n) == "--pwd"       ; s_PWD := HB_PValue(++n)
+      CASE HB_PValue(n) == "--dtb"       ; s_DTB := HB_PValue(++n)
+      CASE HB_PValue(n) == "--tablename" ; s_TABLE_NAME := HB_PValue(++n)
+      CASE HB_PValue(n) == "--newtable"  ; s_NEW_TABLE := .T.
+      CASE HB_PValue(n) == "--droptable" ; s_DROP_TABLE := .T.
+      CASE HB_PValue(n) == "--records"   ; s_NUM_REC := val(HB_PValue(++n))
+      CASE HB_PValue(n) == "--times"     ; s_NUM_TIMES := val(HB_PValue(++n))
       ENDCASE
       ++n
    ENDDO
+
+   IF s_NUM_REC < 300
+      ? "The number of records cannot be < 300"
+      WAIT
+      QUIT
+   ENDIF
 
    rddSetDefault(RDD_NAME)
 
@@ -67,33 +78,34 @@ PROCEDURE Main()
    nConnection := sr_AddConnection(CONNECT_FIREBIRD5, "FIREBIRD=" + s_SERVER + ";UID=" + s_UID + ";PWD=" + s_PWD + ";DTB=" + s_DTB)
 
    IF nConnection < 0
-      alert("Connection error. See sqlerror.log for details.")
+      ? "Connection error. See sqlerror.log for details."
+      WAIT
       QUIT
    ENDIF
 
    sr_StartLog(nConnection)
 
-   IF sr_ExistTable(TABLE_NAME)
-      sr_DropTable(TABLE_NAME)
+   IF s_NEW_TABLE .AND. sr_ExistTable(s_TABLE_NAME)
+      sr_DropTable(s_TABLE_NAME)
    ENDIF
 
    // TODO: add more data types
-   IF !sr_ExistTable(TABLE_NAME)
+   IF !sr_ExistTable(s_TABLE_NAME)
       ? "Creating table"
-      dbCreate(TABLE_NAME, {{"ID        ", "N", 10, 0}, ;
-                            {"NAME      ", "C", 10, 0}, ;
-                            {"DATE      ", "D",  8, 0}}, RDD_NAME)
+      dbCreate(s_TABLE_NAME, {{"ID        ", "N", 10, 0}, ;
+                              {"NAME      ", "C", 10, 0}, ;
+                              {"DATE      ", "D",  8, 0}}, RDD_NAME)
    ENDIF
 
    ? "Opening table"
-   USE (TABLE_NAME) EXCLUSIVE VIA (RDD_NAME)
+   USE (s_TABLE_NAME) EXCLUSIVE VIA (RDD_NAME)
    ? "bof()", bof()
    ? "eof()", eof()
    ? "reccount()", reccount()
 
-   IF reccount() == 0 // < NUM_REC
+   IF reccount() == 0 // < s_NUM_REC
       ? "Adding records"
-      FOR n := 1 TO NUM_REC
+      FOR n := 1 TO s_NUM_REC
          APPEND BLANK
          REPLACE ID WITH n
          REPLACE NAME WITH strzero(n, 10)
@@ -113,9 +125,9 @@ PROCEDURE Main()
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
+   FOR n := 1 TO s_NUM_REC * s_NUM_TIMES
       // create a valid id
-      nID := hb_RandomInt(1, NUM_REC)
+      nID := hb_RandomInt(1, s_NUM_REC)
       SEEK nID
       IF found() .AND. !bof() .AND. !eof() .AND. FIELD->ID == nId
          ++nSeekFound
@@ -123,7 +135,7 @@ PROCEDURE Main()
          ++nSeekFailed
       ENDIF
       // create a invalid id
-      nID := hb_RandomInt(NUM_REC + 1, NUM_REC + NUM_REC)
+      nID := hb_RandomInt(s_NUM_REC + 1, s_NUM_REC + s_NUM_REC)
       SEEK nId
       IF !found() .AND. !bof() .AND. eof()
          ++nSeekNotFound
@@ -132,23 +144,23 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
 
    ? "Testing index 1 (ID) with scope"
    SET INDEX TO index1
-   SET SCOPE TO 101, (NUM_REC - 100)
+   SET SCOPE TO 101, (s_NUM_REC - 100)
    nSeekFound := 0
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
+   FOR n := 1 TO s_NUM_REC * s_NUM_TIMES
       // create a valid id
-      nID := hb_RandomInt(101, NUM_REC - 100)
+      nID := hb_RandomInt(101, s_NUM_REC - 100)
       SEEK nID
       IF found() .AND. !bof() .AND. !eof() .AND. FIELD->ID == nId
          ++nSeekFound
@@ -158,8 +170,8 @@ PROCEDURE Main()
       // create a invalid id
       SWITCH hb_RandomInt(1, 3)
       CASE 1; nID := hb_RandomInt(1, 100); EXIT // key is valid, but out of scope
-      CASE 2; nID := hb_RandomInt(NUM_REC - 100 + 1, NUM_REC); EXIT // key is valid, but out of scope
-      CASE 3; nID := hb_RandomInt(NUM_REC + 1, NUM_REC + NUM_REC); EXIT // key is invalid
+      CASE 2; nID := hb_RandomInt(s_NUM_REC - 100 + 1, s_NUM_REC); EXIT // key is valid, but out of scope
+      CASE 3; nID := hb_RandomInt(s_NUM_REC + 1, s_NUM_REC + s_NUM_REC); EXIT // key is invalid
       ENDSWITCH
       SEEK nId
       IF !found() .AND. !bof() .AND. eof()
@@ -169,10 +181,10 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
    SET SCOPE TO
@@ -183,9 +195,9 @@ PROCEDURE Main()
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
+   FOR n := 1 TO s_NUM_REC * s_NUM_TIMES
       // create a valid name
-      cName := strzero(hb_RandomInt(1, NUM_REC), 10)
+      cName := strzero(hb_RandomInt(1, s_NUM_REC), 10)
       SEEK cName
       IF found() .AND. !bof() .AND. !eof() .AND. FIELD->NAME == cName
          ++nSeekFound
@@ -193,7 +205,7 @@ PROCEDURE Main()
          ++nSeekFailed
       ENDIF
       // create a invalid name
-      cName := strzero(hb_RandomInt(NUM_REC + 1, NUM_REC + NUM_REC), 10)
+      cName := strzero(hb_RandomInt(s_NUM_REC + 1, s_NUM_REC + s_NUM_REC), 10)
       SEEK cName
       IF !found() .AND. !bof() .AND. eof()
          ++nSeekNotFound
@@ -202,10 +214,10 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
 
@@ -215,9 +227,9 @@ PROCEDURE Main()
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
+   FOR n := 1 TO s_NUM_REC * s_NUM_TIMES
       // create a valid date
-      dDate := date() - hb_RandomInt(1, NUM_REC)
+      dDate := date() - hb_RandomInt(1, s_NUM_REC)
       SEEK dDate
       IF found() .AND. !bof() .AND. !eof() .AND. FIELD->DATE == dDate
          ++nSeekFound
@@ -225,7 +237,7 @@ PROCEDURE Main()
          ++nSeekFailed
       ENDIF
       // create a invalid date
-      dDate := date() + hb_RandomInt(1, NUM_REC)
+      dDate := date() + hb_RandomInt(1, s_NUM_REC)
       SEEK dDate
       IF !found() .AND. !bof() .AND. eof()
          ++nSeekNotFound
@@ -234,10 +246,10 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
 
@@ -247,8 +259,8 @@ PROCEDURE Main()
    nSeekNotFound := 0
    nSeekFailed := 0
    ? time()
-   FOR n := 1 TO NUM_REC * NUM_TIMES
-      nRand := hb_RandomInt(1, NUM_REC)
+   FOR n := 1 TO s_NUM_REC * s_NUM_TIMES
+      nRand := hb_RandomInt(1, s_NUM_REC)
       // create a valid name
       cName := strzero(nRand, 10)
       // create a valid date
@@ -260,9 +272,9 @@ PROCEDURE Main()
          ++nSeekFailed
       ENDIF
       // create a invalid name
-      cName := strzero(hb_RandomInt(NUM_REC + 1, NUM_REC + NUM_REC), 10)
+      cName := strzero(hb_RandomInt(s_NUM_REC + 1, s_NUM_REC + s_NUM_REC), 10)
       // create a invalid date
-      dDate := date() + hb_RandomInt(1, NUM_REC)
+      dDate := date() + hb_RandomInt(1, s_NUM_REC)
       SEEK cName + dtos(dDate)
       IF !found() .AND. !bof() .AND. eof()
          ++nSeekNotFound
@@ -271,10 +283,10 @@ PROCEDURE Main()
       ENDIF
    NEXT n
    ? time()
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekFound", nSeekFound, iif(nSeekFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
-   // must be NUM_REC * NUM_TIMES
-   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == NUM_REC * NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekFound", nSeekFound, iif(nSeekFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
+   // must be s_NUM_REC * s_NUM_TIMES
+   ? "nSeekNotFound", nSeekNotFound, iif(nSeekNotFound == s_NUM_REC * s_NUM_TIMES, "OK", "ERROR")
    // must be 0
    ? "nSeekFailed", nSeekFailed, iif(nSeekFailed == 0, "OK", "ERROR")
 
@@ -287,8 +299,10 @@ PROCEDURE Main()
    ? "Closing table"
    CLOSE DATABASE
 
-   ? "Removing table"
-   sr_DropTable(TABLE_NAME)
+   IF s_DROP_TABLE .AND. sr_ExistTable(s_TABLE_NAME)
+      ? "Removing table"
+      sr_DropTable(s_TABLE_NAME)
+   ENDIF
 
    sr_StopLog(nConnection)
 

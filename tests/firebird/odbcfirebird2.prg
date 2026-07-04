@@ -15,18 +15,20 @@
 // To use the command line parameters:
 // odbcfirebird2 --driver <drivername> --server <servername> --port <port> --uid <username> --pwd <userpassword> --database <databasename> --client <options> --charset <charset>
 
-STATIC s_ODBC_DRIVER   := "Firebird/InterBase(r) driver"
-STATIC s_ODBC_SERVER   := "localhost"
-STATIC s_ODBC_PORT     := "3050"
-STATIC s_ODBC_UID      := "SYSDBA"
-STATIC s_ODBC_PWD      := "masterkey"
-STATIC s_ODBC_DATABASE := "C:\PATHTODATABASE\TEST.FDB"
-STATIC s_ODBC_CLIENT   := "fbclient.dll"
-STATIC s_ODBC_CHARSET  := "ISO8859_1"
+STATIC s_DRIVER     := "Firebird/InterBase(r) driver"
+STATIC s_SERVER     := "localhost"
+STATIC s_PORT       := "3050"
+STATIC s_UID        := "SYSDBA"
+STATIC s_PWD        := "masterkey"
+STATIC s_DATABASE   := "C:\PATHTODATABASE\TEST.FDB"
+STATIC s_CLIENT     := "fbclient.dll"
+STATIC s_CHARSET    := "ISO8859_1"
+STATIC s_TABLE_NAME := "test"
+STATIC s_NEW_TABLE  := .F.
+STATIC s_DROP_TABLE := .F.
+STATIC s_NUM_REC    := 100
 
 #define RDD_NAME "SQLEX"
-#define TABLE_NAME "test"
-#define NUM_REC 100
 
 REQUEST SQLEX
 REQUEST SR_ODBC
@@ -47,22 +49,18 @@ PROCEDURE Main()
    n := 1
    DO WHILE n <= PCount()
       DO CASE
-      CASE HB_PValue(n) == "--driver"
-         s_ODBC_DRIVER := HB_PValue(++n)
-      CASE HB_PValue(n) == "--server"
-         s_ODBC_SERVER := HB_PValue(++n)
-      CASE HB_PValue(n) == "--port"
-         s_ODBC_PORT := HB_PValue(++n)
-      CASE HB_PValue(n) == "--uid"
-         s_ODBC_UID := HB_PValue(++n)
-      CASE HB_PValue(n) == "--pwd"
-         s_ODBC_PWD := HB_PValue(++n)
-      CASE HB_PValue(n) == "--database"
-         s_ODBC_DATABASE := HB_PValue(++n)
-      CASE HB_PValue(n) == "--client"
-         s_ODBC_CLIENT := HB_PValue(++n)
-      CASE HB_PValue(n) == "--charset"
-         s_ODBC_CHARSET := HB_PValue(++n)
+      CASE HB_PValue(n) == "--driver"    ; s_DRIVER := HB_PValue(++n)
+      CASE HB_PValue(n) == "--server"    ; s_SERVER := HB_PValue(++n)
+      CASE HB_PValue(n) == "--port"      ; s_PORT := HB_PValue(++n)
+      CASE HB_PValue(n) == "--uid"       ; s_UID := HB_PValue(++n)
+      CASE HB_PValue(n) == "--pwd"       ; s_PWD := HB_PValue(++n)
+      CASE HB_PValue(n) == "--database"  ; s_DATABASE := HB_PValue(++n)
+      CASE HB_PValue(n) == "--client"    ; s_CLIENT := HB_PValue(++n)
+      CASE HB_PValue(n) == "--charset"   ; s_CHARSET := HB_PValue(++n)
+      CASE HB_PValue(n) == "--tablename" ; s_TABLE_NAME := HB_PValue(++n)
+      CASE HB_PValue(n) == "--newtable"  ; s_NEW_TABLE := .T.
+      CASE HB_PValue(n) == "--droptable" ; s_DROP_TABLE := .T.
+      CASE HB_PValue(n) == "--records"   ; s_NUM_REC := val(HB_PValue(++n))
       ENDCASE
       ++n
    ENDDO
@@ -70,36 +68,41 @@ PROCEDURE Main()
    rddSetDefault(RDD_NAME)
 
    nConnection := sr_AddConnection(CONNECT_ODBC, ;
-      "driver="   + s_ODBC_DRIVER   + ";" + ;
-      "server="   + s_ODBC_SERVER   + ";" + ;
-      "port="     + s_ODBC_PORT     + ";" + ;
-      "uid="      + s_ODBC_UID      + ";" + ;
-      "pwd="      + s_ODBC_PWD      + ";" + ;
-      "database=" + s_ODBC_DATABASE + ";" + ;
-      "client="   + s_ODBC_CLIENT   + ";" + ;
-      "charset="  + s_ODBC_CHARSET  + ";")
+      "driver="   + s_DRIVER   + ";" + ;
+      "server="   + s_SERVER   + ";" + ;
+      "port="     + s_PORT     + ";" + ;
+      "uid="      + s_UID      + ";" + ;
+      "pwd="      + s_PWD      + ";" + ;
+      "database=" + s_DATABASE + ";" + ;
+      "client="   + s_CLIENT   + ";" + ;
+      "charset="  + s_CHARSET  + ";")
 
    IF nConnection < 0
-      alert("Connection error. See sqlerror.log for details.")
+      ? "Connection error. See sqlerror.log for details."
+      WAIT
       QUIT
    ENDIF
 
    sr_StartLog(nConnection)
 
-   IF !sr_ExistTable(TABLE_NAME)
-      dbCreate(TABLE_NAME, {{"ID",      "N", 10, 0}, ;
-                            {"FIRST",   "C", 30, 0}, ;
-                            {"LAST",    "C", 30, 0}, ;
-                            {"AGE",     "N",  3, 0}, ;
-                            {"DATE",    "D",  8, 0}, ;
-                            {"MARRIED", "L",  1, 0}, ;
-                            {"VALUE",   "N", 12, 2}}, RDD_NAME)
+   IF s_NEW_TABLE .AND. sr_ExistTable(s_TABLE_NAME)
+      sr_DropTable(s_TABLE_NAME)
    ENDIF
 
-   USE (TABLE_NAME) EXCLUSIVE VIA (RDD_NAME)
+   IF !sr_ExistTable(s_TABLE_NAME)
+      dbCreate(s_TABLE_NAME, {{"ID",      "N", 10, 0}, ;
+                              {"FIRST",   "C", 30, 0}, ;
+                              {"LAST",    "C", 30, 0}, ;
+                              {"AGE",     "N",  3, 0}, ;
+                              {"DATE",    "D",  8, 0}, ;
+                              {"MARRIED", "L",  1, 0}, ;
+                              {"VALUE",   "N", 12, 2}}, RDD_NAME)
+   ENDIF
+
+   USE (s_TABLE_NAME) ALIAS TEST EXCLUSIVE VIA (RDD_NAME)
 
    IF reccount() == 0
-      FOR n := 1 TO NUM_REC
+      FOR n := 1 TO s_NUM_REC
          APPEND BLANK
          REPLACE ID      WITH n
          REPLACE FIRST   WITH "FIRST" + hb_ntos(n)
@@ -133,27 +136,20 @@ PROCEDURE Main()
       dispend()
       nKey := inkey(0)
       SWITCH nKey
-      CASE K_UP
-         oTB:up()
-         EXIT
-      CASE K_DOWN
-         oTB:down()
-         EXIT
-      CASE K_LEFT
-         oTB:left()
-         EXIT
-      CASE K_RIGHT
-         oTB:right()
-         EXIT
-      CASE K_PGUP
-         oTB:PageUp()
-         EXIT
-      CASE K_PGDN
-         oTB:PageDown()
+      CASE K_UP    ; oTB:up()       ; EXIT
+      CASE K_DOWN  ; oTB:down()     ; EXIT
+      CASE K_LEFT  ; oTB:left()     ; EXIT
+      CASE K_RIGHT ; oTB:right()    ; EXIT
+      CASE K_PGUP  ; oTB:PageUp()   ; EXIT
+      CASE K_PGDN  ; oTB:PageDown()
       ENDSWITCH
    ENDDO
 
    CLOSE DATABASE
+
+   IF s_DROP_TABLE .AND. sr_ExistTable(s_TABLE_NAME)
+      sr_DropTable(s_TABLE_NAME)
+   ENDIF
 
    sr_StopLog(nConnection)
 
