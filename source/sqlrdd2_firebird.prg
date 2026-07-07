@@ -5187,7 +5187,7 @@ METHOD SR_WORKAREA:sqlOrderListAdd(cBagName, cTag)
                ::aIndex[nLen, SYNTH_INDEX_COL_POS] := nPos
                SWITCH ::aFields[nPos, FIELD_TYPE]
                CASE "C"
-                  IF ::aFields[nPos, FIELD_TYPE] == ::cDeletedName // TODO: check this code
+                  IF ::aNames[nPos] == ::cDeletedName
                      cXBase += "Deleted() + "
                   ELSE
                      cXBase += ::aNames[nPos] + " + "
