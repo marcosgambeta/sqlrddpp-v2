@@ -100,6 +100,53 @@ hbmk2 <filename> sqlrddpp-v2.hbc -llibpq
 hbmk2 <filename> sqlrddpp-v2.hbc -lfbclient
 ```
 
+## Bibliotecas dedicadas
+
+Além da biblioteca principal, existem bibliotecas dedicadas para Firebird, MySQL/MariaDB,
+Oracle e PostgreSQL. Siga estas etapas para compilar essas bibliotecas:
+
+1. Para compilar todas as bibliotecas (principal e dedicadas):
+
+```Batch
+hbmk2 sqlrddpp-v2-alllibs.hbp
+```
+
+2. Para compilar a biblioteca para Firebird:
+
+```Batch
+hbmk2 sqlrddpp-v2-firebird.hbp
+```
+
+3. Para compilar a biblioteca para MySQL/MariaDB:
+
+```Batch
+hbmk2 sqlrddpp-v2-mysql.hbp
+```
+
+4. Para compilar a biblioteca para Oracle:
+
+```Batch
+hbmk2 sqlrddpp-v2-oracle.hbp
+```
+
+5. Para compilar a biblioteca para PostgreSQL:
+
+```Batch
+hbmk2 sqlrddpp-v2-postgresql.hbp
+```
+
+6. Use o arquivo .hbc equivalente para compilar seus programas:
+
+```Batch
+hbmk2 <filename> sqlrddpp-v2-firebird.hbc ...
+hbmk2 <filename> sqlrddpp-v2-mysql.hbc ...
+hbmk2 <filename> sqlrddpp-v2-oracle.hbc ...
+hbmk2 <filename> sqlrddpp-v2-postgresql.hbc ...
+```
+
+As bibliotecas dedicadas apresentam o mesmo comportamento da biblioteca principal, mas
+o código é mais enxuto e não precisa verificar constantemente qual SGBD está sendo utilizado.
+
 ## Problemas na utilização
 
 Caso tenha problemas na utilização deste projeto, informe na seção 'Issues':
