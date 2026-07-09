@@ -306,19 +306,19 @@ HB_FUNC(SR_LISTODBCDRIVERS)
   hb_itemReturnRelease(pArray);
 }
 
-HB_FUNC(SR_LISTODBCDATASOURCES)
+static bool sr_listodbcdatasources(SQLUSMALLINT direction)
 {
   SQLHENV henv = SQL_NULL_HENV;
 
   if (SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv) != SQL_SUCCESS) {
     hb_reta(0);
-    return;
+    return false;
   }
 
   if (SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0) != SQL_SUCCESS) {
     SQLFreeHandle(SQL_HANDLE_ENV, henv);
     hb_reta(0);
-    return;
+    return false;
   }
 
   SQLCHAR dsn_name[SQL_MAX_DSN_LENGTH + 1];
@@ -327,7 +327,7 @@ HB_FUNC(SR_LISTODBCDATASOURCES)
   SQLSMALLINT driver_desc_len;
 
   // first entry
-  SQLRETURN retcode = SQLDataSources(henv, SQL_FETCH_FIRST,
+  SQLRETURN retcode = SQLDataSources(henv, direction,
                                      dsn_name, sizeof(dsn_name), &dsn_name_len,
                                      driver_desc, sizeof(driver_desc), &driver_desc_len);
 
@@ -350,104 +350,23 @@ HB_FUNC(SR_LISTODBCDATASOURCES)
   }
 
   SQLFreeHandle(SQL_HANDLE_ENV, henv);
-
   hb_itemReturnRelease(pArray);
+  return true;
+}
+
+HB_FUNC(SR_LISTODBCDATASOURCES)
+{
+  sr_listodbcdatasources(HB_ISNUM(1) ? (SQLUSMALLINT)hb_parni(1) : SQL_FETCH_FIRST);
 }
 
 HB_FUNC(SR_LISTODBCUSERDATASOURCES)
 {
-  SQLHENV henv = SQL_NULL_HENV;
-
-  if (SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv) != SQL_SUCCESS) {
-    hb_reta(0);
-    return;
-  }
-
-  if (SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0) != SQL_SUCCESS) {
-    SQLFreeHandle(SQL_HANDLE_ENV, henv);
-    hb_reta(0);
-    return;
-  }
-
-  SQLCHAR dsn_name[SQL_MAX_DSN_LENGTH + 1];
-  SQLSMALLINT dsn_name_len;
-  SQLCHAR driver_desc[256];
-  SQLSMALLINT driver_desc_len;
-
-  // first entry
-  SQLRETURN retcode = SQLDataSources(henv, SQL_FETCH_FIRST_USER,
-                                     dsn_name, sizeof(dsn_name), &dsn_name_len,
-                                     driver_desc, sizeof(driver_desc), &driver_desc_len);
-
-
-  PHB_ITEM pArray = hb_itemNew(nullptr);
-  hb_arrayNew(pArray, 0);
-
-  while (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
-    // add DSN name and driver description to array
-    PHB_ITEM pTempArray = hb_itemNew(nullptr);
-    hb_arrayNew(pTempArray, 2);
-    hb_arraySetC(pTempArray, 1, (const char *)dsn_name);
-    hb_arraySetC(pTempArray, 2, (const char *)driver_desc);
-    hb_arrayAddForward(pArray, pTempArray);
-    hb_itemRelease(pTempArray);
-    // next entry
-    retcode = SQLDataSources(henv, SQL_FETCH_NEXT,
-                             dsn_name, sizeof(dsn_name), &dsn_name_len,
-                             driver_desc, sizeof(driver_desc), &driver_desc_len);
-  }
-
-  SQLFreeHandle(SQL_HANDLE_ENV, henv);
-
-  hb_itemReturnRelease(pArray);
+  sr_listodbcdatasources(SQL_FETCH_FIRST_USER);
 }
 
 HB_FUNC(SR_LISTODBCSYSTEMDATASOURCES)
 {
-  SQLHENV henv = SQL_NULL_HENV;
-
-  if (SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv) != SQL_SUCCESS) {
-    hb_reta(0);
-    return;
-  }
-
-  if (SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0) != SQL_SUCCESS) {
-    SQLFreeHandle(SQL_HANDLE_ENV, henv);
-    hb_reta(0);
-    return;
-  }
-
-  SQLCHAR dsn_name[SQL_MAX_DSN_LENGTH + 1];
-  SQLSMALLINT dsn_name_len;
-  SQLCHAR driver_desc[256];
-  SQLSMALLINT driver_desc_len;
-
-  // first entry
-  SQLRETURN retcode = SQLDataSources(henv, SQL_FETCH_FIRST_SYSTEM,
-                                     dsn_name, sizeof(dsn_name), &dsn_name_len,
-                                     driver_desc, sizeof(driver_desc), &driver_desc_len);
-
-
-  PHB_ITEM pArray = hb_itemNew(nullptr);
-  hb_arrayNew(pArray, 0);
-
-  while (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
-    // add DSN name and driver description to array
-    PHB_ITEM pTempArray = hb_itemNew(nullptr);
-    hb_arrayNew(pTempArray, 2);
-    hb_arraySetC(pTempArray, 1, (const char *)dsn_name);
-    hb_arraySetC(pTempArray, 2, (const char *)driver_desc);
-    hb_arrayAddForward(pArray, pTempArray);
-    hb_itemRelease(pTempArray);
-    // next entry
-    retcode = SQLDataSources(henv, SQL_FETCH_NEXT,
-                             dsn_name, sizeof(dsn_name), &dsn_name_len,
-                             driver_desc, sizeof(driver_desc), &driver_desc_len);
-  }
-
-  SQLFreeHandle(SQL_HANDLE_ENV, henv);
-
-  hb_itemReturnRelease(pArray);
+  sr_listodbcdatasources(SQL_FETCH_FIRST_SYSTEM);
 }
 
 #endif
