@@ -253,6 +253,59 @@ HB_FUNC(SR_UNINSTALLUSERDSN)
   }
 }
 
+HB_FUNC(SR_LISTODBCDRIVERS)
+{
+  SQLHENV henv = SQL_NULL_HENV;
+
+  if (SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv) != SQL_SUCCESS) {
+    hb_reta(0);
+    return;
+  }
+
+  if (SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0) != SQL_SUCCESS) {
+    SQLFreeHandle(SQL_HANDLE_ENV, henv);
+    hb_reta(0);
+    return;
+  }
+
+  SQLCHAR driverDesc[256];
+  SQLSMALLINT descLen;
+  SQLCHAR driverAttr[256];
+  SQLSMALLINT attrLen;
+
+  // first entry
+  SQLRETURN retcode = SQLDrivers(henv, SQL_FETCH_FIRST,
+                                 driverDesc, sizeof(driverDesc), &descLen,
+                                 driverAttr, sizeof(driverAttr), &attrLen);
+
+  PHB_ITEM pArray = hb_itemNew(nullptr);
+  hb_arrayNew(pArray, 0);
+
+  while (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+    // change '\0' to ';'
+    for (int i = attrLen - 1; i > 0; i--) {
+      if (driverAttr[i] == '\0') {
+        driverAttr[i] = ';';
+      }
+    }
+    // add description and attributes to array
+    PHB_ITEM pTempArray = hb_itemNew(nullptr);
+    hb_arrayNew(pTempArray, 2);
+    hb_arraySetC(pTempArray, 1, (const char *)driverDesc);
+    hb_arraySetC(pTempArray, 2, (const char *)driverAttr);
+    hb_arrayAddForward(pArray, pTempArray);
+    hb_itemRelease(pTempArray);
+    // next entry
+    retcode = SQLDrivers(henv, SQL_FETCH_NEXT,
+                         driverDesc, sizeof(driverDesc), &descLen,
+                         driverAttr, sizeof(driverAttr), &attrLen);
+  }
+
+  SQLFreeHandle(SQL_HANDLE_ENV, henv);
+
+  hb_itemReturnRelease(pArray);
+}
+
 #endif
 
 //----------------------------------------------------------------------------//
