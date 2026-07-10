@@ -921,7 +921,9 @@ void *hb_xreallocDebug(int iline, void *p, HB_SIZE ulSize)
 #ifdef _MSC_VER
 #define strdupx hb_strdup
 #else
+#if !defined(__BORLANDC__)
 extern char *strdup __P((const char *s));
+#endif
 #define strdupx hb_strdup
 #endif
 
