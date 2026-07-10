@@ -26,7 +26,7 @@ HBFLAGS = \
 	-I$(SRC_DIR) \
 	-I$(HB_INC_DIR)
 
-CC = clang
+CC = clang++
 
 CFLAGS = \
 	-Wall \
