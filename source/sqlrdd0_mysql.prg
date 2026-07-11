@@ -656,14 +656,18 @@ RETURN NIL
 STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
 
    LOCAL aRet := {}
-   LOCAL cRet := ""
+   LOCAL cRet //:= "" (value not used)
    LOCAL i
    LOCAL oCnn
    LOCAL cStartingVersion
    //LOCAL cSql (variable not used)
    LOCAL lOld
+   LOCAL cToolsOwner
 
-   HB_SYMBOL_UNUSED(cRet)
+   //HB_SYMBOL_UNUSED(cRet)
+
+   // call SR_GetToolsOwner() function one time and store the value in a local variable
+   cToolsOwner := SR_GetToolsOwner()
 
    FOR i := 1 TO 2
 
@@ -683,157 +687,107 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
 
    // check for the control tables
    aRet := {}
-   oConnect:Exec("SELECT VERSION_, SIGNATURE_ FROM " + SR_GetToolsOwner() + "SR_MGMNTVERSION", .F., .T., @aRet)
+   oConnect:Exec("SELECT VERSION_, SIGNATURE_ FROM " + cToolsOwner + "SR_MGMNTVERSION", .F., .T., @aRet)
 
-   IF Len(aRet) > 0
-      cStartingVersion := AllTrim(aRet[1, 1])
-   ELSE
-      cStartingVersion := ""
-   ENDIF
+   cStartingVersion := IIf(Len(aRet) > 0, AllTrim(aRet[1, 1]), "")
 
    IF cStartingVersion < "MGMNT 1.02"
       // Only use BASIC types and commands to be 100% darabase independent
       oConnect:Commit()
-      oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTVERSION", .F.)
+      oConnect:Exec("DROP TABLE " + cToolsOwner + "SR_MGMNTVERSION", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + ;
-         "SR_MGMNTVERSION (VERSION_ CHAR(20), SIGNATURE_ CHAR(20))", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTVERSION (VERSION_ CHAR(20), SIGNATURE_ CHAR(20))", .F.)
       oConnect:Commit()
-
-      oConnect:Exec("INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTVERSION (VERSION_, SIGNATURE_) VALUES ('" + ;
-         HB_SR__MGMNT_VERSION + "', '" + DToS(Date()) + " " + Time() + "')", .T.)
+      oConnect:Exec("INSERT INTO " + cToolsOwner + "SR_MGMNTVERSION (VERSION_, SIGNATURE_) VALUES ('" + HB_SR__MGMNT_VERSION + "', '" + DToS(Date()) + " " + Time() + "')", .T.)
       oConnect:Commit()
-      oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTINDEXES", .F.)
+      oConnect:Exec("DROP TABLE " + cToolsOwner + "SR_MGMNTINDEXES", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTINDEXES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), IDXNAME_ CHAR(64), PHIS_NAME_ CHAR(64), IDXKEY_ VARCHAR(254), IDXFOR_ VARCHAR(254), IDXCOL_ CHAR(3), TAG_ CHAR(30), TAGNUM_ CHAR(6) )", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTINDEXES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), IDXNAME_ CHAR(64), PHIS_NAME_ CHAR(64), IDXKEY_ VARCHAR(254), IDXFOR_ VARCHAR(254), IDXCOL_ CHAR(3), TAG_ CHAR(30), TAGNUM_ CHAR(6) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + " " + " INDEX " + ;
-         "" + "SR_MGMNTINDEX01 ON " + ;
-         SR_GetToolsOwner() + "SR_MGMNTINDEXES ( TABLE_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTINDEX01 ON " + cToolsOwner + "SR_MGMNTINDEXES ( TABLE_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + ;
-         "SR_MGMNTINDEX02 ON " + SR_GetToolsOwner() + "SR_MGMNTINDEXES ( IDXNAME_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTINDEX02 ON " + cToolsOwner + "SR_MGMNTINDEXES ( IDXNAME_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES", .F.)
+      oConnect:Exec("DROP TABLE " + cToolsOwner + "SR_MGMNTTABLES", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + " " + " INDEX " + ;
-         "" + "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTTABLES01 ON " + cToolsOwner + "SR_MGMNTTABLES ( TABLE_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + " " + " INDEX " + ;
-         "" + "SR_MGMNTCONSTRAINTS01 ON " + ;
-         SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTCONSTRAINTS01 ON " + cToolsOwner + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + " " + " INDEX " + ;
-         "" + "SR_MGMNTCONSTRSRCCOLS01 ON " + ;
-         SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTCONSTRSRCCOLS01 ON " + cToolsOwner + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + " " + " INDEX " + ;
-         "" + "SR_MGMNTCONSTRTGTCOLS01 ON " + ;
-         SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
-
-      // Caché - should add dual table ,like Oracle
-
+      oConnect:Exec("CREATE INDEX SR_MGMNTCONSTRTGTCOLS01 ON " + cToolsOwner + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
       cRet := HB_SR__MGMNT_VERSION
-
    ELSEIF cStartingVersion < "MGMNT 1.03"
-
       oConnect:Commit()
-      oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES", .F.)
+      oConnect:Exec("DROP TABLE " + cToolsOwner + "SR_MGMNTTABLES", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTTABLES (TABLE_ CHAR(50), SIGNATURE_ CHAR(20), CREATED_ CHAR(20), TYPE_ CHAR(30), REGINFO_ CHAR(15))", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + ;
-         "SR_MGMNTTABLES01 ON " + SR_GetToolsOwner() + "SR_MGMNTTABLES ( TABLE_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTTABLES01 ON " + cToolsOwner + "SR_MGMNTTABLES ( TABLE_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
+      oConnect:Exec("UPDATE " + cToolsOwner + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
       oConnect:Commit()
-
       cRet := HB_SR__MGMNT_VERSION
    ELSE
       cRet := aRet[1, 1]
    ENDIF
 
    IF cStartingVersion < "MGMNT 1.65"
-
       oConnect:Commit()
-      oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS", .F.)
+      oConnect:Exec("DROP TABLE " + cToolsOwner + "SR_MGMNTLOCKS", .F.)
       oConnect:Commit()
-      oConnect:Exec("DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTLTABLES", .F.) // Table REMOVED from SQLRDD catalogs
+      oConnect:Exec("DROP TABLE " + cToolsOwner + "SR_MGMNTLTABLES", .F.) // Table REMOVED from SQLRDD catalogs
       oConnect:Commit()
-
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + ;
-         "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ DECIMAL(8), LOGIN_TIME_ TIMESTAMP )", .F.)
-
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ DECIMAL(8), LOGIN_TIME_ TIMESTAMP )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + " " + " INDEX " + ;
-         "" + "SR_MGMNTLOCKS01 ON " + ;
-         SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTLOCKS01 ON " + cToolsOwner + "SR_MGMNTLOCKS ( LOCK_, WSID_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + ;
-         "SR_MGMNTLOCKS02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( WSID_, LOCK_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTLOCKS02 ON " + cToolsOwner + "SR_MGMNTLOCKS ( WSID_, LOCK_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + ;
-         "SR_MGMNTLOCKS03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( SPID_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTLOCKS03 ON " + cToolsOwner + "SR_MGMNTLOCKS ( SPID_ )", .F.)
       oConnect:Commit()
-
-      oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
+      oConnect:Exec("UPDATE " + cToolsOwner + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
       oConnect:Commit()
-
       cRet := HB_SR__MGMNT_VERSION
    ENDIF
 
    IF cStartingVersion < "MGMNT 1.50"
-
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_ CHAR(50), COLUMN_ CHAR(50), TYPE_ CHAR(1), LEN_ CHAR(8), DEC_ CHAR(8) )", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTLANG ( TABLE_ CHAR(50), COLUMN_ CHAR(50), TYPE_ CHAR(1), LEN_ CHAR(8), DEC_ CHAR(8) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE " + " " + " INDEX " + ;
-         "" + "SR_MGMNTLANG01 ON " + ;
-         SR_GetToolsOwner() + "SR_MGMNTLANG ( TABLE_, COLUMN_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTLANG01 ON " + cToolsOwner + "SR_MGMNTLANG ( TABLE_, COLUMN_ )", .F.)
       oConnect:Commit()
-
-      oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
+      oConnect:Exec("UPDATE " + cToolsOwner + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
       oConnect:Commit()
-
       cRet := HB_SR__MGMNT_VERSION
    ENDIF
 
    IF cStartingVersion < "MGMNT 1.60"
-
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_ CHAR(50), TARGETTABLE_ CHAR(50), CONSTRNAME_ CHAR(50), CONSTRTYPE_ CHAR(2) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + ;
-         "SR_MGMNTCONSTRAINTS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
-
+      oConnect:Exec("CREATE INDEX SR_MGMNTCONSTRAINTS01 ON " + cToolsOwner + "SR_MGMNTCONSTRAINTS ( SOURCETABLE_, CONSTRNAME_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), SOURCECOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + ;
-         "SR_MGMNTCONSTRSRCCOLS01 ON " + SR_GetToolsOwner() + ;
-         "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
-
+      oConnect:Exec("CREATE INDEX SR_MGMNTCONSTRSRCCOLS01 ON " + cToolsOwner + "SR_MGMNTCONSTRSRCCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_ CHAR(50), CONSTRNAME_ CHAR(50), ORDER_ CHAR(02), TARGETCOLUMN_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + ;
-         "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + ;
-         "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
-
+      oConnect:Exec("CREATE INDEX SR_MGMNTCONSTRTGTCOLS01 ON " + cToolsOwner + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
+      oConnect:Exec("UPDATE " + cToolsOwner + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
       oConnect:Commit()
-
       cRet := HB_SR__MGMNT_VERSION
-
    ENDIF
 
    IF cStartingVersion < "MGMNT 1.67"
@@ -867,19 +821,19 @@ STATIC FUNCTION SR_SetEnvSQLRDD(oConnect)
       SR_UseDeleteds(lOld)
 
 #if 0
-      oConnect:Exec("CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ BIGINT(12) NOT NULL, WPID_ BIGINT(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ MEDIUMBLOB, CALLSTACK_ MEDIUMBLOB, SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
+      oConnect:Exec("CREATE TABLE " + cToolsOwner + "SR_MGMNTLOGCHG (SPID_ BIGINT(12) NOT NULL, WPID_ BIGINT(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ MEDIUMBLOB, CALLSTACK_ MEDIUMBLOB, SITE_ CHAR(10), FREE1_ CHAR(50) )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + "SR_MGMNTLOGCHG01 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( SPID_, WPID_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTLOGCHG01 ON " + cToolsOwner + "SR_MGMNTLOGCHG ( SPID_, WPID_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + "SR_MGMNTLOGCHG02 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( APPUSER_, SPID_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTLOGCHG02 ON " + cToolsOwner + "SR_MGMNTLOGCHG ( APPUSER_, SPID_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + "SR_MGMNTLOGCHG03 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TIME_, SITE_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTLOGCHG03 ON " + cToolsOwner + "SR_MGMNTLOGCHG ( TIME_, SITE_ )", .F.)
       oConnect:Commit()
-      oConnect:Exec("CREATE INDEX " + "" + "SR_MGMNTLOGCHG04 ON " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG ( TYPE_, TIME_ )", .F.)
+      oConnect:Exec("CREATE INDEX SR_MGMNTLOGCHG04 ON " + cToolsOwner + "SR_MGMNTLOGCHG ( TYPE_, TIME_ )", .F.)
       oConnect:Commit()
 #endif
 
-      oConnect:Exec("UPDATE " + SR_GetToolsOwner() + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
+      oConnect:Exec("UPDATE " + cToolsOwner + "SR_MGMNTVERSION SET VERSION_ = '" + HB_SR__MGMNT_VERSION + "'")
       oConnect:Commit()
 
       cRet := HB_SR__MGMNT_VERSION
