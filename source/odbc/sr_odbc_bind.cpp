@@ -478,7 +478,7 @@ HB_FUNC_STATIC(SR_FREESTM)
 
   hb_retni(-1);
 
-  // hb_retni(SQLFreeStmt((HSTMT) hb_parptr(1), hb_parni(2)));
+  // hb_retni(SQLFreeStmt(static_cast<HSTMT>(hb_parptr(1)), hb_parni(2)));
 }
 
 //----------------------------------------------------------------------------//
@@ -1081,7 +1081,7 @@ HB_FUNC_STATIC(SR_DESCRIB)
   auto bBuffer = static_cast<SQLTCHAR *>(hb_xgrab(lLen * sizeof(SQLTCHAR)));
   bBuffer[0] = '\0';
 
-  wResult = SQLDescribeCol((HSTMT)hb_parptr(1), SR_PAR_SQLUSMALLINT(2),
+  wResult = SQLDescribeCol(static_cast<HSTMT>(hb_parptr(1)), SR_PAR_SQLUSMALLINT(2),
                            static_cast<SQLTCHAR *>(bBuffer), lLen, &wBufLen, &wDataType,
                            &wColSize, &wDecimals, &wNullable);
   if (wDataType == -8 && ulSystemID == SQLRDD::RDBMS::MYSQL) {
@@ -1403,13 +1403,13 @@ void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQu
     char buffer[2];
     lLenOut = 0;
     // res = 0;
-    res = SQLGetData((HSTMT)hStmt, ui, SQL_CHAR, buffer, 0, &lLenOut);
+    res = SQLGetData(static_cast<HSTMT>(hStmt), ui, SQL_CHAR, buffer, 0, &lLenOut);
     if (SQL_SUCCEEDED(res)) {
       if (static_cast<int>(lLenOut) == SQL_NULL_DATA || lLenOut == 0) {
         sr_odbcFieldGet(pField, pItem, nullptr, -1, bQueryOnly, ulSystemID, bTranslate);
       } else if (lLenOut > 0) {
         auto val = static_cast<char *>(hb_xgrab(lLenOut + 1));
-        res = SQLGetData((HSTMT)hStmt, ui, SQL_CHAR, val, lLenOut + 1, &lLenOut);
+        res = SQLGetData(static_cast<HSTMT>(hStmt), ui, SQL_CHAR, val, lLenOut + 1, &lLenOut);
         if (SQL_SUCCEEDED(res)) {
           sr_odbcFieldGet(pField, pItem, static_cast<char *>(val), lLenOut, bQueryOnly,
                           ulSystemID, bTranslate);
