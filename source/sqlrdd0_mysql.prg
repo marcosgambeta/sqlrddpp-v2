@@ -78,6 +78,18 @@ STATIC s_mutex := hb_mutexcreate()
 STATIC s_aConnections := {}
 STATIC s_nActiveConnection := 0
 
+#ifdef __XHARBOUR__
+#define SR_MUTEXLOCK(mutex)
+#else
+#define SR_MUTEXLOCK(mutex) hb_mutexlock(mutex)
+#endif
+
+#ifdef __XHARBOUR__
+#define SR_MUTEXUNLOCK(mutex)
+#else
+#define SR_MUTEXUNLOCK(mutex) hb_mutexunlock(mutex)
+#endif
+
 STATIC s_lTblMgmnt := .F.
 STATIC s_EvalFilters := .F.
 STATIC s_RecnoName := "SR_RECNO"
@@ -394,9 +406,7 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
    LOCAL oConnect
    LOCAL oConnect2
 
-#ifndef __XHARBOUR__
-   hb_mutexlock(s_mutex)
-#endif
+   SR_MUTEXLOCK(s_mutex)
 
    DEFAULT nType TO CONNECT_ODBC
    DEFAULT lAutoCommit TO .F.
@@ -526,9 +536,7 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
       EXIT
    SR_OTHERWISE
       SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + Str(nType))
-#ifndef __XHARBOUR__
-      hb_mutexunlock(s_mutex)
-#endif
+      SR_MUTEXUNLOCK(s_mutex)
       RETURN -1
    ENDSWITCH
 
@@ -537,9 +545,7 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
          nTimeout)
    ELSE
       SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + Str(nType))
-#ifndef __XHARBOUR__
-      hb_mutexunlock(s_mutex)
-#endif
+      SR_MUTEXUNLOCK(s_mutex)
       RETURN -1
    ENDIF
 
@@ -571,16 +577,12 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
 
       IF !lNoSetEnv
          IF Empty(SR_SetEnvSQLRDD(oConnect))
-#ifndef __XHARBOUR__
-            hb_mutexunlock(s_mutex)
-#endif
+            SR_MUTEXUNLOCK(s_mutex)
             RETURN -1
          ENDIF
       ELSE
          IF Empty(SR_SetEnvMinimal(oConnect))
-#ifndef __XHARBOUR__
-            hb_mutexunlock(s_mutex)
-#endif
+            SR_MUTEXUNLOCK(s_mutex)
             RETURN -1
          ENDIF
       ENDIF
@@ -603,9 +605,7 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
 
    ENDIF
 
-#ifndef __XHARBOUR__
-   hb_mutexunlock(s_mutex)
-#endif
+   SR_MUTEXUNLOCK(s_mutex)
 
 RETURN nRet
 
@@ -1094,9 +1094,7 @@ FUNCTION SR_EndConnection(nConnection)
    LOCAL oCnn
    LOCAL uRet
 
-#ifndef __XHARBOUR__
-   hb_mutexlock(s_mutex)
-#endif
+   SR_MUTEXLOCK(s_mutex)
 
    //DEFAULT s_nActiveConnection TO 0
    DEFAULT nConnection TO s_nActiveConnection
@@ -1105,9 +1103,7 @@ FUNCTION SR_EndConnection(nConnection)
    SR_CheckConnection(nConnection)
 
    IF nConnection > Len(s_aConnections) .OR. nConnection == 0 .OR. nConnection < 0
-#ifndef __XHARBOUR__
-      hb_mutexunlock(s_mutex)
-#endif
+      SR_MUTEXUNLOCK(s_mutex)
       RETURN NIL
    ENDIF
 
@@ -1129,9 +1125,7 @@ FUNCTION SR_EndConnection(nConnection)
 
    s_nActiveConnection := Len(s_aConnections)
 
-#ifndef __XHARBOUR__
-   hb_mutexunlock(s_mutex)
-#endif
+   SR_MUTEXUNLOCK(s_mutex)
 
 RETURN uRet
 
