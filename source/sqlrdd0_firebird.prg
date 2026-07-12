@@ -451,6 +451,18 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
       oConnect := &("SR_FIREBIRD()")
       oConnect:lQueryOnly := .T.
       EXIT
+   CASE CONNECT_FIREBIRD3_QUERY_ONLY
+      oConnect := &("SR_FIREBIRD3()")
+      oConnect:lQueryOnly := .T.
+      EXIT
+   CASE CONNECT_FIREBIRD4_QUERY_ONLY
+      oConnect := &("SR_FIREBIRD4()")
+      oConnect:lQueryOnly := .T.
+      EXIT
+   CASE CONNECT_FIREBIRD5_QUERY_ONLY
+      oConnect := &("SR_FIREBIRD5()")
+      oConnect:lQueryOnly := .T.
+      EXIT
    SR_OTHERWISE
       SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + Str(nType))
       SR_MUTEXUNLOCK(s_mutex)

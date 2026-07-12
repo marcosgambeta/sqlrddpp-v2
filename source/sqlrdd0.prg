@@ -530,6 +530,24 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
       oConnect:lQueryOnly := .T.
 #endif
       EXIT
+   CASE CONNECT_FIREBIRD3_QUERY_ONLY
+#ifndef MYSQLRDD
+      oConnect := &("SR_FIREBIRD3()")
+      oConnect:lQueryOnly := .T.
+#endif
+      EXIT
+   CASE CONNECT_FIREBIRD4_QUERY_ONLY
+#ifndef MYSQLRDD
+      oConnect := &("SR_FIREBIRD4()")
+      oConnect:lQueryOnly := .T.
+#endif
+      EXIT
+   CASE CONNECT_FIREBIRD5_QUERY_ONLY
+#ifndef MYSQLRDD
+      oConnect := &("SR_FIREBIRD5()")
+      oConnect:lQueryOnly := .T.
+#endif
+      EXIT
    //CASE CONNECT_MARIA_QUERY_ONLY (deprecated)
    CASE CONNECT_MARIADB_QUERY_ONLY
 #ifndef MYSQLRDD
