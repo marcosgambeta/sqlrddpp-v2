@@ -418,118 +418,118 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
    SWITCH nType
    CASE CONNECT_ODBC
    CASE CONNECT_ODBC_NOEXLOCK
-#ifndef MYSQLRDD
+//#ifndef MYSQLRDD
       oConnect := &("SR_ODBC()")
       oConnect2 := &("SR_ODBC()")
-#endif
+//#endif
       EXIT
-   CASE CONNECT_MYSQL
-   CASE CONNECT_MYSQL_NOEXLOCK
-      oConnect := &("SR_MYSQL()")
-      oConnect2 := &("SR_MYSQL()")
-      EXIT
+   //CASE CONNECT_MYSQL
+   //CASE CONNECT_MYSQL_NOEXLOCK
+   //   oConnect := &("SR_MYSQL()")
+   //   oConnect2 := &("SR_MYSQL()")
+   //   EXIT
    CASE CONNECT_POSTGRES
    CASE CONNECT_POSTGRES_NOEXLOCK
-#ifndef MYSQLRDD
+//#ifndef MYSQLRDD
       oConnect := &("SR_PGS()")
       oConnect2 := &("SR_PGS()")
-#endif
+//#endif
       EXIT
-   CASE CONNECT_ORACLE
-   CASE CONNECT_ORACLE_NOEXLOCK
-#ifndef MYSQLRDD
-      oConnect := &("SR_ORACLE()")
-      oConnect2 := &("SR_ORACLE()")
-#endif
-      EXIT
-   CASE CONNECT_ORACLE2
-   CASE CONNECT_ORACLE2_NOEXLOCK
-#ifndef MYSQLRDD
-      oConnect := &("SR_ORACLE2()")
-      oConnect2 := &("SR_ORACLE2()")
-#endif
-      EXIT
-   CASE CONNECT_FIREBIRD
-   CASE CONNECT_FIREBIRD_NOEXLOCK
-#ifndef MYSQLRDD
-      oConnect := &("SR_FIREBIRD()")
-      oConnect2 := &("SR_FIREBIRD()")
-#endif
-      EXIT
-   CASE CONNECT_FIREBIRD3
-   CASE CONNECT_FIREBIRD3_NOEXLOCK
-#ifndef MYSQLRDD
-      oConnect := &("SR_FIREBIRD3()")
-      oConnect2 := &("SR_FIREBIRD3()")
-#endif
-      EXIT
-   CASE CONNECT_FIREBIRD4
-   CASE CONNECT_FIREBIRD4_NOEXLOCK
-#ifndef MYSQLRDD
-      oConnect := &("SR_FIREBIRD4()")
-      oConnect2 := &("SR_FIREBIRD4()")
-#endif
-      EXIT
-   CASE CONNECT_FIREBIRD5
-   CASE CONNECT_FIREBIRD5_NOEXLOCK
-#ifndef MYSQLRDD
-      oConnect := &("SR_FIREBIRD5()")
-      oConnect2 := &("SR_FIREBIRD5()")
-#endif
-      EXIT
+   //CASE CONNECT_ORACLE
+   //CASE CONNECT_ORACLE_NOEXLOCK
+//#ifndef MYSQLRDD
+   //   oConnect := &("SR_ORACLE()")
+   //   oConnect2 := &("SR_ORACLE()")
+//#endif
+   //   EXIT
+   //CASE CONNECT_ORACLE2
+   //CASE CONNECT_ORACLE2_NOEXLOCK
+//#ifndef MYSQLRDD
+   //   oConnect := &("SR_ORACLE2()")
+   //   oConnect2 := &("SR_ORACLE2()")
+//#endif
+   //   EXIT
+   //CASE CONNECT_FIREBIRD
+   ///CASE CONNECT_FIREBIRD_NOEXLOCK
+//#ifndef MYSQLRDD
+   //   oConnect := &("SR_FIREBIRD()")
+   //   oConnect2 := &("SR_FIREBIRD()")
+//#endif
+   //   EXIT
+   //CASE CONNECT_FIREBIRD3
+   //CASE CONNECT_FIREBIRD3_NOEXLOCK
+//#ifndef MYSQLRDD
+   //   oConnect := &("SR_FIREBIRD3()")
+   //   oConnect2 := &("SR_FIREBIRD3()")
+//#endif
+   //   EXIT
+   //CASE CONNECT_FIREBIRD4
+   //CASE CONNECT_FIREBIRD4_NOEXLOCK
+//#ifndef MYSQLRDD
+   //   oConnect := &("SR_FIREBIRD4()")
+   //   oConnect2 := &("SR_FIREBIRD4()")
+//#endif
+   //   EXIT
+   //CASE CONNECT_FIREBIRD5
+   //CASE CONNECT_FIREBIRD5_NOEXLOCK
+//#ifndef MYSQLRDD
+   //   oConnect := &("SR_FIREBIRD5()")
+   //   oConnect2 := &("SR_FIREBIRD5()")
+//#endif
+   //   EXIT
    //CASE CONNECT_MARIA (deprecated)
-   CASE CONNECT_MARIADB
+   //CASE CONNECT_MARIADB
    //CASE CONNECT_MARIA_NOEXLOCK (deprecated)
-   CASE CONNECT_MARIADB_NOEXLOCK
-#ifndef MYSQLRDD
+   //CASE CONNECT_MARIADB_NOEXLOCK
+//#ifndef MYSQLRDD
       //oConnect := &("SR_MARIA()") (deprecated)
-      oConnect := &("SR_MARIADB()")
+   ///   oConnect := &("SR_MARIADB()")
       //oConnect2 := &("SR_MARIA()") (deprecated)
-      oConnect2 := &("SR_MARIADB()")
-#endif
-      EXIT
+   //   oConnect2 := &("SR_MARIADB()")
+//#endif
+   //   EXIT
    CASE CONNECT_ODBC_QUERY_ONLY
-#ifndef MYSQLRDD
+//#ifndef MYSQLRDD
       oConnect := &("SR_ODBC()")
       oConnect:lQueryOnly := .T.
-#endif
+//#endif
       EXIT
-   CASE CONNECT_ORACLE_QUERY_ONLY
-#ifndef MYSQLRDD
-      oConnect := &("SR_ORACLE()")
-      oConnect:lQueryOnly := .T.
-#endif
-      EXIT
-   CASE CONNECT_ORACLE2_QUERY_ONLY
-#ifndef MYSQLRDD
-      oConnect := &("SR_ORACLE2()")
-      oConnect:lQueryOnly := .T.
-#endif
-      EXIT
-   CASE CONNECT_MYSQL_QUERY_ONLY
-      oConnect := &("SR_MYSQL()")
-      oConnect:lQueryOnly := .T.
-      EXIT
+   //CASE CONNECT_ORACLE_QUERY_ONLY
+//#ifndef MYSQLRDD
+   //   oConnect := &("SR_ORACLE()")
+   //   oConnect:lQueryOnly := .T.
+//#endif
+   //   EXIT
+   //CASE CONNECT_ORACLE2_QUERY_ONLY
+//#ifndef MYSQLRDD
+   //   oConnect := &("SR_ORACLE2()")
+   //   oConnect:lQueryOnly := .T.
+//#endif
+   //   EXIT
+   //CASE CONNECT_MYSQL_QUERY_ONLY
+   //   oConnect := &("SR_MYSQL()")
+   //   oConnect:lQueryOnly := .T.
+   //   EXIT
    CASE CONNECT_POSTGRES_QUERY_ONLY
-#ifndef MYSQLRDD
+//#ifndef MYSQLRDD
       oConnect := &("SR_PGS()")
       oConnect:lQueryOnly := .T.
-#endif
+//#endif
       EXIT
-   CASE CONNECT_FIREBIRD_QUERY_ONLY
-#ifndef MYSQLRDD
-      oConnect := &("SR_FIREBIRD()")
-      oConnect:lQueryOnly := .T.
-#endif
-      EXIT
+   //CASE CONNECT_FIREBIRD_QUERY_ONLY
+//#ifndef MYSQLRDD
+   //   oConnect := &("SR_FIREBIRD()")
+   //   oConnect:lQueryOnly := .T.
+//#endif
+   //   EXIT
    //CASE CONNECT_MARIA_QUERY_ONLY (deprecated)
-   CASE CONNECT_MARIADB_QUERY_ONLY
-#ifndef MYSQLRDD
+   //CASE CONNECT_MARIADB_QUERY_ONLY
+//#ifndef MYSQLRDD
       //oConnect := &("SR_MARIA()") (deprecated)
-      oConnect := &("SR_MARIADB()")
-      oConnect:lQueryOnly := .T.
-#endif
-      EXIT
+   //   oConnect := &("SR_MARIADB()")
+   //   oConnect:lQueryOnly := .T.
+//#endif
+   //   EXIT
    SR_OTHERWISE
       SR_MsgLogFile("Invalid connection type in SR_AddConnection() :" + Str(nType))
       SR_MUTEXUNLOCK(s_mutex)
@@ -585,19 +585,19 @@ FUNCTION SR_AddConnection(nType, cDSN, cUser, cPassword, cOwner, lCounter, lAuto
 
       SR_ReloadFieldModifiers(oConnect)
 
-      IF !("DB2/400" $ oConnect:cSystemName)
+      //IF !("DB2/400" $ oConnect:cSystemName)
          IF !lAutoCommit
             oConnect:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF)
             IF nType < CONNECT_QUERY_ONLY
                oConnect2:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF)
             ENDIF
          ENDIF
-      ELSE
-         oConnect:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_ON)
-         IF nType < CONNECT_QUERY_ONLY
-            oConnect2:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_ON)
-         ENDIF
-      ENDIF
+      //ELSE
+      //   oConnect:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_ON)
+      //   IF nType < CONNECT_QUERY_ONLY
+      //      oConnect2:SetOptions(SQL_AUTOCOMMIT, SQL_AUTOCOMMIT_ON)
+      //   ENDIF
+      //ENDIF
 
    ENDIF
 
