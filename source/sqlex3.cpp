@@ -108,13 +108,13 @@ static void createSeekQuery(SQLEXAREA *thiswa, bool bUseOptimizerHints)
 //------------------------------------------------------------------------
 
 static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int queryLevel,
-                                         HB_BOOL *bUseOptimizerHints)
+                                         bool *bUseOptimizerHints)
 {
-  HB_BOOL bWhere = false;
+  bool bWhere = false;
   int iCol;
   INDEXBIND *SeekBind;
   COLUMNBIND *BindStructure;
-  HB_BOOL bDirectionFWD;
+  bool bDirectionFWD;
   char *temp;
 
   thiswa->sWhere[0] = '\0';
@@ -179,15 +179,15 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
 }
 
 #if 0
-static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int queryLevel, HB_BOOL * bUseOptimizerHints)
+static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int queryLevel, bool *bUseOptimizerHints)
 {
    SqlExLog("getSeekWhereExpression()", 3);
 
-   HB_BOOL bWhere = false;
+   bool bWhere = false;
    int iCol;
    INDEXBIND *SeekBind;
    COLUMNBIND *BindStructure;
-   HB_BOOL bDirectionFWD;
+   bool bDirectionFWD;
    char * temp;
 
    thiswa->sWhere[0] = '\0';
@@ -298,7 +298,7 @@ HB_ERRCODE prepareSeekQuery(SQLEXAREA *thiswa, INDEXBIND *SeekBind)
 
 bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel)
 {
-  HB_BOOL bUseOptimizerHints = thiswa->nSystemID == SQLRDD::RDBMS::ORACLE;
+  bool bUseOptimizerHints = thiswa->nSystemID == SQLRDD::RDBMS::ORACLE;
   thiswa->bConditionChanged1 = true; // SKIP statements are no longer valid
 
   // Alloc memory for binding structures, if first time
