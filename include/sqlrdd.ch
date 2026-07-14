@@ -118,7 +118,7 @@
 
 // supported RDBMS
 
-#define SUPPORTED_DATABASES           23
+#define SR_SUPPORTED_DATABASES           23
 
 #define LASTREC_POS             99999998
 

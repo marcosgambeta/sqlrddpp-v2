@@ -192,7 +192,7 @@
 #define SR_FIELD_PRIMARY_KEY              10
 #define SR_FIELD_UNIQUE                   11
 
-#define SUPPORTED_DATABASES           23
+#define SR_SUPPORTED_DATABASES           23
 
 #endif // SR_FIELD_INFO_SIZE
 
