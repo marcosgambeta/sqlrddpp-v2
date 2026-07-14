@@ -415,7 +415,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREA *thiswa, PHB_ITEM pFieldData, HB_LO
       return HB_FAILURE;
     }
 
-    colName = SQLRDD::QualifyName(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
+    colName = SQLRDD::QualifyName(hb_arrayGetC(pFieldStruct, SR_FIELD_NAME), thiswa);
 
     if (thiswa->bIsSelect) {
       sprintf(sSql, "SELECT %c%s%c FROM (%s) WHERE %c%s%c = ?", OPEN_QUALIFIER(thiswa), colName,
@@ -466,7 +466,7 @@ static HB_ERRCODE getMissingColumn(SQLEXAREA *thiswa, PHB_ITEM pFieldData, HB_LO
     }
   }
 
-  // lType = hb_arrayGetNL(pFieldStruct, FIELD_DOMAIN);
+  // lType = hb_arrayGetNL(pFieldStruct, SR_FIELD_DOMAIN);
   SR_odbcGetData(static_cast<HSTMT>(thiswa->colStmt[lFieldPosDB - 1]),
                  hb_arrayGetItemPtr(thiswa->aFields, lFieldPosDB), pFieldData, 0,
                  thiswa->nSystemID, false, 1);
@@ -1177,25 +1177,25 @@ void SR_SetCurrRecordStructure(SQLEXAREA *thiswa)
 
   for (i = 1; i <= iCols; i++) {
     pFieldStruct = hb_arrayGetItemPtr(thiswa->aFields, i);
-    pFieldLen = hb_arrayGetItemPtr(pFieldStruct, FIELD_LEN);
-    pFieldDec = hb_arrayGetItemPtr(pFieldStruct, FIELD_DEC);
-    lType = hb_arrayGetNL(pFieldStruct, FIELD_DOMAIN);
-    cType = (*hb_arrayGetCPtr(pFieldStruct, FIELD_TYPE));
-    bMultiLang = hb_arrayGetL(pFieldStruct, FIELD_MULTILANG);
+    pFieldLen = hb_arrayGetItemPtr(pFieldStruct, SR_FIELD_LEN);
+    pFieldDec = hb_arrayGetItemPtr(pFieldStruct, SR_FIELD_DEC);
+    lType = hb_arrayGetNL(pFieldStruct, SR_FIELD_DOMAIN);
+    cType = (*hb_arrayGetCPtr(pFieldStruct, SR_FIELD_TYPE));
+    bMultiLang = hb_arrayGetL(pFieldStruct, SR_FIELD_MULTILANG);
     if (bMultiLang) {
       cType = 'M';
     }
 
     BindStructure->iSQLType = static_cast<int>(lType);
-    BindStructure->isNullable = hb_arrayGetL(pFieldStruct, FIELD_NULLABLE);
+    BindStructure->isNullable = hb_arrayGetL(pFieldStruct, SR_FIELD_NULLABLE);
     BindStructure->isBoundNULL = false;
     BindStructure->isArgumentNull = false;
     BindStructure->lFieldPosDB = i;
-    BindStructure->lFieldPosWA = hb_arrayGetNL(pFieldStruct, FIELD_WAOFFSET);
+    BindStructure->lFieldPosWA = hb_arrayGetNL(pFieldStruct, SR_FIELD_WAOFFSET);
     BindStructure->ColumnSize = (SQLUINTEGER)hb_itemGetNI(pFieldLen);
     BindStructure->DecimalDigits = static_cast<SQLSMALLINT>(hb_itemGetNI(pFieldDec));
     BindStructure->colName =
-        SQLRDD::QualifyName(hb_arrayGetC(pFieldStruct, FIELD_NAME), thiswa);
+        SQLRDD::QualifyName(hb_arrayGetC(pFieldStruct, SR_FIELD_NAME), thiswa);
     BindStructure->isMemo = cType == 'M';
 
 #ifdef SQLRDD_TOPCONN
@@ -1969,7 +1969,7 @@ static HB_ERRCODE updateRecordBuffer(SQLEXAREA *thiswa, HB_BOOL bUpdateDeleted)
                                    // been needed in current WA. Will be filled on demand
       } else {
         // HB_LONG lType = hb_arrayGetNL(hb_arrayGetItemPtr(thiswa->aFields,
-        // thiswa->uiBufferIndex[i - 1]), FIELD_DOMAIN);
+        // thiswa->uiBufferIndex[i - 1]), SR_FIELD_DOMAIN);
         ++iIndex;
         SR_odbcGetData(static_cast<HSTMT>(thiswa->hStmtBuffer),
                        hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), &temp,
@@ -2575,7 +2575,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREA *thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
                                    // been needed in current WA. Will be filled on demand
       } else {
         // HB_LONG lType = hb_arrayGetNL(hb_arrayGetItemPtr(thiswa->aFields,
-        // thiswa->uiBufferIndex[i - 1]), FIELD_DOMAIN);
+        // thiswa->uiBufferIndex[i - 1]), SR_FIELD_DOMAIN);
         ++iIndex;
         SR_odbcGetData(static_cast<HSTMT>(hStmt),
                        hb_arrayGetItemPtr(thiswa->aFields, thiswa->uiBufferIndex[i - 1]), &temp,

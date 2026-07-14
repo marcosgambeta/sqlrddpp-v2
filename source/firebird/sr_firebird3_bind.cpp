@@ -1268,7 +1268,7 @@ HB_FUNC_STATIC(SR_FBLINEPROCESSED3)
       // temp = hb_itemNew(nullptr); (using stack instead of heap)
       HB_ITEM temp{};
       var = session->sqlda->sqlvar;
-      lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, icol), FIELD_ENUM);
+      lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, icol), SR_FIELD_ENUM);
       // lType = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, icol), 6);
       lLen = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, icol), 3);
       lDec = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, icol), 4);

@@ -506,10 +506,10 @@ static void sr_odbcFieldGet(PHB_ITEM pField, PHB_ITEM pItem, char *bBuffer,
                             const HB_ISIZ lLenBuff, const HB_BOOL bQueryOnly,
                             const HB_ULONG ulSystemID, const HB_BOOL bTranslate)
 {
-  const HB_LONG lType = hb_arrayGetNL(pField, FIELD_DOMAIN);
-  const HB_SIZE lLen = hb_arrayGetNL(pField, FIELD_LEN);
-  const HB_SIZE lDec = hb_arrayGetNL(pField, FIELD_DEC);
-  auto cType = hb_arrayGetCPtr(pField, FIELD_TYPE);
+  const HB_LONG lType = hb_arrayGetNL(pField, SR_FIELD_DOMAIN);
+  const HB_SIZE lLen = hb_arrayGetNL(pField, SR_FIELD_LEN);
+  const HB_SIZE lDec = hb_arrayGetNL(pField, SR_FIELD_DEC);
+  auto cType = hb_arrayGetCPtr(pField, SR_FIELD_TYPE);
 
   if (lLenBuff <= 0) {
     // database content is NULL
@@ -814,7 +814,7 @@ HB_FUNC_STATIC(SR_ODBCLINEPROCESSED)
   for (i = 1; i <= cols; i++) {
     // temp = hb_itemNew(nullptr); (using stack instead of heap)
     HB_ITEM temp{};
-    lIndex = static_cast<HB_USHORT>(hb_arrayGetNI(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM));
+    lIndex = static_cast<HB_USHORT>(hb_arrayGetNI(hb_arrayGetItemPtr(pFields, i), SR_FIELD_ENUM));
 
     if (lIndex == 0) {
       hb_arraySetForward(pRet, i, &temp);
@@ -923,7 +923,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
       lLenOut = 0;
       iReallocs = 0;
       // temp = hb_itemNew(nullptr); (using stack instead of heap)
-      lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i), FIELD_ENUM);
+      lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i), SR_FIELD_ENUM);
       lIndex = lIndex ? lIndex : i;
 
       if (lIndex == 0) {
@@ -1383,10 +1383,10 @@ void SR_odbcGetData(SQLHSTMT hStmt, PHB_ITEM pField, PHB_ITEM pItem, HB_BOOL bQu
   SQLLEN lLenOut;
   SQLRETURN res;
 
-  cType = const_cast<char *>(hb_arrayGetCPtr(pField, FIELD_TYPE));
-  lType = hb_arrayGetNL(pField, FIELD_DOMAIN);
-  lLen = hb_arrayGetNL(pField, FIELD_LEN);
-  lDec = hb_arrayGetNL(pField, FIELD_DEC);
+  cType = const_cast<char *>(hb_arrayGetCPtr(pField, SR_FIELD_TYPE));
+  lType = hb_arrayGetNL(pField, SR_FIELD_DOMAIN);
+  lLen = hb_arrayGetNL(pField, SR_FIELD_LEN);
+  lDec = hb_arrayGetNL(pField, SR_FIELD_DEC);
   iLen = SQL_NULL_DATA;
   switch (lType) {
   case SQL_CHAR:

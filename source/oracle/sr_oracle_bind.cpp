@@ -732,7 +732,7 @@ HB_FUNC_STATIC(SR_SQLO_LINEPROCESSED)
     cols = hb_arrayLen(pFields);
 
     for (i = 0; i < cols; i++) {
-      lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i + 1), FIELD_ENUM);
+      lIndex = hb_arrayGetNL(hb_arrayGetItemPtr(pFields, i + 1), SR_FIELD_ENUM);
       temp = hb_itemNew(nullptr);
 
       if (lIndex != 0) {
