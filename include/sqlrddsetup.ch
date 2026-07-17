@@ -161,8 +161,8 @@
 #define SR_LIST_FORWARD                   0
 #define SR_LIST_BACKWARD                  1
 
-#define LONG_LIST                      0
-#define SHORT_LIST                     1
+#define SR_LONG_LIST                      0
+#define SR_SHORT_LIST                     1
 
 #define EXCLUSIVE_TABLE_LOCK_SIGN   "SQL_EXCLUSIVE_TABLE_$_"
 #define FLOCK_TABLE_LOCK_SIGN       "SQL_FLOCK_TABLE_$_"
