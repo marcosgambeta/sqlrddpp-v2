@@ -149,40 +149,40 @@ static void ResolveSpecialCols(SQLEXAREA *thiswa)
 
   for (i = 1; i <= iIndexes; i++) {
     pIndex = hb_arrayGetItemPtr(thiswa->pIndexMgmnt, i);
-    pIndIt = hb_itemArrayGet(pIndex, INDEXMAN_COLUMNS);
-    // pIndIt = hb_arrayGetItemPtr(pIndex, INDEXMAN_COLUMNS);
+    pIndIt = hb_itemArrayGet(pIndex, SR_INDEXMAN_COLUMNS);
+    // pIndIt = hb_arrayGetItemPtr(pIndex, SR_INDEXMAN_COLUMNS);
 
     if (!SQLRDD::itemEmpty(pIndIt)) {
       HB_EVALINFO info;
-      hb_evalNew(&info, hb_itemArrayGet(pIndex, INDEXMAN_KEY_CODEBLOCK));
+      hb_evalNew(&info, hb_itemArrayGet(pIndex, SR_INDEXMAN_KEY_CODEBLOCK));
       pKeyVal = hb_evalLaunch(&info);
       hb_evalRelease(&info);
 
       // Get field position in ::aLocalBuffer
       // uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_arrayGetItemPtr(pIndex,
-      // INDEXMAN_SYNTH_COLPOS)));
+      // SR_INDEXMAN_SYNTH_COLPOS)));
       uiPos =
-          static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_SYNTH_COLPOS)));
+          static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, SR_INDEXMAN_SYNTH_COLPOS)));
       thiswa->specialMask[uiPos] = '1';
 
       hb_arraySetForward(thiswa->aBuffer, uiPos, pKeyVal);
       hb_itemRelease(pKeyVal);
     }
 
-    // pIndIt = hb_arrayGetItemPtr(pIndex, INDEXMAN_FOR_CODEBLOCK);
-    pIndIt = hb_itemArrayGet(pIndex, INDEXMAN_FOR_CODEBLOCK);
+    // pIndIt = hb_arrayGetItemPtr(pIndex, SR_INDEXMAN_FOR_CODEBLOCK);
+    pIndIt = hb_itemArrayGet(pIndex, SR_INDEXMAN_FOR_CODEBLOCK);
 
     if (!SQLRDD::itemEmpty(pIndIt)) {
       HB_EVALINFO info;
-      hb_evalNew(&info, hb_itemArrayGet(pIndex, INDEXMAN_FOR_CODEBLOCK));
+      hb_evalNew(&info, hb_itemArrayGet(pIndex, SR_INDEXMAN_FOR_CODEBLOCK));
       pKeyVal = hb_evalLaunch(&info);
       hb_evalRelease(&info);
 
       // Get field position in ::aLocalBuffer
       // uiPos = static_cast<HB_USHORT>(hb_itemGetNI(hb_arrayGetItemPtr(pIndex,
-      // INDEXMAN_FOR_COLPOS)));
+      // SR_INDEXMAN_FOR_COLPOS)));
       uiPos =
-          static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, INDEXMAN_FOR_COLPOS)));
+          static_cast<HB_USHORT>(hb_itemGetNI(hb_itemArrayGet(pIndex, SR_INDEXMAN_FOR_COLPOS)));
       thiswa->specialMask[uiPos] = '1';
       hb_arraySetForward(thiswa->aBuffer, uiPos, pKeyVal);
       hb_itemRelease(pKeyVal);
