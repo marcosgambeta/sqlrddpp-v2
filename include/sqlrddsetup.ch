@@ -164,10 +164,10 @@
 #define SR_LONG_LIST                      0
 #define SR_SHORT_LIST                     1
 
-#define EXCLUSIVE_TABLE_LOCK_SIGN   "SQL_EXCLUSIVE_TABLE_$_"
-#define FLOCK_TABLE_LOCK_SIGN       "SQL_FLOCK_TABLE_$_"
-#define SHARED_TABLE_LOCK_SIGN      "SQL_SHARED_TABLE_$_"
-#define LAST_CHAR                   "z"
+#define SR_EXCLUSIVE_TABLE_LOCK_SIGN   "SQL_EXCLUSIVE_TABLE_$_"
+#define SR_FLOCK_TABLE_LOCK_SIGN       "SQL_FLOCK_TABLE_$_"
+#define SR_SHARED_TABLE_LOCK_SIGN      "SQL_SHARED_TABLE_$_"
+#define SR_LAST_CHAR                   "z"
 
 #define SR_ARRAY_BLOCK1      1
 #define SR_ARRAY_BLOCK2      10
