@@ -370,7 +370,7 @@ void SR_getOrderByExpression(SQLEXAREA *thiswa, HB_BOOL bUseOptimizerHints)
       thiswa->sOrderBy[0] = '\0';
     }
   } else {
-    HB_BOOL bDirectionFWD = thiswa->recordListDirection == LIST_FORWARD;
+    HB_BOOL bDirectionFWD = thiswa->recordListDirection == SR_LIST_FORWARD;
 
     if (thiswa->bReverseIndex) {
       bDirectionFWD = !bDirectionFWD;
@@ -835,9 +835,9 @@ static void BindAllIndexStmts(SQLEXAREA *thiswa)
     // Natural order
 
     IndexBind = thiswa->IndexBindings[0];
-    hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt
+    hStmt = thiswa->recordListDirection == SR_LIST_FORWARD ? IndexBind->SkipFwdStmt
                                                         : IndexBind->SkipBwdStmt;
-    sSql = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdSql
+    sSql = thiswa->recordListDirection == SR_LIST_FORWARD ? IndexBind->SkipFwdSql
                                                        : IndexBind->SkipBwdSql;
 
     BindStructure = SR_GetBindStruct(thiswa, IndexBind);
@@ -854,9 +854,9 @@ static void BindAllIndexStmts(SQLEXAREA *thiswa)
     IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
 
     for (iCol = 1; iCol <= thiswa->indexColumns; iCol++) {
-      hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt
+      hStmt = thiswa->recordListDirection == SR_LIST_FORWARD ? IndexBind->SkipFwdStmt
                                                           : IndexBind->SkipBwdStmt;
-      sSql = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdSql
+      sSql = thiswa->recordListDirection == SR_LIST_FORWARD ? IndexBind->SkipFwdSql
                                                          : IndexBind->SkipBwdSql;
       IndexBindParam = thiswa->IndexBindings[thiswa->hOrdCurrent];
       iBind = 1;
@@ -973,7 +973,7 @@ static void FeedCurrentRecordToBindings(SQLEXAREA *thiswa)
            ((thiswa->nSystemID != SQLRDD::RDBMS::POSTGR) && (!HB_IS_LOGICAL(pFieldData))))) {
         if (BindStructure->isNullable && BindStructure->isArgumentNull) {
           // It is STILL NULL, so no problem
-          HSTMT hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt
+          HSTMT hStmt = thiswa->recordListDirection == SR_LIST_FORWARD ? IndexBind->SkipFwdStmt
                                                                     : IndexBind->SkipBwdStmt;
           SR_SetBindValue(pFieldData, BindStructure, hStmt);
         } else if (!BindStructure->isNullable) {
@@ -988,7 +988,7 @@ static void FeedCurrentRecordToBindings(SQLEXAREA *thiswa)
           FeedCurrentRecordToBindings(thiswa); // Recursive call
         }
       } else {
-        HSTMT hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt
+        HSTMT hStmt = thiswa->recordListDirection == SR_LIST_FORWARD ? IndexBind->SkipFwdStmt
                                                                   : IndexBind->SkipBwdStmt;
         SR_SetBindValue(pFieldData, BindStructure, hStmt);
       }
@@ -1283,11 +1283,11 @@ static HB_ERRCODE getWhereExpression(SQLEXAREA *thiswa, int iListType)
 
   // Resolve record or index navigation
 
-  if (iListType == LIST_SKIP_FWD || iListType == LIST_SKIP_BWD) {
+  if (iListType == SR_LIST_SKIP_FWD || iListType == SR_LIST_SKIP_BWD) {
     INDEXBIND *IndexBind = thiswa->IndexBindings[thiswa->hOrdCurrent];
 
-    thiswa->recordListDirection = (iListType == LIST_SKIP_FWD ? LIST_FORWARD : LIST_BACKWARD);
-    bDirectionFWD = iListType == LIST_SKIP_FWD;
+    thiswa->recordListDirection = (iListType == SR_LIST_SKIP_FWD ? SR_LIST_FORWARD : SR_LIST_BACKWARD);
+    bDirectionFWD = iListType == SR_LIST_SKIP_FWD;
 
     if (thiswa->bReverseIndex) {
       bDirectionFWD = !bDirectionFWD;
@@ -1331,7 +1331,7 @@ static HB_ERRCODE getWhereExpression(SQLEXAREA *thiswa, int iListType)
 
           if (!bArgumentIsNull) {
             // Bind column value only if argument is NOT null
-            HSTMT hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt
+            HSTMT hStmt = thiswa->recordListDirection == SR_LIST_FORWARD ? IndexBind->SkipFwdStmt
                                                                       : IndexBind->SkipBwdStmt;
             SR_SetBindValue(pFieldData, BindStructure, hStmt);
           }
@@ -1381,10 +1381,10 @@ static HB_ERRCODE getWhereExpression(SQLEXAREA *thiswa, int iListType)
     thiswa->indexLevel = -1; // Reset index navigation
   }
 
-  if (iListType == LIST_FROM_TOP) {
-    thiswa->recordListDirection = LIST_FORWARD;
-  } else if (iListType == LIST_FROM_BOTTOM) {
-    thiswa->recordListDirection = LIST_BACKWARD;
+  if (iListType == SR_LIST_FROM_TOP) {
+    thiswa->recordListDirection = SR_LIST_FORWARD;
+  } else if (iListType == SR_LIST_FROM_BOTTOM) {
+    thiswa->recordListDirection = SR_LIST_BACKWARD;
   }
 
   SR_SolveFilters(thiswa, bWhere);
@@ -1450,9 +1450,9 @@ static HB_ERRCODE getPreparedRecordList(SQLEXAREA *thiswa,
   // not nedded
   // IndexBind += (thiswa->indexLevel - 1); // Place Offset
 
-  hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt
+  hStmt = thiswa->recordListDirection == SR_LIST_FORWARD ? IndexBind->SkipFwdStmt
                                                       : IndexBind->SkipBwdStmt;
-  sSql = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdSql
+  sSql = thiswa->recordListDirection == SR_LIST_FORWARD ? IndexBind->SkipFwdSql
                                                      : IndexBind->SkipBwdSql;
 
   res = SQLExecute(hStmt);
@@ -1496,14 +1496,14 @@ static HB_ERRCODE getPreparedRecordList(SQLEXAREA *thiswa,
     res = SQLFetch(hStmt);
     if (res != SQL_SUCCESS) {
       if (i > 0 && thiswa->indexLevel == 1 && res == SQL_NO_DATA_FOUND) {
-        if (thiswa->recordListDirection == LIST_FORWARD) {
+        if (thiswa->recordListDirection == SR_LIST_FORWARD) {
           thiswa->lEofAt = thiswa->recordList[i - 1];
         } else {
           thiswa->lBofAt = thiswa->recordList[i - 1];
         }
       } else if (i == 0 && thiswa->indexLevel == 1 && res == SQL_NO_DATA_FOUND &&
                  thiswa->recordListSize > 0) {
-        if (thiswa->recordListDirection == LIST_FORWARD) {
+        if (thiswa->recordListDirection == SR_LIST_FORWARD) {
           thiswa->lEofAt = thiswa->recordList[thiswa->recordListPos];
         } else {
           thiswa->lBofAt = thiswa->recordList[thiswa->recordListPos];
@@ -1573,7 +1573,7 @@ static HB_ERRCODE getRecordList(SQLEXAREA *thiswa, int iMax) // Returns true if 
     res = SQLFetch(thiswa->hStmt);
     if (res != SQL_SUCCESS) {
       if (i > 0 && res == SQL_NO_DATA_FOUND) {
-        if (thiswa->recordListDirection == LIST_FORWARD) {
+        if (thiswa->recordListDirection == SR_LIST_FORWARD) {
           thiswa->lEofAt = thiswa->recordList[i - 1];
         } else {
           thiswa->lBofAt = thiswa->recordList[i - 1];
@@ -2011,7 +2011,7 @@ static HB_ERRCODE trySkippingOnCache(SQLEXAREA *thiswa, HB_LONG lToSkip)
   HB_LONG lSupposedPos;
 
   if (thiswa->skipDirection != 0) {
-    if (thiswa->recordListDirection == LIST_FORWARD) {
+    if (thiswa->recordListDirection == SR_LIST_FORWARD) {
       lSupposedPos = thiswa->recordListPos + lToSkip;
 
       if (lSupposedPos >= 0 && lSupposedPos < thiswa->recordListSize) {
@@ -2087,7 +2087,7 @@ HB_ERRCODE prepareRecordListQuery(SQLEXAREA *thiswa)
     return HB_FAILURE;
   }
 
-  if (thiswa->recordListDirection == LIST_FORWARD) {
+  if (thiswa->recordListDirection == SR_LIST_FORWARD) {
     IndexBind->SkipFwdStmt = hPrep;
     memset(&IndexBind->SkipFwdSql, 0, PREPARED_SQL_LEN);
     hb_xmemcpy(IndexBind->SkipFwdSql, thiswa->sSql, PREPARED_SQL_LEN - 1);
@@ -2114,9 +2114,9 @@ static bool CreateSkipStmt(SQLEXAREA *thiswa)
   if (thiswa->bOrderChanged || thiswa->bConditionChanged1 ||
       (!(thiswa->IndexBindings[thiswa->hOrdCurrent])) ||
       (thiswa->IndexBindings[thiswa->hOrdCurrent] &&
-       ((thiswa->recordListDirection == LIST_FORWARD &&
+       ((thiswa->recordListDirection == SR_LIST_FORWARD &&
          (!((INDEXBIND *)(thiswa->IndexBindings[thiswa->hOrdCurrent]))->SkipFwdStmt)) ||
-        (thiswa->recordListDirection == LIST_BACKWARD &&
+        (thiswa->recordListDirection == SR_LIST_BACKWARD &&
          (!((INDEXBIND *)(thiswa->IndexBindings[thiswa->hOrdCurrent]))
                ->SkipBwdStmt))))) { // Filter or controlling order has changed, or stmt is not
                                     // prepared
@@ -2166,8 +2166,8 @@ static bool CreateSkipStmt(SQLEXAREA *thiswa)
     // Create and prepare queries to scroll to each index column level
 
     for (int i = 1; i <= thiswa->indexColumns; i++) {
-      getWhereExpression(thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD
-                                                                             : LIST_SKIP_BWD);
+      getWhereExpression(thiswa, thiswa->recordListDirection == SR_LIST_FORWARD ? SR_LIST_SKIP_FWD
+                                                                             : SR_LIST_SKIP_BWD);
       createRecodListQuery(thiswa);
       prepareRecordListQuery(thiswa);
       thiswa->indexLevel--;
@@ -2251,9 +2251,9 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREA *thiswa)
   if (thiswa->lEofAt) {
     SELF_GOTO(reinterpret_cast<AREAP>(thiswa), static_cast<HB_LONG>(thiswa->lEofAt));
     if (thiswa->bReverseIndex != s_bOldReverseIndex) {
-      thiswa->recordListDirection = LIST_BACKWARD;
+      thiswa->recordListDirection = SR_LIST_BACKWARD;
       SR_getOrderByExpression(thiswa, false);
-      getWhereExpression(thiswa, LIST_FROM_BOTTOM);
+      getWhereExpression(thiswa, SR_LIST_FROM_BOTTOM);
       SR_setResultSetLimit(thiswa, RECORD_LIST_SIZE / 10);
       createRecodListQuery(thiswa);
 
@@ -2266,10 +2266,10 @@ static HB_ERRCODE sqlExGoBottom(SQLEXAREA *thiswa)
       }
     }
   } else {
-    thiswa->recordListDirection = LIST_BACKWARD;
+    thiswa->recordListDirection = SR_LIST_BACKWARD;
 
     SR_getOrderByExpression(thiswa, false);
-    getWhereExpression(thiswa, LIST_FROM_BOTTOM);
+    getWhereExpression(thiswa, SR_LIST_FROM_BOTTOM);
     SR_setResultSetLimit(thiswa, RECORD_LIST_SIZE / 10);
     createRecodListQuery(thiswa);
 
@@ -2351,7 +2351,7 @@ static HB_ERRCODE sqlExGoTo(SQLEXAREA *thiswa, HB_LONG recno)
 
   thiswa->recordList[0] = static_cast<HB_ULONG>(recno);
   thiswa->recordListSize = 1;
-  thiswa->recordListDirection = LIST_FORWARD;
+  thiswa->recordListDirection = SR_LIST_FORWARD;
   thiswa->recordListPos = 0;
 
   if (updateRecordBuffer(thiswa, true) == HB_SUCCESS) {
@@ -2409,9 +2409,9 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREA *thiswa)
   if (thiswa->lBofAt) {
     SELF_GOTO(reinterpret_cast<AREAP>(thiswa), static_cast<HB_LONG>(thiswa->lBofAt));
     if (thiswa->bReverseIndex != s_bOldReverseIndex) {
-      thiswa->recordListDirection = LIST_FORWARD;
+      thiswa->recordListDirection = SR_LIST_FORWARD;
       SR_getOrderByExpression(thiswa, false);
-      getWhereExpression(thiswa, LIST_FROM_TOP);
+      getWhereExpression(thiswa, SR_LIST_FROM_TOP);
       SR_setResultSetLimit(thiswa, RECORD_LIST_SIZE / 10);
       createRecodListQuery(thiswa);
 
@@ -2424,9 +2424,9 @@ static HB_ERRCODE sqlExGoTop(SQLEXAREA *thiswa)
       }
     }
   } else {
-    thiswa->recordListDirection = LIST_FORWARD;
+    thiswa->recordListDirection = SR_LIST_FORWARD;
     SR_getOrderByExpression(thiswa, false);
-    getWhereExpression(thiswa, LIST_FROM_TOP);
+    getWhereExpression(thiswa, SR_LIST_FROM_TOP);
     SR_setResultSetLimit(thiswa, RECORD_LIST_SIZE / 10);
     createRecodListQuery(thiswa);
 
@@ -2510,7 +2510,7 @@ static HB_ERRCODE sqlExSeek(SQLEXAREA *thiswa, HB_BOOL bSoftSeek, PHB_ITEM pKey,
 
   // Start search code here
 
-  thiswa->recordListDirection = (bFindLast ? LIST_BACKWARD : LIST_FORWARD);
+  thiswa->recordListDirection = (bFindLast ? SR_LIST_BACKWARD : SR_LIST_FORWARD);
 
   // Set binding structures and push pKey to it
   if (!thiswa->IndexBindings[thiswa->hOrdCurrent]) {
@@ -2814,7 +2814,7 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREA *thiswa, HB_LONG lToSkip)
       thiswa->indexColumns = 1; // Natural order, RECNO
     }
 
-    thiswa->recordListDirection = (lToSkip > 0 ? LIST_FORWARD : LIST_BACKWARD);
+    thiswa->recordListDirection = (lToSkip > 0 ? SR_LIST_FORWARD : SR_LIST_BACKWARD);
 
     // Set binding structures and SQL stmts for
     // SKIP and SEEK over current index order
@@ -3918,7 +3918,7 @@ static HB_ERRCODE sqlExOrderInfo(SQLEXAREA *thiswa, HB_USHORT uiIndex, LPDBORDER
     switch (uiIndex) {
     case DBOI_KEYCOUNT: {
       long lValue;
-      getWhereExpression(thiswa, LIST_FROM_TOP);
+      getWhereExpression(thiswa, SR_LIST_FROM_TOP);
       createCountQuery(thiswa);
 
       if (getFirstColumnAsLong(thiswa, &lValue) == HB_FAILURE) {

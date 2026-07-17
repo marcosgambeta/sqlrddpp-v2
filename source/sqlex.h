@@ -362,7 +362,7 @@ struct SQLEXAREA
   int recordListPos;
   // record list size
   int recordListSize;
-  // LIST_FORWARD or LIST_BACKWARD
+  // SR_LIST_FORWARD or SR_LIST_BACKWARD
   int recordListDirection;
   // Top Connect compatible
   int iTCCompat;

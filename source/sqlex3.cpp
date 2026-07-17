@@ -123,8 +123,8 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
   // Nao necessario esta aqui, fazia com que fosse para o ultimo item da chave
   // SeekBind += (queryLevel - 1); // place offset
 
-  thiswa->recordListDirection = (iListType == LIST_SKIP_FWD ? LIST_FORWARD : LIST_BACKWARD);
-  bDirectionFWD = iListType == LIST_SKIP_FWD;
+  thiswa->recordListDirection = (iListType == SR_LIST_SKIP_FWD ? SR_LIST_FORWARD : SR_LIST_BACKWARD);
+  bDirectionFWD = iListType == SR_LIST_SKIP_FWD;
 
   if (thiswa->bReverseIndex) {
     bDirectionFWD = !bDirectionFWD;
@@ -147,7 +147,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
                 BindStructure->colName, CLOSE_QUALIFIER(thiswa));
         hb_xfree(temp);
       } else {
-        if (iCol == queryLevel && iListType == LIST_SKIP_FWD) {
+        if (iCol == queryLevel && iListType == SR_LIST_SKIP_FWD) {
           // This condition should create a WHERE clause like "COLUMN >= NULL".
           // Since this is not numeric, EVERYTHING is greater
           // or equal to NULL, so we do not add any restriction to WHERE clause.
@@ -196,8 +196,8 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
    // Nao necessario esta aqui, fazia com que fosse para o ultimo item da chave
    // SeekBind += (queryLevel - 1); // place offset
 
-   thiswa->recordListDirection = (iListType == LIST_SKIP_FWD ? LIST_FORWARD : LIST_BACKWARD);
-   bDirectionFWD = iListType == LIST_SKIP_FWD;
+   thiswa->recordListDirection = (iListType == SR_LIST_SKIP_FWD ? SR_LIST_FORWARD : SR_LIST_BACKWARD);
+   bDirectionFWD = iListType == SR_LIST_SKIP_FWD;
 
    if (thiswa->bReverseIndex) {
      bDirectionFWD = !bDirectionFWD;
@@ -225,7 +225,7 @@ static HB_ERRCODE getSeekWhereExpression(SQLEXAREA *thiswa, int iListType, int q
                CLOSE_QUALIFIER(thiswa));
             hb_xfree(temp);
          } else {
-            if (iCol == queryLevel && iListType == LIST_SKIP_FWD) {
+            if (iCol == queryLevel && iListType == SR_LIST_SKIP_FWD) {
                // This condition should create a WHERE clause like "COLUMN >= NULL".
                // Since this is not numeric, EVERYTHING is greater
                // or equal to NULL, so we do not add any restriction to WHERE clause.
@@ -279,7 +279,7 @@ HB_ERRCODE prepareSeekQuery(SQLEXAREA *thiswa, INDEXBIND *SeekBind)
     return HB_FAILURE;
   }
 
-  if (thiswa->recordListDirection == LIST_FORWARD) {
+  if (thiswa->recordListDirection == SR_LIST_FORWARD) {
     SeekBind->SeekFwdStmt = hPrep;
     memset(&SeekBind->SeekFwdSql, 0, PREPARED_SQL_LEN);
     hb_xmemcpy(SeekBind->SeekFwdSql, thiswa->sSql, PREPARED_SQL_LEN - 1);
@@ -313,8 +313,8 @@ bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel)
   // Check if stmt must be created or recreated
 
   if (thiswa->bConditionChanged2 || thiswa->bRebuildSeekQuery ||
-      (thiswa->recordListDirection == LIST_FORWARD && (!SeekBind->SeekFwdStmt)) ||
-      (thiswa->recordListDirection == LIST_BACKWARD && (!SeekBind->SeekBwdStmt))) {
+      (thiswa->recordListDirection == SR_LIST_FORWARD && (!SeekBind->SeekFwdStmt)) ||
+      (thiswa->recordListDirection == SR_LIST_BACKWARD && (!SeekBind->SeekBwdStmt))) {
 
     auto pIndexRef =
         hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
@@ -334,7 +334,7 @@ bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel)
     }
 
     getSeekWhereExpression(
-        thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD,
+        thiswa, thiswa->recordListDirection == SR_LIST_FORWARD ? SR_LIST_SKIP_FWD : SR_LIST_SKIP_BWD,
         queryLevel, &bUseOptimizerHints);
     SR_getOrderByExpression(thiswa, bUseOptimizerHints);
     SR_setResultSetLimit(thiswa, 1);
@@ -603,10 +603,10 @@ void SR_BindSeekStmt(SQLEXAREA *thiswa, int queryLevel)
   // removed, this line bellow make the data be the last field name
   // SeekBind += (queryLevel - 1); // place offset
 
-  hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt
+  hStmt = thiswa->recordListDirection == SR_LIST_FORWARD ? SeekBind->SeekFwdStmt
                                                       : SeekBind->SeekBwdStmt;
   sSql =
-      thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
+      thiswa->recordListDirection == SR_LIST_FORWARD ? SeekBind->SeekFwdSql : SeekBind->SeekBwdSql;
   SeekBindParam = thiswa->IndexBindings[thiswa->hOrdCurrent];
   iBind = 1;
 
@@ -694,7 +694,7 @@ HB_ERRCODE SR_getPreparedSeek(SQLEXAREA *thiswa, int queryLevel, HB_USHORT *iInd
   // SeekBind += (queryLevel - 1); // place offset
   HB_SYMBOL_UNUSED(queryLevel);
 
-  *hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt
+  *hStmt = thiswa->recordListDirection == SR_LIST_FORWARD ? SeekBind->SeekFwdStmt
                                                        : SeekBind->SeekBwdStmt;
 
   res = SQLExecute(*hStmt);
