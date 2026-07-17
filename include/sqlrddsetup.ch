@@ -85,7 +85,7 @@
 #define SR_ORD_DIR_BWD                    2
 #define SR_ORD_NATURAL                    3
 
-#define SQL_NULL_HSTMT                 0
+#define SR_SQL_NULL_HSTMT                 0
 
 // aIndexMgmnt array structure
 
