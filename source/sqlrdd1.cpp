@@ -231,7 +231,7 @@ static void readCachePageFWD(SQLAREA *thiswa)
   HB_ITEM pOrd{};
   // PHB_ITEM pDel = hb_itemNew(nullptr); (using stack instead of heap)
   HB_ITEM pDel{};
-  hb_itemPutNL(&pOrd, ORD_DIR_FWD);
+  hb_itemPutNL(&pOrd, SR_ORD_DIR_FWD);
   hb_itemPutL(&pDel, thiswa->wasdel);
   hb_objSendMessage(thiswa->oWorkArea, s_pSym_READPAGE, 2, &pOrd, &pDel);
   // hb_itemRelease(pOrd);
@@ -246,7 +246,7 @@ static void readCachePageBWD(SQLAREA *thiswa)
   HB_ITEM pOrd{};
   // PHB_ITEM pDel = hb_itemNew(nullptr); (using stack instead of heap)
   HB_ITEM pDel{};
-  hb_itemPutNL(&pOrd, ORD_DIR_BWD);
+  hb_itemPutNL(&pOrd, SR_ORD_DIR_BWD);
   hb_itemPutL(&pDel, thiswa->wasdel);
   hb_objSendMessage(thiswa->oWorkArea, s_pSym_READPAGE, 2, &pOrd, &pDel);
   // hb_itemRelease(pOrd);

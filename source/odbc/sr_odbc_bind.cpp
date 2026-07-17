@@ -84,8 +84,8 @@ typedef unsigned char SQLTCHAR;
 //#define AINFO_EOF 2 (unnecessary)
 //#define AINFO_BOF_AT 13 (unnecessary)
 //#define AINFO_EOF_AT 14 (unnecessary)
-#define ORD_DIR_FWD 1
-#define ORD_DIR_BWD 2
+#define SR_ORD_DIR_FWD 1
+#define SR_ORD_DIR_BWD 2
 
 //#define AINFO_NPOSCACHE 20 (unnecessary)
 
@@ -889,7 +889,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
       if (wReturn == SQL_ERROR) {
         break;
       }
-      if (ulDirect == static_cast<HB_ULONG>(ORD_DIR_FWD)) {
+      if (ulDirect == static_cast<HB_ULONG>(SR_ORD_DIR_FWD)) {
         hb_arraySet(pInfo, SR_AINFO_EOF_AT, pRec);
         hb_arraySetNL(pInfo, SR_AINFO_NCACHEEND, lPos);
       } else {
@@ -899,7 +899,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
       break;
     }
 
-    if (ulDirect == static_cast<HB_ULONG>(ORD_DIR_FWD)) {
+    if (ulDirect == static_cast<HB_ULONG>(SR_ORD_DIR_FWD)) {
       lPos++;
       if (lPos > (SR_CACHE_PAGE_SIZE * 3)) {
         lPos -= (SR_CACHE_PAGE_SIZE * 3);
