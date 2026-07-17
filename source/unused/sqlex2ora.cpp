@@ -888,7 +888,7 @@ HB_ERRCODE CreateUpdateStmtOra(SQLEXORAAREAP thiswa)
     pColumns = hb_arrayGetItemPtr(
         hb_arrayGetItemPtr(thiswa->sqlarea.aOrders,
                            static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent)),
-        INDEX_FIELDS);
+        SR_AINDEX_INDEX_FIELDS);
     thiswa->indexColumns = hb_arrayLen(pColumns);
 
     for (i = 1; i <= thiswa->indexColumns; i++) {

@@ -318,7 +318,7 @@ bool SR_CreateSeekStmt(SQLEXAREA *thiswa, int queryLevel)
 
     auto pIndexRef =
         hb_arrayGetItemPtr(thiswa->aOrders, static_cast<HB_ULONG>(thiswa->hOrdCurrent));
-    auto pColumns = hb_arrayGetItemPtr(pIndexRef, INDEX_FIELDS);
+    auto pColumns = hb_arrayGetItemPtr(pIndexRef, SR_AINDEX_INDEX_FIELDS);
     thiswa->indexColumns = static_cast<int>(hb_arrayLen(pColumns));
 
     // Free the statements we are about to recreate
