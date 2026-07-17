@@ -80,14 +80,14 @@ typedef unsigned char SQLTCHAR;
 #define SQL_FAKE_DATE -101
 #define SQL_FAKE_NUM -102
 
-#define AINFO_BOF 1
-#define AINFO_EOF 2
-#define AINFO_BOF_AT 13
-#define AINFO_EOF_AT 14
+//#define AINFO_BOF 1 (unnecessary)
+//#define AINFO_EOF 2 (unnecessary)
+//#define AINFO_BOF_AT 13 (unnecessary)
+//#define AINFO_EOF_AT 14 (unnecessary)
 #define ORD_DIR_FWD 1
 #define ORD_DIR_BWD 2
 
-#define AINFO_NPOSCACHE 20
+//#define AINFO_NPOSCACHE 20 (unnecessary)
 
 #ifndef HB_OS_WIN_32
 #ifndef SQL_GUID
@@ -858,7 +858,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
   auto pRec = hb_param(13, HB_IT_ANY);
   HB_LONG lPos = hb_parnl(14);
 
-  HB_ULONG ulPosCache = hb_arrayGetNL(pInfo, AINFO_NPOSCACHE);
+  HB_ULONG ulPosCache = hb_arrayGetNL(pInfo, SR_AINFO_NPOSCACHE);
 
   if (!pFields) {
     hb_errRT_BASE_SubstR(EG_ARG, 1111, nullptr, "SR_ODBCGETLINES", 3, hb_paramError(1),
@@ -890,11 +890,11 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
         break;
       }
       if (ulDirect == static_cast<HB_ULONG>(ORD_DIR_FWD)) {
-        hb_arraySet(pInfo, AINFO_EOF_AT, pRec);
-        hb_arraySetNL(pInfo, AINFO_NCACHEEND, lPos);
+        hb_arraySet(pInfo, SR_AINFO_EOF_AT, pRec);
+        hb_arraySetNL(pInfo, SR_AINFO_NCACHEEND, lPos);
       } else {
-        hb_arraySet(pInfo, AINFO_BOF_AT, pRec);
-        hb_arraySetNL(pInfo, AINFO_NCACHEBEGIN, lPos);
+        hb_arraySet(pInfo, SR_AINFO_BOF_AT, pRec);
+        hb_arraySetNL(pInfo, SR_AINFO_NCACHEBEGIN, lPos);
       }
       break;
     }
@@ -975,7 +975,7 @@ HB_FUNC_STATIC(SR_ODBCGETLINES)
       hb_arrayAdd(pFetch, pRec);
     }
   }
-  hb_arraySetNL(pInfo, AINFO_NPOSCACHE, ulPosCache);
+  hb_arraySetNL(pInfo, SR_AINFO_NPOSCACHE, ulPosCache);
   hb_xfree((PTR)bBuffer);
   hb_retnl(wReturn);
 }

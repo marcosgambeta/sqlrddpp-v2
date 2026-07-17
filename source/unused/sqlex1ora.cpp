@@ -174,7 +174,7 @@ static void sqlGetCleanBufferOra(SQLEXORAAREAP thiswa)
   hb_itemRelease(pCol);
 
   // fix lastrec() + 1
-  pCol = hb_arrayGetItemPtr(thiswa->sqlarea.aInfo, AINFO_RCOUNT);
+  pCol = hb_arrayGetItemPtr(thiswa->sqlarea.aInfo, SR_AINFO_RCOUNT);
   thiswa->lLastRec = hb_itemGetNL(pCol) + 1;
   thiswa->sqlarea.area.fEof = true;
 }
@@ -3195,10 +3195,10 @@ static HB_ERRCODE sqlExOraGoCold(SQLEXORAAREAP thiswa)
   if (thiswa->bufferHot) { // && (!(thiswa->sqlarea.ulhDeleted > 0 ? true :
                            // thiswa->deletedList[thiswa->recordListPos] == ' ') )
     if (thiswa->bHistoric) {
-      hb_arraySetL(thiswa->sqlarea.aInfo, AINFO_ISINSERT, thiswa->bIsInsert);
-      hb_arraySetL(thiswa->sqlarea.aInfo, AINFO_HOT, thiswa->bufferHot);
+      hb_arraySetL(thiswa->sqlarea.aInfo, SR_AINFO_ISINSERT, thiswa->bIsInsert);
+      hb_arraySetL(thiswa->sqlarea.aInfo, SR_AINFO_HOT, thiswa->bufferHot);
       if (!thiswa->bIsInsert) {
-        hb_arraySetNLL(thiswa->sqlarea.aInfo, AINFO_RECNO, GetCurrentRecordNumOra(thiswa));
+        hb_arraySetNLL(thiswa->sqlarea.aInfo, SR_AINFO_RECNO, GetCurrentRecordNumOra(thiswa));
       }
 
       return SUPER_GOCOLD(&thiswa->sqlarea.area); // Historic workareas are handled by xBase
@@ -3415,9 +3415,9 @@ static HB_ERRCODE sqlExOraRecCount(SQLEXORAAREAP thiswa, HB_ULONG *recCount)
   }
 
   if (thiswa->bIsInsert && thiswa->bufferHot) {
-    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->sqlarea.aInfo, AINFO_RCOUNT) + 1);
+    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->sqlarea.aInfo, SR_AINFO_RCOUNT) + 1);
   } else {
-    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->sqlarea.aInfo, AINFO_RCOUNT));
+    *recCount = static_cast<HB_ULONG>(hb_arrayGetNL(thiswa->sqlarea.aInfo, SR_AINFO_RCOUNT));
   }
 
   thiswa->lLastRec = (*recCount) + 1;
@@ -3740,7 +3740,7 @@ static HB_ERRCODE sqlExOraOrderListAdd(SQLEXORAAREAP thiswa, LPDBORDERINFO pOrde
     thiswa->lEofAt = 0;
     thiswa->indexLevel = -1;
     bOldReverseIndex = thiswa->bReverseIndex;
-    thiswa->bReverseIndex = hb_arrayGetL(thiswa->sqlarea.aInfo, AINFO_REVERSE_INDEX);
+    thiswa->bReverseIndex = hb_arrayGetL(thiswa->sqlarea.aInfo, SR_AINFO_REVERSE_INDEX);
   }
 
   return err;
@@ -3787,7 +3787,7 @@ static HB_ERRCODE sqlExOraOrderListFocus(SQLEXORAAREAP thiswa, LPDBORDERINFO pOr
                            static_cast<HB_ULONG>(thiswa->sqlarea.hOrdCurrent)),
         INDEX_FIELDS));
     bOldReverseIndex = thiswa->bReverseIndex;
-    thiswa->bReverseIndex = hb_arrayGetL(thiswa->sqlarea.aInfo, AINFO_REVERSE_INDEX);
+    thiswa->bReverseIndex = hb_arrayGetL(thiswa->sqlarea.aInfo, SR_AINFO_REVERSE_INDEX);
     if (thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent]) {
       hb_xfree(thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent]);
       thiswa->IndexBindings[thiswa->sqlarea.hOrdCurrent] = nullptr;
@@ -3834,7 +3834,7 @@ static HB_ERRCODE sqlExOraOrderCreate(SQLEXORAAREAP thiswa,
 
   if (err == HB_SUCCESS) {
     bOldReverseIndex = thiswa->bReverseIndex;
-    thiswa->bReverseIndex = hb_arrayGetL(thiswa->sqlarea.aInfo, AINFO_REVERSE_INDEX);
+    thiswa->bReverseIndex = hb_arrayGetL(thiswa->sqlarea.aInfo, SR_AINFO_REVERSE_INDEX);
   }
 
   return err;
@@ -3905,7 +3905,7 @@ static HB_ERRCODE sqlExOraOrderInfo(SQLEXORAAREAP thiswa, HB_USHORT uiIndex,
       uiError = SUPER_ORDINFO(&thiswa->sqlarea.area, uiIndex, pInfo);
       bOldReverseIndex = thiswa->bReverseIndex;
       thiswa->bReverseIndex = hb_arrayGetL(
-          thiswa->sqlarea.aInfo, AINFO_REVERSE_INDEX); // OrderInfo() may change this flag
+          thiswa->sqlarea.aInfo, SR_AINFO_REVERSE_INDEX); // OrderInfo() may change this flag
     }
     }
   } else {
@@ -4001,9 +4001,9 @@ static HB_ERRCODE sqlExOraLock(SQLEXORAAREAP thiswa, LPDBLOCKINFO pLockInfo)
     thiswa->sqlarea.firstinteract = false;
   }
 
-  hb_arraySetL(thiswa->sqlarea.aInfo, AINFO_BOF, thiswa->sqlarea.area.fBof);
-  hb_arraySetL(thiswa->sqlarea.aInfo, AINFO_EOF, thiswa->sqlarea.area.fEof);
-  hb_arraySetNLL(thiswa->sqlarea.aInfo, AINFO_RECNO, GetCurrentRecordNumOra(thiswa));
+  hb_arraySetL(thiswa->sqlarea.aInfo, SR_AINFO_BOF, thiswa->sqlarea.area.fBof);
+  hb_arraySetL(thiswa->sqlarea.aInfo, SR_AINFO_EOF, thiswa->sqlarea.area.fEof);
+  hb_arraySetNLL(thiswa->sqlarea.aInfo, SR_AINFO_RECNO, GetCurrentRecordNumOra(thiswa));
 
   return SUPER_LOCK(&thiswa->sqlarea.area, pLockInfo);
 }
@@ -4021,9 +4021,9 @@ static HB_ERRCODE sqlExOraUnLock(SQLEXORAAREAP thiswa, PHB_ITEM pRecNo)
     thiswa->sqlarea.firstinteract = false;
   }
 
-  hb_arraySetL(thiswa->sqlarea.aInfo, AINFO_BOF, thiswa->sqlarea.area.fBof);
-  hb_arraySetL(thiswa->sqlarea.aInfo, AINFO_EOF, thiswa->sqlarea.area.fEof);
-  hb_arraySetNLL(thiswa->sqlarea.aInfo, AINFO_RECNO, GetCurrentRecordNumOra(thiswa));
+  hb_arraySetL(thiswa->sqlarea.aInfo, SR_AINFO_BOF, thiswa->sqlarea.area.fBof);
+  hb_arraySetL(thiswa->sqlarea.aInfo, SR_AINFO_EOF, thiswa->sqlarea.area.fEof);
+  hb_arraySetNLL(thiswa->sqlarea.aInfo, SR_AINFO_RECNO, GetCurrentRecordNumOra(thiswa));
 
   return SUPER_UNLOCK(&thiswa->sqlarea.area, pRecNo);
 }
