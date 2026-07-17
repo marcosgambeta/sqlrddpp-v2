@@ -150,9 +150,8 @@
 #define SR_CACHEINFO_HNCOLPK             12
 #define SR_CACHEINFO_ANAMES_LOWER        13
 
-
-#define ORDER_TYPE_ASCEND              1
-#define ORDER_TYPE_DESASCEND           0
+#define SR_ORDER_TYPE_ASCEND              1
+#define SR_ORDER_TYPE_DESASCEND           0
 
 #define LIST_FROM_TOP                  0
 #define LIST_FROM_BOTTOM               1
