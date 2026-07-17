@@ -1478,7 +1478,7 @@ static HB_ERRCODE getPreparedRecordList(SQLEXAREA *thiswa,
       // Run query again and try to find it in result
       // set since it can be deleted by other user - MISSING!!!
       SQLFreeStmt(hStmt, SQL_CLOSE);
-      return HB_RETRY;
+      return SR_HB_RETRY;
     }
 
     if (CHECK_SQL_N_OK(res)) {
@@ -2840,7 +2840,7 @@ static HB_ERRCODE sqlExSkipRaw(SQLEXAREA *thiswa, HB_LONG lToSkip)
         SQLRDD::commonError(reinterpret_cast<AREAP>(thiswa), EG_ARG, ESQLRDD_READ,
                             thiswa->sTable.c_str());
         return HB_FAILURE;
-      } else if (res == HB_RETRY) {
+      } else if (res == SR_HB_RETRY) {
         if (lToSkip > 0) {
           sqlGetCleanBuffer(thiswa);
           break;
@@ -3057,7 +3057,7 @@ static HB_ERRCODE sqlExGetValue(SQLEXAREA *thiswa, HB_USHORT fieldNum, PHB_ITEM 
     char *bBuffer = const_cast<char *>(hb_itemGetCPtr(itemTemp)); // const char * to char *
     auto lLenBuff = static_cast<HB_LONG>(hb_itemGetCLen(itemTemp));
     PHB_ITEM pTemp;
-    if (lLenBuff > 10 && strncmp(bBuffer, SQL_SERIALIZED_SIGNATURE, 10) == 0 &&
+    if (lLenBuff > 10 && strncmp(bBuffer, SR_SQL_SERIALIZED_SIGNATURE, 10) == 0 &&
         (!sr_lSerializedAsString())) {
       if (s_pSym_SR_DESERIALIZE == nullptr) {
         s_pSym_SR_DESERIALIZE = hb_dynsymFindName("SR_DESERIALIZE");

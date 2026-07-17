@@ -1111,7 +1111,7 @@ METHOD SR_WORKAREA:LockTable(lCheck4ExcLock, lFLock)
    DEFAULT lCheck4ExcLock TO .T.
    DEFAULT lFLock TO .F.
 
-   FOR i := 1 TO LOCKTABLE_TRIES
+   FOR i := 1 TO SR_LOCKTABLE_TRIES
 
       IF lCheck4ExcLock
 
@@ -1863,7 +1863,7 @@ METHOD SR_WORKAREA:Quoted(uData, trim, nLen, nDec, nTargetDB, lSynthetic)
          RETURN ::Quoted(cRet, trim, nLen, nDec, nTargetDB)
       ENDIF
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN ::Quoted(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, trim, nLen, nDec, nTargetDB)
+      RETURN ::Quoted(SR_SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, trim, nLen, nDec, nTargetDB)
 
    ENDSWITCH
 
@@ -1933,7 +1933,7 @@ METHOD SR_WORKAREA:QuotedNull(uData, trim, nLen, nDec, nTargetDB, lNull, lMemo)
          RETURN "'" + DToS(uData) + "'"
       ENDIF
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN ::Quoted(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
+      RETURN ::Quoted(SR_SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
 
    CASE "T"
       IF Empty(uData)
@@ -1952,14 +1952,14 @@ METHOD SR_WORKAREA:QuotedNull(uData, trim, nLen, nDec, nTargetDB, lNull, lMemo)
          RETURN LTrim(Str(uData))
       ENDIF
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN ::Quoted(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
+      RETURN ::Quoted(SR_SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
 
    CASE "L"
       IF !lMemo
          RETURN IIf(uData, "true", "false")
       ENDIF
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN ::Quoted(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
+      RETURN ::Quoted(SR_SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
 
    SR_OTHERWISE
       IF HB_IsArray(uData) .AND. SR_SetSerializeArrayAsJson()
@@ -1967,7 +1967,7 @@ METHOD SR_WORKAREA:QuotedNull(uData, trim, nLen, nDec, nTargetDB, lNull, lMemo)
          RETURN ::Quoted(cRet, .F., , , nTargetDB)
       ENDIF
       cRet := SR_STRTOHEX(HB_Serialize(uData))
-      RETURN ::Quoted(SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
+      RETURN ::Quoted(SR_SQL_SERIALIZED_SIGNATURE + Str(Len(cRet), 10) + cRet, .F., , , nTargetDB)
 
    ENDSWITCH
 
@@ -2264,7 +2264,7 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
                IF lMemo .OR. lML
                   IF !HB_IsString(aBuffer[i])
                      cMemo := SR_STRTOHEX(HB_Serialize(aBuffer[i]))
-                     cMemo := SQL_SERIALIZED_SIGNATURE + Str(Len(cMemo), 10) + cMemo
+                     cMemo := SR_SQL_SERIALIZED_SIGNATURE + Str(Len(cMemo), 10) + cMemo
                   ELSE
                      cMemo := aBuffer[i]
                   ENDIF
@@ -2393,7 +2393,7 @@ METHOD SR_WORKAREA:WriteBuffer(lInsert, aBuffer)
 
          // Record should remain Locked
 
-         IF ::aInfo[AINFO_SHARED] .AND. Len(::aLocked) < MAXIMUN_LOCKS
+         IF ::aInfo[AINFO_SHARED] .AND. Len(::aLocked) < SR_MAXIMUN_LOCKS
             AAdd(::aLocked, aBuffer[::hnRecno])
          ENDIF
 
@@ -4252,8 +4252,8 @@ METHOD SR_WORKAREA:sqlCreate(aStruct, cFileName, cAlias, nArea)
       hb_HDelAt(::oSql:aTableInfo, nPos)
    ENDIF
 
-   IF Len(::cFileName) > MAX_TABLE_NAME_LENGHT
-      cTblName := subStr(::cFileName, 1, MAX_TABLE_NAME_LENGHT)
+   IF Len(::cFileName) > SR_MAX_TABLE_NAME_LENGHT
+      cTblName := subStr(::cFileName, 1, SR_MAX_TABLE_NAME_LENGHT)
       ::cFileName := cTblName
    ELSE
       cTblName := ::cFileName
@@ -4627,8 +4627,8 @@ METHOD SR_WORKAREA:sqlOpenArea(cFileName, nArea, lShared, lReadOnly, cAlias, nDB
          ::cFileName := SR_ParseFileName(aRet[TABLE_INFO_TABLE_NAME])
       ENDIF
 
-      IF Len(::cFileName) > MAX_TABLE_NAME_LENGHT
-         ::cFileName := subStr(::cFileName, 1, MAX_TABLE_NAME_LENGHT)
+      IF Len(::cFileName) > SR_MAX_TABLE_NAME_LENGHT
+         ::cFileName := subStr(::cFileName, 1, SR_MAX_TABLE_NAME_LENGHT)
       ENDIF
 
    ENDIF
@@ -4901,8 +4901,8 @@ METHOD SR_WORKAREA:CreateOrclFunctions(cOwner, cFileName)
    LOCAL cTblName
    LOCAL cSql
 
-   IF Len(cFileName) > MAX_TABLE_NAME_LENGHT
-      cTblName := subStr(cFileName, 1, MAX_TABLE_NAME_LENGHT)
+   IF Len(cFileName) > SR_MAX_TABLE_NAME_LENGHT
+      cTblName := subStr(cFileName, 1, SR_MAX_TABLE_NAME_LENGHT)
       cFileName := cTblName
    ELSE
       cTblName := cFileName
@@ -6315,9 +6315,9 @@ METHOD SR_WORKAREA:sqlLock(nType, uRecord)
       ASize(::aLocked, 0)
    ENDIF
 
-   // Sets the timeout to LOCK_TIMEOUT seconds
+   // Sets the timeout to SR_LOCK_TIMEOUT seconds
 
-   ::oSql:SetNextOpt(SQL_ATTR_QUERY_TIMEOUT, LOCK_TIMEOUT)
+   ::oSql:SetNextOpt(SQL_ATTR_QUERY_TIMEOUT, SR_LOCK_TIMEOUT)
 
    IF nType < 3
       IF ::oSql:Exec("SELECT * FROM " + ::cQualifiedTableName + ;
@@ -7993,8 +7993,8 @@ RETURN lOld
 
 STATIC FUNCTION LimitLen(cStr, nLen)
 
-   IF Len(cStr) > (MAX_TABLE_NAME_LENGHT - nLen)
-      RETURN SubStr(cStr, 1, MAX_TABLE_NAME_LENGHT - nLen)
+   IF Len(cStr) > (SR_MAX_TABLE_NAME_LENGHT - nLen)
+      RETURN SubStr(cStr, 1, SR_MAX_TABLE_NAME_LENGHT - nLen)
    ENDIF
 
 RETURN cStr
@@ -8116,7 +8116,7 @@ FUNCTION SR_Serialize1(uVal)
 
    LOCAL cMemo := SR_STRTOHEX(HB_Serialize(uVal))
 
-RETURN SQL_SERIALIZED_SIGNATURE + Str(Len(cMemo), 10) + cMemo
+RETURN SR_SQL_SERIALIZED_SIGNATURE + Str(Len(cMemo), 10) + cMemo
 
 //-------------------------------------------------------------------------------------------------------------------//
 
